@@ -1,0 +1,60 @@
+from httpx import AsyncClient, codes
+
+from app.main import app
+from app.models import User
+from app.tests.conftest import default_user_object, default_user_password
+
+
+async def test_auth_access_token(client: AsyncClient, default_user: User):
+    response = await client.post(
+        app.url_path_for("login_access_token"),
+        data={
+            "username": default_user_object.RCSID,
+            "password": default_user_password,
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    assert response.status_code == codes.OK
+    token = response.json()
+    assert token["token_type"] == "Bearer"
+    assert "access_token" in token
+    assert "expires_at" in token
+    assert "issued_at" in token
+
+
+async def test_auth_access_token_fail_no_user(client: AsyncClient):
+    response = await client.post(
+        app.url_path_for("login_access_token"),
+        data={
+            "username": "xxx",
+            "password": "yyy",
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+
+    assert response.status_code == codes.BAD_REQUEST
+    assert response.json() == {"detail": "Incorrect email or password"}
+
+
+async def test_auth_refresh_token(client: AsyncClient, default_user: User):
+    response = await client.post(
+        app.url_path_for("login_access_token"),
+        data={
+            "username": default_user_object.RCSID,
+            "password": default_user_password,
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+
+    new_token_response = await client.post(
+        app.url_path_for("refresh_token")
+    )
+    assert new_token_response.status_code == codes.OK
+    token = new_token_response.json()
+    assert token["token_type"] == "Bearer"
+    assert "access_token" in token
+    assert "expires_at" in token
+    assert "issued_at" in token
+    assert "refresh_token" in token
+    assert "refresh_token_expires_at" in token
+    assert "refresh_token_issued_at" in token
