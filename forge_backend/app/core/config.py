@@ -29,7 +29,7 @@ from typing import Literal
 from pydantic import AnyHttpUrl, EmailStr, PostgresDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-PROJECT_DIR = Path(__file__).parent.parent.parent
+PROJECT_DIR = Path(__file__).parent.parent.parent.parent
 with open(f"{PROJECT_DIR}/pyproject.toml", "rb") as f:
     PYPROJECT_CONTENT = tomllib.load(f)["tool"]["poetry"]
 
@@ -56,11 +56,11 @@ class Settings(BaseSettings):
     DEFAULT_DATABASE_DB: str
 
     # POSTGRESQL TEST DATABASE
-    TEST_DATABASE_HOSTNAME: str = "postgres"
-    TEST_DATABASE_USER: str = "postgres"
-    TEST_DATABASE_PASSWORD: str = "postgres"
-    TEST_DATABASE_PORT: int = 5432
-    TEST_DATABASE_DB: str = "postgres"
+    TEST_DATABASE_HOSTNAME: str
+    TEST_DATABASE_USER: str
+    TEST_DATABASE_PASSWORD: str
+    TEST_DATABASE_PORT: int
+    TEST_DATABASE_DB: str
 
     # FIRST SUPERUSER
     FIRST_SUPERUSER_EMAIL: EmailStr

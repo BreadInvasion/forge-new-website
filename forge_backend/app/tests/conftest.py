@@ -12,6 +12,7 @@ from app.core import config, security
 from app.core.session import async_engine, async_session
 from app.main import app
 from app.models import Base, User, PronounType
+from app.schemas.enums import GenderType
 
 default_user_password = "welcometothefroge"
 default_user_object = User(
@@ -20,8 +21,8 @@ default_user_object = User(
     first_name="Mark",
     last_name="Haddleton",
     major="Computer Science",
-    pronoun_A=PronounType.MASCULINE,
-    pronoun_B=PronounType.MASCULINE,
+    gender_identity=GenderType.MALE,
+    pronouns=PronounType.HE_HIM,
     hashed_password=security.get_password_hash(SecretStr(default_user_password)),
 )
 default_user_access_token = security.create_jwt_token(

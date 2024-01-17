@@ -47,9 +47,18 @@ def create_jwt_token(subject: str | int, exp_secs: int) -> tuple[str, int, int]:
     )
     return encoded_jwt, expires_at, issued_at
 
+
 def create_token_response(subject: str) -> AccessTokenResponse:
-    token, expires_at, issued_at = create_jwt_token(subject=subject, exp_secs=ACCESS_TOKEN_EXPIRE_SECS)
-    return AccessTokenResponse(token_type="bearer", access_token=token, expires_at=expires_at, issued_at=issued_at)
+    token, expires_at, issued_at = create_jwt_token(
+        subject=subject, exp_secs=ACCESS_TOKEN_EXPIRE_SECS
+    )
+    return AccessTokenResponse(
+        token_type="bearer",
+        access_token=token,
+        expires_at=expires_at,
+        issued_at=issued_at,
+    )
+
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verifies plain and hashed password matches

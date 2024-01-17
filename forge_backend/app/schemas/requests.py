@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import UUID4, BaseModel, EmailStr, SecretStr
 
 from app.schemas.enums import GenderType, PronounType
@@ -26,32 +27,48 @@ class UserCreateRequest(BaseRequest):
     genderIdentity: GenderType
 
     # Pronouns
-    pronounA: PronounType
-    pronounB: PronounType
-    
+    pronouns: PronounType
+
     # Password
     password: SecretStr
+
 
 class UserChangeNameRequest(BaseRequest):
     firstName: str
     lastName: str
 
+
 class UserChangePronounsRequest(BaseRequest):
-    pronounA: PronounType
-    pronounB: PronounType
+    pronouns: PronounType
+
 
 class UserChangeDetailsRequest(BaseRequest):
     major: str
     genderIdentity: GenderType
 
+
 class MachineUsageMaterial(BaseModel):
-    slot_id: UUID4 # The slot being filled by this material choice
-    material_id: UUID4 # The material chosen to fill the slot
-    quantity: float # The amount of the material being used (in whatever the chosen material's units are)
+    slot_id: UUID4  # The slot being filled by this material choice
+    material_id: UUID4  # The material chosen to fill the slot
+    quantity: float  # The amount of the material being used (in whatever the chosen material's units are)
+    is_own_material: bool  # The material being used belongs to the user
+
 
 class MachineUsageRequest(BaseRequest):
     machine_id: UUID4
 
-    duration: int # Duration in minutes
+    duration: int  # Duration in minutes
 
-    materials: 
+    materials: List[MachineUsageMaterial]
+
+    is_for_class: bool
+    is_reprint: bool
+
+
+class ClearMachineRequest(BaseRequest):
+    machine_id: UUID4
+
+
+class FailMachineRequest(BaseRequest):
+    machine_id: UUID4
+    reason: str

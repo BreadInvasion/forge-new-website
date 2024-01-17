@@ -1,4 +1,5 @@
-from enum import Enum
+from enum import Enum, StrEnum
+
 
 class GenderType(Enum):
     OTHER = 0
@@ -7,14 +8,18 @@ class GenderType(Enum):
     NOTDISCLOSED = 3
 
 
-class PronounType(Enum):
-    NEUTRAL = 0
-    MASCULINE = 1
-    FEMININE = 2
-    ALL = 3
-    NONE = 4
+class PronounType(StrEnum):
+    NOT_SHOWN = "not_shown"
+    THEY_THEM = "they_them"
+    HE_HIM = "he_him"
+    SHE_HER = "she_her"
+    HE_THEY = "he_they"
+    SHE_THEY = "she_they"
+    ALL_ANY = "all_any"
+    JUST_USE_MY_NAME = "use_name"
+
 
 class MachineUsageStatus(Enum):
-    IN_PROGRESS = 0
-    COMPLETED = 1
+    ACTIVE = 0
+    CLEARED = 1
     FAILED = 2
