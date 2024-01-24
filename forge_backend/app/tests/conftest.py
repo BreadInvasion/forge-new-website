@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import AsyncGenerator
+from copy import copy
 from pydantic import SecretStr
 
 import pytest
@@ -7,12 +8,13 @@ import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core import config, security
 from app.core.session import async_engine, async_session
 from app.main import app
-from app.models import Base, User, PronounType
-from app.schemas.enums import GenderType
+from app.models import Base, Role, User, PronounType
+from app.schemas.enums import GenderType, Permissions
 
 default_user_password = "welcometothefroge"
 default_user_object = User(
@@ -70,16 +72,71 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
 @pytest_asyncio.fixture
 async def default_user(test_db_setup_sessionmaker) -> User:
     async with async_session() as session:
-        result = await session.execute(
+        user = await session.scalar(
             select(User).where(User.RCSID == default_user_object.RCSID)
         )
-        user = result.scalars().first()
         if user is None:
-            session.add(default_user_object)
+            user = User(
+                RCSID=default_user_object.RCSID,
+                RIN=default_user_object.RIN,
+                first_name=default_user_object.first_name,
+                last_name=default_user_object.last_name,
+                major=default_user_object.major,
+                gender_identity=default_user_object.gender_identity,
+                pronouns=default_user_object.pronouns,
+                hashed_password=default_user_object.hashed_password,
+                is_graduating=False,
+                is_rpi_staff=False,
+                active=False,
+            )
+            session.add(user)
             await session.commit()
-            await session.refresh(default_user_object)
-            return default_user_object
+            await session.refresh(user)
         return user
+
+
+@pytest_asyncio.fixture
+async def default_superuser(default_user: User, session: AsyncSession) -> User:
+    user = (
+        await session.scalars(
+            select(User)
+            .where(User.id == default_user.id)
+            .options(selectinload(User.roles))
+        )
+    ).one()
+    role = Role(
+        name="god",
+        permissions={Permissions.IS_SUPERUSER},
+        inverse_permissions=set(),
+        display_role=False,
+        priority=100,
+    )
+    session.add(role)
+    user.roles = [role]
+    await session.commit()
+    return default_user
+
+
+@pytest_asyncio.fixture
+async def default_user_with_use_machine(default_user) -> User:
+    async with async_session() as session:
+        role = Role(name="test", permissions={Permissions.CAN_USE_MACHINES})
+        session.add(role)
+        session.add(default_user)
+        default_user.roles = [role]
+        await session.commit()
+        return default_user
+
+
+@pytest_asyncio.fixture
+async def default_user_with_clear_machine(default_user) -> User:
+    async with async_session() as session:
+        role = Role(name="test", permissions={Permissions.CAN_CLEAR_MACHINES})
+        session.add(role)
+        session.add(default_user)
+        default_user.roles = [role]
+        await session.commit()
+        return default_user
 
 
 @pytest.fixture

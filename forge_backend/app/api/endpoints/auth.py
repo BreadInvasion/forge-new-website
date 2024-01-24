@@ -10,6 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api import deps
 from app.core import config, security
 from app.models import User
+from app.schemas.enums import PERMISSIONS_NONE, Permissions
+from app.api import utils
 
 router = APIRouter()
 
@@ -30,13 +32,18 @@ async def login_access_token(
     if not security.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
+    if await utils.has_permission(session, user.id, Permissions.LOCKOUT):
+        raise HTTPException(
+            status_code=403, detail="User access has been disabled by an administrator"
+        )
+
     return security.create_token_response(user.RCSID)
 
 
 @router.post("/refresh")
 async def refresh_token(
     session: AsyncSession = Depends(deps.get_session),
-    current_user: User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.PermittedUserChecker(PERMISSIONS_NONE)),
 ):
     """OAuth2 compatible token, get a new access token for the currently active user"""
 
