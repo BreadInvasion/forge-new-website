@@ -1,0 +1,115 @@
+[
+    {
+        "name": "Mark Haddleton",
+        "day": "Monday",
+        "startTime": "09:30",
+        "endTime": "10:00",
+        "level": "ADMIN"
+    },
+    {
+        "name": "Saad Mujahid",
+        "day": "Tuesday",
+        "startTime": "12:00",
+        "endTime": "14:00",
+        "level": "ADMIN"
+    },
+    {
+        "name": "Will",
+        "day": "Wednesday",
+        "startTime": "09:00",
+        "endTime": "11:00",
+        "level": "FORGE1"
+    },
+    {
+        "name": "Luke",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "13:00",
+        "level": "FORGE1"
+    },
+    {
+        "name": "Mario",
+        "day": "Wednesday",
+        "startTime": "10:00",
+        "endTime": "12:00",
+        "level": "FORGE1"
+    },
+    {
+        "name": "Kev",
+        "day": "Wednesday",
+        "startTime": "12:00",
+        "endTime": "14:00",
+        "level": "FORGE1"
+    },
+    {
+        "name": "Milo",
+        "day": "Wednesday",
+        "startTime": "12:00",
+        "endTime": "14:00",
+        "level": "FORGE1"
+    }
+    ,
+    {
+        "name": "Maya",
+        "day": "Wednesday",
+        "startTime": "13:00",
+        "endTime": "15:00",
+        "level": "FORGE1"
+    },
+    {
+        "name": "Alexa",
+        "day": "Wednesday",
+        "startTime": "14:00",
+        "endTime": "16:00",
+        "level": "FORGE1"
+    },
+    {
+        "name": "Andrew K",
+        "day": "Wednesday",
+        "startTime": "14:00",
+        "endTime": "15:00",
+        "level": "MANAGER"
+    },
+    {
+        "name": "Andrew M",
+        "day": "Wednesday",
+        "startTime": "14:00",
+        "endTime": "15:00",
+        "level": "MANAGER"
+    },
+    {
+        "name": "Bill",
+        "day": "Wednesday",
+        "startTime": "14:00",
+        "endTime": "15:00",
+        "level": "FORGE2"
+    },
+    {
+        "name": "Jacob",
+        "day": "Wednesday",
+        "startTime": "15:00",
+        "endTime": "18:00",
+        "level": "FORGE2"
+    },
+    {
+        "name": "James",
+        "day": "Wednesday",
+        "startTime": "15:00",
+        "endTime": "17:00",
+        "level": "ADMIN"
+    },
+    {
+        "name": "Ryan",
+        "day": "Wednesday",
+        "startTime": "16:00",
+        "endTime": "18:00",
+        "level": "FORGE1"
+    },
+    {
+        "name": "Zach",
+        "day": "Wednesday",
+        "startTime": "17:00",
+        "endTime": "18:00",
+        "level": "FORGE2"
+    }
+]

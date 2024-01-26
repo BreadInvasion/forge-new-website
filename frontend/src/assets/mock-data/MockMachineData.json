@@ -1,0 +1,72 @@
+[
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Alpha",
+        "status": "success",
+        "user": "Thomas Byrne",
+        "start": "1694966400000",
+        "end": "1694974920000"
+    },
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Beta",
+        "status": "busy",
+        "user": "Thomas Byrne",
+        "start": "1694966400000",
+        "end": "1694996520000"
+    },
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Gamma",
+        "status": "failed",
+        "user": "Thomas Byrne",
+        "start": "1694966400000",
+        "end": "1694996520000"
+    },
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Delta",
+        "status": "broken"
+    },
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Epsilon",
+        "status": "idle"
+    },
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Theta",
+        "status": "idle"
+    },
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Iota",
+        "status": "idle"
+    },
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Lambda",
+        "status": "idle"
+    },
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Mu",
+        "status": "idle"
+    },
+
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Sigma",
+        "status": "idle"
+    },
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Phi",
+        "status": "idle"
+    },
+    {
+        "machineType": "Prusa i3 MK3",
+        "machineName": "Omega",
+        "status": "idle"
+    }
+]

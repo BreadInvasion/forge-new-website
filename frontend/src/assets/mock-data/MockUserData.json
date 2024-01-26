@@ -1,0 +1,373 @@
+[
+    {
+        "RCSid": "leej",
+        "RIN": "660102096",
+        "firstName": "Joshua",
+        "lastName": "Lee",
+        "email": "leej@rpi.edu",
+        "password": "password",
+        "active": true,
+        "groups": [
+            "user",
+            "staff"
+        ],
+        "dateCreated": "2022-01-24T12:00:00Z",
+        "lastLogin": "2022-01-09T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "THU10:30-THU13:30"
+        ]
+    },
+    {
+        "RCSid": "bailek",
+        "RIN": "665902548",
+        "firstName": "Karen",
+        "lastName": "Bailey",
+        "email": "bailek@rpi.edu",
+        "password": "password",
+        "active": true,
+        "groups": [
+            "staff"
+        ],
+        "dateCreated": "2022-01-07T12:00:00Z",
+        "lastLogin": "2022-01-25T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "FRI10:30-FRI13:30"
+        ]
+    },
+    {
+        "RCSid": "rodrij",
+        "RIN": "664271176",
+        "firstName": "Julie",
+        "lastName": "Rodriguez",
+        "email": "rodrij@rpi.edu",
+        "password": "password",
+        "active": false,
+        "groups": [
+            "admin",
+            "manager"
+        ],
+        "dateCreated": "2022-01-06T12:00:00Z",
+        "lastLogin": "2022-01-12T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "TUE09:30-TUE11:30"
+        ]
+    },
+    {
+        "RCSid": "stonej",
+        "RIN": "663248873",
+        "firstName": "Juan",
+        "lastName": "Stone",
+        "email": "stonej@rpi.edu",
+        "password": "password",
+        "active": false,
+        "groups": [
+            "volunteer",
+            "admin"
+        ],
+        "dateCreated": "2022-01-03T12:00:00Z",
+        "lastLogin": "2022-01-14T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "MON10:00-MON12:30"
+        ]
+    },
+    {
+        "RCSid": "lams",
+        "RIN": "666175990",
+        "firstName": "Sarah",
+        "lastName": "Lam",
+        "email": "lams@rpi.edu",
+        "password": "password",
+        "active": false,
+        "groups": [
+            "staff",
+            "volunteer"
+        ],
+        "dateCreated": "2022-01-26T12:00:00Z",
+        "lastLogin": "2022-01-31T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "TUE12:00-TUE14:30"
+        ]
+    },
+    {
+        "RCSid": "moorem",
+        "RIN": "667562263",
+        "firstName": "Michael",
+        "lastName": "Moore",
+        "email": "moorem@rpi.edu",
+        "password": "password",
+        "active": true,
+        "groups": [
+            "organization"
+        ],
+        "dateCreated": "2022-01-12T12:00:00Z",
+        "lastLogin": "2022-01-13T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "WED09:30-WED12:30"
+        ]
+    },
+    {
+        "RCSid": "randob",
+        "RIN": "664348509",
+        "firstName": "Brooke",
+        "lastName": "Randolph",
+        "email": "randob@rpi.edu",
+        "password": "password",
+        "active": false,
+        "groups": [
+            "volunteer"
+        ],
+        "dateCreated": "2022-01-02T12:00:00Z",
+        "lastLogin": "2022-01-23T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "TUE11:30-TUE13:30"
+        ]
+    },
+    {
+        "RCSid": "rodrim",
+        "RIN": "662401904",
+        "firstName": "Michael",
+        "lastName": "Rodriguez",
+        "email": "rodrim@rpi.edu",
+        "password": "password",
+        "active": false,
+        "groups": [
+            "staff",
+            "manager"
+        ],
+        "dateCreated": "2022-01-27T12:00:00Z",
+        "lastLogin": "2022-01-18T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "WED12:00-WED14:30"
+        ]
+    },
+    {
+        "RCSid": "lutzk",
+        "RIN": "661298124",
+        "firstName": "Kimberly",
+        "lastName": "Lutz",
+        "email": "lutzk@rpi.edu",
+        "password": "password",
+        "active": true,
+        "groups": [
+            "staff",
+            "admin"
+        ],
+        "dateCreated": "2022-01-20T12:00:00Z",
+        "lastLogin": "2022-01-26T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "FRI09:00-FRI11:00"
+        ]
+    },
+    {
+        "RCSid": "meyerk",
+        "RIN": "669375632",
+        "firstName": "Karen",
+        "lastName": "Meyer",
+        "email": "meyerk@rpi.edu",
+        "password": "password",
+        "active": false,
+        "groups": [
+            "manager",
+            "admin"
+        ],
+        "dateCreated": "2022-01-18T12:00:00Z",
+        "lastLogin": "2022-01-25T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "MON11:00-MON13:30"
+        ]
+    },
+    {
+        "RCSid": "carrs",
+        "RIN": "664914454",
+        "firstName": "Sara",
+        "lastName": "Carr",
+        "email": "carrs@rpi.edu",
+        "password": "password",
+        "active": false,
+        "groups": [
+            "manager",
+            "user"
+        ],
+        "dateCreated": "2022-01-16T12:00:00Z",
+        "lastLogin": "2022-01-08T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "TUE11:30-TUE13:30"
+        ]
+    },
+    {
+        "RCSid": "youngd",
+        "RIN": "664477311",
+        "firstName": "David",
+        "lastName": "Young",
+        "email": "youngd@rpi.edu",
+        "password": "password",
+        "active": true,
+        "groups": [
+            "volunteer",
+            "user"
+        ],
+        "dateCreated": "2022-01-31T12:00:00Z",
+        "lastLogin": "2022-01-15T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "WED11:00-WED13:30"
+        ]
+    },
+    {
+        "RCSid": "collib",
+        "RIN": "669871698",
+        "firstName": "Brett",
+        "lastName": "Collins",
+        "email": "collib@rpi.edu",
+        "password": "password",
+        "active": true,
+        "groups": [
+            "manager"
+        ],
+        "dateCreated": "2022-01-16T12:00:00Z",
+        "lastLogin": "2022-01-01T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "WED09:30-WED11:30"
+        ]
+    },
+    {
+        "RCSid": "doyled",
+        "RIN": "660731317",
+        "firstName": "Dylan",
+        "lastName": "Doyle",
+        "email": "doyled@rpi.edu",
+        "password": "password",
+        "active": false,
+        "groups": [
+            "organization"
+        ],
+        "dateCreated": "2022-01-01T12:00:00Z",
+        "lastLogin": "2022-01-27T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "THU11:00-THU12:30"
+        ]
+    },
+    {
+        "RCSid": "waship",
+        "RIN": "663928335",
+        "firstName": "Peter",
+        "lastName": "Washington",
+        "email": "waship@rpi.edu",
+        "password": "password",
+        "active": false,
+        "groups": [
+            "staff"
+        ],
+        "dateCreated": "2022-01-10T12:00:00Z",
+        "lastLogin": "2022-01-30T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "TUE09:30-TUE11:30"
+        ]
+    },
+    {
+        "RCSid": "martir",
+        "RIN": "664929640",
+        "firstName": "Robert",
+        "lastName": "Martinez",
+        "email": "martir@rpi.edu",
+        "password": "password",
+        "active": true,
+        "groups": [
+            "staff",
+            "admin"
+        ],
+        "dateCreated": "2022-01-26T12:00:00Z",
+        "lastLogin": "2022-01-19T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "MON10:00-MON12:30"
+        ]
+    },
+    {
+        "RCSid": "kellew",
+        "RIN": "662263945",
+        "firstName": "William",
+        "lastName": "Kelley",
+        "email": "kellew@rpi.edu",
+        "password": "password",
+        "active": true,
+        "groups": [
+            "manager"
+        ],
+        "dateCreated": "2022-01-07T12:00:00Z",
+        "lastLogin": "2022-01-14T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "MON10:30-MON13:00"
+        ]
+    },
+    {
+        "RCSid": "penak",
+        "RIN": "664825769",
+        "firstName": "Kyle",
+        "lastName": "Pena",
+        "email": "penak@rpi.edu",
+        "password": "password",
+        "active": true,
+        "groups": [
+            "organization"
+        ],
+        "dateCreated": "2022-01-31T12:00:00Z",
+        "lastLogin": "2022-01-13T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "WED09:30-WED12:30"
+        ]
+    },
+    {
+        "RCSid": "valens",
+        "RIN": "666346206",
+        "firstName": "Seth",
+        "lastName": "Valentine",
+        "email": "valens@rpi.edu",
+        "password": "password",
+        "active": false,
+        "groups": [
+            "volunteer"
+        ],
+        "dateCreated": "2022-01-24T12:00:00Z",
+        "lastLogin": "2022-01-30T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "MON10:00-MON11:30"
+        ]
+    },
+    {
+        "RCSid": "riverr",
+        "RIN": "668186912",
+        "firstName": "Robert",
+        "lastName": "Rivera",
+        "email": "riverr@rpi.edu",
+        "password": "password",
+        "active": false,
+        "groups": [
+            "volunteer",
+            "manager"
+        ],
+        "dateCreated": "2022-01-17T12:00:00Z",
+        "lastLogin": "2022-01-15T12:00:00Z",
+        "usages": [],
+        "hours": [
+            "TUE09:30-TUE12:30"
+        ]
+    }
+]

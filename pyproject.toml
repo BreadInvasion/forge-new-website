@@ -1,7 +1,7 @@
 [tool.poetry]
 authors = ["Mark Haddleton <markwhaddleton@gmail.com>"]
 description = "Forge @ RPI Backend."
-name = "forge_backend"
+name = "backend"
 version = "0.1.0-alpha"
 
 [tool.poetry.dependencies]
