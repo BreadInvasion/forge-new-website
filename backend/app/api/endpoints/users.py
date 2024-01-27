@@ -124,12 +124,12 @@ async def register_new_user(
     session: AsyncSession = Depends(deps.get_session),
 ):
     """Create new user"""
-    result = await session.execute(select(User).where(User.RCSID == new_user.RCSID))
-    if result.scalars().first() is not None:
+    result = await session.scalar(select(User).where(User.RCSID == new_user.RCSID))
+    if result is not None:
         raise HTTPException(status_code=409, detail="RCSID is in use")
 
-    result = await session.execute(select(User).where(User.RIN == new_user.RIN))
-    if result.scalars().first() is not None:
+    result = await session.scalar(select(User).where(User.RIN == new_user.RIN))
+    if result is not None:
         raise HTTPException(status_code=409, detail="RIN is already in use")
 
     user = User(
