@@ -1,40 +1,39 @@
 version: "3.7"
 
-# For local development, only database is running
+# Database + Webserver (under http, for testing setup on localhost:80)
 #
-# docker-compose up -d
-# uvicorn app.main:app --reload
+# docker-compose -f docker-compose.dev.yml up -d
 #
 
 services:
-  default_database:
+  postgres:
     restart: unless-stopped
     image: postgres:latest
     volumes:
-      - default_database_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=${DEFAULT_DATABASE_DB}
-      - POSTGRES_USER=${DEFAULT_DATABASE_USER}
-      - POSTGRES_PASSWORD=${DEFAULT_DATABASE_PASSWORD}
+      - postgres_data:/var/lib/postgresql/data
     env_file:
       - ./database/.env.dev
-    ports:
-      - "${DEFAULT_DATABASE_PORT}:5432"
-
-  test_database:
-    restart: unless-stopped
-    image: postgres:latest
-    volumes:
-      - test_database_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=${TEST_DATABASE_DB}
-      - POSTGRES_USER=${TEST_DATABASE_USER}
-      - POSTGRES_PASSWORD=${TEST_DATABASE_PASSWORD}
+  backend:
+    depends_on:
+      - postgres
+    restart: "unless-stopped"
+    build: ./backend
     env_file:
-      - ./database/.env.test
+      - ./backend/.env
+    environment:
+      - DEFAULT_DATABASE_HOSTNAME=postgres
+      - DEFAULT_DATABASE_PORT=5432
+    volumes:
+      - ./backend/app:/build/app
+  frontend:
+    restart: unless-stopped
+    build: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     ports:
-      - "${TEST_DATABASE_PORT}:5432"
+      - "3000:3000"
+      - "3010:3010"
 
 volumes:
-  test_database_data:
-  default_database_data:
+  postgres_data:

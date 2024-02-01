@@ -1,8 +1,9 @@
-FROM node:18.17
+FROM node:alpine
 
-WORKDIR /app
-COPY ./package*.json /app/.
-RUN npm install --loglevel verbose
+WORKDIR /app 
+COPY . /app 
+RUN yarn install 
+
 EXPOSE 3000 3010
 
-CMD ["npm", "start"]
+CMD ["yarn", "start"]

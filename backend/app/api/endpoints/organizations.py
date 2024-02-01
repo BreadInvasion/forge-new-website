@@ -22,7 +22,19 @@ from app.schemas.requests import (
     MaterialEditRequest,
     MaterialDeleteRequest,
     MaterialGetRequest,
+    OrgCreateRequest,
 )
 from app.schemas.enums import Permissions
 
 router = APIRouter()
+
+
+@router.post("/orgs/create")
+def create_org(
+    request: OrgCreateRequest,
+    session: AsyncSession = Depends(deps.get_session),
+    current_user: User = Depends(
+        deps.PermittedUserChecker({Permissions.CAN_CREATE_ORGS})
+    ),
+):
+    pass

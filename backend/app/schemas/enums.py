@@ -51,13 +51,12 @@ class Permissions(StrEnum):
     # administrative actions, which should not be available
     # to most people.
 
+    # We want organizations to be invite-only, so only certain staff should be able to create them
+    CAN_CREATE_ORGS = "canCreateOrgs"
+
     # For changing core data of other users, that are too dangerous
     # to allow a user to freely change (RCSID and RIN)
     CAN_EDIT_USER_CORE_INFO = "canEditUserCoreInfo"
-
-    # For deleting users. Should be very restricted, as deleted
-    # users will not appear in charge sheets!
-    CAN_DELETE_USERS = "canDeleteUsers"
 
     # For creating new material representations
     CAN_SEE_MATERIALS = "canSeeMaterials"

@@ -196,3 +196,9 @@ class RoleDeleteRequest(BaseRequest):
 class UserAddRoleRequest(BaseRequest):
     user_id: UUID4
     role_id: UUID4
+
+
+class OrgCreateRequest(BaseRequest):
+    username: str
+    name: str
+    email: EmailStr

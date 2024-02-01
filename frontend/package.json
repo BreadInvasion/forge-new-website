@@ -51,5 +51,8 @@
   "devDependencies": {
     "@types/three": "^0.159.0",
     "@types/uuid": "^9.0.7"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.9.5"
   }
 }

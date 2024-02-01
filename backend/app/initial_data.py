@@ -6,28 +6,31 @@ By default `main` create a superuser if not exists
 """
 
 import asyncio
+from pydantic import SecretStr
 
 from sqlalchemy import select
 
 from app.core import config, security
 from app.core.session import async_session
 from app.models import User
+from app.schemas.enums import GenderType, PronounType
 
 
 async def main() -> None:
     print("Start initial data")
     async with async_session() as session:
-        result = await session.execute(
-            select(User).where(User.email == config.settings.FIRST_SUPERUSER_EMAIL)
-        )
-        user = result.scalars().first()
+        user = await session.scalar(select(User).where(User.RCSID == "haddlm"))
 
-        if user is None:
+        if not user:
             new_superuser = User(
-                email=config.settings.FIRST_SUPERUSER_EMAIL,
-                hashed_password=security.get_password_hash(
-                    config.settings.FIRST_SUPERUSER_PASSWORD
-                ),
+                RCSID="haddlm",
+                RIN="662012578",
+                first_name="Mark",
+                last_name="Haddleton",
+                major="Computer Science",
+                gender_identity=GenderType.MALE,
+                pronouns=PronounType.HE_HIM,
+                hashed_password=security.get_password_hash(SecretStr("12345")),
             )
             session.add(new_superuser)
             await session.commit()

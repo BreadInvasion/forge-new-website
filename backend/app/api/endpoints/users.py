@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.api import deps
 from app.core.security import get_password_hash
@@ -210,9 +211,7 @@ async def change_user_RIN(
 async def delete_user(
     request: UserDeleteRequest,
     session: AsyncSession = Depends(deps.get_session),
-    current_user: User = Depends(
-        deps.PermittedUserChecker({Permissions.CAN_DELETE_USERS})
-    ),
+    current_user: User = Depends(deps.PermittedUserChecker({Permissions.IS_SUPERUSER})),
 ):
     """Deletes target user."""
 
@@ -234,7 +233,9 @@ async def add_role_to_user(
         deps.PermittedUserChecker({Permissions.CAN_CHANGE_USER_ROLES})
     ),
 ):
-    user = await session.scalar(select(User).where(User.id == request.user_id))
+    user = await session.scalar(
+        select(User).where(User.id == request.user_id).options(selectinload(User.roles))
+    )
     if not user:
         raise HTTPException(status_code=404, detail="User with provided ID not found")
 
@@ -252,3 +253,19 @@ async def add_role_to_user(
             status_code=403,
             detail="Roles with restricted-level permissions may only be added or removed by a superuser",
         )
+
+    if utils.has_permissions_any(
+        session, user.id, {Permissions.IS_SUPERUSER, Permissions.ROLE_CHANGE_IMMUNE}
+    ) and not await utils.has_permission(
+        session, current_user.id, Permissions.IS_SUPERUSER
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="This user possesses permissions that protect them from role adjustments by non-superusers",
+        )
+
+    if role in user.roles:
+        raise HTTPException(status_code=409, detail="User already has provided role")
+
+    user.roles.append(role)
+    await session.commit()

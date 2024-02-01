@@ -29,10 +29,6 @@ from typing import Literal
 from pydantic import AnyHttpUrl, EmailStr, PostgresDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-PROJECT_DIR = Path(__file__).parent.parent.parent.parent
-with open(f"{PROJECT_DIR}/pyproject.toml", "rb") as f:
-    PYPROJECT_CONTENT = tomllib.load(f)["tool"]["poetry"]
-
 
 class Settings(BaseSettings):
     # CORE SETTINGS
@@ -42,11 +38,6 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
     ALLOWED_HOSTS: list[str] = ["localhost", "127.0.0.1"]
-
-    # PROJECT NAME, VERSION AND DESCRIPTION
-    PROJECT_NAME: str = PYPROJECT_CONTENT["name"]
-    VERSION: str = PYPROJECT_CONTENT["version"]
-    DESCRIPTION: str = PYPROJECT_CONTENT["description"]
 
     # POSTGRESQL DEFAULT DATABASE
     DEFAULT_DATABASE_HOSTNAME: str
@@ -90,9 +81,7 @@ class Settings(BaseSettings):
             )
         )
 
-    model_config = SettingsConfigDict(
-        env_file=f"{PROJECT_DIR}/backend/.env", case_sensitive=True
-    )
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
 
 settings: Settings = Settings()  # type: ignore

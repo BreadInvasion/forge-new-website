@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Set
 from uuid import UUID
 
 from sqlalchemy import select
@@ -36,5 +36,20 @@ async def get_user_permissions(session: AsyncSession, user_id: UUID):
     return set(permission_set.keys())
 
 
-async def has_permission(session: AsyncSession, user_id: UUID, permission: Permissions):
+async def has_permission(
+    session: AsyncSession, user_id: UUID, permission: Permissions
+) -> bool:
     return permission in await get_user_permissions(session, user_id)
+
+
+async def has_permissions_all(
+    session: AsyncSession, user_id: UUID, permissions: Set[Permissions]
+) -> bool:
+    return permissions.issubset(await get_user_permissions(session, user_id))
+
+
+async def has_permissions_any(
+    session: AsyncSession, user_id: UUID, permissions: Set[Permissions]
+) -> bool:
+    user_permissions = await get_user_permissions(session, user_id)
+    return any(permission in user_permissions for permission in permissions)

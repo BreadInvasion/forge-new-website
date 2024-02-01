@@ -1,0 +1,25 @@
+version: "1"
+
+services:
+  postgres:
+      restart: unless-stopped
+      image: postgres:latest
+      volumes:
+        - default_database_data:/var/lib/postgresql/data
+      env_file:
+        - ../database/.env.dev
+      ports:
+        - "${DEFAULT_DATABASE_PORT}:5432"
+  test_database:
+    restart: unless-stopped
+    image: postgres:latest
+    volumes:
+      - test_database_data:/var/lib/postgresql/data
+    env_file:
+      - ../database/.env.test
+    ports:
+      - "${TEST_DATABASE_PORT}:5432"
+
+volumes:
+  test_database_data:
+  default_database_data:
