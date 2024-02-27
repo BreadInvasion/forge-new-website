@@ -1,75 +1,183 @@
-import React from 'react';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import Offcanvas from 'react-bootstrap/Offcanvas';
-import styled from 'styled-components';
+import React, { useEffect, useState } from 'react';
+import { 
+    NavMenuRoot,
+    NavMenuList,
+    ListItem,
+    NavMenuTrigger,
+    NavMenuContent,
+    Link,
+    Separator,
+    LogoLink,
+    ForgeLogo,
+    CaretDown,
+    Indicator,
+    Arrow,
+    MobileMenuButton,
+    MobileNavMenu,
+    MobileNavTrigger,
+    MobileNavPortal,
+    MobileNavScrollArea,
+    MobileNavScrollViewport,
+    Tag,
+    Text,
+    MobileNavScrollBar,
+    MobileNavContent,
+    CaretRight,
+    TagGroup,
+    // MobileNavContent,
+    // MobileNavItem,
+    // MobileNavSeparator,
+    // MobileNavLabel,
+} from './NavComponents';
+import { useRecoilState } from 'recoil';
+import { isMenuOpenState } from 'src/GlobalAtoms';
+import { List } from '@radix-ui/react-navigation-menu';
 
-const _Navbar = styled(Navbar)`
 
-    background-color: rgba(0,0,0,0);
-    justify-content: flex-end;
-    padding: 1rem 5rem;
-    gap: 0.625rem;
 
-    font-family: 'Roboto Condensed', sans-serif;
-    font-weight: 600;
-    font-size: 1.25rem;
-`;
+/**
+ * To Do:
+ * - [ ] Replace placeholder links with actual links
+ * - [ ] Mobile responsiveness
+ * - [ ] Add User Icon
+ * - [ ] Add User Menu
+ * - [ ] Adopt Autodesk's "Product" dropdown menu - replace Top products
+ *       with "3D Print", then add all types of printers underneath, and so on
+ *       (This'll get rid of Sewing, and make the main machines more noticable)
+ * 
+ */
 
-const BarBreak = styled.div`
-    width: 0.25rem;
-    height: 80%;
-    background-color: #222;
-    border-radius: 0.125rem;
-`;
+const MobileNav = () => {
 
-export default function NavBarCustom() {
-    const expand = 'lg';
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [isLearnOpen, setIsLearnOpen] = useState(false);
+
     return (
-            <_Navbar expand={expand} fixed="top">
-                {/*<Navbar.Brand href="#">Navbar Offcanvas</Navbar.Brand> */}
-                <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
-                <Navbar.Offcanvas
-                id={`offcanvasNavbar-expand-${expand}`}
-                aria-labelledby={`offcanvasNavbarLabel-expand-${expand}`}
-                placement="end"
-                >
-                <Offcanvas.Body>
-                    <Nav className="justify-content-end flex-grow-1 pe-3">
-                        <NavDropdown
-                            title="Create"
-                            id={`offcanvasNavbarDropdown-expand-${expand}`}
-                        >
-                            <NavDropdown.Item href="/">
-                            3D Printing
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/">
-                            Laser Engraving
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/">
-                            Sticker Printing
-                            </NavDropdown.Item>
-                        </NavDropdown>
-                        <Nav.Link href="/status">Status</Nav.Link>
-                        <NavDropdown
-                            title="Learn"
-                            id={`offcanvasNavbarDropdown-expand-${expand}`}
-                        >
-                            <NavDropdown.Item href="/learn">3D Printing</NavDropdown.Item>
-                            <NavDropdown.Item href="/learn">
-                            Laser Engraving
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/learn">
-                            Sticker Printing
-                            </NavDropdown.Item>
-                        </NavDropdown>
-                        <Nav.Link href="/hours">Hours</Nav.Link>
-                        <BarBreak />
-                        <Nav.Link href="/login">Sign In</Nav.Link>
-                    </Nav>
-                </Offcanvas.Body>
-                </Navbar.Offcanvas>
-            </_Navbar>
-    );
+            <MobileNavMenu>
+                <MobileNavTrigger>
+                    <MobileMenuButton />
+                </MobileNavTrigger>
+                <MobileNavContent >
+                    <MobileNavScrollArea>
+                        <MobileNavScrollViewport>
+                            <Text>See Our Hours</Text><Separator horizontal />
+
+                            <Text>Check Machine Status</Text><Separator horizontal />
+
+                            <Text onClick={() => setIsCreateOpen(isCreateOpen => !isCreateOpen)}>
+                                Create 
+                                <CaretRight data-state={isCreateOpen}/>
+                            </Text> 
+                            {isCreateOpen && 
+                                <TagGroup>
+                                    <Tag>3D Print</Tag>
+                                    <Tag>Laser Engrave</Tag>
+                                    <Tag>Print a Sticker</Tag>
+                                    <Tag>See All Machines</Tag>
+                                </TagGroup>
+                            }
+                            <Separator horizontal />
+
+                            <Text onClick={() => setIsLearnOpen(isLearnOpen => !isLearnOpen)}>
+                                Learn
+                                <CaretRight data-state={isLearnOpen}/>
+                            </Text>
+                            {isLearnOpen &&
+                                <TagGroup>
+                                    <Tag>3D Printing Guide</Tag>
+                                    <Tag>Laser Engraving Guide</Tag>
+                                    <Tag>Sticker Preparation</Tag>
+                                    <Tag>Troubleshooting</Tag>
+                                </TagGroup>
+                            }
+
+                        </MobileNavScrollViewport>
+                        <MobileNavScrollBar />
+                    </MobileNavScrollArea>
+                </MobileNavContent>
+            </MobileNavMenu>
+    )
+}
+
+const DesktopNav = () => {
+
+    const preventHover = (event: any) => {
+        const e = event as Event;
+        e.preventDefault();
+    }
+
+    return (
+        <NavMenuList>
+            <ListItem>
+                <NavMenuTrigger onPointerEnter={preventHover} onPointerLeave={preventHover} onPointerMove={preventHover}>
+                    Create <CaretDown aria-hidden/>
+                </NavMenuTrigger>
+                <NavMenuContent onPointerEnter={preventHover} onPointerLeave={preventHover}>
+                    <Link href="/">3D Print</Link>
+                    <Link href="/">Laser Engrave</Link>
+                    <Link href="/">Sticker Print</Link>
+                    <Link href="/">See All Machines</Link>
+                </NavMenuContent>
+            </ListItem>
+            <ListItem>
+                <Link href="/">Status</Link>
+            </ListItem>
+            <ListItem>
+                <NavMenuTrigger onPointerEnter={preventHover} onPointerLeave={preventHover} onPointerMove={preventHover}>
+                    Learn <CaretDown aria-hidden/>
+                </NavMenuTrigger>
+                <NavMenuContent onPointerEnter={preventHover} onPointerLeave={preventHover}>
+                    <Link href="/">3D Printing Guide</Link>
+                    <Link href="/">Laser Engraving Guide</Link>
+                    <Link href="/">Sticker Preparation</Link>
+                    <Link href="/">Troubleshooting</Link>
+                </NavMenuContent>
+            </ListItem>
+            <ListItem>
+                <Link href="/">Hours</Link>
+            </ListItem>
+            <Separator horizontal={false}/>
+            <ListItem>
+                <Link href="/">Login</Link>
+            </ListItem>
+
+            <Indicator>
+                <Arrow />
+            </Indicator>
+        </NavMenuList>
+    )
+}
+
+export const NavBar = () => {
+
+
+    //TO DO: Transfer isMobile and all that to the app to handle, rather than nav
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 900);
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    return (
+        <NavMenuRoot isMobile={isMobile}>
+
+            {isMobile && <MobileNav />}
+            
+            <LogoLink href="/">
+                <ForgeLogo />
+                {!isMobile && "The Forge"}
+            </LogoLink>
+
+            {!isMobile && <DesktopNav />}
+
+        </NavMenuRoot>
+    )
 }

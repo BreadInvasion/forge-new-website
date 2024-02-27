@@ -7,7 +7,14 @@ export default defineConfig({
     assetsInclude: ["**/*.glb"],
     // depending on your application, base can also be "/"
     base: '',
-    plugins: [svgr(), react(), viteTsconfigPaths()],
+    plugins: [
+        svgr({
+            svgrOptions: { exportType: 'named', ref: true, svgo: false, titleProp: true },
+            include: '**/*.svg',
+        }),
+        react(), 
+        viteTsconfigPaths()
+    ],
     server: {
         port: 3000,
         host: true,

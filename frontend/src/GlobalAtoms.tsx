@@ -179,3 +179,8 @@ export const passwordState = atom({
     key: 'password',
     default: '',
 });
+
+export const isMenuOpenState = atom({
+    key: 'isMenuOpen',
+    default: false,
+});
