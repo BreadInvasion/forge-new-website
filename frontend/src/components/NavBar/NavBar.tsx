@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { 
     NavMenuRoot,
     NavMenuList,
@@ -8,6 +8,7 @@ import {
     Link,
     Separator,
     LogoLink,
+    LogoText,
     ForgeLogo,
     CaretDown,
     Indicator,
@@ -15,7 +16,6 @@ import {
     MobileMenuButton,
     MobileNavMenu,
     MobileNavTrigger,
-    MobileNavPortal,
     MobileNavScrollArea,
     MobileNavScrollViewport,
     Tag,
@@ -24,78 +24,81 @@ import {
     MobileNavContent,
     CaretRight,
     TagGroup,
-    // MobileNavContent,
-    // MobileNavItem,
-    // MobileNavSeparator,
-    // MobileNavLabel,
+    SignInButton,
 } from './NavComponents';
-import { useRecoilState } from 'recoil';
-import { isMenuOpenState } from 'src/GlobalAtoms';
-import { List } from '@radix-ui/react-navigation-menu';
 
 
 
 /**
  * To Do:
  * - [ ] Replace placeholder links with actual links
- * - [ ] Mobile responsiveness
+ * - [X] Mobile responsiveness
  * - [ ] Add User Icon
  * - [ ] Add User Menu
  * - [ ] Adopt Autodesk's "Product" dropdown menu - replace Top products
  *       with "3D Print", then add all types of printers underneath, and so on
  *       (This'll get rid of Sewing, and make the main machines more noticable)
  * 
+ * - [ ] Put All related settings (eg. padding) into common variable and reference it
+ * 
+ * 
+ * - Easter Egg? If ever hammer Icon used (For status screen, or whatever), 
+ *               if user drags it to anvil logo, make noise
  */
 
 const MobileNav = () => {
 
+    /* Keep track of MobileNav Dropdowns Locally as they're not needed elsewhere */
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isLearnOpen, setIsLearnOpen] = useState(false);
 
     return (
-            <MobileNavMenu>
-                <MobileNavTrigger>
-                    <MobileMenuButton />
-                </MobileNavTrigger>
-                <MobileNavContent >
-                    <MobileNavScrollArea>
-                        <MobileNavScrollViewport>
-                            <Text>See Our Hours</Text><Separator horizontal />
+        <MobileNavMenu>
+            <MobileNavTrigger>
+                <MobileMenuButton />
+            </MobileNavTrigger>
+            
+            {/*Possibly Put this into a Portal and absolute position to (0,0) w/ an X button */}
+            <MobileNavContent >
+                <MobileNavScrollArea>
+                    <MobileNavScrollViewport>
+                        <Text>See Our Hours</Text><Separator horizontal />
 
-                            <Text>Check Machine Status</Text><Separator horizontal />
+                        <Text>Check Machine Status</Text><Separator horizontal />
 
-                            <Text onClick={() => setIsCreateOpen(isCreateOpen => !isCreateOpen)}>
-                                Create 
-                                <CaretRight data-state={isCreateOpen}/>
-                            </Text> 
-                            {isCreateOpen && 
-                                <TagGroup>
-                                    <Tag>3D Print</Tag>
-                                    <Tag>Laser Engrave</Tag>
-                                    <Tag>Print a Sticker</Tag>
-                                    <Tag>See All Machines</Tag>
-                                </TagGroup>
-                            }
-                            <Separator horizontal />
+                        <Text onClick={() => setIsCreateOpen(isCreateOpen => !isCreateOpen)}>
+                            Create 
+                            <CaretRight data-state={isCreateOpen}/>
+                        </Text> 
+                        {isCreateOpen && 
+                            <TagGroup>
+                                <Tag>3D Print</Tag>
+                                <Tag>Laser Engrave</Tag>
+                                <Tag>Print a Sticker</Tag>
+                                <Tag>See All Machines</Tag>
+                            </TagGroup>
+                        }
+                        <Separator horizontal />
 
-                            <Text onClick={() => setIsLearnOpen(isLearnOpen => !isLearnOpen)}>
-                                Learn
-                                <CaretRight data-state={isLearnOpen}/>
-                            </Text>
-                            {isLearnOpen &&
-                                <TagGroup>
-                                    <Tag>3D Printing Guide</Tag>
-                                    <Tag>Laser Engraving Guide</Tag>
-                                    <Tag>Sticker Preparation</Tag>
-                                    <Tag>Troubleshooting</Tag>
-                                </TagGroup>
-                            }
+                        <Text onClick={() => setIsLearnOpen(isLearnOpen => !isLearnOpen)}>
+                            Learn
+                            <CaretRight data-state={isLearnOpen}/>
+                        </Text>
+                        {isLearnOpen &&
+                            <TagGroup>
+                                <Tag>About Us</Tag>
+                                <Tag>3D Printing Guide</Tag>
+                                <Tag>Laser Engraving Guide</Tag>
+                                <Tag>Sticker Preparation</Tag>
+                                <Tag>Troubleshooting</Tag>
+                            </TagGroup>
+                        }
 
-                        </MobileNavScrollViewport>
-                        <MobileNavScrollBar />
-                    </MobileNavScrollArea>
-                </MobileNavContent>
-            </MobileNavMenu>
+                    </MobileNavScrollViewport>
+                    <MobileNavScrollBar />
+                </MobileNavScrollArea>
+            </MobileNavContent>
+        </MobileNavMenu>
     )
 }
 
@@ -127,6 +130,7 @@ const DesktopNav = () => {
                     Learn <CaretDown aria-hidden/>
                 </NavMenuTrigger>
                 <NavMenuContent onPointerEnter={preventHover} onPointerLeave={preventHover}>
+                    <Link href="/">About Us</Link>
                     <Link href="/">3D Printing Guide</Link>
                     <Link href="/">Laser Engraving Guide</Link>
                     <Link href="/">Sticker Preparation</Link>
@@ -136,10 +140,8 @@ const DesktopNav = () => {
             <ListItem>
                 <Link href="/">Hours</Link>
             </ListItem>
-            <Separator horizontal={false}/>
-            <ListItem>
-                <Link href="/">Login</Link>
-            </ListItem>
+            <Separator/>
+
 
             <Indicator>
                 <Arrow />
@@ -150,33 +152,22 @@ const DesktopNav = () => {
 
 export const NavBar = () => {
 
-
-    //TO DO: Transfer isMobile and all that to the app to handle, rather than nav
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth < 900);
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-
     return (
-        <NavMenuRoot isMobile={isMobile}>
+        <NavMenuRoot>
 
-            {isMobile && <MobileNav />}
+            <MobileNav />
             
             <LogoLink href="/">
                 <ForgeLogo />
-                {!isMobile && "The Forge"}
+                <LogoText>The Forge</LogoText>
             </LogoLink>
 
-            {!isMobile && <DesktopNav />}
+            <DesktopNav />
+
+            {/* Need to put User Icon and Dropdown here which replaces the SignInButton after Logged in */}
+            <SignInButton>
+                <Link href="/">Sign In</Link>
+            </SignInButton>
 
         </NavMenuRoot>
     )

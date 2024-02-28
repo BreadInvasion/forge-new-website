@@ -1,8 +1,7 @@
-import { styled } from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSquareFacebook, faInstagram } from '@fortawesome/free-brands-svg-icons'
 import React from 'react';
-import { faEnvelopeOpenText } from '@fortawesome/free-solid-svg-icons';
+import { styled } from 'styled-components';
+import { InstagramLogoIcon, EnvelopeOpenIcon } from '@radix-ui/react-icons';
+import { ReactComponent as FacebookLogoIcon } from 'src/assets/img/nav-icon2.svg';
 
 const Container = styled.div`
     position: absolute;
@@ -10,17 +9,30 @@ const Container = styled.div`
     right: 0;
     padding-bottom: 15px;
     padding-right: 50px;
-    font-size: 2em;
+    display: flex;
+    flex-direction: row;
+
+    @media (max-width: 450px) {
+        display: none;
+    }
 `;
 
 const IconContainer = styled.a`
-    margin: 0 0.5rem;
+    margin: 0 0.25rem;
     cursor: pointer;
-`;
+    color: #000;
+    background-color: transparent;
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    line-height: 0;
+    justify-content: center;
+    align-items: center;
 
-const Icon = styled(FontAwesomeIcon)`
-    color: #000000D0;
-    font-weight: 400;
+    svg {
+        width: 30px;
+        height: 30px;
+    }
 `;
 
 
@@ -30,13 +42,13 @@ export default function Footer() {
     return (
         <Container>
             <IconContainer href="https://www.facebook.com/RPIMakerSpace/" target='_blank'>
-                <Icon icon={faSquareFacebook} />
+                <FacebookLogoIcon />
             </IconContainer>
             <IconContainer href="https://www.instagram.com/the_forge_rpi/" target='_blank'>
-                <Icon icon={faInstagram} />
+                <InstagramLogoIcon />
             </IconContainer>
             <IconContainer href="mailto:theforge@rpi.edu" target='_blank'>
-                <Icon icon={faEnvelopeOpenText} />
+                <EnvelopeOpenIcon />
             </IconContainer>
         </Container>
     );

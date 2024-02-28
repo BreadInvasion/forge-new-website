@@ -20,7 +20,7 @@ const itemStyles = `
     padding: 0.25rem 0.5rem;
 `;
 
-const BaseColor = grayDark.gray1;
+const BaseColor = "#000";
 const HighlightColor = grayDark.gray3;
 const BorderColor = grayDark.gray11;
 const TextColor = grayDark.gray12;
@@ -28,6 +28,8 @@ const TextColor = grayDark.gray12;
 const PopUpText = grayDark.gray1;
 const PopUpColor = grayDark.gray12;
 const PopUpHightlight = grayDark.gray11;
+
+const mobileBreakpoint = "900px";
 
 /* ---------------------- Animations ---------------------- */
 
@@ -63,15 +65,20 @@ const rotateOut = keyframes`
 
 /* ---------------------- Base NavMenu Children ---------------------- */
 
-export const NavMenuRoot = styled(NavMenu.Root)<{ isMobile?: boolean;}>`
+export const NavMenuRoot = styled(NavMenu.Root)`
+    // position: absolute;
     display: flex;
-    justify-content: ${props => props.isMobile ? 'left' : 'space-between'};
+    justify-content: right;
     width: 100%;
     min-height: 60px;
     height: 8%;
 
     border-bottom: 2px solid ${BorderColor};
     background-color: ${BaseColor};
+
+    @media (max-width: ${mobileBreakpoint}) {
+        justify-content: left;
+    }
 `;
 
 export const NavMenuList = styled(NavMenu.List)`
@@ -82,7 +89,11 @@ export const NavMenuList = styled(NavMenu.List)`
     height: 100%;
     gap: 1.75rem;
     list-style: none;
-    padding: 10px 20px;
+    padding: 0.75rem 1.75rem;
+
+    @media (max-width: ${mobileBreakpoint}) {
+        display: none;
+    }
 `;
 
 export const ListItem = styled(NavMenu.Item)`
@@ -122,15 +133,27 @@ export const LogoLink = styled(NavMenu.Link)`
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.3125rem;
-    padding: 10px 20px;
-
+    gap: 0.5rem;
     text-decoration: none;
+    background-color: transparent;
+    padding: 0.75rem 1.75rem;
+
+    @media (max-width: ${mobileBreakpoint}) {
+        padding: 0.75rem 0;
+    }
+    margin-right: auto;
+`;
+
+export const LogoText = styled.div`
     color: ${TextColor};
     font-family: Montserrat;
     font-size: 1.875rem;
     font-weight: 700;
     text-transform: uppercase;
+
+    @media (max-width: ${mobileBreakpoint}) {
+        display: none;
+    }
 `;
 
 export const NavMenuContent = styled(NavMenu.Content)`
@@ -168,7 +191,8 @@ export const Indicator = styled(NavMenu.Indicator)`
     justify-content: center;
     height: 10px;
     overflow: hidden;
-    top: 48px;
+    top: 100%;
+    margin-top: -10px;
     z-index: 1;
     transition: width, transform 250ms ease;
 
@@ -183,24 +207,27 @@ export const Indicator = styled(NavMenu.Indicator)`
 /* ---------------------- Mobile Dropdown ---------------------- */
 
 
-export const MobileNavMenu = styled(Dropdown.Root)`
-
-`;
+export const MobileNavMenu = styled(Dropdown.Root)``;
 
 export const MobileNavTrigger = styled(Dropdown.Trigger)`
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: fit-content;
-    padding-left: 20px;
+    height: 100%;
+    aspect-ratio: 1;
     background-color: transparent;
     color: ${BaseColor};
     outline: none;
     border: none;
-`;
 
-export const MobileNavPortal = styled(Dropdown.Portal)`
-    position: fixed;
-    z-index: 1000;
+    svg {
+        width: 60%;
+        height: 60%;
+    }
+
+    @media (min-width: ${mobileBreakpoint}) {
+        display: none;
+    }
 `;
 
 export const MobileNavScrollArea = styled(ScrollArea.Root)`
@@ -211,6 +238,10 @@ export const MobileNavScrollArea = styled(ScrollArea.Root)`
     background-color: ${grayDark.gray2};
     border-right: 2px solid ${grayDark.gray11};
     border-top: 2px solid ${grayDark.gray11};
+    
+    @media (min-width: ${mobileBreakpoint}) {
+        display: none;
+    }
 `;
 
 export const MobileNavScrollViewport = styled(ScrollArea.Viewport)`
@@ -241,9 +272,28 @@ export const MobileNavScrollThumb = styled(ScrollArea.Thumb)`
 `;
 
 export const MobileNavContent = styled(Dropdown.Content)`
-    display: flex;
-    flex-direction: column;
+
 `;
+
+/* ---------------------- Sign In Button/Dropdown ---------------------- */
+
+export const SignInButton = styled(NavMenu.Item)`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    border-radius: 4px;
+    margin: 0.75rem 1.75rem 0.75rem 0;
+    color: ${TextColor};
+    background-color: transparent;
+    cursor: pointer;
+
+    &:hover {
+        background-color: ${HighlightColor};
+    }
+`;
+
+//Put the User Avatar/Icon Here along with the user dropdown menu
 
 
 /* ---------------------- Other Components ---------------------- */
@@ -289,7 +339,7 @@ export const MobileMenuButton = styled(HamburgerMenuIcon)`
     transition: transform 250ms ease;
 `;
 
-export const Separator = styled.div<{ horizontal: boolean | undefined }>`
+export const Separator = styled.div<{ horizontal?: boolean }>`
     background-color: ${grayDark.gray11};
     border-radius: 1px;
 
