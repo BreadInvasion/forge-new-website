@@ -1,5 +1,6 @@
 import { styled } from 'styled-components';
-import background from 'src/assets/img/anvil_with_benchys_right.png'
+import background from 'src/assets/img/background_desktop.png'
+import mobile_background from 'src/assets/img/background_mobile.png'
 import { grayDark, whiteA } from '@radix-ui/colors';
 
 //Works for 90% of phones (With the settings for background and all that) Has some trouble with tablets
@@ -19,8 +20,7 @@ export const Cover = styled.div`
     background-size: cover;
     background-position: center;
     @media (max-width: ${mobileBreakpoint}) {
-        background-position: 93% -40%;
-        background-size: 110vh;
+        background-image:  url(${mobile_background});
     }
 `;
 
