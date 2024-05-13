@@ -1,0 +1,15 @@
+<mjml>
+  <mj-body background-color="#fafbfc">
+    <mj-section background-color="#fff" padding="40px 20px">
+      <mj-column vertical-align="middle" width="100%">
+        <mj-text align="center" padding="35px" font-size="20px" color="#333">The Forge - New Account</mj-text>
+        <mj-text align="center" font-size="16px" padding-left="25px" padding-right="25px" font-family="Arial, Helvetica, sans-serif" color="#555"><span>Welcome to the Forge!</span></mj-text>
+        <mj-text align="center" font-size="16px" padding-left="25px" padding-right="25px" font-family="Arial, Helvetica, sans-serif" color="#555">To access your new account, verify your email here:</mj-text>
+        <mj-button align="center" font-size="18px" background-color="#af0909" border-radius="8px" color="#fff" href="{{ link }}" padding="15px 30px">Verify</mj-button>
+        <mj-divider border-color="#ccc" border-width="2px"></mj-divider>
+        <mj-text align="center" font-size="12px" padding-left="25px" padding-right="25px" font-family="Arial, Helvetica, sans-serif" color="#D3D3D3">Didn't create an account? You can safely ignore this email. Unverified accounts are inaccessible, and are purged if left unverified for more than a day.</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+

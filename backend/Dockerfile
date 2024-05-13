@@ -1,29 +1,28 @@
-FROM python:3.12.0-slim-bullseye
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
 
-ENV PYTHONUNBUFFERED 1
-WORKDIR /build
+WORKDIR /app/
 
-# Create venv, add it to path and install requirements
-RUN python -m venv /venv
-ENV PATH="/venv/bin:$PATH"
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python && \
+    cd /usr/local/bin && \
+    ln -s /opt/poetry/bin/poetry && \
+    poetry config virtualenvs.create false
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# Copy poetry.lock* in case it doesn't exist in the repo
+COPY ./pyproject.toml ./poetry.lock* /app/
 
-# Install uvicorn server
-RUN pip install uvicorn[standard]
+# Allow installing dev dependencies to run tests
+ARG INSTALL_DEV=false
+RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-root ; else poetry install --no-root --only main ; fi"
 
-# Copy the rest of app
-COPY app app
-COPY alembic alembic
-COPY alembic.ini .
-COPY .env .
+ENV PYTHONPATH=/app
 
-# Create new user to run app process as unprivileged user
-RUN addgroup --gid 1001 --system uvicorn && \
-    adduser --gid 1001 --shell /bin/false --disabled-password --uid 1001 uvicorn
+COPY ./scripts/ /app/
 
-# Run init.sh script then start uvicorn
-RUN chown -R uvicorn:uvicorn /build
-CMD alembic upgrade head && runuser -u uvicorn -- /venv/bin/uvicorn app.main:app --app-dir /build --host 0.0.0.0 --port 8000 --workers 2 --loop uvloop --reload
-EXPOSE 8000
+COPY ./alembic.ini /app/
+
+COPY ./prestart.sh /app/
+
+COPY ./tests-start.sh /app/
+
+COPY ./app /app/app

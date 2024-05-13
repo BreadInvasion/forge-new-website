@@ -1,87 +1,119 @@
-"""
-File with environment variables and general configuration logic.
-`SECRET_KEY`, `ENVIRONMENT` etc. map to env variables with the same names.
+import secrets
+import warnings
+from typing import Annotated, Any, Literal
 
-Pydantic priority ordering:
-
-1. (Most important, will overwrite everything) - environment variables
-2. `.env` file in root folder of project
-3. Default values
-
-For project name, version, description we use pyproject.toml
-For the rest, we use file `.env` (gitignored), see `.env.example`
-
-`DEFAULT_SQLALCHEMY_DATABASE_URI` and `TEST_SQLALCHEMY_DATABASE_URI`:
-Both are ment to be validated at the runtime, do not change unless you know
-what are you doing. All the two validators do is to build full URI (TCP protocol)
-to databases to avoid typo bugs.
-
-See https://pydantic-docs.helpmanual.io/usage/settings/
-
-Note, complex types like lists are read as json-encoded strings.
-"""
-
-import tomllib
-from functools import cached_property
-from pathlib import Path
-from typing import Literal
-
-from pydantic import AnyHttpUrl, EmailStr, PostgresDsn, computed_field
+from pydantic import (
+    AnyUrl,
+    BeforeValidator,
+    HttpUrl,
+    PostgresDsn,
+    computed_field,
+    model_validator,
+)
+from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing_extensions import Self
+
+
+def parse_cors(v: Any) -> list[str] | str:
+    if isinstance(v, str) and not v.startswith("["):
+        return [i.strip() for i in v.split(",")]
+    elif isinstance(v, list | str):
+        return v
+    raise ValueError(v)
 
 
 class Settings(BaseSettings):
-    # CORE SETTINGS
-    SECRET_KEY: str
-    ENVIRONMENT: Literal["DEV", "PYTEST", "STG", "PRD"] = "DEV"
-    SECURITY_BCRYPT_ROUNDS: int = 12
+    model_config = SettingsConfigDict(
+        env_file=".env", env_ignore_empty=True, extra="ignore"
+    )
+    API_V1_STR: str = "/api"
+    SECRET_KEY: str = secrets.token_urlsafe(32)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
-    BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
-    ALLOWED_HOSTS: list[str] = ["localhost", "127.0.0.1"]
+    DOMAIN: str = "localhost"
+    ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
-    # POSTGRESQL DEFAULT DATABASE
-    DEFAULT_DATABASE_HOSTNAME: str
-    DEFAULT_DATABASE_USER: str
-    DEFAULT_DATABASE_PASSWORD: str
-    DEFAULT_DATABASE_PORT: int
-    DEFAULT_DATABASE_DB: str
+    @computed_field  # type: ignore[misc]
+    @property
+    def server_host(self) -> str:
+        # Use HTTPS for anything other than local development
+        if self.ENVIRONMENT == "local":
+            return f"http://{self.DOMAIN}"
+        return f"https://{self.DOMAIN}"
 
-    # POSTGRESQL TEST DATABASE
-    TEST_DATABASE_HOSTNAME: str
-    TEST_DATABASE_USER: str
-    TEST_DATABASE_PASSWORD: str
-    TEST_DATABASE_PORT: int
-    TEST_DATABASE_DB: str
+    BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = (
+        []
+    )
 
-    @computed_field
-    @cached_property
-    def DEFAULT_SQLALCHEMY_DATABASE_URI(self) -> str:
-        return str(
-            PostgresDsn.build(
-                scheme="postgresql+asyncpg",
-                username=self.DEFAULT_DATABASE_USER,
-                password=self.DEFAULT_DATABASE_PASSWORD,
-                host=self.DEFAULT_DATABASE_HOSTNAME,
-                port=self.DEFAULT_DATABASE_PORT,
-                path=self.DEFAULT_DATABASE_DB,
-            )
+    PROJECT_NAME: str
+    SENTRY_DSN: HttpUrl | None = None
+    POSTGRES_SERVER: str
+    POSTGRES_PORT: int = 5432
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str = ""
+
+    @computed_field  # type: ignore[misc]
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
+        return MultiHostUrl.build(
+            scheme="postgresql+psycopg",
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+            host=self.POSTGRES_SERVER,
+            port=self.POSTGRES_PORT,
+            path=self.POSTGRES_DB,
         )
 
-    @computed_field
-    @cached_property
-    def TEST_SQLALCHEMY_DATABASE_URI(self) -> str:
-        return str(
-            PostgresDsn.build(
-                scheme="postgresql+asyncpg",
-                username=self.TEST_DATABASE_USER,
-                password=self.TEST_DATABASE_PASSWORD,
-                host=self.TEST_DATABASE_HOSTNAME,
-                port=self.TEST_DATABASE_PORT,
-                path=self.TEST_DATABASE_DB,
+    SMTP_TLS: bool = True
+    SMTP_SSL: bool = False
+    SMTP_PORT: int = 587
+    SMTP_HOST: str | None = None
+    SMTP_USER: str | None = None
+    SMTP_PASSWORD: str | None = None
+    # TODO: update type to EmailStr when sqlmodel supports it
+    EMAILS_FROM_EMAIL: str | None = None
+    EMAILS_FROM_NAME: str | None = None
+
+    @model_validator(mode="after")
+    def _set_default_emails_from(self) -> Self:
+        if not self.EMAILS_FROM_NAME:
+            self.EMAILS_FROM_NAME = self.PROJECT_NAME
+        return self
+
+    EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 2
+    EMAIL_ACTIVATION_TOKEN_EXPIRE_HOURS: int = 24
+
+    @computed_field  # type: ignore[misc]
+    @property
+    def emails_enabled(self) -> bool:
+        return bool(self.SMTP_HOST and self.EMAILS_FROM_EMAIL)
+
+    FIRST_SUPERUSER_RCSID: str
+    FIRST_SUPERUSER_RIN: int
+    FIRST_SUPERUSER_PASSWORD: str
+    USERS_OPEN_REGISTRATION: bool = False
+
+    def _check_default_secret(self, var_name: str, value: str | None) -> None:
+        if value == "changethis":
+            message = (
+                f'The value of {var_name} is "changethis", '
+                "for security, please change it, at least for deployments."
             )
+            if self.ENVIRONMENT == "local":
+                warnings.warn(message, stacklevel=1)
+            else:
+                raise ValueError(message)
+
+    @model_validator(mode="after")
+    def _enforce_non_default_secrets(self) -> Self:
+        self._check_default_secret("SECRET_KEY", self.SECRET_KEY)
+        self._check_default_secret("POSTGRES_PASSWORD", self.POSTGRES_PASSWORD)
+        self._check_default_secret(
+            "FIRST_SUPERUSER_PASSWORD", self.FIRST_SUPERUSER_PASSWORD
         )
 
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+        return self
 
 
-settings: Settings = Settings()  # type: ignore
+settings = Settings()  # type: ignore
