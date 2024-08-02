@@ -24,7 +24,7 @@ services:
       - DEFAULT_DATABASE_HOSTNAME=postgres
       - DEFAULT_DATABASE_PORT=5432
     volumes:
-      - ./backend/app:/build/app
+      - ./backend:/build
   frontend:
     restart: unless-stopped
     build: ./frontend
