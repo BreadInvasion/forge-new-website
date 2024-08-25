@@ -71,6 +71,7 @@ export const NavMenuRoot = styled(NavMenu.Root)`
     justify-content: right;
     width: 100%;
     min-height: 60px;
+    overflow: visible;
     height: 8%;
 
     border-bottom: 2px solid ${BorderColor};
@@ -78,6 +79,10 @@ export const NavMenuRoot = styled(NavMenu.Root)`
 
     @media (max-width: ${mobileBreakpoint}) {
         justify-content: left;
+    }
+
+    & > div {
+        overflow: visible;
     }
 `;
 

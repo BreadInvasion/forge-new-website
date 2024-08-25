@@ -85,6 +85,68 @@ export const machines: Machine[] = [
         material: "PLA",
         status: Status.Idle
     },
+    {
+        name: "Mk2",
+        icon: "Markforged",
+        material: "PLA",
+        status: Status.Idle
+    },
+    {
+        name: "Onyx",
+        icon: "Markforged",
+        user: "Deon R.",
+        material: "Carbon Fiber",
+        weight: 212,
+        totalTime: 180,
+        startTime: "2022-03-12T21:01:00Z",
+        status: Status.InProgress
+    },
+    {
+        name: "Form 3",
+        icon: "Formlabs",
+        material: "PLA",
+        status: Status.Idle
+    },
+    {
+        name: "Laser",
+        icon: "Laser",
+        user: "Deon R.",
+        material: "Wood",
+        weight: 1000,
+        totalTime: 180,
+        startTime: "2022-03-12T21:01:00Z",
+        status: Status.InProgress
+    },
+    {
+        name: "Sticker",
+        icon: "Sticker",
+        material: "PLA",
+        status: Status.Idle
+    },
+    {
+        name: "Russell XL",
+        icon: "Prusa",
+        material: "PLA",
+        status: Status.Idle
+    },
+    {
+        name: "Rish XL",
+        icon: "Prusa",
+        material: "PLA",
+        status: Status.Idle
+    },
+    {
+        name: "Mini",
+        icon: "Prusa",
+        material: "PLA",
+        status: Status.Idle
+    },
+    {
+        name: "Mini",
+        icon: "Prusa",
+        material: "PLA",
+        status: Status.Idle
+    },
 ];
 
 export const otherMachines: Machine[] = [
@@ -144,4 +206,17 @@ export const otherMachines: Machine[] = [
         material: "PLA",
         status: Status.Idle
     },
+    {
+        name: "Mini",
+        icon: "Prusa",
+        material: "PLA",
+        status: Status.Idle
+    },
+    {
+        name: "Mini",
+        icon: "Prusa",
+        material: "PLA",
+        status: Status.Idle
+    },
+    
 ];

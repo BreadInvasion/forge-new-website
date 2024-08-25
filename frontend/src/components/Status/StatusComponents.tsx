@@ -1,6 +1,4 @@
 import { styled } from 'styled-components';
-import background from 'src/assets/img/background_desktop.png'
-import mobile_background from 'src/assets/img/background_mobile.png'
 import { grayDark, whiteA } from '@radix-ui/colors';
 
 //Works for 90% of phones (With the settings for background and all that) Has some trouble with tablets
@@ -11,10 +9,6 @@ export const Cover = styled.div`
     height: 100%;
     margin: 0;
     padding: 1% 2%;
-    display: grid;
-    grid-template-columns: 6fr 4fr;
-    grid-template-rows: 1fr;
-    grid-gap: 2%;
 `;
 
 /******************************* Prusa Shelf ******************************** */
@@ -24,20 +18,26 @@ export const Prusas = styled.div`
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: 1fr;
     grid-gap: 1%;
-    justify-content: end;
+    // display: flex;
+    // gap: 1%;
+    // flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
 `;
 
 export const Card = styled.div<{ symbol?: string }>`
+    // width: 15%;
+    // min-width: 150px;
     width: 100%;
-    padding: 5%;
+    flex-grow: 1000;
+    padding: 10px;
     aspect-ratio: 5 / 4;
     display: flex;
     justify-content: space-between;
-    border-radius: 10px;
+    border-radius: 20px;
     border: 1px solid #000000;
     position: relative;
     ${props => props?.symbol && `
@@ -85,7 +85,7 @@ export const StatusText = styled.span<{area?: string}>`
     width: max-content;
 `;
 
-export const ProgressBar = styled.div<{horizontal?: boolean}>`
+export const ProgressBar = styled.div<{horizontal?: string}>`
     width: 10%;
     height: 100%;
     background-color: ${whiteA.whiteA11};

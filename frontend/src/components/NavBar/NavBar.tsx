@@ -25,6 +25,7 @@ import {
     CaretRight,
     TagGroup,
     SignInButton,
+
 } from './NavComponents';
 
 
@@ -115,30 +116,30 @@ const DesktopNav = () => {
                 <NavMenuTrigger onPointerEnter={preventHover} onPointerLeave={preventHover} onPointerMove={preventHover}>
                     Create <CaretDown aria-hidden/>
                 </NavMenuTrigger>
-                <NavMenuContent onPointerEnter={preventHover} onPointerLeave={preventHover}>
-                    <Link href="/">3D Print</Link>
-                    <Link href="/">Laser Engrave</Link>
-                    <Link href="/">Sticker Print</Link>
-                    <Link href="/">See All Machines</Link>
+                <NavMenuContent onPointerEnter={preventHover} onPointerLeave={preventHover} onPointerMove={preventHover}>
+                    <Link href="/create/3dprint">3D Print</Link>
+                    <Link href="/create/laser">Laser Engrave</Link>
+                    <Link href="/create/sticker">Sticker Print</Link>
+                    <Link href="/create/all">See All Machines</Link>
                 </NavMenuContent>
             </ListItem>
             <ListItem>
-                <Link href="/">Status</Link>
+                <Link href="/status">Status</Link>
             </ListItem>
             <ListItem>
                 <NavMenuTrigger onPointerEnter={preventHover} onPointerLeave={preventHover} onPointerMove={preventHover}>
                     Learn <CaretDown aria-hidden/>
                 </NavMenuTrigger>
-                <NavMenuContent onPointerEnter={preventHover} onPointerLeave={preventHover}>
-                    <Link href="/">About Us</Link>
-                    <Link href="/">3D Printing Guide</Link>
-                    <Link href="/">Laser Engraving Guide</Link>
-                    <Link href="/">Sticker Preparation</Link>
-                    <Link href="/">Troubleshooting</Link>
+                <NavMenuContent onPointerEnter={preventHover} onPointerLeave={preventHover} onPointerMove={preventHover}>
+                    <Link href="/learn/aboutus">About Us</Link>
+                    <Link href="/learn/3d-printing-guide">3D Printing Guide</Link>
+                    <Link href="/learn/laser-engraving-guide">Laser Engraving Guide</Link>
+                    <Link href="/learn/sticker-preparation">Sticker Preparation</Link>
+                    <Link href="/learn/troubleshooting">Troubleshooting</Link>
                 </NavMenuContent>
             </ListItem>
             <ListItem>
-                <Link href="/">Hours</Link>
+                <Link href="/hours">Hours</Link>
             </ListItem>
             <Separator/>
 
@@ -146,6 +147,7 @@ const DesktopNav = () => {
             <Indicator>
                 <Arrow />
             </Indicator>
+
         </NavMenuList>
     )
 }
@@ -166,9 +168,9 @@ export const NavBar = () => {
 
             {/* Need to put User Icon and Dropdown here which replaces the SignInButton after Logged in */}
             <SignInButton>
-                <Link href="/">Sign In</Link>
+                <Link href="/login">Sign In</Link>
             </SignInButton>
-
+      
         </NavMenuRoot>
     )
 }
