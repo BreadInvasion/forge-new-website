@@ -53,7 +53,6 @@ const Input = styled.input`
     font-size: 1rem;
     width: 100%;
     border: 1px solid #333;
-
 `;
 
 const ButtonContainer = styled.div`
