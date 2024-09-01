@@ -2,7 +2,7 @@ import React from 'react';
 import { ExclamationTriangleIcon, Component1Icon } from '@radix-ui/react-icons';
 import {
     Card,
-    Cover, Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Progress, ProgressBar, Prusas, StatusText,
+    Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Progress, ProgressBar, Prusas, StatusText,
 } from './StatusComponents';
 import { machines, otherMachines } from './generateMockStatusData';
 

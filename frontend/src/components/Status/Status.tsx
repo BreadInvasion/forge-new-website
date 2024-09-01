@@ -2,7 +2,7 @@ import React from 'react';
 import { ExclamationTriangleIcon, Component1Icon } from '@radix-ui/react-icons';
 import {
     Card,
-    Cover, Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Progress, ProgressBar, Prusas, StatusText,
+    Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Progress, ProgressBar, Prusas, StatusText,
 } from './StatusComponents';
 import { machines, otherMachines } from './generateMockStatusData';
 import MachineCard from './MachineCard';
@@ -24,7 +24,6 @@ const getProgress = (startTime: string | undefined, totalTime: number | undefine
 export default function Status() {
 
     return (
-        <Cover>
             <Prusas>
             {machines.map((machine, index) => (
                 <MachineCard
@@ -39,7 +38,10 @@ export default function Status() {
                 />
             ))}
             </Prusas>
-            {/* <OtherMachines>
+            
+    );
+}
+{/* <OtherMachines>
                 {otherMachines.map((machine, index) => (
                     <ListItem key={index}>
                         <ListIcon symbol={machine.icon} />
@@ -60,6 +62,3 @@ export default function Status() {
                     </ListItem>
                 ))}
             </OtherMachines> */}
-        </Cover>
-    );
-}

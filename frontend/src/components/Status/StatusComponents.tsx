@@ -4,13 +4,6 @@ import { grayDark, whiteA } from '@radix-ui/colors';
 //Works for 90% of phones (With the settings for background and all that) Has some trouble with tablets
 const mobileBreakpoint = "850px";
 
-export const Cover = styled.div`
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 1% 2%;
-`;
-
 /******************************* Prusa Shelf ******************************** */
 
 
@@ -18,28 +11,27 @@ export const Prusas = styled.div`
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(10%,15%));
     grid-auto-rows: 1fr;
+    grid-auto-flow: row;
     grid-gap: 1%;
     // display: flex;
     // gap: 1%;
     // flex-wrap: wrap;
+    padding: 1% 2%;
+    overflow-y: auto;
     align-items: center;
     justify-content: center;
 `;
 
 export const Card = styled.div<{ symbol?: string }>`
-    // width: 15%;
-    // min-width: 150px;
-    width: 100%;
-    flex-grow: 1000;
-    padding: 10px;
-    aspect-ratio: 5 / 4;
     display: flex;
+    height: min-content;
+    padding: 15px;
+    aspect-ratio: 5 / 4;
     justify-content: space-between;
     border-radius: 20px;
     border: 1px solid #000000;
-    position: relative;
     ${props => props?.symbol && `
         background-image: url(src/assets/img/symbols/${props.symbol}.svg);
         background-size: auto 90%;
@@ -52,21 +44,16 @@ export const Card = styled.div<{ symbol?: string }>`
 `;
 
 export const Info = styled.div`
-    width: max-content;
-    height: 100%;
+    height: auto;
     display: flex;
+    gap: 5%;
     flex-direction: column;
-    justify-content: space-between;
 `;
 
-export const MachineName = styled.h1`
+export const MachineName = styled.h3`
     color: #000;
 
     font-family: Montserrat;
-    font-size: 1.5vw;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
     text-transform: uppercase;
 
     margin: 0;
@@ -81,8 +68,6 @@ export const StatusText = styled.span<{area?: string}>`
     font-style: normal;
     font-weight: 600;
     line-height: normal;
-    display: flex;
-    width: max-content;
 `;
 
 export const ProgressBar = styled.div<{horizontal?: string}>`
@@ -108,7 +93,7 @@ export const Progress = styled.div<{ progress: number, horizontal?: boolean }>`
     width: 100%;
     height: ${props => props.progress}%;
     background-color: green;
-    border-radius: 9px;
+    border-radius: 1vw;
     ${props => props.horizontal && `
         width: ${props.progress}%;
         height: 100%;

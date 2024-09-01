@@ -8,6 +8,7 @@ import Status from './components/Status/Status';
 import Login from './components/Login/Login';
 import Register from './components/Login/Register';
 import ComingSoon from './components/Home/ComingSoon';
+import NewStatus from './components/Status/NewStatus';
 
 const Content = styled.div`
     height: 100vh;
@@ -50,7 +51,7 @@ export default function App() {
                 <NavBar />
                 <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/status" element={<Status/>} />
+                    <Route path="/status" element={<NewStatus/>} />
                     <Route path="/login" element={<Login/>} />
                     <Route path="/register" element={<Register/>} />
                     <Route path="/learn/aboutus" element={<ComingSoon/>} />

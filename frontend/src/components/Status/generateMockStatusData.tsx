@@ -147,6 +147,20 @@ export const machines: Machine[] = [
         material: "PLA",
         status: Status.Idle
     },
+    {
+        name: "Mini",
+        icon: "Prusa",
+        material: "PLA",
+        status: Status.Idle
+    },
+    {
+        name: "Mini",
+        icon: "Prusa",
+        material: "PLA",
+        status: Status.Idle
+    },
+
+    
 ];
 
 export const otherMachines: Machine[] = [
