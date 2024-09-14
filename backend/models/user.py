@@ -10,8 +10,8 @@ from uuid import uuid4, UUID
 from schemas.enums import GenderStatsType, PronounType
 
 if TYPE_CHECKING:
-    from .role import Role, UserRoleAssociation
-    from .org import Org, UserOrgMembership
+    from .role import Role
+    from .org import Org
 
 class User(Base):
     __tablename__ = "users"

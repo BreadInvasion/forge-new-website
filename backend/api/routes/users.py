@@ -39,7 +39,7 @@ async def register_user(request: UserCreateRequest, session: DBSession) -> Basic
     )
     session.add(new_user)
     await session.commit()
-    session.refresh(new_user)
+    await session.refresh(new_user)
     return BasicUserResponse.model_validate(new_user, strict=False, from_attributes=True)
 
 @router.get("/users/rcsid/{rcsid}")
@@ -99,10 +99,10 @@ async def get_all_users(
     session: DBSession,
     current_user: Annotated[User, Depends(PermittedUserChecker({Permissions.CAN_SEE_USERS}))],
     limit: int = 20,
-    offset: int = 20,
+    offset: int = 0,
     order_by: Literal["RCSID", "RIN", "first_name", "last_name", "is_rpi_staff"] = "RCSID",
     descending: bool = False
-    ) -> list[UserNoHash]:
+    ):
     """Returns a list of all users. Provide query parameters to cap and re-order the output."""
 
     attr_key_map: dict[str, InstrumentedAttribute] = {

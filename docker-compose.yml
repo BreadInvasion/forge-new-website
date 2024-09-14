@@ -23,6 +23,7 @@ services:
     environment:
       - DEFAULT_DATABASE_HOSTNAME=postgres
       - DEFAULT_DATABASE_PORT=5432
+      - WATCHFILES_FORCE_POLLING=true
     volumes:
       - ./backend:/build
   frontend:

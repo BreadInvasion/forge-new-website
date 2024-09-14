@@ -19,6 +19,9 @@ COPY alembic alembic
 COPY alembic.ini .
 COPY .env .
 COPY main.py .
+COPY init.sh .
+COPY initial_data.py .
+COPY wait_for_db.py .
 
 
 # Create new user to run app process as unprivileged user
@@ -26,5 +29,5 @@ RUN addgroup --gid 1001 --system uvicorn && \
     adduser --gid 1001 --shell /bin/false --disabled-password --uid 1001 uvicorn
 
 RUN chown -R uvicorn:uvicorn /build
-CMD ["fastapi", "run", "main.py", "--port", "8000", "--reload"]
+CMD ./init.sh
 EXPOSE 8000

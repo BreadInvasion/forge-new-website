@@ -6,15 +6,17 @@ By default `main` create a superuser if not exists
 """
 
 import asyncio
+import logging
 from pydantic import SecretStr
 
 from sqlalchemy import select
+from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
-from .core import security
-from .core.session import async_session
-from .models.role import Role
-from .models.user import User
-from .schemas.enums import GenderStatsType, PronounType, Permissions
+from core import security
+from core.session import async_session
+from models.role import Role
+from models.user import User
+from schemas.enums import GenderStatsType, PronounType, Permissions
 
 
 async def main() -> None:
@@ -26,6 +28,7 @@ async def main() -> None:
             superuser_role = Role(
                 name="Super Admin",
                 permissions=[Permissions.IS_SUPERUSER],
+                inverse_permissions=[],
                 display_role=False,
                 priority=10000
             )
@@ -42,7 +45,9 @@ async def main() -> None:
                 gender_identity=GenderStatsType.MALE,
                 pronouns=PronounType.HE_HIM,
                 hashed_password=security.get_password_hash(SecretStr("12345")),
-                roles=[superuser_role]
+                roles=[superuser_role],
+                is_rpi_staff=False,
+                is_graduating=False,
             )
             session.add(new_superuser)
             await session.commit()
