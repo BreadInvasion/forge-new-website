@@ -54,8 +54,8 @@ class MachineInfo(BaseModel):
 
 
 class MachineInfoGroup(BaseModel):
-    group_id: UUID4
-    group_name: str
+    id: UUID4
+    name: str
     machines: List[MachineInfo]
 
 class ResourceInfo(BaseModel):

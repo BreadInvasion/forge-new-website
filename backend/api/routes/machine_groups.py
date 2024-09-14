@@ -66,8 +66,8 @@ async def get_machine_group(
         )
 
     return MachineInfoGroup(
-        group_id=machine_group.id,
-        group_name=machine_group.name,
+        id=machine_group.id,
+        name=machine_group.name,
         machines=[
             MachineInfo(
                 id=machine.id,
@@ -101,8 +101,8 @@ async def get_all_machine_groups(
 
     return [
         MachineInfoGroup(
-            group_id=machine_group.id,
-            group_name=machine_group.name,
+            id=machine_group.id,
+            name=machine_group.name,
             machines=[
                 MachineInfo(
                     id=machine.id,
