@@ -53,12 +53,9 @@ class MachineInfo(BaseModel):
 
 
 class MachineInfoGroup(BaseModel):
+    group_id: UUID4
     group_name: str
     machines: List[MachineInfo]
-
-
-class AllMachineInfoResponse(BaseResponse):
-    groups: List[MachineInfoGroup]
 
 
 class MachineCreateResponse(BaseResponse):

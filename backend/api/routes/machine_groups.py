@@ -66,6 +66,7 @@ async def get_machine_group(
         )
 
     return MachineInfoGroup(
+        group_id=machine_group.id,
         group_name=machine_group.name,
         machines=[
             MachineInfo(
@@ -90,10 +91,17 @@ async def get_all_machine_groups(
 ):
     "Fetch all machine groups."
 
-    machine_groups = (await session.scalars(select(MachineGroup))).all()
+    machine_groups = (
+        await session.scalars(
+            select(MachineGroup).options(
+                selectinload(MachineGroup.machines).subqueryload(Machine.active_usage)
+            )
+        )
+    ).all()
 
     return [
         MachineInfoGroup(
+            group_id=machine_group.id,
             group_name=machine_group.name,
             machines=[
                 MachineInfo(
@@ -131,14 +139,18 @@ async def edit_machine_group(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine group with provided ID not found",
         )
-    
-    machines = (await session.scalars(select(Machine).where(Machine.id.in_(request.machine_ids)))).all()
+
+    machines = (
+        await session.scalars(
+            select(Machine).where(Machine.id.in_(request.machine_ids))
+        )
+    ).all()
     if len(machines) != len(request.machine_ids):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="One or more of the provided machine IDs is invalid"
+            detail="One or more of the provided machine IDs is invalid",
         )
-    
+
     machine_group.name = request.name
     machine_group.machines = list(machines)
     await session.commit()
@@ -164,11 +176,11 @@ async def delete_machine_group(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine group with provided ID not found",
         )
-    
+
     if len(machine_group.machines):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot delete a group that contains machines"
+            detail="Cannot delete a group that contains machines",
         )
 
     await session.delete(machine_group)
