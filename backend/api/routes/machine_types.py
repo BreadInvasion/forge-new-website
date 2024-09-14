@@ -10,7 +10,12 @@ from models.machine import Machine
 from models.machine_type import MachineType
 from models.resource_slot import ResourceSlot
 from schemas.requests import MachineTypeCreateRequest, MachineTypeEditRequest
-from schemas.responses import CreateResponse, MachineTypeInfo, ResourceInfo, ResourceSlotInfo
+from schemas.responses import (
+    CreateResponse,
+    MachineTypeInfo,
+    ResourceInfo,
+    ResourceSlotInfo,
+)
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
@@ -69,7 +74,11 @@ async def get_machine_type(
     machine_type = await session.scalar(
         select(MachineType)
         .where(MachineType.id == type_id)
-        .options(selectinload(MachineType.resource_slots).subqueryload(ResourceSlot.valid_resources))
+        .options(
+            selectinload(MachineType.resource_slots).subqueryload(
+                ResourceSlot.valid_resources
+            )
+        )
     )
     if not machine_type:
         raise HTTPException(
@@ -91,11 +100,12 @@ async def get_machine_type(
                         name=resource.name,
                         units=resource.units,
                         brand=resource.brand,
-                        cost=resource.cost
-                    ) for resource in resource_slot.valid_resources
+                        cost=resource.cost,
+                    )
+                    for resource in resource_slot.valid_resources
                 ],
                 allow_own_material=resource_slot.allow_own_material,
-                allow_empty=resource_slot.allow_empty
+                allow_empty=resource_slot.allow_empty,
             )
             for resource_slot in machine_type.resource_slots
         ],
@@ -113,7 +123,11 @@ async def get_all_machine_types(
 
     machine_types = (
         await session.scalars(
-            select(MachineType).options(selectinload(MachineType.resource_slots).subqueryload(ResourceSlot.valid_resources))
+            select(MachineType).options(
+                selectinload(MachineType.resource_slots).subqueryload(
+                    ResourceSlot.valid_resources
+                )
+            )
         )
     ).all()
 
@@ -132,11 +146,12 @@ async def get_all_machine_types(
                             name=resource.name,
                             units=resource.units,
                             brand=resource.brand,
-                            cost=resource.cost
-                        ) for resource in resource_slot.valid_resources
+                            cost=resource.cost,
+                        )
+                        for resource in resource_slot.valid_resources
                     ],
                     allow_own_material=resource_slot.allow_own_material,
-                    allow_empty=resource_slot.allow_empty
+                    allow_empty=resource_slot.allow_empty,
                 )
                 for resource_slot in machine_type.resource_slots
             ],
@@ -145,8 +160,9 @@ async def get_all_machine_types(
     ]
 
 
-@router.post("/machinetypes/edit")
+@router.post("/machinetypes/{type_id}")
 async def edit_machine_type(
+    type_id: UUID,
     request: MachineTypeEditRequest,
     session: DBSession,
     current_user: Annotated[
@@ -157,8 +173,12 @@ async def edit_machine_type(
 
     machine_type = await session.scalar(
         select(MachineType)
-        .where(MachineType.id == request.type_id)
-        .options(selectinload(MachineType.resource_slots).subqueryload(ResourceSlot.valid_resources))
+        .where(MachineType.id == type_id)
+        .options(
+            selectinload(MachineType.resource_slots).subqueryload(
+                ResourceSlot.valid_resources
+            )
+        )
     )
     if not machine_type:
         raise HTTPException(
@@ -193,8 +213,7 @@ async def delete_machine_type(
     "Delete the machine type with the provided ID."
 
     machine_type = await session.scalar(
-        select(MachineType)
-        .where(MachineType.id == type_id)
+        select(MachineType).where(MachineType.id == type_id)
     )
     if not machine_type:
         raise HTTPException(
@@ -202,7 +221,9 @@ async def delete_machine_type(
             detail="Machine type with provided ID not found",
         )
 
-    machines = (await session.scalars(select(Machine).where(Machine.type_id == machine_type.id))).all()
+    machines = (
+        await session.scalars(select(Machine).where(Machine.type_id == machine_type.id))
+    ).all()
     if len(machines):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

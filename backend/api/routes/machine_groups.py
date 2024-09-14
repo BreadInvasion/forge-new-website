@@ -119,8 +119,9 @@ async def get_all_machine_groups(
     ]
 
 
-@router.post("/machinegroups/edit")
+@router.post("/machinegroups/{group_id}")
 async def edit_machine_group(
+    group_id: UUID,
     request: MachineGroupEditRequest,
     session: DBSession,
     current_user: Annotated[
@@ -131,7 +132,7 @@ async def edit_machine_group(
 
     machine_group = await session.scalar(
         select(MachineGroup)
-        .where(MachineGroup.id == request.machine_group_id)
+        .where(MachineGroup.id == group_id)
         .options(selectinload(MachineGroup.machines).subqueryload(Machine.active_usage))
     )
     if not machine_group:

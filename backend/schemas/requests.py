@@ -137,7 +137,6 @@ class ResourceSlotDeleteRequest(BaseRequest):
 
 
 class MachineTypeEditRequest(BaseRequest):
-    type_id: UUID4
     name: str
     resource_slot_ids: list[UUID4]
 
@@ -149,9 +148,9 @@ class MachineCreateRequest(BaseRequest):
 
 
 class MachineEditRequest(BaseRequest):
-    machine_id: UUID4
     name: str
     type_id: UUID4
+    group_id: UUID4
 
 
 class MachineDeleteRequest(BaseRequest):
@@ -168,7 +167,6 @@ class MachineGroupCreateRequest(BaseRequest):
 
 
 class MachineGroupEditRequest(BaseRequest):
-    machine_group_id: UUID4
     name: str
     machine_ids: list[UUID4]
 

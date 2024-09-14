@@ -58,12 +58,14 @@ class MachineInfoGroup(BaseModel):
     name: str
     machines: List[MachineInfo]
 
+
 class ResourceInfo(BaseModel):
     id: UUID4
     name: str
     brand: Optional[str]
     units: str
     cost: Decimal = Field(max_digits=10, decimal_places=5)
+
 
 class ResourceSlotInfo(BaseModel):
     id: UUID4
@@ -73,10 +75,12 @@ class ResourceSlotInfo(BaseModel):
     allow_own_material: bool
     allow_empty: bool
 
+
 class MachineTypeInfo(BaseModel):
     id: UUID4
     name: str
     resource_slots: list[ResourceSlotInfo]
+
 
 class MachineCreateResponse(BaseResponse):
     machine_id: UUID4
@@ -84,6 +88,7 @@ class MachineCreateResponse(BaseResponse):
 
 class CreateResponse(BaseResponse):
     id: UUID4
+
 
 class MachineUsageFailureLog(BaseModel):
     usage_id: UUID4
