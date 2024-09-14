@@ -21,6 +21,7 @@ class BasicUserResponse(BaseResponse):
     first_name: str
     last_name: str
 
+
 class UserNoHash(BaseModel):
     id: UUID4
 
@@ -42,6 +43,7 @@ class UserNoHash(BaseModel):
 
     is_graduating: bool
 
+
 class MachineInfo(BaseModel):
     id: UUID4
     name: str
@@ -62,6 +64,9 @@ class AllMachineInfoResponse(BaseResponse):
 class MachineCreateResponse(BaseResponse):
     machine_id: UUID4
 
+
+class CreateResponse(BaseResponse):
+    id: UUID4
 
 class MachineUsageFailureLog(BaseModel):
     usage_id: UUID4

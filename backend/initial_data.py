@@ -30,7 +30,7 @@ async def main() -> None:
                 permissions=[Permissions.IS_SUPERUSER],
                 inverse_permissions=[],
                 display_role=False,
-                priority=10000
+                priority=10000,
             )
 
             session.add(superuser_role)

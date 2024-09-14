@@ -19,6 +19,7 @@ class PronounType(StrEnum):
     ALL_ANY = "all_any"
     JUST_USE_MY_NAME = "use_name"
 
+
 class OrgRole(Enum):
     MEMBER = 0
     OFFICER = 1
@@ -66,17 +67,17 @@ class Permissions(StrEnum):
     # to allow a user to freely change (RCSID and RIN)
     CAN_EDIT_USER_CORE_INFO = "canEditUserCoreInfo"
 
-    # For creating new material representations
-    CAN_SEE_MATERIALS = "canSeeMaterials"
-    CAN_CREATE_MATERIALS = "canCreateMaterials"
-    CAN_EDIT_MATERIALS = "canEditMaterials"
-    CAN_DELETE_MATERIALS = "canDeleteMaterials"
+    # For creating new resource representations
+    CAN_SEE_RESOURCES = "canSeeResources"
+    CAN_CREATE_RESOURCES = "canCreateResources"
+    CAN_EDIT_RESOURCES = "canEditResources"
+    CAN_DELETE_RESOURCES = "canDeleteResources"
 
-    # For creating new material groups (for machine slots)
-    CAN_SEE_MATERIAL_GROUPS = "canSeeMaterialGroups"
-    CAN_CREATE_MATERIAL_GROUPS = "canCreateMaterialGroups"
-    CAN_EDIT_MATERIAL_GROUPS = "canEditMaterialGroups"
-    CAN_DELETE_MATERIAL_GROUPS = "canDeleteMaterialGroups"
+    # For creating new resource groups (for machine slots)
+    CAN_SEE_RESOURCE_GROUPS = "canSeeResourceGroups"
+    CAN_CREATE_RESOURCE_SLOTS = "canCreateResourceGroups"
+    CAN_EDIT_RESOURCE_GROUPS = "canEditResourceGroups"
+    CAN_DELETE_RESOURCE_GROUPS = "canDeleteResourceGroups"
 
     # For creating new machine types
     CAN_SEE_MACHINE_TYPES = "canSeeMachineTypes"

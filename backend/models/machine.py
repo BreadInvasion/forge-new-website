@@ -9,6 +9,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 if TYPE_CHECKING:
     from .machine_type import MachineType
     from .machine_usage import MachineUsage
+    from .machine_group import MachineGroup
+
 
 class Machine(Base):
     __tablename__ = "machines"
@@ -18,7 +20,13 @@ class Machine(Base):
     )
 
     name: Mapped[str] = mapped_column(unique=True)
+
     type: Mapped["MachineType"] = relationship()
     type_id: Mapped[UUID] = mapped_column(ForeignKey("machine_types.id"))
 
-    active_usage: Mapped[Optional["MachineUsage"]] = relationship(back_populates="machine")
+    group: Mapped["MachineGroup"] = relationship()
+    group_id: Mapped[UUID] = mapped_column(ForeignKey("machine_groups.id"))
+
+    active_usage: Mapped[Optional["MachineUsage"]] = relationship(
+        back_populates="machine"
+    )

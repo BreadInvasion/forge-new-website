@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 max_tries = 300
 wait_seconds = 1
 
+
 @retry(
     stop=stop_after_attempt(max_tries),
     wait=wait_fixed(wait_seconds),
@@ -25,7 +26,8 @@ async def wait_for_db() -> None:
         except Exception as e:
             logger.error(e)
             raise e
-        
+
+
 if __name__ == "__main__":
     print("Waiting for db...")
     asyncio.run(wait_for_db())

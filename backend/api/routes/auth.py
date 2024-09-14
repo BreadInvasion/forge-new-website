@@ -29,23 +29,32 @@ ACCOUNT_DISABLED_ERROR = HTTPException(
     headers={"WWW-Authenticate": "Bearer"},
 )
 
+
 @router.post("/login")
-async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: DBSession) -> AccessTokenResponse:
+async def login_user(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: DBSession
+) -> AccessTokenResponse:
     """Check if user credentials are valid. If they are, create and return an access token."""
 
     user = await session.scalar(select(User).where(User.RCSID == form_data.username))
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise AUTH_FAILED_ERROR
-        
+
     user_permissions = await get_user_permissions(session, user.id)
-    if Permissions.IS_SUPERUSER not in user_permissions and Permissions.LOCKOUT in user_permissions:
+    if (
+        Permissions.IS_SUPERUSER not in user_permissions
+        and Permissions.LOCKOUT in user_permissions
+    ):
         # Provided user is locked out. Their credentials are right, but refuse login anyway.
         raise ACCOUNT_DISABLED_ERROR
 
     return create_token_response(user.RCSID)
 
+
 @router.get("/refresh")
-async def refresh_auth(current_user: Annotated[User, Depends(PermittedUserChecker(set()))]):
+async def refresh_auth(
+    current_user: Annotated[User, Depends(PermittedUserChecker(set()))]
+):
     """If the user has a valid access token, create and return a fresh one."""
 
     # Auth and permissions check is handled by the dependency injection, so we can just return a fresh token.
