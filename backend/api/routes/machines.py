@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 from models.machine import Machine
 from models.machine_group import MachineGroup
 from models.machine_type import MachineType
+from models.machine_usage import MachineUsage
 from schemas.requests import MachineCreateRequest, MachineEditRequest
 from schemas.responses import CreateResponse, MachineInfo
 
@@ -150,6 +151,7 @@ async def edit_machine(
     machine.name = request.name
     machine.type = type
     machine.group = group
+    machine.maintenance_mode = request.maintenance_mode
     await session.commit()
 
 
@@ -168,6 +170,17 @@ async def delete_machine(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine with provided ID not found",
+        )
+
+    usages = (
+        await session.scalars(
+            select(MachineUsage).where(MachineUsage.machine_id == machine.id)
+        )
+    ).all()
+    if len(usages):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Can't delete a machine with usages",
         )
 
     await session.delete(machine)

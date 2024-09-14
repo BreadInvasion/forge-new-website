@@ -30,3 +30,5 @@ class Machine(Base):
     active_usage: Mapped[Optional["MachineUsage"]] = relationship(
         back_populates="machine"
     )
+
+    maintenance_mode: Mapped[bool] = mapped_column(default=False)

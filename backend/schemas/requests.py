@@ -64,7 +64,7 @@ class MachineGetTypeRequest(BaseRequest):
 class MachineUsageResource(BaseModel):
     slot_id: UUID4  # The slot being filled by this resource choice
     resource_id: UUID4  # The resource chosen to fill the slot
-    quantity: float  # The amount of the resource being used (in whatever the chosen resource's units are)
+    quantity: Decimal  # The amount of the resource being used (in whatever the chosen resource's units are)
     is_own_resource: bool  # The resource being used belongs to the user
 
 
@@ -100,11 +100,10 @@ class ResourceGetRequest(BaseRequest):
 
 
 class ResourceEditRequest(BaseRequest):
-    resource_id: UUID4
     name: str
     brand: Optional[str]
     units: str
-    cost: float
+    cost: Decimal
 
 
 class ResourceDeleteRequest(BaseRequest):
@@ -151,6 +150,7 @@ class MachineEditRequest(BaseRequest):
     name: str
     type_id: UUID4
     group_id: UUID4
+    maintenance_mode: bool
 
 
 class MachineDeleteRequest(BaseRequest):

@@ -74,10 +74,10 @@ class Permissions(StrEnum):
     CAN_DELETE_RESOURCES = "canDeleteResources"
 
     # For creating new resource groups (for machine slots)
-    CAN_SEE_RESOURCE_GROUPS = "canSeeResourceGroups"
-    CAN_CREATE_RESOURCE_SLOTS = "canCreateResourceGroups"
-    CAN_EDIT_RESOURCE_GROUPS = "canEditResourceGroups"
-    CAN_DELETE_RESOURCE_GROUPS = "canDeleteResourceGroups"
+    CAN_SEE_RESOURCE_SLOTS = "canSeeResourceSlots"
+    CAN_CREATE_RESOURCE_SLOTS = "canCreateResourceSlots"
+    CAN_EDIT_RESOURCE_SLOTS = "canEditResourceSlots"
+    CAN_DELETE_RESOURCE_SLOTS = "canDeleteResourceSlots"
 
     # For creating new machine types
     CAN_SEE_MACHINE_TYPES = "canSeeMachineTypes"

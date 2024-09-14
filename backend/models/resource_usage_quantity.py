@@ -1,9 +1,10 @@
+from decimal import Decimal
 from .base import Base
 
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, UUID as DB_UUID
+from sqlalchemy import DECIMAL, ForeignKey, UUID as DB_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
@@ -35,3 +36,5 @@ class ResourceUsageQuantity(Base):
     resource: Mapped["Resource"] = relationship()
 
     is_own_material: Mapped[bool]
+
+    amount: Mapped[Decimal] = mapped_column(DECIMAL(precision=15, scale=5))
