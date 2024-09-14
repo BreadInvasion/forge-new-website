@@ -85,6 +85,12 @@ class Permissions(StrEnum):
     CAN_EDIT_MACHINE_TYPES = "canEditMachineTypes"
     CAN_DELETE_MACHINE_TYPES = "canDeleteMachineTypes"
 
+    # For creating new machine groups
+    CAN_SEE_MACHINE_GROUPS = "canSeeMachineGroups"
+    CAN_CREATE_MACHINE_GROUPS = "canCreateMachineGroups"
+    CAN_EDIT_MACHINE_GROUPS = "canEditMachineGroups"
+    CAN_DELETE_MACHINE_GROUPS = "canDeleteMachineGroups"
+
     # For creating new machines
     CAN_CREATE_MACHINES = "canCreateMachines"
     CAN_EDIT_MACHINES = "canEditMachines"

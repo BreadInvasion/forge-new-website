@@ -160,6 +160,13 @@ class UserChangeRCSIDRequest(BaseRequest):
 class MachineGroupCreateRequest(BaseRequest):
     name: str
 
+
+class MachineGroupEditRequest(BaseRequest):
+    machine_group_id: UUID4
+    name: str
+    machine_ids: list[UUID4]
+
+
 class MachineTypeCreateRequest(BaseRequest):
     name: str
     resource_slot_ids: list[UUID4]
