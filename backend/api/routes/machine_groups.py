@@ -26,7 +26,7 @@ async def create_machine_group(
         User, Depends(PermittedUserChecker({Permissions.CAN_CREATE_MACHINE_GROUPS}))
     ],
 ):
-    "Create a new machine type with the provided name and resource slots."
+    "Create a new machine type with the provided name."
 
     existing_machine_group = await session.scalar(
         select(MachineGroup).where(MachineGroup.name == request.name)
@@ -37,7 +37,7 @@ async def create_machine_group(
             detail="A machine group with that name already exists",
         )
 
-    new_machine_group = MachineGroup(name=request.name)
+    new_machine_group = MachineGroup(name=request.name, machines=[])
     session.add(new_machine_group)
     await session.commit()
     await session.refresh(new_machine_group)
