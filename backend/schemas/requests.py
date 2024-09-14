@@ -136,6 +136,12 @@ class ResourceSlotDeleteRequest(BaseRequest):
     group_id: UUID4
 
 
+class MachineTypeEditRequest(BaseRequest):
+    type_id: UUID4
+    name: str
+    resource_slot_ids: list[UUID4]
+
+
 class MachineCreateRequest(BaseRequest):
     name: str
     group_id: UUID4

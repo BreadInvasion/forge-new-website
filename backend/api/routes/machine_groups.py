@@ -161,7 +161,7 @@ async def delete_machine_group(
     group_id: UUID,
     session: DBSession,
     current_user: Annotated[
-        User, Depends(PermittedUserChecker({Permissions.CAN_SEE_MACHINE_GROUPS}))
+        User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_MACHINE_GROUPS}))
     ],
 ):
     "Delete the machine group with the provided ID."

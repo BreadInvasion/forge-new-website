@@ -29,6 +29,7 @@ class MachineType(Base):
     )
 
     name: Mapped[str] = mapped_column(unique=True)
+
     resource_slots: Mapped[list["ResourceSlot"]] = relationship(
         secondary="machine_type_slot_associations"
     )
