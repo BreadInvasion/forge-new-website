@@ -44,7 +44,7 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 
     return create_token_response(user.RCSID)
 
-@router.post("/refresh")
+@router.get("/refresh")
 async def refresh_auth(current_user: Annotated[User, Depends(PermittedUserChecker(set()))]):
     """If the user has a valid access token, create and return a fresh one."""
 
