@@ -17,14 +17,21 @@ from core.security import get_password_hash
 
 router = APIRouter()
 
+
 @router.post("/signup")
-async def register_user(request: UserCreateRequest, session: DBSession) -> BasicUserResponse:
+async def register_user(
+    request: UserCreateRequest, session: DBSession
+) -> BasicUserResponse:
     """Register a new Forge user."""
 
-    conflicting_users = await session.scalar(select(User).where(or_(User.RCSID == request.RCSID, User.RIN == request.RIN)))
+    conflicting_users = await session.scalar(
+        select(User).where(or_(User.RCSID == request.RCSID, User.RIN == request.RIN))
+    )
     if conflicting_users is not None:
-        raise HTTPException(status_code=409, detail="A user with that RCSID or RIN already exists")
-    
+        raise HTTPException(
+            status_code=409, detail="A user with that RCSID or RIN already exists"
+        )
+
     new_user = User(
         RCSID=request.RCSID,
         RIN=request.RIN,
@@ -35,24 +42,33 @@ async def register_user(request: UserCreateRequest, session: DBSession) -> Basic
         pronouns=request.pronouns,
         is_rpi_staff=False,
         is_graduating=False,
-        hashed_password=get_password_hash(request.password)
+        hashed_password=get_password_hash(request.password),
     )
     session.add(new_user)
     await session.commit()
-    session.refresh(new_user)
-    return BasicUserResponse.model_validate(new_user, strict=False, from_attributes=True)
+    await session.refresh(new_user)
+    return BasicUserResponse.model_validate(
+        new_user, strict=False, from_attributes=True
+    )
+
 
 @router.get("/users/rcsid/{rcsid}")
 async def get_user_by_rcsid(
     rcsid: str,
     session: DBSession,
-    current_user: Annotated[User, Depends(PermittedUserChecker({Permissions.CAN_SEE_USERS}))]
-    ) -> UserNoHash:
+    current_user: Annotated[
+        User, Depends(PermittedUserChecker({Permissions.CAN_SEE_USERS}))
+    ],
+) -> UserNoHash:
     """Get a user's info by their RCSID."""
 
-    user = await session.scalar(select(User).where(User.RCSID == rcsid).options(selectinload(User.roles)))
+    user = await session.scalar(
+        select(User).where(User.RCSID == rcsid).options(selectinload(User.roles))
+    )
     if user is None:
-        raise HTTPException(status_code=404, detail="User with provided RCSID not found")
+        raise HTTPException(
+            status_code=404, detail="User with provided RCSID not found"
+        )
 
     return UserNoHash(
         id=user.id,
@@ -68,15 +84,20 @@ async def get_user_by_rcsid(
         is_graduating=user.is_graduating,
     )
 
+
 @router.get("/users/rin/{rin}")
 async def get_user_by_rin(
     rin: str,
     session: DBSession,
-    current_user: Annotated[User, Depends(PermittedUserChecker({Permissions.CAN_SEE_USERS}))]
-    ) -> UserNoHash:
+    current_user: Annotated[
+        User, Depends(PermittedUserChecker({Permissions.CAN_SEE_USERS}))
+    ],
+) -> UserNoHash:
     """Get a user's info by their RIN."""
 
-    user = await session.scalar(select(User).where(User.RIN == rin).options(selectinload(User.roles)))
+    user = await session.scalar(
+        select(User).where(User.RIN == rin).options(selectinload(User.roles))
+    )
     if user is None:
         raise HTTPException(status_code=404, detail="User with provided RIN not found")
 
@@ -94,15 +115,20 @@ async def get_user_by_rin(
         is_graduating=user.is_graduating,
     )
 
+
 @router.get("/users")
 async def get_all_users(
     session: DBSession,
-    current_user: Annotated[User, Depends(PermittedUserChecker({Permissions.CAN_SEE_USERS}))],
+    current_user: Annotated[
+        User, Depends(PermittedUserChecker({Permissions.CAN_SEE_USERS}))
+    ],
     limit: int = 20,
-    offset: int = 20,
-    order_by: Literal["RCSID", "RIN", "first_name", "last_name", "is_rpi_staff"] = "RCSID",
-    descending: bool = False
-    ) -> list[UserNoHash]:
+    offset: int = 0,
+    order_by: Literal[
+        "RCSID", "RIN", "first_name", "last_name", "is_rpi_staff"
+    ] = "RCSID",
+    descending: bool = False,
+):
     """Returns a list of all users. Provide query parameters to cap and re-order the output."""
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
@@ -110,13 +136,17 @@ async def get_all_users(
         "RIN": User.RIN,
         "first_name": User.first_name,
         "last_name": User.last_name,
-        "is_rpi_staff": User.is_rpi_staff
+        "is_rpi_staff": User.is_rpi_staff,
     }
     order_determinant = attr_key_map[order_by]
     if descending:
         order_determinant = order_determinant.desc()
 
-    users = (await session.scalars(select(User).order_by(order_determinant).limit(limit).offset(offset))).all()
+    users = (
+        await session.scalars(
+            select(User).order_by(order_determinant).limit(limit).offset(offset)
+        )
+    ).all()
 
     return [
         UserNoHash(
@@ -131,8 +161,10 @@ async def get_all_users(
             pronouns=user.pronouns,
             role_ids=[role.id for role in user.roles],
             is_graduating=user.is_graduating,
-        ) for user in users
+        )
+        for user in users
     ]
+
 
 # GET ALL USERS
 
@@ -141,4 +173,3 @@ async def get_all_users(
 # EDIT USER SECURE DETAILS
 
 # HARD DELETE USER
-

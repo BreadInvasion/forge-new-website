@@ -1,4 +1,5 @@
 from .base import Base
+from .machine_group import MachineGroup
 from .machine_type import MachineType
 from .machine_usage import MachineUsage
 from .machine import Machine

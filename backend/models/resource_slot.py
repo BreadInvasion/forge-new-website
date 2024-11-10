@@ -9,14 +9,21 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 if TYPE_CHECKING:
     from .resource import Resource
 
+
 class ResourceSlotAssociation(Base):
     __tablename__ = "resource_slot_associations"
 
-    resource_slot_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("resource_slots.id"), primary_key=True)
-    resource_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("resources.id"), primary_key=True)
+    resource_slot_id: Mapped[UUID] = mapped_column(
+        DB_UUID(as_uuid=True), ForeignKey("resource_slots.id"), primary_key=True
+    )
+    resource_id: Mapped[UUID] = mapped_column(
+        DB_UUID(as_uuid=True), ForeignKey("resources.id"), primary_key=True
+    )
+
 
 class ResourceSlot(Base):
     """A set of valid materials for an input slot on a machine."""
+
     __tablename__ = "resource_slots"
 
     id: Mapped[UUID] = mapped_column(
@@ -30,7 +37,9 @@ class ResourceSlot(Base):
     display_name: Mapped[str]
 
     # Valid inputs for the slot.
-    valid_resources: Mapped[list["Resource"]] = relationship(secondary="resource_slot_associations")
+    valid_resources: Mapped[list["Resource"]] = relationship(
+        secondary="resource_slot_associations"
+    )
 
     # Should users be allowed to use their own material for this slot?
     allow_own_material: Mapped[bool]

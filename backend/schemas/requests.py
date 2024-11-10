@@ -1,5 +1,6 @@
+from decimal import Decimal
 from typing import Annotated, List, Optional
-from pydantic import UUID4, AfterValidator, BaseModel, EmailStr, SecretStr
+from pydantic import UUID4, AfterValidator, BaseModel, EmailStr, Field, SecretStr
 
 from .enums import GenderStatsType, Permissions, PronounType, SemesterType
 
@@ -60,11 +61,11 @@ class MachineGetTypeRequest(BaseRequest):
     machine_id: UUID4
 
 
-class MachineUsageMaterial(BaseModel):
-    slot_id: UUID4  # The slot being filled by this material choice
-    material_id: UUID4  # The material chosen to fill the slot
-    quantity: float  # The amount of the material being used (in whatever the chosen material's units are)
-    is_own_material: bool  # The material being used belongs to the user
+class MachineUsageResource(BaseModel):
+    slot_id: UUID4  # The slot being filled by this resource choice
+    resource_id: UUID4  # The resource chosen to fill the slot
+    quantity: Decimal  # The amount of the resource being used (in whatever the chosen resource's units are)
+    is_own_resource: bool  # The resource being used belongs to the user
 
 
 class MachineUseRequest(BaseRequest):
@@ -72,7 +73,7 @@ class MachineUseRequest(BaseRequest):
 
     duration: int  # Duration in minutes
 
-    materials: List[MachineUsageMaterial]
+    resources: List[MachineUsageResource]
 
     is_for_class: bool
     is_reprint: bool
@@ -87,51 +88,69 @@ class MachineFailRequest(BaseRequest):
     reason: str
 
 
-class MaterialCreateRequest(BaseRequest):
+class ResourceCreateRequest(BaseRequest):
     name: str
+    brand: Optional[str]
     units: str
-    cost: float
+    cost: Decimal = Field(max_digits=10, decimal_places=5)
 
 
-class MaterialGetRequest(BaseRequest):
-    material_id: UUID4
+class ResourceGetRequest(BaseRequest):
+    resource_id: UUID4
 
 
-class MaterialEditRequest(BaseRequest):
-    material_id: UUID4
+class ResourceEditRequest(BaseRequest):
     name: str
+    brand: Optional[str]
     units: str
-    cost: float
+    cost: Decimal
 
 
-class MaterialDeleteRequest(BaseRequest):
-    material_id: UUID4
+class ResourceDeleteRequest(BaseRequest):
+    resource_id: UUID4
 
 
-class MaterialGroupCreateRequest(BaseRequest):
-    name: str
-    material_ids: List[UUID4]
+class ResourceSlotCreateRequest(BaseRequest):
+    db_name: str
+    display_name: str
+    resource_ids: List[UUID4]
+    allow_own_material: bool
+    allow_empty: bool
 
 
-class MaterialGroupEditRequest(BaseRequest):
+class ResourceSlotGetRequest(BaseRequest):
+    resource_slot_id: UUID4
+
+
+class ResourceSlotEditRequest(BaseRequest):
     group_id: UUID4
-    name: str
-    material_ids: List[UUID4]
+    db_name: str
+    display_name: str
+    resource_ids: List[UUID4]
+    allow_own_material: bool
+    allow_empty: bool
 
 
-class MaterialGroupDeleteRequest(BaseRequest):
+class ResourceSlotDeleteRequest(BaseRequest):
     group_id: UUID4
+
+
+class MachineTypeEditRequest(BaseRequest):
+    name: str
+    resource_slot_ids: list[UUID4]
 
 
 class MachineCreateRequest(BaseRequest):
     name: str
+    group_id: UUID4
     type_id: UUID4
 
 
 class MachineEditRequest(BaseRequest):
-    machine_id: UUID4
     name: str
     type_id: UUID4
+    group_id: UUID4
+    maintenance_mode: bool
 
 
 class MachineDeleteRequest(BaseRequest):
@@ -141,6 +160,20 @@ class MachineDeleteRequest(BaseRequest):
 class UserChangeRCSIDRequest(BaseRequest):
     target_RCSID: str
     new_RCSID: str
+
+
+class MachineGroupCreateRequest(BaseRequest):
+    name: str
+
+
+class MachineGroupEditRequest(BaseRequest):
+    name: str
+    machine_ids: list[UUID4]
+
+
+class MachineTypeCreateRequest(BaseRequest):
+    name: str
+    resource_slot_ids: list[UUID4]
 
 
 class UserChangeRINRequest(BaseRequest):

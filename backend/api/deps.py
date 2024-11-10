@@ -24,6 +24,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
         finally:
             await session.close()
 
+
 DBSession = Annotated[AsyncSession, Depends(get_session)]
 
 

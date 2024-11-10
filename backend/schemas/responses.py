@@ -1,6 +1,7 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Optional
-from pydantic import BaseModel, ConfigDict, UUID4
+from pydantic import BaseModel, ConfigDict, UUID4, Field
 
 from .enums import GenderStatsType, PronounType
 
@@ -20,6 +21,7 @@ class BasicUserResponse(BaseResponse):
     RCSID: str
     first_name: str
     last_name: str
+
 
 class UserNoHash(BaseModel):
     id: UUID4
@@ -42,6 +44,7 @@ class UserNoHash(BaseModel):
 
     is_graduating: bool
 
+
 class MachineInfo(BaseModel):
     id: UUID4
     name: str
@@ -51,16 +54,40 @@ class MachineInfo(BaseModel):
 
 
 class MachineInfoGroup(BaseModel):
-    group_name: str
+    id: UUID4
+    name: str
     machines: List[MachineInfo]
 
 
-class AllMachineInfoResponse(BaseResponse):
-    groups: List[MachineInfoGroup]
+class ResourceInfo(BaseModel):
+    id: UUID4
+    name: str
+    brand: Optional[str]
+    units: str
+    cost: Decimal = Field(max_digits=10, decimal_places=5)
+
+
+class ResourceSlotInfo(BaseModel):
+    id: UUID4
+    db_name: str
+    display_name: str
+    valid_resources: list[ResourceInfo]
+    allow_own_material: bool
+    allow_empty: bool
+
+
+class MachineTypeInfo(BaseModel):
+    id: UUID4
+    name: str
+    resource_slots: list[ResourceSlotInfo]
 
 
 class MachineCreateResponse(BaseResponse):
     machine_id: UUID4
+
+
+class CreateResponse(BaseResponse):
+    id: UUID4
 
 
 class MachineUsageFailureLog(BaseModel):

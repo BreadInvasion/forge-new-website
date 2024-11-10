@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from .user import User
     from .resource_usage_quantity import ResourceUsageQuantity
 
+
 class MachineUsage(Base):
     __tablename__ = "machine_usages"
 
@@ -21,9 +22,7 @@ class MachineUsage(Base):
         DB_UUID(as_uuid=True), primary_key=True, default=uuid4
     )
 
-    machine_id: Mapped[UUID] = mapped_column(
-        ForeignKey("machines.id")
-    )
+    machine_id: Mapped[UUID] = mapped_column(ForeignKey("machines.id"))
     machine: Mapped["Machine"] = relationship(back_populates="active_usage")
 
     semester_id: Mapped[UUID] = mapped_column(ForeignKey("semesters.id"))
@@ -45,7 +44,9 @@ class MachineUsage(Base):
     )
 
     # nullable field that notes who failed the usage, if it was failed
-    failed_by_id: Mapped[UUID | None] = mapped_column(ForeignKey("users.id", name="fk_failed_by"))
+    failed_by_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("users.id", name="fk_failed_by")
+    )
     failed_by: Mapped[Optional["User"]] = relationship(foreign_keys=[failed_by_id])
 
     # nullable field that notes the fail reason, if it was failed

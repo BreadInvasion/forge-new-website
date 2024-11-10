@@ -10,8 +10,9 @@ from uuid import uuid4, UUID
 from schemas.enums import GenderStatsType, PronounType
 
 if TYPE_CHECKING:
-    from .role import Role, UserRoleAssociation
-    from .org import Org, UserOrgMembership
+    from .role import Role
+    from .org import Org
+
 
 class User(Base):
     __tablename__ = "users"
@@ -37,7 +38,9 @@ class User(Base):
     major: Mapped[str | None] = mapped_column(String(64))
 
     # Gender Identity. Reported for statistics purposes only. User editable. Only None for RPI faculty/staff.
-    gender_identity: Mapped[GenderStatsType] = mapped_column(default=GenderStatsType.NOTDISCLOSED)
+    gender_identity: Mapped[GenderStatsType] = mapped_column(
+        default=GenderStatsType.NOTDISCLOSED
+    )
 
     # Pronouns. Shown next to user's name for volunteer reference.
     pronouns: Mapped[PronounType]
@@ -54,4 +57,6 @@ class User(Base):
     is_graduating: Mapped[bool]
 
     # Organizations that the user is a member of (can charge usages to the organization)
-    orgs: Mapped[list["Org"]] = relationship(secondary="user_org_memberships", back_populates="members")
+    orgs: Mapped[list["Org"]] = relationship(
+        secondary="user_org_memberships", back_populates="members"
+    )

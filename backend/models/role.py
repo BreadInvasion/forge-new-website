@@ -11,13 +11,19 @@ from schemas.enums import Permissions
 if TYPE_CHECKING:
     from .user import User
 
+
 class UserRoleAssociation(Base):
     # Association table for the many-to-many relationship between User and Role.
 
     __tablename__ = "user_role_association"
 
-    user_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
-    role_id: Mapped[UUID] = mapped_column(DB_UUID(as_uuid=True), ForeignKey("roles.id"), primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(
+        DB_UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True
+    )
+    role_id: Mapped[UUID] = mapped_column(
+        DB_UUID(as_uuid=True), ForeignKey("roles.id"), primary_key=True
+    )
+
 
 class Role(Base):
     # Represents a user role.
