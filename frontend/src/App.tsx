@@ -9,14 +9,8 @@ import Login from './components/Login/Login';
 import Register from './components/Login/Register';
 import ComingSoon from './components/Home/ComingSoon';
 import NewStatus from './components/Status/NewStatus';
-
-const Content = styled.div`
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-`;
+import { AuthProvider } from './components/Auth/AuthContext';
+import { ProtectedRoute } from './components/Auth/ProtectedRoute';
 
 /**
  * 
@@ -46,28 +40,59 @@ const Content = styled.div`
 
 export default function App() {
     return (
-        <Router>
-            <Content>
+        <AuthProvider>
+            <Router>
                 <NavBar />
                 <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/status" element={<NewStatus/>} />
-                    <Route path="/login" element={<Login/>} />
-                    <Route path="/register" element={<Register/>} />
-                    <Route path="/learn/aboutus" element={<ComingSoon/>} />
-                    <Route path="/learn/3d-printing-guide" element={<ComingSoon/>} />
-                    <Route path="/learn/laser-engraving-guide" element={<ComingSoon/>} />
-                    <Route path="/learn/sticker-preparation" element={<ComingSoon/>} />
-                    <Route path="/learn/troubleshooting" element={<ComingSoon/>} />
-                    <Route path="/hours" element={<ComingSoon/>} />
-                    <Route path="/create/3dprint" element={<ComingSoon/>} />
-                    <Route path="/create/laser" element={<ComingSoon/>} />
-                    <Route path="/create/sticker" element={<ComingSoon/>} />
-                    <Route path="/create/all" element={<ComingSoon/>} />
-                    <Route path="/myforge" element={<ComingSoon/>} />
+                    <Route path="/status" element={<NewStatus />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/learn/aboutus" element={<ComingSoon />} />
+                    <Route path="/learn/3d-printing-guide" element={<ComingSoon />} />
+                    <Route path="/learn/laser-engraving-guide" element={<ComingSoon />} />
+                    <Route path="/learn/sticker-preparation" element={<ComingSoon />} />
+                    <Route path="/learn/troubleshooting" element={<ComingSoon />} />
+                    <Route path="/hours" element={<ComingSoon />} />
+                    <Route path="/myforge" element={
+                        <ProtectedRoute>
+                            <ComingSoon />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/create/3dprint" element={
+                        <ProtectedRoute>
+                            <ComingSoon />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/create/laser" element={
+                        <ProtectedRoute>
+                            <ComingSoon />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/create/sticker" element={
+                        <ProtectedRoute>
+                            <ComingSoon />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/create/all" element={
+                        <ProtectedRoute>
+                            <ComingSoon />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/user" element={
+                        <ProtectedRoute>
+                            <ComingSoon />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="*" element={
+                        <div>
+                            <h1>404</h1>
+                            <p>Page not found</p>
+                        </div>
+                    } />
                 </Routes>
                 {/* <Footer /> */}
-            </Content>
-        </Router>
+            </Router>
+        </AuthProvider>
     );
 }

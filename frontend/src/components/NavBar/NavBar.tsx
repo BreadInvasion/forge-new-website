@@ -26,6 +26,12 @@ import {
     TagGroup,
     SignInButton,
 } from './NavComponents';
+import useAuth from '../Auth/useAuth';
+import Avatar from './Avatar/Avatar';
+import { UserList, UserContent, UserItem, UserTrigger, LogoutButton } from './UserMenuComponents';
+import { useNavigate } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { userState } from 'src/GlobalAtoms';
 
 
 
@@ -143,15 +149,30 @@ const DesktopNav = () => {
             <Separator/>
 
 
-            <Indicator>
+            {/* Broken due to the UserAvatar also being a Dropdown */}
+            {/* <Indicator>
                 <Arrow />
-            </Indicator>
+            </Indicator> */}
 
         </NavMenuList>
     )
 }
 
 export const NavBar = () => {
+
+    const { isAuthenticated, logout } = useAuth();
+    const navigate = useNavigate();
+
+
+    const preventHover = (event: any) => {
+        const e = event as Event;
+        e.preventDefault();
+    }
+
+    const handleLogout = (e: React.MouseEvent<HTMLButtonElement>) => {
+        logout();
+        navigate('/');
+    }
 
     return (
         <NavMenuRoot>
@@ -166,9 +187,26 @@ export const NavBar = () => {
             <DesktopNav />
 
             {/* Need to put User Icon and Dropdown here which replaces the SignInButton after Logged in */}
-            <SignInButton>
-                <Link href="/login">Sign In</Link>
-            </SignInButton>
+            {!isAuthenticated && 
+                <SignInButton>
+                    <Link href="/login">Sign In</Link>
+                </SignInButton>
+            }
+            {isAuthenticated &&
+                <UserList>
+                    <Avatar />
+                    <UserItem>
+                        <UserTrigger onPointerEnter={preventHover} onPointerLeave={preventHover} onPointerMove={preventHover}>
+                            byrnet2 <CaretDown aria-hidden/>
+                        </UserTrigger>
+                        <UserContent onPointerEnter={preventHover} onPointerLeave={preventHover} onPointerMove={preventHover}>
+                            <Link href="/user/summary">Summary</Link>
+                            <Link href="/user/usages">Usages</Link>
+                            <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+                        </UserContent>
+                    </UserItem>
+                </UserList>
+            }
       
         </NavMenuRoot>
     )

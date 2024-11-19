@@ -1,17 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
-
 import { machines } from '../generateMockStatusData';
 import CondensedCard from './CondensedCard';
 
-// Define the grid container
 const GridContainer = styled.div`
     grid-area: status;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
-    padding: 1rem;
+    column-gap: 10px;
 `;
 
 

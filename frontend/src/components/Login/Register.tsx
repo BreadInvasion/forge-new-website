@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { CheckboxInput, DropdownInput, FormIcon, FormLabel, FormWrapper, TextInput } from './Form';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../Auth/useAuth';
 
 const PageContainer = styled.div`
     width: 100%;
@@ -14,7 +16,7 @@ const PageContainer = styled.div`
     align-items: center;
 `;
 
-const FormContainer = styled.div`
+const FormContainer = styled.form`
     display: flex;
     height: 100%;
     min-width: 50%;
@@ -67,11 +69,13 @@ const formFields = [
         type: "text",
         label: "Password",
         id: "password",
+        secret: true,
     },
     {
         type: "text",
         label: "Confirm Password",
         id: "confirm-password",
+        secret: true,
     },
     {
         type: "checkbox",
@@ -90,6 +94,9 @@ export default function Register() {
 
     const [formValues, setFormValues] = useState<{ [key: string]: string }>({});
 
+    const { login } = useAuth();
+    const navigate = useNavigate();
+
     const handleInputChange = (input: string, value: string) => {
         setFormValues((prevValues) => ({
             ...prevValues,
@@ -97,11 +104,43 @@ export default function Register() {
         }));
     };
     
-    // Just check validity at submission.
+    const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch('http://localhost:3000/api/signup', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "RCSID": formValues["rcsid"],
+                    "RIN": formValues["rin"],
+                    "first_name": formValues["first-name"],
+                    "last_name": formValues["last-name"],
+                    "major": formValues["major"],
+                    "gender_identity": 0,
+                    "pronouns": "not_shown",
+                    "password": formValues["password"]
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Register successful:', result);
+                navigate('/login');
+            } else {
+                console.error('Register failed:', response.status);
+                console.error('Register failed:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
 
     return (
         <PageContainer>
-            <FormContainer>
+            <FormContainer onSubmit={handleRegister}>
                 <FormWrapper>
                     <FormIcon src="src/assets/img/logo.svg" />
                     <FormLabel>Register</FormLabel>
@@ -143,11 +182,7 @@ export default function Register() {
                                 return null;
                         }
                     })}
-                    <SubmitButton
-                        onClick={() => {
-                            console.log(formValues);
-                        }}
-                    >
+                    <SubmitButton type="submit" >
                         Submit
                     </SubmitButton>
                 </FormWrapper>

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ReactComponent as ForgeSVG } from 'src/assets/img/logo.svg';
+import { machines } from '../Status/generateMockStatusData';
 
 
 const Container = styled.div`
@@ -23,6 +24,9 @@ const Text = styled.h1`
 `;
 
 const ComingSoon = () => {
+
+    const [machines, setMachines] = useState([])
+
     return (
         <Container>
             <ForgeLogo/>

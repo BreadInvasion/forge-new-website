@@ -52,7 +52,7 @@ async def register_user(
     )
 
 
-@router.get("/users/rcsid/{rcsid}")
+@router.get("/users/rcsid/{rcsid}", tags=["users"])
 async def get_user_by_rcsid(
     rcsid: str,
     session: DBSession,
@@ -85,7 +85,7 @@ async def get_user_by_rcsid(
     )
 
 
-@router.get("/users/rin/{rin}")
+@router.get("/users/rin/{rin}", tags=["users"])
 async def get_user_by_rin(
     rin: str,
     session: DBSession,
@@ -116,7 +116,7 @@ async def get_user_by_rin(
     )
 
 
-@router.get("/users")
+@router.get("/users", tags=["users"])
 async def get_all_users(
     session: DBSession,
     current_user: Annotated[

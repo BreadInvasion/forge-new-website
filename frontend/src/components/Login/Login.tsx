@@ -1,5 +1,10 @@
 import * as React from 'react';
+import { FormEvent, useState } from 'react';
 import styled from 'styled-components';
+import useAuth from '../Auth/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { userState } from 'src/GlobalAtoms';
 
 const PageContainer = styled.div`
     width: 100%;
@@ -15,7 +20,7 @@ const PageContainer = styled.div`
 
 `;
 
-const FormContainer = styled.div`
+const FormContainer = styled.form`
     display: flex;
     flex-direction: column;
     
@@ -96,15 +101,67 @@ const Seperator = styled.div`
 
 export default function Login() {
 
+    const [username, setUsername] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+
+    const { login } = useAuth();
+    const navigate = useNavigate();
+
+    const [user, setUser] = useRecoilState(userState);
+
+
+    const handleLogin = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+
+        try {
+            const response = await fetch('http://localhost:3000/api/login', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                const token = result.access_token;
+
+                if (token) {
+                    login(token); // Store the token and update auth state
+
+                    
+
+                    navigate('/myforge');
+                }
+            } else {
+                console.error('Login failed:', response.status);
+                console.error('Login failed:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
     return (
         <PageContainer>
-            <FormContainer>
+            <FormContainer onSubmit={handleLogin}>
                 <LogoIcon />
                 <Title>Sign In</Title>
-                <Input type="text" placeholder='RCS ID'/>
-                <Input type="text" placeholder='Password'/>
+                <Input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                />
+                <Input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
                 <ButtonContainer>
-                    <Button>Sign In</Button>
+                    <Button type='submit'>Sign In</Button>
                     <ForgotPassword href="/reset-password">Forgot Password?</ForgotPassword>
                 </ButtonContainer>
                 <Seperator />

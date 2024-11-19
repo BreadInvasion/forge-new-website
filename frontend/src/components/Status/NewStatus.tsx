@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Toolbar from './components/Toolbar';
 import StatusGrid from './components/StatusGrid';
+import Highlight from './components/Highlight';
 
 const Page = styled.div`
     width: 100%;
@@ -28,7 +29,7 @@ const NewStatus: React.FC = () => {
         <Page>
             <Toolbar />
             <StatusGrid />
-            <div style={{gridArea: "highlight", backgroundColor: "blue"}}>Highlight</div>
+            <Highlight />
             <div style={{gridArea: "up-next", backgroundColor: "green"}}>Up Next</div>
         </Page>
     );

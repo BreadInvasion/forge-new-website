@@ -59,7 +59,7 @@ const Card = styled.div<{symbol: string, progress: number}>`
 `;
 
 const MachineName = styled.h3`
-    font-size: 1.5rem;
+    font-size: 3.5vh;
     font-weight: 600;
     color: #000;
     text-transform: uppercase;
@@ -68,7 +68,7 @@ const MachineName = styled.h3`
 `;
 
 const StatusText = styled.p`
-    font-size: 1rem;
+    font-size: 2.5vh;
     color: #000;
     text-align: center;
     text-jusitfy: center;

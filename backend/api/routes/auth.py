@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from models.user import User
 from schemas.enums import Permissions
-from schemas.responses import AccessTokenResponse
+from schemas.responses import AccessTokenResponse, UserNoHash
 
 from ..deps import DBSession, PermittedUserChecker
 from ..utils import get_user_permissions
@@ -59,3 +59,23 @@ async def refresh_auth(
 
     # Auth and permissions check is handled by the dependency injection, so we can just return a fresh token.
     return create_token_response(current_user.RCSID)
+
+@router.get("/me")
+async def get_current_user(
+    current_user: Annotated[User, Depends(PermittedUserChecker(set()))]
+):
+    """If the user has a valid access token, return current user data"""
+
+    return UserNoHash(
+        id=current_user.id,
+        is_rpi_staff=current_user.is_rpi_staff,
+        RCSID=current_user.RCSID,
+        RIN=current_user.RIN,
+        first_name=current_user.first_name,
+        last_name=current_user.last_name,
+        major=current_user.major,
+        gender_identity=current_user.gender_identity,
+        pronouns=current_user.pronouns,
+        role_ids=[role.id for role in current_user.roles],
+        is_graduating=current_user.is_graduating,
+    )

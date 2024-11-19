@@ -71,6 +71,7 @@ export const TextInput = (props: FormElementProps) => {
                 value={value}
                 onChange={(e) => onChange(id, e.target.value)}
                 placeholder={placeholder ? placeholder : ""}
+                required
             />
         </InputContainer>
     );
@@ -101,6 +102,7 @@ export const DropdownInput = (props: FormElementProps & { options: string[] }) =
             <StyledDropdown
                 defaultValue="placeholder"
                 onChange={(e) => onChange(id, e.target.value)}
+                required
             >
                 {placeholder && <StyledDropdownPlaceholder value="placeholder" hidden>{placeholder}</StyledDropdownPlaceholder>}
                 {options.map((option) => (

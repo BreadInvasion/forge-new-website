@@ -8,8 +8,8 @@ import { ToolButton, FilterItem, FilterX } from "./FilterComponents";
 
 const ToolbarContainer = styled.div`
     grid-area: tools;
-    padding: 1vh 0;
     display: flex;
+    padding-bottom: 10px;
     gap: 10px;
 `;
 
