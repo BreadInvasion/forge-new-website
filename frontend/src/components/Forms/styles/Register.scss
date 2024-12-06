@@ -1,0 +1,46 @@
+.page-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+
+    padding: 10% 10% 10% 0;
+    background-color: #D40000;
+    background-image: url(anvil_with_benchys.png);
+    background-size: cover;
+    background-position: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: max-content !important;
+    height: auto;
+    
+    border-radius: 5px;
+    padding: 1rem 2rem;
+    gap: 1rem;
+    background-color: #eeeeee;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+}
+
+.submit-button {
+	padding: 5px 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	font-size: 1rem;
+	min-width: fit-content;
+	width: 50%;
+	background-color: #AF0909;
+	color: white;
+	cursor: pointer;
+}
+
+.input-container label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    text-align: right;
+}

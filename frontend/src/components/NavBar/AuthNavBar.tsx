@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import useAuth from '../Auth/useAuth';
+import { useResetRecoilState } from 'recoil';
+import { UserInterface, userState } from 'src/GlobalAtoms';
 import * as NavMenu from "@radix-ui/react-navigation-menu";
 import { ReactComponent as ForgeSVG } from 'src/assets/img/logo.svg';
 import { CaretDownIcon } from '@radix-ui/react-icons';
@@ -7,7 +10,39 @@ import './styles/Avatar.scss';
 import './styles/UserMenu.scss';
 import './styles/NavBar.scss';
 
-export const NavBar: React.FC = () => {
+
+interface NavBarProps {
+    user: UserInterface;
+    setAuth: (value: boolean) => void;
+}
+
+const UserMenu: React.FC<NavBarProps> = ({user, setAuth}) => {
+
+    const setDefaultUser = useResetRecoilState(userState);
+
+    const onSignOut = () => {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('token_expiration');
+        setAuth(false);
+        setDefaultUser();
+    }
+
+    return (
+        <NavMenu.Item className='user-item'>
+            <NavMenu.Trigger className='user-trigger' >
+                {user.RCSID} <CaretDownIcon className='caret-down' aria-hidden />
+            </NavMenu.Trigger>
+            <NavMenu.Content className='user-content' >
+                <NavMenu.Link className='link' href="/user/summary">Summary</NavMenu.Link>
+                <NavMenu.Link className='link' href="/user/usages">Usages</NavMenu.Link>
+                <NavMenu.Link className='link' href="/" onSelect={(e) => onSignOut()}>Logout</NavMenu.Link>
+            </NavMenu.Content>
+        </NavMenu.Item>
+    )
+}
+
+export const AuthNavBar: React.FC<NavBarProps> = ({user, setAuth}) => {
 
     return (
         <NavMenu.Root className='nav-menu-root'>
@@ -50,9 +85,7 @@ export const NavBar: React.FC = () => {
 
                 <div className='separator horizontal' />
 
-                <NavMenu.Item className='sign-in-button'>
-                    <NavMenu.Link className='link' href="/login">Sign In</NavMenu.Link>
-                </NavMenu.Item>
+                <UserMenu user={user} setAuth={setAuth}/>
 
                 <NavMenu.Indicator className='indicator'>
                     <div className='arrow' />

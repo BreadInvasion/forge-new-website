@@ -1,0 +1,96 @@
+@use "./NavBar.variables.scss" as nav;
+
+
+.user-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    height: 100%;
+    gap: 0.25rem;
+    list-style: none;
+}
+
+.logout-button {
+    @include nav.itemStyles;
+    background-color: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    width: auto;
+    text-align: center;
+}
+
+.user-content {
+    position: absolute;
+    top: 100%;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    padding: 0.25rem;
+    width: max-content;
+    gap: 0.5rem;
+    border-radius: 4px;
+    background-color: nav.$popup-color;
+    color: nav.$popup-text;
+    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+    transition: width, height, 250ms ease;
+}
+.user-content[data-state="open"] {
+    animation: scale-in  200ms ease;
+}
+.user-content[data-state="closed"] {
+    animation: scale-out 200ms ease;
+}
+
+.user-content a:hover {
+    background-color: nav.$popup-highlight;
+}
+
+.user-content .logout-button:hover {
+    background-color: nav.$popup-highlight;
+}
+
+
+
+.user-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    border-radius: 4px;
+    color: nav.$text-color;
+}
+.user-item:hover {
+    background-color: nav.$highlight-color;
+}
+
+.user-trigger {
+    display: flex;
+    align-items: center;
+    @include nav.itemStyles;
+    gap: 0.3125rem;
+    border: none;
+    background-color: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+.user-trigger[data-state='open'] {
+    background-color: nav.$highlight-color;
+}
+
+.usermenu-placeholder {
+    width: 100%;
+    height: 58px;
+    color: black;
+}
+
+@keyframes pulse {
+    50% {
+        opacity: .5
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite
+}

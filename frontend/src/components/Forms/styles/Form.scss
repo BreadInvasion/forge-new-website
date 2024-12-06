@@ -1,0 +1,63 @@
+
+.input-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-gap: 10px;
+    align-items: center;
+    justify-content: block-end;
+}
+
+.form-icon {
+    height: 10vh;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-image: url('logo.svg');
+    background-size: auto 90%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.form-container label {
+    font-size: 4vh;
+    color: #333;
+    text-align: center;
+}
+
+.styled-input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 2vh;
+    width: 100%;
+    border: 1px solid #333;
+}
+
+.styled-dropdown {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1.875vh;
+    width: 100%;
+    border: 1px solid #333;
+}
+
+.styled-dropdown-option {
+    color: #090909;
+}
+
+.styled-dropdown-placeholder {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.styled-checkbox {
+    /* Add your styling here */
+}
+
+.checkbox-label {
+    text-align: center;
+}
+
+.checkbox-input-container {
+    align-items: center;
+}

@@ -1,14 +1,13 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
-import { Navigate } from 'react-router-dom';
 import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil';
-import { userState } from 'src/GlobalAtoms';
+import { authState, UserInterface, userState } from 'src/GlobalAtoms';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (token: string) => void;
-  logout: () => void;
+  user: UserInterface;
+  setAuth: (value: boolean) => void;
+  setUser: (value: UserInterface) => void;
 }
 
 interface CustomJwtPayload extends JwtPayload {
@@ -19,43 +18,31 @@ interface CustomJwtPayload extends JwtPayload {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const initialAuthState = (localStorage.getItem('token_expiration') &&
+    Number(localStorage.getItem('token_expiration')) * 1000 > Date.now()) as boolean;
+  const [isAuthenticated, setAuth] = useState<boolean>(initialAuthState);
 
-  const [user, setUser] = useRecoilState(userState);
+  const initialUserData = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : {} as UserInterface;
+  const [user, setUser] = useState<UserInterface>(initialUserData);
+
+
   const setDefaultUser = useResetRecoilState(userState);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      console.log(token);
-      const decodedToken: CustomJwtPayload = jwtDecode<JwtPayload>(token);
+    const userData = localStorage.getItem('user');
+    const token_expiration = localStorage.getItem('token_expiration');
 
-      // Token expiration logic
-      if (decodedToken.expires_at && decodedToken.expires_at * 1000 > Date.now()) {
-        setIsAuthenticated(true);
-      } else {
-        localStorage.removeItem('authToken');
-        setDefaultUser();
-      }
+    if (token_expiration && Number(token_expiration) * 1000 > Date.now()) {
+      setAuth(true);
+      setUser(JSON.parse(userData || '{}'));
+    } else {
+      setAuth(false);
+      setDefaultUser();
     }
-    setIsLoading(false);
   }, []);
 
-  const login = (token: string) => {
-    console.log('Logging in');
-    localStorage.setItem('authToken', token);
-    setIsAuthenticated(true);
-  };
-
-  const logout = () => {
-    console.log('Logging out');
-    localStorage.removeItem('authToken');
-    setIsAuthenticated(false);
-  };
-
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, setAuth, setUser }}>
       {children}
     </AuthContext.Provider>
   );

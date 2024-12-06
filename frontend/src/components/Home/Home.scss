@@ -1,0 +1,113 @@
+// Home.scss
+
+$white-a11: rgba(255, 255, 255, 1);
+
+/* Coming Soon Page */
+.cs-container {
+    background-color: #fff;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.cs-container h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.cs-logo {
+    height: 15vh;
+}
+
+/* Home Page */
+
+.home-container {
+    margin: 0;
+    flex: 1 1 auto;
+ 
+    background-image:  url(background_desktop.png);
+    background-color: #D40000;
+    
+    background-size: cover;
+    background-position: center;
+    @media screen and (max-width: 768px) {
+        background-image: url(background_mobile.png);
+    }
+}
+
+.home-cover {
+    align-items: flex-start !important;
+    padding-left: 5%;
+
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(90deg, #000 10%, #0000 65%);
+    color: $white-a11;
+
+    @media screen and (max-width: 768px) {
+        background: linear-gradient(0deg, #000 20%,  #0000 100%);
+        justify-content: flex-end;
+        padding: 15% 10%;
+    }
+}
+
+.home-cover h1 {
+    font-size: clamp(1.5rem, calc(1.5rem + 0.926vw), 3rem);
+    width: calc(5/12 * 100%);
+    margin: 0.5rem 0;
+
+    @media screen and (max-width: 768px) {
+        width: 100%;
+        margin: 0.5rem 1rem;
+    }
+}
+
+.home-cover h2 {
+    font-size: 1.25rem;
+    margin: 0 1rem;
+}
+
+.home-cover h2 ul {
+    list-style-type: none;
+    padding: 0.5rem 1.5rem;
+    font-size: inherit;
+}
+
+
+.home-button-container {
+    height: auto !important;
+    padding: 0.5rem 1rem;
+    gap: 1.25rem;
+
+    @media (min-width: 768px) {
+        display: none;
+    }
+}
+
+.home-button {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    width: 100%;
+    padding: 0.5rem 0.6255rem;
+    background-color: #FFF;
+    color: #000;
+    border-radius: 0.25rem;
+    cursor: pointer;
+
+    @media (min-width: 768px) {
+        display: none;
+    }
+    svg {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}
