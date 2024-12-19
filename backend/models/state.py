@@ -19,6 +19,6 @@ class State(Base):
     # Current active semester.
     # If None, only staff with CAN_USE_MACHINES_BETWEEN_SEMESTERS will be able to log usages.
     active_semester: Mapped[Optional["Semester"]] = relationship()
-    active_semester_id: Mapped[UUID] = mapped_column(
+    active_semester_id: Mapped[Optional[UUID]] = mapped_column(
         DB_UUID(as_uuid=True), ForeignKey("semesters.id")
     )

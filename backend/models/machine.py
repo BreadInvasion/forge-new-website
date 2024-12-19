@@ -24,11 +24,15 @@ class Machine(Base):
     type: Mapped["MachineType"] = relationship()
     type_id: Mapped[UUID] = mapped_column(ForeignKey("machine_types.id"))
 
-    group: Mapped["MachineGroup"] = relationship()
-    group_id: Mapped[UUID] = mapped_column(ForeignKey("machine_groups.id"))
+    group: Mapped[Optional["MachineGroup"]] = relationship()
+    group_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("machine_groups.id"), nullable=True)
 
     active_usage: Mapped[Optional["MachineUsage"]] = relationship(
         back_populates="machine"
     )
 
+    # Prevent usage by members, show in machine list as in maintenance mode
     maintenance_mode: Mapped[bool] = mapped_column(default=False)
+
+    # Prevent usage by members, hide from all non-internal machine lists
+    disabled: Mapped[bool]         = mapped_column(default=False)

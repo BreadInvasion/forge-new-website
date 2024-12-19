@@ -92,6 +92,7 @@ class Permissions(StrEnum):
     CAN_DELETE_MACHINE_GROUPS = "canDeleteMachineGroups"
 
     # For creating new machines
+    CAN_SEE_MACHINES = "canSeeMachines"
     CAN_CREATE_MACHINES = "canCreateMachines"
     CAN_EDIT_MACHINES = "canEditMachines"
     CAN_DELETE_MACHINES = "canDeleteMachines"
@@ -133,6 +134,55 @@ class Permissions(StrEnum):
     # Roles with this tag can only be assigned or edited by another superuser.
     IS_SUPERUSER = "isSuperuser"
 
+class LogType(StrEnum):
+    MACHINE_USED = "machine_used"
+
+    MACHINE_CREATED = "machine_created"
+    MACHINE_EDITED  = "machine_edited"
+    MACHINE_DELETED = "machine_deleted"
+
+    MACHINE_TYPE_CREATED = "machine_type_created"
+    MACHINE_TYPE_EDITED  = "machine_type_edited"
+    MACHINE_TYPE_DELETED = "machine_type_deleted"
+
+    MACHINE_GROUP_CREATED = "machine_group_created"
+    MACHINE_GROUP_EDITED  = "machine_group_edited"
+    MACHINE_GROUP_DELETED = "machine_group_deleted"
+
+    # Specifically an internal manual usage creation
+    MACHINE_USAGE_CREATED = "machine_usage_created"
+    MACHINE_USAGE_EDITED = "machine_usage_edited"
+    MACHINE_USAGE_DELETED = "machine_usage_deleted"
+    MACHINE_USAGE_CLEARED = "machine_usage_cleared"
+    MACHINE_USAGE_FAILED = "machine_usage_failed"
+
+    RESOURCE_CREATED = "resource_created"
+    RESOURCE_EDITED  = "resource_edited"
+    RESOURCE_DELETED = "resource_deleted"
+
+    RESOURCE_SLOT_CREATED = "resource_slot_created"
+    RESOURCE_SLOT_EDITED  = "resource_slot_edited"
+    RESOURCE_SLOT_DELETED = "resource_slot_deleted"
+
+    RESOURCE_USAGE_QUANTITY_CREATED = "resource_usage_quantity_created"
+    RESOURCE_USAGE_QUANTITY_EDITED  = "resource_usage_quantity_edited"
+    RESOURCE_USAGE_QUANTITY_DELETED = "resource_usage_quantity_deleted"
+
+    ROLE_CREATED = "role_created"
+    ROLE_EDITED  = "role_edited"
+    ROLE_DELETED = "role_deleted"
+
+    SEMESTER_CREATED = "semester_created"
+    SEMESTER_EDITED  = "semester_edited"
+    SEMESTER_DELETED = "semester_deleted"
+
+    USER_CREATED = "user_created"
+    USER_EDITED  = "user_edited"
+    USER_DELETED = "user_deleted"
+
+    ORG_CREATED = "org_created"
+    ORG_EDITED  = "org_edited"
+    ORG_DELETED = "org_deleted"
 
 # Used to indicate no particular permission is required to access
 # an endpoint. Lockout is still checked.

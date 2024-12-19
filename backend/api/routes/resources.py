@@ -5,13 +5,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import and_, select
 
+from models.audit_log import AuditLog
 from models.resource import Resource
 from schemas.requests import ResourceCreateRequest, ResourceEditRequest
-from schemas.responses import CreateResponse, ResourceInfo
+from schemas.responses import CreateResponse, ResourceDetails, ResourceInfo
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
-from schemas.enums import Permissions
+from schemas.enums import LogType, Permissions
 
 router = APIRouter()
 
@@ -47,6 +48,14 @@ async def create_resource(
     session.add(new_resource)
     await session.commit()
     await session.refresh(new_resource)
+
+    audit_log = AuditLog(type=LogType.RESOURCE_CREATED, content={
+        "resource_id": new_resource.id,
+        "user_id": current_user.id,
+    })
+    session.add(audit_log)
+    await session.commit()
+
     return CreateResponse(id=new_resource.id)
 
 
@@ -66,13 +75,14 @@ async def get_resource(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resource with provided ID not found",
         )
+    
+    audit_logs = (await session.scalars(
+        select(AuditLog).where(AuditLog.content.op("?")("resource_id")).order_by(AuditLog.time_created.desc())
+    )).all()
 
-    return ResourceInfo(
-        id=resource.id,
-        name=resource.name,
-        units=resource.units,
-        brand=resource.brand,
-        cost=resource.cost,
+    return ResourceDetails(
+        audit_logs=list(audit_logs),
+        **resource.__dict__,
     )
 
 
@@ -89,11 +99,7 @@ async def get_all_resources(
 
     return [
         ResourceInfo(
-            id=resource.id,
-            name=resource.name,
-            units=resource.units,
-            brand=resource.brand,
-            cost=resource.cost,
+            **resource.__dict__
         )
         for resource in resources
     ]
@@ -116,11 +122,26 @@ async def edit_resource(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resource with provided ID not found",
         )
+    
+    differences = {
+        "name": request.name if resource.name != request.name else None,
+        "brand": request.brand if resource.brand != request.brand else None,
+        "units": request.units if resource.units != request.units else None,
+        "cost": request.cost if resource.cost != request.cost else None,
+    }
 
     resource.name = request.name
     resource.brand = request.brand
     resource.units = request.units
     resource.cost = request.cost
+
+    audit_log = AuditLog(type=LogType.RESOURCE_EDITED, content={
+        "resource_id": resource_id,
+        "user_id": current_user.id,
+        "changed_values": differences,
+    })
+    session.add(audit_log)
+
     await session.commit()
 
 
@@ -142,4 +163,11 @@ async def delete_resource(
         )
 
     await session.delete(resource)
+    
+    audit_log = AuditLog(type=LogType.RESOURCE_DELETED, content={
+        "resource_id": resource_id,
+        "user_id": current_user.id,
+    })
+    session.add(audit_log)
+
     await session.commit()

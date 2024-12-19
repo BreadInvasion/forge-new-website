@@ -22,6 +22,18 @@ class BaseRequest(BaseModel):
 class UserUpdatePasswordRequest(BaseRequest):
     password: SecretStr
 
+class ResourceUsage(BaseModel):
+    resource_id: UUID4
+    amount: Decimal
+    is_own_material: bool
+
+class MachineUsageRequest(BaseRequest):
+
+    # Map resource slot id to resource usage quantity details
+    resource_usages: dict[UUID4, ResourceUsage]
+    duration_seconds: int
+
+    as_org_id: Optional[UUID4]
 
 class UserCreateRequest(BaseRequest):
     # RPI Identification Information
@@ -123,7 +135,6 @@ class ResourceSlotGetRequest(BaseRequest):
 
 
 class ResourceSlotEditRequest(BaseRequest):
-    group_id: UUID4
     db_name: str
     display_name: str
     resource_ids: List[UUID4]
@@ -132,7 +143,7 @@ class ResourceSlotEditRequest(BaseRequest):
 
 
 class ResourceSlotDeleteRequest(BaseRequest):
-    group_id: UUID4
+    resource_slot_id: UUID4
 
 
 class MachineTypeEditRequest(BaseRequest):
@@ -142,15 +153,16 @@ class MachineTypeEditRequest(BaseRequest):
 
 class MachineCreateRequest(BaseRequest):
     name: str
-    group_id: UUID4
+    group_id: Optional[UUID4]
     type_id: UUID4
 
 
 class MachineEditRequest(BaseRequest):
     name: str
     type_id: UUID4
-    group_id: UUID4
+    group_id: Optional[UUID4]
     maintenance_mode: bool
+    disabled: bool
 
 
 class MachineDeleteRequest(BaseRequest):

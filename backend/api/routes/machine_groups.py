@@ -3,17 +3,18 @@
 from typing import Annotated
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.orm import selectinload
 
+from models.audit_log import AuditLog
 from models.machine import Machine
 from models.machine_group import MachineGroup
 from schemas.requests import MachineGroupCreateRequest, MachineGroupEditRequest
-from schemas.responses import CreateResponse, MachineInfo, MachineInfoGroup
+from schemas.responses import CreateResponse, MachineInfo, MachineInfoGroup, MachineInfoGroupDetails
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
-from schemas.enums import Permissions
+from schemas.enums import LogType, Permissions
 
 router = APIRouter()
 
@@ -41,6 +42,15 @@ async def create_machine_group(
     session.add(new_machine_group)
     await session.commit()
     await session.refresh(new_machine_group)
+
+    audit_log = AuditLog(type=LogType.MACHINE_GROUP_DELETED, content={
+        "machine_group_id": new_machine_group.id,
+        "user_rcsid": current_user.RCSID,
+        "props": request,
+    })
+    session.add(audit_log)
+    await session.commit()
+
     return CreateResponse(id=new_machine_group.id)
 
 
@@ -64,21 +74,15 @@ async def get_machine_group(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine group with provided ID not found",
         )
+    
+    audit_logs = (await session.scalars(
+        select(AuditLog).where(AuditLog.content.op("?")("machine_group_id")).order_by(AuditLog.time_created.desc())
+    )).all()
 
-    return MachineInfoGroup(
-        id=machine_group.id,
-        name=machine_group.name,
-        machines=[
-            MachineInfo(
-                id=machine.id,
-                name=machine.name,
-                is_in_use=machine.active_usage is not None,
-                is_failed=(
-                    machine.active_usage.failed if machine.active_usage else False
-                ),
-            )
-            for machine in machine_group.machines
-        ],
+    return MachineInfoGroupDetails(
+        audit_logs=list(audit_logs),
+        machine_ids=[machine.id for machine in machine_group.machines],
+        **machine_group.__dict__,
     )
 
 
@@ -101,19 +105,8 @@ async def get_all_machine_groups(
 
     return [
         MachineInfoGroup(
-            id=machine_group.id,
-            name=machine_group.name,
-            machines=[
-                MachineInfo(
-                    id=machine.id,
-                    name=machine.name,
-                    is_in_use=machine.active_usage is not None,
-                    is_failed=(
-                        machine.active_usage.failed if machine.active_usage else False
-                    ),
-                )
-                for machine in machine_group.machines
-            ],
+            machine_ids=[machine.id for machine in machine_group.machines],
+            **machine_group.__dict__,
         )
         for machine_group in machine_groups
     ]
@@ -151,9 +144,22 @@ async def edit_machine_group(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="One or more of the provided machine IDs is invalid",
         )
+    
+    differences = {
+        "name": request.name if machine_group.name != request.name else None,
+        "machine_ids": request.machine_ids if set(machine_group.machines) != set(machines) else None,
+    }
 
     machine_group.name = request.name
     machine_group.machines = list(machines)
+
+    audit_log = AuditLog(type=LogType.MACHINE_GROUP_DELETED, content={
+        "machine_group_id": machine_group.id,
+        "user_rcsid": current_user.RCSID,
+        "changed_values": differences,
+    })
+    session.add(audit_log)
+
     await session.commit()
 
 
@@ -185,4 +191,11 @@ async def delete_machine_group(
         )
 
     await session.delete(machine_group)
+
+    audit_log = AuditLog(type=LogType.MACHINE_GROUP_DELETED, content={
+        "machine_group_id": machine_group.id,
+        "user_rcsid": current_user.RCSID
+    })
+    session.add(audit_log)
+
     await session.commit()

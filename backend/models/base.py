@@ -1,3 +1,8 @@
-from sqlalchemy.orm import declarative_base
+from typing import Any
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.dialects.postgresql import JSONB
 
-Base = declarative_base()
+class Base(DeclarativeBase):
+    type_annotation_map = {
+        dict[str, Any]: JSONB
+    }

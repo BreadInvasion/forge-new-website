@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class ResourceUsageQuantity(Base):
-    """How much of a resource was used in a specific resource slot during a specific machine usage."""
+    """How much of a resource was used, and its cost at the time, during a specific machine usage."""
 
     __tablename__ = "resource_usage_quantities"
 
@@ -25,11 +25,6 @@ class ResourceUsageQuantity(Base):
         back_populates="resources_used"
     )
 
-    resource_slot_id: Mapped[UUID] = mapped_column(
-        DB_UUID(as_uuid=True), ForeignKey("resource_slots.id"), primary_key=True
-    )
-    resource_slot: Mapped["ResourceSlot"] = relationship()
-
     resource_id: Mapped[UUID] = mapped_column(
         DB_UUID(as_uuid=True), ForeignKey("resources.id")
     )
@@ -38,3 +33,5 @@ class ResourceUsageQuantity(Base):
     is_own_material: Mapped[bool]
 
     amount: Mapped[Decimal] = mapped_column(DECIMAL(precision=15, scale=5))
+    # Cost per unit at time of usage
+    cpu_at_usage: Mapped[Decimal] = mapped_column(DECIMAL(precision=10, scale=5))

@@ -6,12 +6,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
+from models.audit_log import AuditLog
 from models.machine import Machine
 from models.machine_type import MachineType
 from models.resource_slot import ResourceSlot
 from schemas.requests import MachineTypeCreateRequest, MachineTypeEditRequest
 from schemas.responses import (
     CreateResponse,
+    MachineTypeDetails,
     MachineTypeInfo,
     ResourceInfo,
     ResourceSlotInfo,
@@ -19,7 +21,7 @@ from schemas.responses import (
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
-from schemas.enums import Permissions
+from schemas.enums import LogType, Permissions
 
 router = APIRouter()
 
@@ -58,6 +60,15 @@ async def create_machine_type(
     session.add(new_machine_type)
     await session.commit()
     await session.refresh(new_machine_type)
+
+    audit_log = AuditLog(type=LogType.MACHINE_TYPE_CREATED, content={
+        "machine_type_id": new_machine_type.id,
+        "user_rcsid": current_user.RCSID,
+        "props": request,
+    })
+    session.add(audit_log)
+    await session.commit()
+
     return CreateResponse(id=new_machine_type.id)
 
 
@@ -85,30 +96,17 @@ async def get_machine_type(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine type with provided ID not found",
         )
+    
+    audit_logs = (await session.scalars(
+        select(AuditLog).where(AuditLog.content.op("?")("machine_type_id")).order_by(AuditLog.time_created.desc())
+    )).all()
 
-    return MachineTypeInfo(
-        id=machine_type.id,
-        name=machine_type.name,
-        resource_slots=[
-            ResourceSlotInfo(
-                id=resource_slot.id,
-                db_name=resource_slot.db_name,
-                display_name=resource_slot.display_name,
-                valid_resources=[
-                    ResourceInfo(
-                        id=resource.id,
-                        name=resource.name,
-                        units=resource.units,
-                        brand=resource.brand,
-                        cost=resource.cost,
-                    )
-                    for resource in resource_slot.valid_resources
-                ],
-                allow_own_material=resource_slot.allow_own_material,
-                allow_empty=resource_slot.allow_empty,
-            )
-            for resource_slot in machine_type.resource_slots
+    return MachineTypeDetails(
+        audit_logs=list(audit_logs),
+        resource_slot_ids=[
+            resource_slot.id for resource_slot in machine_type.resource_slots
         ],
+        **machine_type.__dict__,
     )
 
 
@@ -133,28 +131,10 @@ async def get_all_machine_types(
 
     return [
         MachineTypeInfo(
-            id=machine_type.id,
-            name=machine_type.name,
-            resource_slots=[
-                ResourceSlotInfo(
-                    id=resource_slot.id,
-                    db_name=resource_slot.db_name,
-                    display_name=resource_slot.display_name,
-                    valid_resources=[
-                        ResourceInfo(
-                            id=resource.id,
-                            name=resource.name,
-                            units=resource.units,
-                            brand=resource.brand,
-                            cost=resource.cost,
-                        )
-                        for resource in resource_slot.valid_resources
-                    ],
-                    allow_own_material=resource_slot.allow_own_material,
-                    allow_empty=resource_slot.allow_empty,
-                )
-                for resource_slot in machine_type.resource_slots
+            resource_slot_ids=[
+                resource_slot.id for resource_slot in machine_type.resource_slots
             ],
+            **machine_type.__dict__,
         )
         for machine_type in machine_types
     ]
@@ -197,8 +177,21 @@ async def edit_machine_type(
             detail="One or more of the provided resource slot IDs is invalid",
         )
 
+    differences = {
+        "name": request.name if machine_type.name != request.name else None,
+        "resource_slots": request.resource_slot_ids if set(machine_type.resource_slots) != set(resource_slots) else None,
+    }
+
     machine_type.name = request.name
     machine_type.resource_slots = list(resource_slots)
+
+    audit_log = AuditLog(type=LogType.MACHINE_TYPE_EDITED, content={
+        "machine_type_id": machine_type.id,
+        "user_rcsid": current_user.RCSID,
+        "changed_values": differences
+    })
+    session.add(audit_log)
+
     await session.commit()
 
 
@@ -231,4 +224,8 @@ async def delete_machine_type(
         )
 
     await session.delete(machine_type)
+
+    audit_log = AuditLog(type=LogType.MACHINE_TYPE_DELETED, content={"machine_type_id": machine_type.id, "user_rcsid": current_user.RCSID})
+    session.add(audit_log)
+
     await session.commit()

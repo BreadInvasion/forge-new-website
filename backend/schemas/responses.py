@@ -1,7 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel, ConfigDict, UUID4, Field
+
+from models.audit_log import AuditLog
 
 from .enums import GenderStatsType, PronounType
 
@@ -44,20 +46,21 @@ class UserNoHash(BaseModel):
 
     is_graduating: bool
 
-
 class MachineInfo(BaseModel):
     id: UUID4
     name: str
+    machine_usage_id: Optional[UUID4]
 
-    is_in_use: bool
-    is_failed: bool
-
+class MachineDetails(MachineInfo):
+    audit_logs: list[AuditLog]
 
 class MachineInfoGroup(BaseModel):
     id: UUID4
     name: str
-    machines: List[MachineInfo]
+    machine_ids: list[UUID4]
 
+class MachineInfoGroupDetails(MachineInfoGroup):
+    audit_logs: list[AuditLog]
 
 class ResourceInfo(BaseModel):
     id: UUID4
@@ -66,21 +69,27 @@ class ResourceInfo(BaseModel):
     units: str
     cost: Decimal = Field(max_digits=10, decimal_places=5)
 
+class ResourceDetails(ResourceInfo):
+    audit_logs: list[AuditLog]
 
 class ResourceSlotInfo(BaseModel):
     id: UUID4
     db_name: str
     display_name: str
-    valid_resources: list[ResourceInfo]
+    valid_resource_ids: list[UUID4]
     allow_own_material: bool
     allow_empty: bool
 
+class ResourceSlotDetails(ResourceSlotInfo):
+    audit_logs: list[AuditLog]
 
 class MachineTypeInfo(BaseModel):
     id: UUID4
     name: str
-    resource_slots: list[ResourceSlotInfo]
+    resource_slot_ids: list[UUID4]
 
+class MachineTypeDetails(MachineTypeInfo):
+    audit_logs: list[AuditLog]
 
 class MachineCreateResponse(BaseResponse):
     machine_id: UUID4
@@ -90,21 +99,21 @@ class CreateResponse(BaseResponse):
     id: UUID4
 
 
-class MachineUsageFailureLog(BaseModel):
-    usage_id: UUID4
-    machine_id: UUID4
+class ResourceSlotSchema(BaseModel):
+    resource_slot_id: UUID4
+    display_name: str
 
-    # Only one of these two pairs should be populated
-    user_id: Optional[UUID4]
-    user_name: Optional[str]
-    organization_id: Optional[UUID4]
-    organization_name: Optional[str]
+    valid_resources: list[ResourceInfo]
 
-    failed_at: datetime
-    failed_by_id: UUID4
-    failed_by_name: str
-    failure_reason: str
+    allow_own_material: bool
+    allow_empty: bool
 
+class MachineUsageSchema(BaseResponse):
+    name: str
+    group_id: UUID4 | None
+    group_name: str | None
+    type_id: UUID4
+    type_name: str
+    resource_slots: list[ResourceSlotSchema]
 
-class MachineUsageFailureLogsResponse(BaseResponse):
-    logs: List[MachineUsageFailureLog]
+    maintenance_mode: bool
