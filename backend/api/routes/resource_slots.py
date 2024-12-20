@@ -62,7 +62,7 @@ async def create_resource_slot(
     await session.refresh(new_resource_slot)
 
     audit_log = AuditLog(type=LogType.RESOURCE_SLOT_CREATED, content={
-        "resource_slot_id": new_resource_slot.id,
+        "resource_slot_id": str(new_resource_slot.id),
         "user_rcsid": current_user.RCSID,
         "props": request,
     })
@@ -162,7 +162,7 @@ async def edit_resource_slot(
     resource_slot.allow_own_material = request.allow_own_material
 
     audit_log = AuditLog(type=LogType.RESOURCE_SLOT_EDITED, content={
-        "resource_slot_id": resource_slot.id,
+        "resource_slot_id": str(resource_slot.id),
         "user_rcsid": current_user.RCSID,
         "changed_values": differences,
     })
@@ -190,7 +190,13 @@ async def delete_resource_slot(
 
     await session.delete(resource_slot)
 
-    audit_log = AuditLog(type=LogType.RESOURCE_SLOT_DELETED, content={"resource_slot_id": resource_slot.id, "user_rcsid": current_user.RCSID})
+    audit_log = AuditLog(
+        type=LogType.RESOURCE_SLOT_DELETED,
+        content={
+            "resource_slot_id": str(resource_slot.id),
+            "user_rcsid": current_user.RCSID
+        }
+    )
     session.add(audit_log)
 
     await session.commit()

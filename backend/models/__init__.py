@@ -1,4 +1,5 @@
 from .base import Base
+from .audit_log import AuditLog
 from .machine_group import MachineGroup
 from .machine_type import MachineType
 from .machine_usage import MachineUsage

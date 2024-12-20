@@ -44,7 +44,7 @@ async def create_machine_group(
     await session.refresh(new_machine_group)
 
     audit_log = AuditLog(type=LogType.MACHINE_GROUP_DELETED, content={
-        "machine_group_id": new_machine_group.id,
+        "machine_group_id": str(new_machine_group.id),
         "user_rcsid": current_user.RCSID,
         "props": request,
     })
@@ -154,7 +154,7 @@ async def edit_machine_group(
     machine_group.machines = list(machines)
 
     audit_log = AuditLog(type=LogType.MACHINE_GROUP_DELETED, content={
-        "machine_group_id": machine_group.id,
+        "machine_group_id": str(machine_group.id),
         "user_rcsid": current_user.RCSID,
         "changed_values": differences,
     })
@@ -193,7 +193,7 @@ async def delete_machine_group(
     await session.delete(machine_group)
 
     audit_log = AuditLog(type=LogType.MACHINE_GROUP_DELETED, content={
-        "machine_group_id": machine_group.id,
+        "machine_group_id": str(machine_group.id),
         "user_rcsid": current_user.RCSID
     })
     session.add(audit_log)

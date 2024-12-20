@@ -183,7 +183,7 @@ async def use_a_machine(
     audit_log = AuditLog(
         type=LogType.MACHINE_USED,
         content={
-            "machine_usage_id": machine_usage.id,
+            "machine_usage_id": str(machine_usage.id),
             "user_id": current_user.id,
             "props": request,
         }

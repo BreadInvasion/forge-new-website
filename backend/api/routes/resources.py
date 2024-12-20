@@ -49,10 +49,13 @@ async def create_resource(
     await session.commit()
     await session.refresh(new_resource)
 
-    audit_log = AuditLog(type=LogType.RESOURCE_CREATED, content={
-        "resource_id": new_resource.id,
-        "user_id": current_user.id,
-    })
+    audit_log = AuditLog(
+        type=LogType.RESOURCE_CREATED,
+        content={
+            "resource_id": str(new_resource.id),
+            "user_id": current_user.id,
+        },
+    )
     session.add(audit_log)
     await session.commit()
 
@@ -75,10 +78,14 @@ async def get_resource(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resource with provided ID not found",
         )
-    
-    audit_logs = (await session.scalars(
-        select(AuditLog).where(AuditLog.content.op("?")("resource_id")).order_by(AuditLog.time_created.desc())
-    )).all()
+
+    audit_logs = (
+        await session.scalars(
+            select(AuditLog)
+            .where(AuditLog.content.op("?")("resource_id"))
+            .order_by(AuditLog.time_created.desc())
+        )
+    ).all()
 
     return ResourceDetails(
         audit_logs=list(audit_logs),
@@ -97,12 +104,7 @@ async def get_all_resources(
 
     resources = (await session.scalars(select(Resource))).all()
 
-    return [
-        ResourceInfo(
-            **resource.__dict__
-        )
-        for resource in resources
-    ]
+    return [ResourceInfo(**resource.__dict__) for resource in resources]
 
 
 @router.post("/resources/{resource_id}")
@@ -122,7 +124,7 @@ async def edit_resource(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resource with provided ID not found",
         )
-    
+
     differences = {
         "name": request.name if resource.name != request.name else None,
         "brand": request.brand if resource.brand != request.brand else None,
@@ -135,11 +137,14 @@ async def edit_resource(
     resource.units = request.units
     resource.cost = request.cost
 
-    audit_log = AuditLog(type=LogType.RESOURCE_EDITED, content={
-        "resource_id": resource_id,
-        "user_id": current_user.id,
-        "changed_values": differences,
-    })
+    audit_log = AuditLog(
+        type=LogType.RESOURCE_EDITED,
+        content={
+            "resource_id": str(resource_id),
+            "user_id": current_user.id,
+            "changed_values": differences,
+        },
+    )
     session.add(audit_log)
 
     await session.commit()
@@ -163,11 +168,14 @@ async def delete_resource(
         )
 
     await session.delete(resource)
-    
-    audit_log = AuditLog(type=LogType.RESOURCE_DELETED, content={
-        "resource_id": resource_id,
-        "user_id": current_user.id,
-    })
+
+    audit_log = AuditLog(
+        type=LogType.RESOURCE_DELETED,
+        content={
+            "resource_id": str(resource_id),
+            "user_id": current_user.id,
+        },
+    )
     session.add(audit_log)
 
     await session.commit()

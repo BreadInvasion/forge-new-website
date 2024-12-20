@@ -62,7 +62,7 @@ async def create_machine(
     await session.refresh(new_machine)
 
     audit_log = AuditLog(type=LogType.MACHINE_CREATED, content={
-        "machine_id": new_machine.id,
+        "machine_id": str(new_machine.id),
         "user_rcsid": current_user.RCSID,
         "props": request,
     })
@@ -183,7 +183,7 @@ async def edit_machine(
     machine.disabled = request.disabled
 
     audit_log = AuditLog(type=LogType.MACHINE_EDITED, content={
-        "machine_id": machine.id,
+        "machine_id": str(machine.id),
         "user_rcsid": current_user.RCSID,
         "changed_values": differences,
     })
@@ -222,7 +222,13 @@ async def delete_machine(
 
     await session.delete(machine)
 
-    audit_log = AuditLog(type=LogType.MACHINE_DELETED, content={"machine_id": machine.id, "user_rcsid": current_user.RCSID})
+    audit_log = AuditLog(
+        type=LogType.MACHINE_DELETED,
+        content={
+            "machine_id": str(machine.id),
+            "user_rcsid": current_user.RCSID
+        }
+    )
     session.add(audit_log)
 
     await session.commit()
