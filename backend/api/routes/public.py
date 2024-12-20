@@ -24,13 +24,14 @@ async def get_machines_status(
     group_dict = groupby(machines, key=lambda x: x.group_id)
     group_list = []
     loner_list = []
-    for k, group in group_dict:
+    for _, group in group_dict:
         machines = list(group)
 
         machine_statuses = [
             MachineStatus.model_validate({
                 "in_use": machine.active_usage is not None,
                 "failed": machine.active_usage.failed if machine.active_usage else False,
+                "failed_at": machine.active_usage.failed_at if machine.active_usage else None,
                 "usage_start": machine.active_usage.time_started if machine.active_usage else None,
                 "usage_duration": machine.active_usage.duration_seconds if machine.active_usage else None,
                 **machine.__dict__,

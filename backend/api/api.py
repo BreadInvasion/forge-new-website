@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 
+from api.routes import volunteer_actions
+
 from .routes import (
     auth,
     machine_groups,
@@ -22,3 +24,4 @@ api_router.include_router(resource_slots.router, tags=["resource_slots"])
 api_router.include_router(resources.router, tags=["resources"])
 api_router.include_router(users.router, tags=["users"])
 api_router.include_router(use_a_machine.router, tags=["use_a_machine"])
+api_router.include_router(volunteer_actions.router, tags=["volunteer_actions"])

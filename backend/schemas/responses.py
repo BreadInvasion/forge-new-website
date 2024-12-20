@@ -64,6 +64,7 @@ class MachineStatus(BaseResponse):
     maintenance_mode: bool
     disabled: bool
     failed: bool
+    failed_at: Optional[datetime] = None
 
 class MachineStatusGroup(BaseResponse):
     name: str

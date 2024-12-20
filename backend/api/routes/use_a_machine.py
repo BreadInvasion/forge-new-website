@@ -176,8 +176,10 @@ async def use_a_machine(
         cost=total_cost,
         resources_used=resource_usage_quantities,
     )
+    machine.active_usage = machine_usage
     
     session.add(machine_usage)
+    session.add(machine)
     await session.commit()
     await session.refresh(machine_usage)
 

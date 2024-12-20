@@ -27,9 +27,8 @@ class Machine(Base):
     group: Mapped[Optional["MachineGroup"]] = relationship()
     group_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("machine_groups.id"), nullable=True)
 
-    active_usage: Mapped[Optional["MachineUsage"]] = relationship(
-        back_populates="machine"
-    )
+    active_usage: Mapped[Optional["MachineUsage"]] = relationship()
+    active_usage_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("machine_usages.id"), nullable=True)
 
     # Prevent usage by members, show in machine list as in maintenance mode
     maintenance_mode: Mapped[bool] = mapped_column(default=False)

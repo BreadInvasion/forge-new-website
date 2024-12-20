@@ -23,7 +23,7 @@ class MachineUsage(Base):
     )
 
     machine_id: Mapped[UUID] = mapped_column(ForeignKey("machines.id"))
-    machine: Mapped["Machine"] = relationship(back_populates="active_usage")
+    machine: Mapped["Machine"] = relationship()
 
     semester_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("semesters.id"))
     semester: Mapped[Optional["Semester"]] = relationship()
@@ -36,6 +36,7 @@ class MachineUsage(Base):
 
     # Did usage fail?
     failed: Mapped[bool] = mapped_column(default=False)
+    failed_at: Mapped[Optional[datetime]]
 
     cost: Mapped[float]
 
