@@ -10,7 +10,7 @@ from models.audit_log import AuditLog
 from models.machine import Machine
 from models.machine_group import MachineGroup
 from schemas.requests import MachineGroupCreateRequest, MachineGroupEditRequest
-from schemas.responses import CreateResponse, MachineInfo, MachineInfoGroup, MachineInfoGroupDetails
+from schemas.responses import AuditLogModel, CreateResponse, MachineInfo, MachineInfoGroup, MachineInfoGroupDetails
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
@@ -46,7 +46,7 @@ async def create_machine_group(
     audit_log = AuditLog(type=LogType.MACHINE_GROUP_DELETED, content={
         "machine_group_id": str(new_machine_group.id),
         "user_rcsid": current_user.RCSID,
-        "props": request.model_dump_json(),
+        "props": request.model_dump(mode="json"),
     })
     session.add(audit_log)
     await session.commit()
@@ -80,7 +80,7 @@ async def get_machine_group(
     )).all()
 
     return MachineInfoGroupDetails(
-        audit_logs=list(audit_logs),
+        audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         machine_ids=[machine.id for machine in machine_group.machines],
         **machine_group.__dict__,
     )

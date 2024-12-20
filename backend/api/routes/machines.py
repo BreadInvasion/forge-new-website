@@ -12,7 +12,7 @@ from models.machine_group import MachineGroup
 from models.machine_type import MachineType
 from models.machine_usage import MachineUsage
 from schemas.requests import MachineCreateRequest, MachineEditRequest
-from schemas.responses import CreateResponse, MachineDetails, MachineInfo
+from schemas.responses import AuditLogModel, CreateResponse, MachineDetails, MachineInfo
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
@@ -98,7 +98,7 @@ async def get_machine(
     )).all()
 
     return MachineDetails(
-        audit_logs=list(audit_logs),
+        audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         machine_usage_id=(machine.active_usage.id if machine.active_usage else None),
         **machine.__dict__,
     )

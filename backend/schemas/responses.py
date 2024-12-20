@@ -5,11 +5,15 @@ from pydantic import BaseModel, ConfigDict, UUID4, Field
 
 from .enums import GenderStatsType, LogType, PronounType
 
-if TYPE_CHECKING:
-    from ..models.audit_log import AuditLog
-
 class BaseResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+
+
+class AuditLogModel(BaseResponse):
+    id: UUID4
+    time_created: datetime
+    type: LogType
+    content: dict[str, Any]
 
 
 class AccessTokenResponse(BaseResponse):
@@ -52,7 +56,7 @@ class MachineInfo(BaseModel):
     machine_usage_id: Optional[UUID4]
 
 class MachineDetails(MachineInfo):
-    audit_logs: list["AuditLog"]
+    audit_logs: list[AuditLogModel]
 
 class MachineInfoGroup(BaseModel):
     id: UUID4
@@ -60,7 +64,7 @@ class MachineInfoGroup(BaseModel):
     machine_ids: list[UUID4]
 
 class MachineInfoGroupDetails(MachineInfoGroup):
-    audit_logs: list["AuditLog"]
+    audit_logs: list[AuditLogModel]
 
 class ResourceInfo(BaseModel):
     id: UUID4
@@ -70,7 +74,7 @@ class ResourceInfo(BaseModel):
     cost: Decimal = Field(max_digits=10, decimal_places=5)
 
 class ResourceDetails(ResourceInfo):
-    audit_logs: list["AuditLog"]
+    audit_logs: list[AuditLogModel]
 
 class ResourceSlotInfo(BaseModel):
     id: UUID4
@@ -81,7 +85,7 @@ class ResourceSlotInfo(BaseModel):
     allow_empty: bool
 
 class ResourceSlotDetails(ResourceSlotInfo):
-    audit_logs: list["AuditLog"]
+    audit_logs: list[AuditLogModel]
 
 class MachineTypeInfo(BaseModel):
     id: UUID4
@@ -89,7 +93,7 @@ class MachineTypeInfo(BaseModel):
     resource_slot_ids: list[UUID4]
 
 class MachineTypeDetails(MachineTypeInfo):
-    audit_logs: list["AuditLog"]
+    audit_logs: list[AuditLogModel]
 
 class MachineCreateResponse(BaseResponse):
     machine_id: UUID4

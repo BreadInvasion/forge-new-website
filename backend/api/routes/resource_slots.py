@@ -11,7 +11,7 @@ from models.resource import Resource
 from models.resource_slot import ResourceSlot
 from models.resource_usage_quantity import ResourceUsageQuantity
 from schemas.requests import ResourceSlotCreateRequest, ResourceSlotEditRequest
-from schemas.responses import CreateResponse, ResourceSlotInfo, ResourceSlotDetails
+from schemas.responses import AuditLogModel, CreateResponse, ResourceSlotInfo, ResourceSlotDetails
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
@@ -97,7 +97,7 @@ async def get_resource_slot(
     )).all()
 
     return ResourceSlotDetails(
-        audit_logs=list(audit_logs),
+        audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         valid_resource_ids=[resource.id for resource in resource_slot.valid_resources],
         **resource_slot.__dict__,
     )

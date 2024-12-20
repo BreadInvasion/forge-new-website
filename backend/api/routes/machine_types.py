@@ -12,6 +12,7 @@ from models.machine_type import MachineType
 from models.resource_slot import ResourceSlot
 from schemas.requests import MachineTypeCreateRequest, MachineTypeEditRequest
 from schemas.responses import (
+    AuditLogModel,
     CreateResponse,
     MachineTypeDetails,
     MachineTypeInfo,
@@ -102,7 +103,7 @@ async def get_machine_type(
     )).all()
 
     return MachineTypeDetails(
-        audit_logs=list(audit_logs),
+        audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         resource_slot_ids=[
             resource_slot.id for resource_slot in machine_type.resource_slots
         ],

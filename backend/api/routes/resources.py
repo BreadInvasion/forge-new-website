@@ -8,7 +8,7 @@ from sqlalchemy import and_, select
 from models.audit_log import AuditLog
 from models.resource import Resource
 from schemas.requests import ResourceCreateRequest, ResourceEditRequest
-from schemas.responses import CreateResponse, ResourceDetails, ResourceInfo
+from schemas.responses import AuditLogModel, CreateResponse, ResourceDetails, ResourceInfo
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
@@ -53,7 +53,7 @@ async def create_resource(
         type=LogType.RESOURCE_CREATED,
         content={
             "resource_id": str(new_resource.id),
-            "user_id": current_user.id,
+            "user_id": str(current_user.id),
         },
     )
     session.add(audit_log)
@@ -88,7 +88,7 @@ async def get_resource(
     ).all()
 
     return ResourceDetails(
-        audit_logs=list(audit_logs),
+        audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         **resource.__dict__,
     )
 
@@ -141,7 +141,7 @@ async def edit_resource(
         type=LogType.RESOURCE_EDITED,
         content={
             "resource_id": str(resource_id),
-            "user_id": current_user.id,
+            "user_id": str(current_user.id),
             "changed_values": differences,
         },
     )
@@ -173,7 +173,7 @@ async def delete_resource(
         type=LogType.RESOURCE_DELETED,
         content={
             "resource_id": str(resource_id),
-            "user_id": current_user.id,
+            "user_id": str(current_user.id),
         },
     )
     session.add(audit_log)
