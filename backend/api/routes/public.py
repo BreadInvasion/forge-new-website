@@ -18,24 +18,27 @@ async def get_machines_status(
 
     machines = (
         await session.scalars(
-            select(Machine).options(selectinload(Machine.active_usage)).options(selectinload(Machine.group).options(selectinload(Machine.type)))
+            select(Machine).options(selectinload(Machine.active_usage)).options(selectinload(Machine.group)).options(selectinload(Machine.type))
     )).all()
 
     group_dict = groupby(machines, key=lambda x: x.group_id)
     group_list = []
     loner_list = []
-    for _, group in group_dict:
+    for k, group in group_dict:
+        machines = list(group)
+
         machine_statuses = [
-            MachineStatus(
-                in_use=machine.active_usage is not None,
-                failed=machine.active_usage.failed if machine.active_usage else False,
-                usage_start=machine.active_usage.time_started if machine.active_usage else None,
-                usage_duration=machine.active_usage.duration_seconds if machine.active_usage else None,
+            MachineStatus.model_validate({
+                "in_use": machine.active_usage is not None,
+                "failed": machine.active_usage.failed if machine.active_usage else False,
+                "usage_start": machine.active_usage.time_started if machine.active_usage else None,
+                "usage_duration": machine.active_usage.duration_seconds if machine.active_usage else None,
                 **machine.__dict__,
-            ) for machine in list(group)
+            }) for machine in machines
         ]
 
-        first_machine = list(group)[0]
+        
+        first_machine = machines[0]
         # We portray it like this just to make linter happy
         if first_machine.group is None:
             loner_list = machine_statuses

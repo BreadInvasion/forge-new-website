@@ -70,7 +70,7 @@ class MachineStatusGroup(BaseResponse):
     machines: list[MachineStatus]
 
 class AllMachinesStatusResponse(BaseResponse):
-    groups: list[MachineStatus]
+    groups: list[MachineStatusGroup]
     loners: list[MachineStatus]
 
 class MachineDetails(MachineInfo):
