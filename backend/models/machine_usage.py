@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import DateTime, ForeignKey, func
 from .base import Base
 
 from datetime import datetime
@@ -31,6 +31,7 @@ class MachineUsage(Base):
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", name="fk_used_by"))
     user: Mapped["User"] = relationship(foreign_keys=[user_id])
 
+    time_started: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     duration_seconds: Mapped[int]
 
     # Did usage fail?

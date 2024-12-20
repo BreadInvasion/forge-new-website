@@ -55,6 +55,24 @@ class MachineInfo(BaseModel):
     name: str
     machine_usage_id: Optional[UUID4]
 
+class MachineStatus(BaseResponse):
+    id: UUID4
+    name: str
+    in_use: bool
+    usage_start: Optional[datetime] = None
+    usage_duration: Optional[int] = None
+    maintenance_mode: bool
+    disabled: bool
+    failed: bool
+
+class MachineStatusGroup(BaseResponse):
+    name: str
+    machines: list[MachineStatus]
+
+class AllMachinesStatusResponse(BaseResponse):
+    groups: list[MachineStatus]
+    loners: list[MachineStatus]
+
 class MachineDetails(MachineInfo):
     audit_logs: list[AuditLogModel]
 
