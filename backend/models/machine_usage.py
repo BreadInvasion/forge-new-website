@@ -25,8 +25,8 @@ class MachineUsage(Base):
     machine_id: Mapped[UUID] = mapped_column(ForeignKey("machines.id"))
     machine: Mapped["Machine"] = relationship(back_populates="active_usage")
 
-    semester_id: Mapped[UUID] = mapped_column(ForeignKey("semesters.id"))
-    semester: Mapped["Semester"] = relationship()
+    semester_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("semesters.id"))
+    semester: Mapped[Optional["Semester"]] = relationship()
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", name="fk_used_by"))
     user: Mapped["User"] = relationship(foreign_keys=[user_id])

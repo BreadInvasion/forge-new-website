@@ -103,7 +103,7 @@ class CreateResponse(BaseResponse):
     id: UUID4
 
 
-class ResourceSlotSchema(BaseModel):
+class ResourceSlotSchema(BaseResponse):
     resource_slot_id: UUID4
     display_name: str
 

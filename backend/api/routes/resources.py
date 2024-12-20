@@ -53,7 +53,7 @@ async def create_resource(
         type=LogType.RESOURCE_CREATED,
         content={
             "resource_id": str(new_resource.id),
-            "user_id": str(current_user.id),
+            "user_rcsid": current_user.RCSID,
         },
     )
     session.add(audit_log)
@@ -141,7 +141,7 @@ async def edit_resource(
         type=LogType.RESOURCE_EDITED,
         content={
             "resource_id": str(resource_id),
-            "user_id": str(current_user.id),
+            "user_rcsid": current_user.RCSID,
             "changed_values": differences,
         },
     )
@@ -173,7 +173,7 @@ async def delete_resource(
         type=LogType.RESOURCE_DELETED,
         content={
             "resource_id": str(resource_id),
-            "user_id": str(current_user.id),
+            "user_rcsid": current_user.RCSID,
         },
     )
     session.add(audit_log)

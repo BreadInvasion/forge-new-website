@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from models.audit_log import AuditLog
 from models.machine_usage import MachineUsage
-from schemas.responses import MachineUsageSchema
+from schemas.responses import MachineUsageSchema, ResourceInfo, ResourceSlotSchema
 
 from ..utils import has_permissions_any
 from models.machine import Machine
@@ -37,10 +37,8 @@ async def get_usage_schema(
         select(Machine)
         .where(Machine.id == machine_id)
         .options(selectinload(Machine.group))
-        .options(selectinload(Machine.type))
+        .options(selectinload(Machine.type).selectinload(MachineType.resource_slots).selectinload(ResourceSlot.valid_resources))
         .options(selectinload(Machine.active_usage))
-        .options(selectinload(MachineType.resource_slots))
-        .options(selectinload(ResourceSlot.valid_resources))
     )
 
     if not machine or (
@@ -59,6 +57,11 @@ async def get_usage_schema(
     return MachineUsageSchema(
         group_name=machine.group.name if machine.group else None,
         type_name=machine.type.name,
+        resource_slots=[ResourceSlotSchema.model_validate({
+            **slot.__dict__,
+            "resource_slot_id": slot.id,
+            "valid_resources": [ResourceInfo.model_validate(resource.__dict__) for resource in slot.valid_resources],
+        }) for slot in machine.type.resource_slots],
         **machine.__dict__
     )
 
@@ -76,10 +79,8 @@ async def use_a_machine(
     machine = await session.scalar(
         select(Machine)
         .where(Machine.id == machine_id)
-        .options(selectinload(Machine.type))
+        .options(selectinload(Machine.type).selectinload(MachineType.resource_slots).selectinload(ResourceSlot.valid_resources))
         .options(selectinload(Machine.active_usage))
-        .options(selectinload(MachineType.resource_slots))
-        .options(selectinload(ResourceSlot.valid_resources))
     )
 
     if not machine or (
@@ -184,7 +185,7 @@ async def use_a_machine(
         type=LogType.MACHINE_USED,
         content={
             "machine_usage_id": str(machine_usage.id),
-            "user_id": str(current_user.id),
+            "user_rcsid": current_user.RCSID,
             "props": request.model_dump(mode="json"),
         }
     )
