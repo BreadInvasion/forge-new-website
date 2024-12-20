@@ -64,7 +64,7 @@ async def create_resource_slot(
     audit_log = AuditLog(type=LogType.RESOURCE_SLOT_CREATED, content={
         "resource_slot_id": str(new_resource_slot.id),
         "user_rcsid": current_user.RCSID,
-        "props": request,
+        "props": request.model_dump(mode="json"),
     })
     session.add(audit_log)
     await session.commit()

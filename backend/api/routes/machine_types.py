@@ -64,7 +64,7 @@ async def create_machine_type(
     audit_log = AuditLog(type=LogType.MACHINE_TYPE_CREATED, content={
         "machine_type_id": str(new_machine_type.id),
         "user_rcsid": current_user.RCSID,
-        "props": request,
+        "props": request.model_dump(mode="json"),
     })
     session.add(audit_log)
     await session.commit()

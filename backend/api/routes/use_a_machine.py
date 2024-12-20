@@ -185,7 +185,7 @@ async def use_a_machine(
         content={
             "machine_usage_id": str(machine_usage.id),
             "user_id": current_user.id,
-            "props": request,
+            "props": request.model_dump(mode="json"),
         }
     )
     session.add(audit_log)
