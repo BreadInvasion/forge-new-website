@@ -8,6 +8,7 @@ from .routes import (
     resource_slots,
     resources,
     users,
+    use_a_machine,
 )
 
 api_router = APIRouter()
@@ -18,3 +19,4 @@ api_router.include_router(machines.router, tags=["machines"])
 api_router.include_router(resource_slots.router, tags=["resource_slots"])
 api_router.include_router(resources.router, tags=["resources"])
 api_router.include_router(users.router, tags=["users"])
+api_router.include_router(use_a_machine.router, tags=["use_a_machine"])
