@@ -1,0 +1,22 @@
+.tab-container {
+  display: flex;
+  flex-grow: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+.tab-column-cover {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}

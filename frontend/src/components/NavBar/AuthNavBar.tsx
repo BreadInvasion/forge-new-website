@@ -6,7 +6,7 @@ import * as NavMenu from "@radix-ui/react-navigation-menu";
 import { ReactComponent as ForgeSVG } from 'src/assets/img/logo.svg';
 import { CaretDownIcon } from '@radix-ui/react-icons';
 
-import './styles/Avatar.scss';
+// import './styles/Avatar.scss';
 import './styles/UserMenu.scss';
 import './styles/NavBar.scss';
 
@@ -34,8 +34,8 @@ const UserMenu: React.FC<NavBarProps> = ({user, setAuth}) => {
                 {user.RCSID} <CaretDownIcon className='caret-down' aria-hidden />
             </NavMenu.Trigger>
             <NavMenu.Content className='user-content' >
-                <NavMenu.Link className='link' href="/user/summary">Summary</NavMenu.Link>
-                <NavMenu.Link className='link' href="/user/usages">Usages</NavMenu.Link>
+                <NavMenu.Link className='link' href="/myforge">Summary</NavMenu.Link>
+                <NavMenu.Link className='link' href="/myforge/usages">Usages</NavMenu.Link>
                 <NavMenu.Link className='link' href="/" onSelect={(e) => onSignOut()}>Logout</NavMenu.Link>
             </NavMenu.Content>
         </NavMenu.Item>

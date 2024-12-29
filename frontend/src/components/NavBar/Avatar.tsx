@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as AvatarPrimitive from '@radix-ui/react-avatar';
 
-import './styles/Avatar.scss';
+// import './styles/Avatar.scss';
 
 const Avatar = () => {
     return (

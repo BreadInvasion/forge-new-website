@@ -2673,6 +2673,13 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.npmjs.org/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
+react-minimal-pie-chart@^9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/react-minimal-pie-chart/-/react-minimal-pie-chart-9.1.0.tgz#bc77820e584bfd483615f0b1b43f0ab1a619d3d0"
+  integrity sha512-JziZXZT0aw+9X+rGSpQwbSG7t3ypsyhzJNpiTUGfVeCqr70YIPbHE5Us3RsCsNRlVHbeLGrp/ibVuzUJT6Gcvw==
+  dependencies:
+    svg-partial-circle "^1.0.0"
+
 react-refresh@^0.14.0:
   version "0.14.0"
   resolved "https://registry.npmjs.org/react-refresh/-/react-refresh-0.14.0.tgz"
@@ -2967,6 +2974,11 @@ svg-parser@^2.0.4:
   version "2.0.4"
   resolved "https://registry.npmjs.org/svg-parser/-/svg-parser-2.0.4.tgz"
   integrity sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==
+
+svg-partial-circle@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/svg-partial-circle/-/svg-partial-circle-1.0.0.tgz#1121e8e03bdd895b34d655d75b98b8fc7086347e"
+  integrity sha512-jDWgNzrlpsGo9A7/tdjCy6+1RzeeANYV1a3JtNYC/0ZXI3U+3VMucuNv7JuKti9VVBdyNxNO1CZs/k0xS1lUFA==
 
 three@^0.159.0:
   version "0.159.0"

@@ -3,7 +3,7 @@ import * as NavMenu from "@radix-ui/react-navigation-menu";
 import { ReactComponent as ForgeSVG } from 'src/assets/img/logo.svg';
 import { CaretDownIcon } from '@radix-ui/react-icons';
 
-import './styles/Avatar.scss';
+// import './styles/Avatar.scss';
 import './styles/UserMenu.scss';
 import './styles/NavBar.scss';
 

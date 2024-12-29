@@ -1,0 +1,162 @@
+@use "./UserMenu.variables.scss" as um;
+
+
+.avatar-root {
+    display: block;
+    border-radius: 100%;
+    overflow: hidden;
+    width: 125px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+}
+
+.avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
+.avatar-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: um.$gray-background;
+    color: um.$text-gray;
+    font-size: 2rem;
+    line-height: 1;
+    font-weight: bold;
+}
+
+.user-summary {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    height: auto;
+    overflow: visible;
+    margin-top: 1rem;
+}
+
+.user-summary h2 {
+    font-size: 1.5rem;
+    margin: 0 auto;
+}
+
+.user-summary h3 {
+    font-size: 0.75rem;
+    margin: 0 auto;
+    color: um.$soft-gray;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 18%;
+    height: 100%;
+    background-color: um.$white-background;
+    color: um.$text-gray;
+    border-right: 1px solid um.$divider-gray;
+}
+
+
+hr.divider {
+    width: auto;
+    height: 2px;
+    background-color: um.$divider-gray;
+    margin: 10px 0;
+    border-style: none;
+    border-bottom: 2px solid um.$divider-gray;
+}
+
+div.divider {
+    width: auto;
+    height: 2px;
+    background-color: um.$divider-gray;
+    margin: 20px 1rem;
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    overflow-y: auto;
+    padding: 3%;
+    direction: rtl;
+}
+
+.options-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.options-container::-webkit-scrollbar-thumb {
+    background-color: #cccccc;
+    border-radius: 10px;
+}
+
+.options-container::-webkit-scrollbar-thumb:hover {
+    background-color: #888888;
+}
+
+.options-container::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    border-radius: 10px;
+}
+
+.user-options {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+    gap: 1rem;
+    direction: ltr;
+}
+
+.user-options li {
+    list-style: none;
+    margin: 0;
+    // padding: 0.25rem;
+    border-radius: 5px;
+    color: um.$black;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.member li {
+    background-color: um.$muted-red;
+}
+.member li:hover {
+    background-color: um.$hover-muted-red;
+}
+
+.volunteer li {
+    background-color: um.$muted-blue;
+}
+.volunteer li:hover {
+    background-color: um.$hover-muted-blue;
+}
+
+.manager li {
+    background-color: um.$muted-green;
+}
+.manager li:hover {
+    background-color: um.$hover-muted-green;
+}
+
+.eboard li {
+    background-color: um.$muted-purple;
+}
+.eboard li:hover {
+    background-color: um.$hover-muted-purple;
+}
+
+.btn {
+    display: flex;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+    width: 100%;
+    padding: 0.25rem;
+}

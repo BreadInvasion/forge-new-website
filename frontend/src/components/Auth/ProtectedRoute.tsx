@@ -7,12 +7,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  // Show a loading indicator while authentication is still being determined
-  if (isLoading) {
-    return <div>Loading...</div>; // You can replace this with a proper spinner or loader.
-  }
+  const { isAuthenticated } = useAuth();
 
   // Redirect to login if the user is not authenticated
   if (!isAuthenticated) {

@@ -1,0 +1,135 @@
+.table-container {
+    margin-top: 20px;
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 0.5rem;
+    border: 1px solid #a7a7a7;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.table-container th {
+    background-color: #e3e3e3;
+    color: #111827;
+    font-weight: bold;
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #a0a0a0;
+    border-right: 1px solid #a0a0a0;
+}
+.table-container th:first-of-type {
+    width: 20%;
+}
+.table-container th:last-of-type {
+    border-right: none;
+}
+
+.table-container td {
+    color: #333333;
+    padding: 12px;
+    border-bottom: 1px solid #a0a0a0;
+    border-right: 1px solid #a0a0a0;
+}
+.table-container td:last-of-type {
+    border-right: none;
+}
+
+.table-container tr:hover {
+    background-color: #F3F4F6;
+}
+
+.table-container tr:nth-child(even) {
+    background-color: #eaeaea;
+}
+
+.table-container svg {
+    cursor: pointer;
+}
+.table-container td svg:hover {
+    color: #f00;
+}
+.table-container td a svg:hover {
+    color: inherit;
+}
+
+#edit-col {
+    width: 8%;
+    text-align: center;
+}
+
+#delete-col {
+    width: 8%;
+    text-align: center;
+}
+
+.icon {
+    text-align: center;
+}
+
+.pagination-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-right: 30px;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.page-info {
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+}
+
+.pagination button {
+    background-color: #fff;
+    color: #111827;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    margin: 0 2px;
+}
+.pagination button:hover {
+    background-color: #c9c9c9;
+}
+
+.pagination button:disabled {
+    background-color: #a7a7a7;
+    color: #262d3b;
+    cursor: not-allowed;
+}
+
+.pagination button.active {
+    background-color: #e3e3e3;
+    color: #111827;
+}
+
+.pagination button.active:hover {
+    background-color: #c9c9c9;
+}
+
+.pagination button:first-of-type {
+    background-color: #ffffff;
+}
+.pagination button:last-of-type {
+    background-color: #ffffff;
+    margin-right: 0;
+}
+.pagination button:first-of-type:hover {
+    background-color: #c9c9c9;
+}
+.pagination button:last-of-type:hover {
+    background-color: #c9c9c9;
+}
