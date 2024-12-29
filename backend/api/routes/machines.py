@@ -115,17 +115,23 @@ async def get_all_machines(
 
     machines = (
         await session.scalars(
-            select(Machine).options(selectinload(Machine.active_usage))
+            select(Machine)
         )
     ).all()
-
-    return [
-        MachineInfo(
-            machine_usage_id=(machine.active_usage.id if machine.active_usage else None),
-            **machine.__dict__,
+    
+    compiled_machines = []
+    
+    for machine in machines:
+        group_name = await session.scalar(select(MachineGroup.name).where(MachineGroup.id == machine.group_id))
+        type_name = await session.scalar(select(MachineType.name).where(MachineType.id == machine.type_id))
+        machine_info = MachineInfo(
+            **{key: value for key, value in machine.__dict__.items() if key in MachineInfo.model_fields},
+            group=group_name,
+            type=type_name
         )
-        for machine in machines
-    ]
+        compiled_machines.append(machine_info)
+            
+    return compiled_machines
 
 
 @router.post("/machines/{machine_id}")

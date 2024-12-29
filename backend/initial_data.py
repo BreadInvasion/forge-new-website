@@ -22,9 +22,9 @@ from schemas.enums import GenderStatsType, PronounType, Permissions
 async def main() -> None:
     print("Start initial data")
     async with async_session() as session:
-        user = await session.scalar(select(User).where(User.RCSID == "haddlm"))
-
-        if not user:
+        super_user_role = await session.scalar(select(Role).where(Role.name == "Super Admin"))
+        
+        if not super_user_role:
             superuser_role = Role(
                 name="Super Admin",
                 permissions=[Permissions.IS_SUPERUSER],
@@ -35,6 +35,24 @@ async def main() -> None:
 
             session.add(superuser_role)
             await session.commit()
+            
+            super_user_role = superuser_role
+            
+            print("Superuser role was created")
+        else:
+            print("Superuser role already exists in database")
+        
+        superuser_role = Role(
+                name="Super Admin",
+                permissions=[Permissions.IS_SUPERUSER],
+                inverse_permissions=[],
+                display_role=False,
+                priority=10000,
+            )
+        
+        user = await session.scalar(select(User).where(User.RCSID == "haddlm"))
+
+        if not user:
 
             new_superuser = User(
                 RCSID="haddlm",
@@ -49,11 +67,37 @@ async def main() -> None:
                 is_rpi_staff=False,
                 is_graduating=False,
             )
+            
             session.add(new_superuser)
             await session.commit()
             print("Superuser was created")
         else:
             print("Superuser already exists in database")
+        
+        user = await session.scalar(select(User).where(User.RCSID == "byrnet2"))
+
+        if not user:
+            
+            new_superuser = User(
+                RCSID="byrnet2",
+                RIN="662029936",
+                first_name="Thomas",
+                last_name="Byrne",
+                major="Computer Science",
+                gender_identity=GenderStatsType.MALE,
+                pronouns=PronounType.HE_HIM,
+                hashed_password=security.get_password_hash(SecretStr("password")),
+                roles=[superuser_role],
+                is_rpi_staff=False,
+                is_graduating=False,
+            )
+            
+            session.add(new_superuser)
+            await session.commit()
+            print("Thomas Superuser was created")
+        else:
+            print("Thomas Superuser already exists in database")
+    
 
         print("Initial data created")
 

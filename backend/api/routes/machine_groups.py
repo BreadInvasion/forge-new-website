@@ -98,7 +98,7 @@ async def get_all_machine_groups(
     machine_groups = (
         await session.scalars(
             select(MachineGroup).options(
-                selectinload(MachineGroup.machines).subqueryload(Machine.active_usage)
+                selectinload(MachineGroup.machines)
             )
         )
     ).all()

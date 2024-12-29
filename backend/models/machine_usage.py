@@ -23,7 +23,7 @@ class MachineUsage(Base):
     )
 
     machine_id: Mapped[UUID] = mapped_column(ForeignKey("machines.id"))
-    machine: Mapped["Machine"] = relationship()
+    machine: Mapped["Machine"] = relationship(foreign_keys=[machine_id])
 
     semester_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("semesters.id"))
     semester: Mapped[Optional["Semester"]] = relationship()
