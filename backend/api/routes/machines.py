@@ -96,11 +96,15 @@ async def get_machine(
     audit_logs = (await session.scalars(
         select(AuditLog).where(AuditLog.content.op("?")("machine_id")).order_by(AuditLog.time_created.desc())
     )).all()
+    
+    group_name = await session.scalar(select(MachineGroup.name).where(MachineGroup.id == machine.group_id))
+    type_name = await session.scalar(select(MachineType.name).where(MachineType.id == machine.type_id))
 
     return MachineDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
-        machine_usage_id=(machine.active_usage.id if machine.active_usage else None),
         **machine.__dict__,
+        group=group_name,
+        type=type_name
     )
 
 
