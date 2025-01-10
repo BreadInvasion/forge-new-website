@@ -7,7 +7,10 @@ import '../styles/TabStyles.scss';
 interface MachineType extends Record<string, any> {
     id: string;
     name: string;
+    resource_slots: number;
+    count: number;
     resource_slot_ids: string[];
+    resource_types: string[];
 }
 
 const MachineTypes: React.FC = () => {
@@ -16,7 +19,7 @@ const MachineTypes: React.FC = () => {
     const columns: (keyof MachineType)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => !key.includes('_id') && key !== 'id') : [];
 
     React.useEffect(() => {
-        fetch('http://localhost:3000/api/machines', {
+        fetch('http://localhost:3000/api/machinetypes', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
