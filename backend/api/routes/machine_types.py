@@ -62,11 +62,14 @@ async def create_machine_type(
     await session.commit()
     await session.refresh(new_machine_type)
 
-    audit_log = AuditLog(type=LogType.MACHINE_TYPE_CREATED, content={
-        "machine_type_id": str(new_machine_type.id),
-        "user_rcsid": current_user.RCSID,
-        "props": request.model_dump(mode="json"),
-    })
+    audit_log = AuditLog(
+        type=LogType.MACHINE_TYPE_CREATED,
+        content={
+            "machine_type_id": str(new_machine_type.id),
+            "user_rcsid": current_user.RCSID,
+            "props": request.model_dump(mode="json"),
+        },
+    )
     session.add(audit_log)
     await session.commit()
 
@@ -97,10 +100,14 @@ async def get_machine_type(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine type with provided ID not found",
         )
-    
-    audit_logs = (await session.scalars(
-        select(AuditLog).where(AuditLog.content.op("?")("machine_type_id")).order_by(AuditLog.time_created.desc())
-    )).all()
+
+    audit_logs = (
+        await session.scalars(
+            select(AuditLog)
+            .where(AuditLog.content.op("?")("machine_type_id"))
+            .order_by(AuditLog.time_created.desc())
+        )
+    ).all()
 
     return MachineTypeDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
@@ -117,16 +124,22 @@ async def get_all_machine_types(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_MACHINE_TYPES}))
     ],
+    limit: int = 20,
+    offset: int = 0,
 ):
     "Fetch all machine types."
 
     machine_types = (
         await session.scalars(
-            select(MachineType).options(
+            select(MachineType)
+            .options(
                 selectinload(MachineType.resource_slots).subqueryload(
                     ResourceSlot.valid_resources
                 )
             )
+            .order_by(MachineType.name)
+            .offset(offset)
+            .fetch(limit)
         )
     ).all()
 
@@ -180,17 +193,24 @@ async def edit_machine_type(
 
     differences = {
         "name": request.name if machine_type.name != request.name else None,
-        "resource_slots": request.resource_slot_ids if set(machine_type.resource_slots) != set(resource_slots) else None,
+        "resource_slots": (
+            request.resource_slot_ids
+            if set(machine_type.resource_slots) != set(resource_slots)
+            else None
+        ),
     }
 
     machine_type.name = request.name
     machine_type.resource_slots = list(resource_slots)
 
-    audit_log = AuditLog(type=LogType.MACHINE_TYPE_EDITED, content={
-        "machine_type_id": str(machine_type.id),
-        "user_rcsid": current_user.RCSID,
-        "changed_values": differences
-    })
+    audit_log = AuditLog(
+        type=LogType.MACHINE_TYPE_EDITED,
+        content={
+            "machine_type_id": str(machine_type.id),
+            "user_rcsid": current_user.RCSID,
+            "changed_values": differences,
+        },
+    )
     session.add(audit_log)
 
     await session.commit()
@@ -230,8 +250,8 @@ async def delete_machine_type(
         type=LogType.MACHINE_TYPE_DELETED,
         content={
             "machine_type_id": str(machine_type.id),
-            "user_rcsid": current_user.RCSID
-        }
+            "user_rcsid": current_user.RCSID,
+        },
     )
     session.add(audit_log)
 
