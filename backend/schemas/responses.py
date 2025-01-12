@@ -51,6 +51,8 @@ class UserNoHash(BaseModel):
 
     is_graduating: bool
 
+    semester_balance: Decimal = Field(max_digits=10, decimal_places=2)
+
 
 class MachineStatus(BaseResponse):
     id: UUID4

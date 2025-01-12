@@ -176,7 +176,7 @@ async def get_all_machine_types(
                 ]
             ),
             num_machines=next(
-                item[-1] for item in num_machines if item[0] == machine_type.id
+                item[0][-1] for item in num_machines if item[0][0] == machine_type.id
             ),
             **machine_type.__dict__,
         )

@@ -1,12 +1,16 @@
 from typing import Annotated, Callable, Literal
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import or_, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import selectinload, InstrumentedAttribute
+
+from backend.models.state import State
+
 from ..deps import DBSession, PermittedUserChecker
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from models.machine_usage import MachineUsage
 from models.role import Role
 from models.user import User
 from schemas.enums import Permissions
@@ -101,6 +105,23 @@ async def get_user_by_rin(
     if user is None:
         raise HTTPException(status_code=404, detail="User with provided RIN not found")
 
+    current_semester_id = await session.scalar(select(State.active_semester_id))
+
+    semester_balance = (
+        await session.scalar(
+            select(func.sum())
+            .select_from(MachineUsage.cost)
+            .where(
+                and_(
+                    MachineUsage.user_id == user.id,
+                    MachineUsage.semester_id == current_semester_id,
+                )
+            )
+        )
+        if current_semester_id
+        else 0
+    )
+
     return UserNoHash(
         id=user.id,
         is_rpi_staff=user.is_rpi_staff,
@@ -113,6 +134,7 @@ async def get_user_by_rin(
         pronouns=user.pronouns,
         role_ids=[role.id for role in user.roles],
         is_graduating=user.is_graduating,
+        semester_balance=semester_balance,
     )
 
 
@@ -148,6 +170,21 @@ async def get_all_users(
         )
     ).all()
 
+    current_semester_id = await session.scalar(select(State.active_semester_id))
+
+    semester_balances = (
+        (
+            await session.execute(
+                select(User.id, func.sum(MachineUsage.cost))
+                .join(MachineUsage.user)
+                .where(MachineUsage.semester_id == current_semester_id)
+                .group_by(User.id)
+            )
+        ).all()
+        if current_semester_id
+        else None
+    )
+
     return [
         UserNoHash(
             id=user.id,
@@ -161,6 +198,11 @@ async def get_all_users(
             pronouns=user.pronouns,
             role_ids=[role.id for role in user.roles],
             is_graduating=user.is_graduating,
+            semester_balance=next(
+                balance[0][1]
+                for balance in semester_balances
+                if balance[0][0] == user.id
+            ),
         )
         for user in users
     ]
