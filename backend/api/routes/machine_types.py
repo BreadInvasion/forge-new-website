@@ -109,23 +109,24 @@ async def get_machine_type(
         )
     ).all()
 
-    num_machines = await session.scalar(
-        select(func.count())
-        .select_from(Machine)
-        .where(Machine.type_id == machine_type.id)
-    )
+    num_machines = (
+        await session.scalar(
+            select(func.count())
+            .select_from(Machine)
+            .where(Machine.type_id == machine_type.id)
+        )
+    ) or 0
 
     return MachineTypeDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         resource_slot_ids=[
             resource_slot.id for resource_slot in machine_type.resource_slots
         ],
-        resource_names=set().union(
-            [
-                [resource.name for resource in slot.valid_resource]
-                for slot in machine_type.resource_slots
-            ]
-        ),
+        resource_names={
+            resource.name
+            for slot in machine_type.resource_slots
+            for resource in slot.valid_resources
+        },
         num_machines=num_machines,
         **machine_type.__dict__,
     )
@@ -170,7 +171,11 @@ async def get_all_machine_types(
             resource_slot_ids=[
                 resource_slot.id for resource_slot in machine_type.resource_slots
             ],
-            resource_names={resource.name for slot in machine_type.resource_slots for resource in slot.valid_resources},
+            resource_names={
+                resource.name
+                for slot in machine_type.resource_slots
+                for resource in slot.valid_resources
+            },
             num_machines=num_machines.get(machine_type.id, 0),
             **machine_type.__dict__,
         )

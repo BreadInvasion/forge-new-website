@@ -1,10 +1,13 @@
 """ User authentication endpoints. """
 
+from decimal import Decimal
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import select
+from sqlalchemy import and_, func, select
 
+from models.machine_usage import MachineUsage
+from models.state import State
 from models.user import User
 from schemas.enums import Permissions
 from schemas.responses import AccessTokenResponse, UserNoHash
@@ -60,11 +63,33 @@ async def refresh_auth(
     # Auth and permissions check is handled by the dependency injection, so we can just return a fresh token.
     return create_token_response(current_user.RCSID)
 
+
 @router.get("/me")
 async def get_current_user(
-    current_user: Annotated[User, Depends(PermittedUserChecker(set()))]
+    session: DBSession,
+    current_user: Annotated[User, Depends(PermittedUserChecker(set()))],
 ):
     """If the user has a valid access token, return current user data"""
+
+    current_semester_id = await session.scalar(select(State.active_semester_id))
+
+    semester_balance = (
+        (
+            await session.scalar(
+                select(func.sum(MachineUsage.cost))
+                .select_from(MachineUsage)
+                .where(
+                    and_(
+                        MachineUsage.user_id == current_user.id,
+                        MachineUsage.semester_id == current_semester_id,
+                    )
+                )
+            )
+        )
+        or 0.0
+        if current_semester_id
+        else 0.0
+    )
 
     return UserNoHash(
         id=current_user.id,
@@ -78,4 +103,5 @@ async def get_current_user(
         pronouns=current_user.pronouns,
         role_ids=[role.id for role in current_user.roles],
         is_graduating=current_user.is_graduating,
+        semester_balance=Decimal(semester_balance),
     )

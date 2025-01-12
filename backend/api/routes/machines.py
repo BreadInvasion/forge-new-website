@@ -108,7 +108,7 @@ async def get_machine(
     return MachineDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         **machine.__dict__,
-        group_name=machine.group.name,
+        group_name=machine.group.name if machine.group else None,
         type_name=machine.type.name,
     )
 
@@ -138,10 +138,7 @@ async def get_all_machines(
 
     return [
         MachineInfo(
-            machine_usage_id=(
-                machine.active_usage.id if machine.active_usage else None
-            ),
-            group_name=machine.group.name,
+            group_name=machine.group.name if machine.group else None,
             type_name=machine.type.name,
             **machine.__dict__,
         )

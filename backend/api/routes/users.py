@@ -1,14 +1,13 @@
-from typing import Annotated, Callable, Literal
+from decimal import Decimal
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import ScalarSelect, and_, func, or_, select
 from sqlalchemy.orm import selectinload, InstrumentedAttribute
 
 from models.state import State
 
 from ..deps import DBSession, PermittedUserChecker
-
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.machine_usage import MachineUsage
 from models.role import Role
@@ -106,7 +105,7 @@ async def get_user_by_rcsid(
         pronouns=user.pronouns,
         role_ids=[role.id for role in user.roles],
         is_graduating=user.is_graduating,
-        semester_balance=semester_balance,
+        semester_balance=Decimal(semester_balance),
     )
 
 
@@ -158,7 +157,7 @@ async def get_user_by_rin(
         pronouns=user.pronouns,
         role_ids=[role.id for role in user.roles],
         is_graduating=user.is_graduating,
-        semester_balance=semester_balance,
+        semester_balance=Decimal(semester_balance),
     )
 
 
@@ -188,18 +187,20 @@ async def get_all_users(
 
     current_semester_id = await session.scalar(select(State.active_semester_id))
 
-    attr_key_map: dict[str, InstrumentedAttribute] = {
+    attr_key_map: dict[str, InstrumentedAttribute | ScalarSelect] = {
         "RCSID": User.RCSID,
         "RIN": User.RIN,
         "first_name": User.first_name,
         "last_name": User.last_name,
         "is_rpi_staff": User.is_rpi_staff,
-        "semester_balance": select([func.sum(MachineUsage.cost)]).where(
+        "semester_balance": select(func.sum(MachineUsage.cost))
+        .where(
             and_(
                 MachineUsage.user_id == User.id,
                 MachineUsage.semester_id == current_semester_id,
             )
-        ),
+        )
+        .as_scalar(),
         "is_graduating": User.is_graduating,
         "gender_identity": User.gender_identity,
         "pronouns": User.pronouns,
@@ -212,7 +213,7 @@ async def get_all_users(
     users = (
         await session.scalars(
             select(User)
-            .selectinload(User.roles)
+            .options(selectinload(User.roles))
             .order_by(order_determinant)
             .limit(limit)
             .offset(offset)
@@ -245,11 +246,11 @@ async def get_all_users(
             pronouns=user.pronouns,
             role_ids=[role.id for role in user.roles],
             is_graduating=user.is_graduating,
-            semester_balance=(
+            semester_balance=Decimal(
                 next(
-                    balance[0][1]
+                    balance.tuple()[1]
                     for balance in semester_balances
-                    if balance[0][0] == user.id
+                    if balance.tuple()[0] == user.id
                 )
                 if semester_balances and len(semester_balances) > 0
                 else 0.0
