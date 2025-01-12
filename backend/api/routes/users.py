@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import selectinload, InstrumentedAttribute
 
-from backend.models.state import State
+from models.state import State
 
 from ..deps import DBSession, PermittedUserChecker
 

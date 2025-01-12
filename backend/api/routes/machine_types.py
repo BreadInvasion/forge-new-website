@@ -156,28 +156,22 @@ async def get_all_machine_types(
         )
     ).all()
 
-    num_machines = (
+    num_machines_result = (
         await session.execute(
             select(Machine.type_id, func.count(Machine.type_id)).group_by(
                 Machine.type_id
             )
         )
     ).all()
+    num_machines = {item[0]: item[1] for item in num_machines_result}
 
     return [
         MachineTypeInfo(
             resource_slot_ids=[
                 resource_slot.id for resource_slot in machine_type.resource_slots
             ],
-            resource_names=set().union(
-                [
-                    [resource.name for resource in slot.valid_resource]
-                    for slot in machine_type.resource_slots
-                ]
-            ),
-            num_machines=next(
-                item[0][-1] for item in num_machines if item[0][0] == machine_type.id
-            ),
+            resource_names={resource.name for slot in machine_type.resource_slots for resource in slot.valid_resources},
+            num_machines=num_machines.get(machine_type.id, 0),
             **machine_type.__dict__,
         )
         for machine_type in machine_types
