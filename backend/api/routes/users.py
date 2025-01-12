@@ -222,10 +222,14 @@ async def get_all_users(
             pronouns=user.pronouns,
             role_ids=[role.id for role in user.roles],
             is_graduating=user.is_graduating,
-            semester_balance=next(
-                balance[0][1]
-                for balance in semester_balances
-                if balance[0][0] == user.id
+            semester_balance=(
+                next(
+                    balance[0][1]
+                    for balance in semester_balances
+                    if balance[0][0] == user.id
+                )
+                if len(semester_balances) > 0
+                else 0.0
             ),
         )
         for user in users
