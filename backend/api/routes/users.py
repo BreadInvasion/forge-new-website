@@ -74,6 +74,26 @@ async def get_user_by_rcsid(
             status_code=404, detail="User with provided RCSID not found"
         )
 
+    current_semester_id = await session.scalar(select(State.active_semester_id))
+
+    semester_balance = (
+        (
+            await session.scalar(
+                select(func.sum(MachineUsage.cost))
+                .select_from(MachineUsage)
+                .where(
+                    and_(
+                        MachineUsage.user_id == user.id,
+                        MachineUsage.semester_id == current_semester_id,
+                    )
+                )
+            )
+        )
+        or 0.0
+        if current_semester_id
+        else 0.0
+    )
+
     return UserNoHash(
         id=user.id,
         is_rpi_staff=user.is_rpi_staff,
@@ -86,6 +106,7 @@ async def get_user_by_rcsid(
         pronouns=user.pronouns,
         role_ids=[role.id for role in user.roles],
         is_graduating=user.is_graduating,
+        semester_balance=semester_balance,
     )
 
 
@@ -108,18 +129,21 @@ async def get_user_by_rin(
     current_semester_id = await session.scalar(select(State.active_semester_id))
 
     semester_balance = (
-        await session.scalar(
-            select(func.sum())
-            .select_from(MachineUsage.cost)
-            .where(
-                and_(
-                    MachineUsage.user_id == user.id,
-                    MachineUsage.semester_id == current_semester_id,
+        (
+            await session.scalar(
+                select(func.sum(MachineUsage.cost))
+                .select_from(MachineUsage)
+                .where(
+                    and_(
+                        MachineUsage.user_id == user.id,
+                        MachineUsage.semester_id == current_semester_id,
+                    )
                 )
             )
         )
+        or 0.0
         if current_semester_id
-        else 0
+        else 0.0
     )
 
     return UserNoHash(
