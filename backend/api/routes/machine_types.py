@@ -90,7 +90,7 @@ async def get_machine_type(
         select(MachineType)
         .where(MachineType.id == type_id)
         .options(
-            selectinload(MachineType.resource_slots).subqueryload(
+            selectinload(MachineType.resource_slots).selectinload(
                 ResourceSlot.valid_resources
             )
         )
@@ -146,7 +146,7 @@ async def get_all_machine_types(
         await session.scalars(
             select(MachineType)
             .options(
-                selectinload(MachineType.resource_slots).subqueryload(
+                selectinload(MachineType.resource_slots).selectinload(
                     ResourceSlot.valid_resources
                 )
             )
@@ -193,7 +193,7 @@ async def edit_machine_type(
         select(MachineType)
         .where(MachineType.id == type_id)
         .options(
-            selectinload(MachineType.resource_slots).subqueryload(
+            selectinload(MachineType.resource_slots).selectinload(
                 ResourceSlot.valid_resources
             )
         )

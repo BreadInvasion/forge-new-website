@@ -76,7 +76,7 @@ async def get_machine_group(
     machine_group = await session.scalar(
         select(MachineGroup)
         .where(MachineGroup.id == group_id)
-        .options(selectinload(MachineGroup.machines).subqueryload(Machine.active_usage))
+        .options(selectinload(MachineGroup.machines).selectinload(Machine.active_usage))
     )
     if not machine_group:
         raise HTTPException(
@@ -145,7 +145,7 @@ async def edit_machine_group(
     machine_group = await session.scalar(
         select(MachineGroup)
         .where(MachineGroup.id == group_id)
-        .options(selectinload(MachineGroup.machines).subqueryload(Machine.active_usage))
+        .options(selectinload(MachineGroup.machines).selectinload(Machine.active_usage))
     )
     if not machine_group:
         raise HTTPException(
