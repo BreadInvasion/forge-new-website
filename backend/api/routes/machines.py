@@ -89,25 +89,23 @@ async def get_machine(
         select(Machine)
         .where(Machine.id == machine_id)
         .options(selectinload(Machine.active_usage))
+        .options(selectinload(Machine.group))
+        .options(selectinload(Machine.type))
     )
     if not machine:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine with provided ID not found",
         )
-
-    audit_logs = (
-        await session.scalars(
-            select(AuditLog)
-            .where(AuditLog.content.op("?")("machine_id"))
-            .order_by(AuditLog.time_created.desc())
-        )
-    ).all()
+    audit_logs = (await session.scalars(
+        select(AuditLog).where(AuditLog.content.op("?")("machine_id")).order_by(AuditLog.time_created.desc())
+    )).all()
 
     return MachineDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
-        machine_usage_id=(machine.active_usage.id if machine.active_usage else None),
         **machine.__dict__,
+        group=machine.group.name,
+        type=machine.type.name
     )
 
 
@@ -126,6 +124,8 @@ async def get_all_machines(
         await session.scalars(
             select(Machine)
             .options(selectinload(Machine.active_usage))
+            .options(selectinload(Machine.group))
+            .options(selectinload(Machine.type))
             .order_by(Machine.name)
             .offset(offset)
             .fetch(limit)
@@ -137,10 +137,13 @@ async def get_all_machines(
             machine_usage_id=(
                 machine.active_usage.id if machine.active_usage else None
             ),
+            group=machine.group.name,
+            type=machine.type.name,
             **machine.__dict__,
         )
-        for machine in machines
-    ]
+        compiled_machines.append(machine_info)
+            
+    return compiled_machines
 
 
 @router.post("/machines/{machine_id}")

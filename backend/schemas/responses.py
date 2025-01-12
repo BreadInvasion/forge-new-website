@@ -50,11 +50,6 @@ class UserNoHash(BaseModel):
 
     is_graduating: bool
 
-class MachineInfo(BaseModel):
-    id: UUID4
-    name: str
-    machine_usage_id: Optional[UUID4]
-
 class MachineStatus(BaseResponse):
     id: UUID4
     name: str
@@ -73,9 +68,6 @@ class MachineStatusGroup(BaseResponse):
 class AllMachinesStatusResponse(BaseResponse):
     groups: list[MachineStatusGroup]
     loners: list[MachineStatus]
-
-class MachineDetails(MachineInfo):
-    audit_logs: list[AuditLogModel]
 
 class MachineInfoGroup(BaseModel):
     id: UUID4
@@ -140,3 +132,16 @@ class MachineUsageSchema(BaseResponse):
     resource_slots: list[ResourceSlotSchema]
 
     maintenance_mode: bool
+
+class MachineInfo(BaseModel):
+    id: UUID4
+    name: str
+    group_id: UUID4 | None
+    group: str | None
+    type_id: UUID4
+    type: str
+    maintenance_mode: bool
+    disabled: bool
+    
+class MachineDetails(MachineInfo):
+    audit_logs: list[AuditLogModel]
