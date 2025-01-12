@@ -171,11 +171,22 @@ async def get_all_users(
     limit: int = 20,
     offset: int = 0,
     order_by: Literal[
-        "RCSID", "RIN", "first_name", "last_name", "is_rpi_staff"
+        "RCSID",
+        "RIN",
+        "first_name",
+        "last_name",
+        "is_rpi_staff",
+        "semester_balance",
+        "is_graduating",
+        "gender_identity",
+        "pronouns",
+        "major",
     ] = "RCSID",
     descending: bool = False,
 ):
     """Returns a list of all users. Provide query parameters to cap and re-order the output."""
+
+    current_semester_id = await session.scalar(select(State.active_semester_id))
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
         "RCSID": User.RCSID,
@@ -183,6 +194,16 @@ async def get_all_users(
         "first_name": User.first_name,
         "last_name": User.last_name,
         "is_rpi_staff": User.is_rpi_staff,
+        "semester_balance": select([func.sum(MachineUsage.cost)]).where(
+            and_(
+                MachineUsage.user_id == User.id,
+                MachineUsage.semester_id == current_semester_id,
+            )
+        ),
+        "is_graduating": User.is_graduating,
+        "gender_identity": User.gender_identity,
+        "pronouns": User.pronouns,
+        "major": User.major,
     }
     order_determinant = attr_key_map[order_by]
     if descending:
@@ -197,8 +218,6 @@ async def get_all_users(
             .offset(offset)
         )
     ).all()
-
-    current_semester_id = await session.scalar(select(State.active_semester_id))
 
     semester_balances = (
         (

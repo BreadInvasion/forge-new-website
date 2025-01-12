@@ -1,9 +1,10 @@
 """ Resource endpoints. """
 
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import and_, select
+from sqlalchemy.orm import InstrumentedAttribute
 
 from models.audit_log import AuditLog
 from models.resource import Resource
@@ -107,12 +108,32 @@ async def get_all_resources(
     ],
     limit: int = 20,
     offset: int = 0,
+    order_by: Literal["name", "brand", "color", "units", "cost"] = "brand",
+    descending: bool = False,
 ):
     "Fetch all resources."
 
+    attr_key_map: dict[str, InstrumentedAttribute] = {
+        "name": Resource.name,
+        "brand": Resource.brand,
+        "color": Resource.color,
+        "units": Resource.units,
+        "cost": Resource.cost,
+    }
+    order_determinant = attr_key_map[order_by]
+    order_secondary = Resource.name if order_by != "name" else Resource.brand
+    order_tertiary = Resource.color if order_by != "color" else Resource.brand
+    if descending:
+        order_determinant = order_determinant.desc()
+        order_secondary = order_secondary.desc()
+        order_tertiary = order_tertiary.desc()
+
     resources = (
         await session.scalars(
-            select(Resource).order_by(Resource.name).offset(offset).fetch(limit)
+            select(Resource)
+            .order_by(order_determinant, order_secondary, order_tertiary)
+            .offset(offset)
+            .fetch(limit)
         )
     ).all()
 
