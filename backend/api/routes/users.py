@@ -228,7 +228,7 @@ async def get_all_users(
                     for balance in semester_balances
                     if balance[0][0] == user.id
                 )
-                if len(semester_balances) > 0
+                if semester_balances and len(semester_balances) > 0
                 else 0.0
             ),
         )

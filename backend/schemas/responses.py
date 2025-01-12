@@ -91,6 +91,7 @@ class ResourceInfo(BaseModel):
     id: UUID4
     name: str
     brand: Optional[str]
+    color: Optional[str]
     units: str
     cost: Decimal = Field(max_digits=10, decimal_places=5)
 
