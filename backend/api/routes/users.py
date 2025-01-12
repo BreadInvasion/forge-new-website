@@ -190,7 +190,11 @@ async def get_all_users(
 
     users = (
         await session.scalars(
-            select(User).order_by(order_determinant).limit(limit).offset(offset)
+            select(User)
+            .selectinload(User.roles)
+            .order_by(order_determinant)
+            .limit(limit)
+            .offset(offset)
         )
     ).all()
 
