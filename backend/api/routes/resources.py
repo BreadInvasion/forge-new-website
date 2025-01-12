@@ -8,7 +8,12 @@ from sqlalchemy import and_, select
 from models.audit_log import AuditLog
 from models.resource import Resource
 from schemas.requests import ResourceCreateRequest, ResourceEditRequest
-from schemas.responses import AuditLogModel, CreateResponse, ResourceDetails, ResourceInfo
+from schemas.responses import (
+    AuditLogModel,
+    CreateResponse,
+    ResourceDetails,
+    ResourceInfo,
+)
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
@@ -99,10 +104,16 @@ async def get_all_resources(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_RESOURCES}))
     ],
+    limit: int = 20,
+    offset: int = 0,
 ):
     "Fetch all resources."
 
-    resources = (await session.scalars(select(Resource))).all()
+    resources = (
+        await session.scalars(
+            select(Resource).order_by(Resource.name).offset(offset).fetch(limit)
+        )
+    ).all()
 
     return [ResourceInfo(**resource.__dict__) for resource in resources]
 

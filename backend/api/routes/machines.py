@@ -61,11 +61,14 @@ async def create_machine(
     await session.commit()
     await session.refresh(new_machine)
 
-    audit_log = AuditLog(type=LogType.MACHINE_CREATED, content={
-        "machine_id": str(new_machine.id),
-        "user_rcsid": current_user.RCSID,
-        "props": request.model_dump(mode="json"),
-    })
+    audit_log = AuditLog(
+        type=LogType.MACHINE_CREATED,
+        content={
+            "machine_id": str(new_machine.id),
+            "user_rcsid": current_user.RCSID,
+            "props": request.model_dump(mode="json"),
+        },
+    )
     session.add(audit_log)
     await session.commit()
 
@@ -86,25 +89,23 @@ async def get_machine(
         select(Machine)
         .where(Machine.id == machine_id)
         .options(selectinload(Machine.active_usage))
+        .options(selectinload(Machine.group))
+        .options(selectinload(Machine.type))
     )
     if not machine:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine with provided ID not found",
         )
-    
     audit_logs = (await session.scalars(
         select(AuditLog).where(AuditLog.content.op("?")("machine_id")).order_by(AuditLog.time_created.desc())
     )).all()
-    
-    group_name = await session.scalar(select(MachineGroup.name).where(MachineGroup.id == machine.group_id))
-    type_name = await session.scalar(select(MachineType.name).where(MachineType.id == machine.type_id))
 
     return MachineDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         **machine.__dict__,
-        group=group_name,
-        type=type_name
+        group=machine.group.name,
+        type=machine.type.name
     )
 
 
@@ -114,24 +115,31 @@ async def get_all_machines(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_MACHINES}))
     ],
+    limit: int = 20,
+    offset: int = 0,
 ):
     "Fetch all machines."
 
     machines = (
         await session.scalars(
             select(Machine)
+            .options(selectinload(Machine.active_usage))
+            .options(selectinload(Machine.group))
+            .options(selectinload(Machine.type))
+            .order_by(Machine.name)
+            .offset(offset)
+            .fetch(limit)
         )
     ).all()
-    
-    compiled_machines = []
-    
-    for machine in machines:
-        group_name = await session.scalar(select(MachineGroup.name).where(MachineGroup.id == machine.group_id))
-        type_name = await session.scalar(select(MachineType.name).where(MachineType.id == machine.type_id))
-        machine_info = MachineInfo(
-            **{key: value for key, value in machine.__dict__.items() if key in MachineInfo.model_fields},
-            group=group_name,
-            type=type_name
+
+    return [
+        MachineInfo(
+            machine_usage_id=(
+                machine.active_usage.id if machine.active_usage else None
+            ),
+            group=machine.group.name,
+            type=machine.type.name,
+            **machine.__dict__,
         )
         compiled_machines.append(machine_info)
             
@@ -177,13 +185,21 @@ async def edit_machine(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Machine group with provided ID not found",
         )
-    
+
     differences = {
-        "name":  request.name     if machine.name != request.name         else None,
-        "type_id":  request.type_id  if machine.type.id != request.type_id   else None,
-        "group_id": request.group_id if (machine.group.id if machine.group else None) != request.group_id else None,
+        "name": request.name if machine.name != request.name else None,
+        "type_id": request.type_id if machine.type.id != request.type_id else None,
+        "group_id": (
+            request.group_id
+            if (machine.group.id if machine.group else None) != request.group_id
+            else None
+        ),
         "disabled": request.disabled if machine.disabled != request.disabled else None,
-        "maintenance_mode": request.maintenance_mode if machine.maintenance_mode != request.maintenance_mode else None,
+        "maintenance_mode": (
+            request.maintenance_mode
+            if machine.maintenance_mode != request.maintenance_mode
+            else None
+        ),
     }
 
     machine.name = request.name
@@ -192,11 +208,14 @@ async def edit_machine(
     machine.maintenance_mode = request.maintenance_mode
     machine.disabled = request.disabled
 
-    audit_log = AuditLog(type=LogType.MACHINE_EDITED, content={
-        "machine_id": str(machine.id),
-        "user_rcsid": current_user.RCSID,
-        "changed_values": differences,
-    })
+    audit_log = AuditLog(
+        type=LogType.MACHINE_EDITED,
+        content={
+            "machine_id": str(machine.id),
+            "user_rcsid": current_user.RCSID,
+            "changed_values": differences,
+        },
+    )
     session.add(audit_log)
 
     await session.commit()
@@ -234,10 +253,7 @@ async def delete_machine(
 
     audit_log = AuditLog(
         type=LogType.MACHINE_DELETED,
-        content={
-            "machine_id": str(machine.id),
-            "user_rcsid": current_user.RCSID
-        }
+        content={"machine_id": str(machine.id), "user_rcsid": current_user.RCSID},
     )
     session.add(audit_log)
 

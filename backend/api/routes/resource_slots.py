@@ -11,7 +11,12 @@ from models.resource import Resource
 from models.resource_slot import ResourceSlot
 from models.resource_usage_quantity import ResourceUsageQuantity
 from schemas.requests import ResourceSlotCreateRequest, ResourceSlotEditRequest
-from schemas.responses import AuditLogModel, CreateResponse, ResourceSlotInfo, ResourceSlotDetails
+from schemas.responses import (
+    AuditLogModel,
+    CreateResponse,
+    ResourceSlotInfo,
+    ResourceSlotDetails,
+)
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
@@ -61,15 +66,19 @@ async def create_resource_slot(
     await session.commit()
     await session.refresh(new_resource_slot)
 
-    audit_log = AuditLog(type=LogType.RESOURCE_SLOT_CREATED, content={
-        "resource_slot_id": str(new_resource_slot.id),
-        "user_rcsid": current_user.RCSID,
-        "props": request.model_dump(mode="json"),
-    })
+    audit_log = AuditLog(
+        type=LogType.RESOURCE_SLOT_CREATED,
+        content={
+            "resource_slot_id": str(new_resource_slot.id),
+            "user_rcsid": current_user.RCSID,
+            "props": request.model_dump(mode="json"),
+        },
+    )
     session.add(audit_log)
     await session.commit()
 
     return CreateResponse(id=new_resource_slot.id)
+
 
 @router.get("/resourceslots/{resource_slot_id}")
 async def get_resource_slot(
@@ -91,10 +100,14 @@ async def get_resource_slot(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resource Slot with provided ID not found",
         )
-    
-    audit_logs = (await session.scalars(
-        select(AuditLog).where(AuditLog.content.op("?")("resource_slot_id")).order_by(AuditLog.time_created.desc())
-    )).all()
+
+    audit_logs = (
+        await session.scalars(
+            select(AuditLog)
+            .where(AuditLog.content.op("?")("resource_slot_id"))
+            .order_by(AuditLog.time_created.desc())
+        )
+    ).all()
 
     return ResourceSlotDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
@@ -109,18 +122,26 @@ async def get_all_resource_slots(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_RESOURCE_SLOTS}))
     ],
+    limit: int = 20,
+    offset: int = 0,
 ):
     "Fetch all resource slots."
 
     resource_slots = (
         await session.scalars(
-            select(ResourceSlot).options(selectinload(ResourceSlot.valid_resources))
+            select(ResourceSlot)
+            .options(selectinload(ResourceSlot.valid_resources))
+            .order_by(ResourceSlot.db_name)
+            .offset(offset)
+            .fetch(limit)
         )
     ).all()
 
     return [
         ResourceSlotInfo(
-            valid_resource_ids=[resource.id for resource in resource_slot.valid_resources],
+            valid_resource_ids=[
+                resource.id for resource in resource_slot.valid_resources
+            ],
             **resource_slot.__dict__,
         )
         for resource_slot in resource_slots
@@ -138,21 +159,47 @@ async def edit_resource_slot(
 ):
     """Update the resource slot with the provided ID."""
 
-    resource_slot = await session.scalar(select(ResourceSlot).where(ResourceSlot.id == resource_slot_id).options(selectinload(ResourceSlot.valid_resources)))
+    resource_slot = await session.scalar(
+        select(ResourceSlot)
+        .where(ResourceSlot.id == resource_slot_id)
+        .options(selectinload(ResourceSlot.valid_resources))
+    )
     if not resource_slot:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resource Slot with provided ID not found",
         )
-    
-    valid_resources = (await session.scalars(select(Resource).where(Resource.id.in_(request.resource_ids)))).all()
-    
+
+    valid_resources = (
+        await session.scalars(
+            select(Resource).where(Resource.id.in_(request.resource_ids))
+        )
+    ).all()
+
     differences = {
-        "db_name": request.db_name if resource_slot.db_name != request.db_name else None,
-        "display_name": request.display_name if resource_slot.display_name != request.display_name else None,
-        "valid_resource_ids": request.resource_ids if set(resource_slot.valid_resources) != set(valid_resources) else None,
-        "allow_own_material": request.allow_own_material if resource_slot.allow_own_material != request.allow_own_material else None,
-        "allow_empty": request.allow_empty if resource_slot.allow_empty != request.allow_empty else None,
+        "db_name": (
+            request.db_name if resource_slot.db_name != request.db_name else None
+        ),
+        "display_name": (
+            request.display_name
+            if resource_slot.display_name != request.display_name
+            else None
+        ),
+        "valid_resource_ids": (
+            request.resource_ids
+            if set(resource_slot.valid_resources) != set(valid_resources)
+            else None
+        ),
+        "allow_own_material": (
+            request.allow_own_material
+            if resource_slot.allow_own_material != request.allow_own_material
+            else None
+        ),
+        "allow_empty": (
+            request.allow_empty
+            if resource_slot.allow_empty != request.allow_empty
+            else None
+        ),
     }
 
     resource_slot.db_name = request.db_name
@@ -161,11 +208,14 @@ async def edit_resource_slot(
     resource_slot.allow_empty = request.allow_empty
     resource_slot.allow_own_material = request.allow_own_material
 
-    audit_log = AuditLog(type=LogType.RESOURCE_SLOT_EDITED, content={
-        "resource_slot_id": str(resource_slot.id),
-        "user_rcsid": current_user.RCSID,
-        "changed_values": differences,
-    })
+    audit_log = AuditLog(
+        type=LogType.RESOURCE_SLOT_EDITED,
+        content={
+            "resource_slot_id": str(resource_slot.id),
+            "user_rcsid": current_user.RCSID,
+            "changed_values": differences,
+        },
+    )
     session.add(audit_log)
 
     await session.commit()
@@ -181,7 +231,9 @@ async def delete_resource_slot(
 ):
     "Delete the resource slot with the provided ID."
 
-    resource_slot = await session.scalar(select(ResourceSlot).where(ResourceSlot.id == resource_slot_id))
+    resource_slot = await session.scalar(
+        select(ResourceSlot).where(ResourceSlot.id == resource_slot_id)
+    )
     if not resource_slot:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -194,8 +246,8 @@ async def delete_resource_slot(
         type=LogType.RESOURCE_SLOT_DELETED,
         content={
             "resource_slot_id": str(resource_slot.id),
-            "user_rcsid": current_user.RCSID
-        }
+            "user_rcsid": current_user.RCSID,
+        },
     )
     session.add(audit_log)
 

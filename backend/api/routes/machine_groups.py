@@ -10,7 +10,13 @@ from models.audit_log import AuditLog
 from models.machine import Machine
 from models.machine_group import MachineGroup
 from schemas.requests import MachineGroupCreateRequest, MachineGroupEditRequest
-from schemas.responses import AuditLogModel, CreateResponse, MachineInfo, MachineInfoGroup, MachineInfoGroupDetails
+from schemas.responses import (
+    AuditLogModel,
+    CreateResponse,
+    MachineInfo,
+    MachineInfoGroup,
+    MachineInfoGroupDetails,
+)
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
@@ -43,11 +49,14 @@ async def create_machine_group(
     await session.commit()
     await session.refresh(new_machine_group)
 
-    audit_log = AuditLog(type=LogType.MACHINE_GROUP_DELETED, content={
-        "machine_group_id": str(new_machine_group.id),
-        "user_rcsid": current_user.RCSID,
-        "props": request.model_dump(mode="json"),
-    })
+    audit_log = AuditLog(
+        type=LogType.MACHINE_GROUP_DELETED,
+        content={
+            "machine_group_id": str(new_machine_group.id),
+            "user_rcsid": current_user.RCSID,
+            "props": request.model_dump(mode="json"),
+        },
+    )
     session.add(audit_log)
     await session.commit()
 
@@ -74,10 +83,14 @@ async def get_machine_group(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine group with provided ID not found",
         )
-    
-    audit_logs = (await session.scalars(
-        select(AuditLog).where(AuditLog.content.op("?")("machine_group_id")).order_by(AuditLog.time_created.desc())
-    )).all()
+
+    audit_logs = (
+        await session.scalars(
+            select(AuditLog)
+            .where(AuditLog.content.op("?")("machine_group_id"))
+            .order_by(AuditLog.time_created.desc())
+        )
+    ).all()
 
     return MachineInfoGroupDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
@@ -92,6 +105,8 @@ async def get_all_machine_groups(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_MACHINE_GROUPS}))
     ],
+    limit: int = 20,
+    offset: int = 0,
 ):
     "Fetch all machine groups."
 
@@ -100,6 +115,9 @@ async def get_all_machine_groups(
             select(MachineGroup).options(
                 selectinload(MachineGroup.machines)
             )
+            .order_by(MachineGroup.name)
+            .offset(offset)
+            .fetch(limit)
         )
     ).all()
 
@@ -144,20 +162,27 @@ async def edit_machine_group(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="One or more of the provided machine IDs is invalid",
         )
-    
+
     differences = {
         "name": request.name if machine_group.name != request.name else None,
-        "machine_ids": request.machine_ids if set(machine_group.machines) != set(machines) else None,
+        "machine_ids": (
+            request.machine_ids
+            if set(machine_group.machines) != set(machines)
+            else None
+        ),
     }
 
     machine_group.name = request.name
     machine_group.machines = list(machines)
 
-    audit_log = AuditLog(type=LogType.MACHINE_GROUP_DELETED, content={
-        "machine_group_id": str(machine_group.id),
-        "user_rcsid": current_user.RCSID,
-        "changed_values": differences,
-    })
+    audit_log = AuditLog(
+        type=LogType.MACHINE_GROUP_DELETED,
+        content={
+            "machine_group_id": str(machine_group.id),
+            "user_rcsid": current_user.RCSID,
+            "changed_values": differences,
+        },
+    )
     session.add(audit_log)
 
     await session.commit()
@@ -192,10 +217,13 @@ async def delete_machine_group(
 
     await session.delete(machine_group)
 
-    audit_log = AuditLog(type=LogType.MACHINE_GROUP_DELETED, content={
-        "machine_group_id": str(machine_group.id),
-        "user_rcsid": current_user.RCSID
-    })
+    audit_log = AuditLog(
+        type=LogType.MACHINE_GROUP_DELETED,
+        content={
+            "machine_group_id": str(machine_group.id),
+            "user_rcsid": current_user.RCSID,
+        },
+    )
     session.add(audit_log)
 
     await session.commit()

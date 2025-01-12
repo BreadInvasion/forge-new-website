@@ -75,7 +75,11 @@ function Table<T extends Record<string, any>>(props: TableProps<T>) {
                     {currentData.map((row: T, rowIndex) => (
                         <tr key={rowIndex}>
                             {columns.map((column, index) => (
-                                <td key={String(column) + index + rowIndex}>{String(row[column])}</td>
+                                <td key={String(column) + index + rowIndex}>
+                                    {Array.isArray(row[column])
+                                        ? row[column].join(', ')
+                                        : String(row[column])}
+                                </td>
                             ))}
                             <td className="icon">
                                 <a href={editPath}>
