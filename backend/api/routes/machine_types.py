@@ -3,7 +3,7 @@
 from typing import Annotated
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
 from models.audit_log import AuditLog
@@ -109,11 +109,24 @@ async def get_machine_type(
         )
     ).all()
 
+    num_machines = await session.scalar(
+        select(func.count())
+        .select_from(Machine)
+        .where(Machine.type_id == machine_type.id)
+    )
+
     return MachineTypeDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         resource_slot_ids=[
             resource_slot.id for resource_slot in machine_type.resource_slots
         ],
+        resource_names=set().union(
+            [
+                [resource.name for resource in slot.valid_resource]
+                for slot in machine_type.resource_slots
+            ]
+        ),
+        num_machines=num_machines,
         **machine_type.__dict__,
     )
 
@@ -143,6 +156,14 @@ async def get_all_machine_types(
         )
     ).all()
 
+    num_machines = (
+        await session.execute(
+            select(Machine.type_id, func.count(Machine.type_id)).group_by(
+                Machine.type_id
+            )
+        )
+    ).all()
+
     return [
         MachineTypeInfo(
             resource_slot_ids=[
@@ -154,7 +175,9 @@ async def get_all_machine_types(
                     for slot in machine_type.resource_slots
                 ]
             ),
-            num_machines=len(machine_type.resource_slots),
+            num_machines=next(
+                item[-1] for item in num_machines if item[0] == machine_type.id
+            ),
             **machine_type.__dict__,
         )
         for machine_type in machine_types

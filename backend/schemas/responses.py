@@ -77,6 +77,7 @@ class AllMachinesStatusResponse(BaseResponse):
 class MachineInfoGroup(BaseModel):
     id: UUID4
     name: str
+    num_machines: int
     machine_ids: list[UUID4]
 
 
