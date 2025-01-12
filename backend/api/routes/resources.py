@@ -36,6 +36,7 @@ async def create_resource(
         select(Resource).where(
             and_(
                 Resource.brand == request.brand,
+                Resource.color == request.color,
                 Resource.name == request.name,
                 Resource.units == request.units,
             )
@@ -44,7 +45,7 @@ async def create_resource(
     if existing_resource:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="A resource with that brand, name, units combination already exists",
+            detail="A resource with that brand, color, name, units combination already exists",
         )
 
     new_resource = Resource(

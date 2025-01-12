@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, UUID4, Field
 
 from .enums import GenderStatsType, LogType, PronounType
 
+
 class BaseResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -50,6 +51,7 @@ class UserNoHash(BaseModel):
 
     is_graduating: bool
 
+
 class MachineStatus(BaseResponse):
     id: UUID4
     name: str
@@ -61,21 +63,26 @@ class MachineStatus(BaseResponse):
     failed: bool
     failed_at: Optional[datetime] = None
 
+
 class MachineStatusGroup(BaseResponse):
     name: str
     machines: list[MachineStatus]
 
+
 class AllMachinesStatusResponse(BaseResponse):
     groups: list[MachineStatusGroup]
     loners: list[MachineStatus]
+
 
 class MachineInfoGroup(BaseModel):
     id: UUID4
     name: str
     machine_ids: list[UUID4]
 
+
 class MachineInfoGroupDetails(MachineInfoGroup):
     audit_logs: list[AuditLogModel]
+
 
 class ResourceInfo(BaseModel):
     id: UUID4
@@ -84,8 +91,10 @@ class ResourceInfo(BaseModel):
     units: str
     cost: Decimal = Field(max_digits=10, decimal_places=5)
 
+
 class ResourceDetails(ResourceInfo):
     audit_logs: list[AuditLogModel]
+
 
 class ResourceSlotInfo(BaseModel):
     id: UUID4
@@ -95,16 +104,22 @@ class ResourceSlotInfo(BaseModel):
     allow_own_material: bool
     allow_empty: bool
 
+
 class ResourceSlotDetails(ResourceSlotInfo):
     audit_logs: list[AuditLogModel]
+
 
 class MachineTypeInfo(BaseModel):
     id: UUID4
     name: str
+    num_machines: int
+    resource_names: set[str]
     resource_slot_ids: list[UUID4]
+
 
 class MachineTypeDetails(MachineTypeInfo):
     audit_logs: list[AuditLogModel]
+
 
 class MachineCreateResponse(BaseResponse):
     machine_id: UUID4
@@ -123,6 +138,7 @@ class ResourceSlotSchema(BaseResponse):
     allow_own_material: bool
     allow_empty: bool
 
+
 class MachineUsageSchema(BaseResponse):
     name: str
     group_id: UUID4 | None
@@ -133,15 +149,17 @@ class MachineUsageSchema(BaseResponse):
 
     maintenance_mode: bool
 
+
 class MachineInfo(BaseModel):
     id: UUID4
     name: str
     group_id: UUID4 | None
-    group: str | None
+    group_name: str | None
     type_id: UUID4
-    type: str
+    type_name: str
     maintenance_mode: bool
     disabled: bool
-    
+
+
 class MachineDetails(MachineInfo):
     audit_logs: list[AuditLogModel]

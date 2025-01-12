@@ -148,6 +148,13 @@ async def get_all_machine_types(
             resource_slot_ids=[
                 resource_slot.id for resource_slot in machine_type.resource_slots
             ],
+            resource_names=set().union(
+                [
+                    [resource.name for resource in slot.valid_resource]
+                    for slot in machine_type.resource_slots
+                ]
+            ),
+            num_machines=len(machine_type.resource_slots),
             **machine_type.__dict__,
         )
         for machine_type in machine_types

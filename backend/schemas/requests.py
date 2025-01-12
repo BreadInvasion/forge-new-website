@@ -22,10 +22,12 @@ class BaseRequest(BaseModel):
 class UserUpdatePasswordRequest(BaseRequest):
     password: SecretStr
 
+
 class ResourceUsage(BaseModel):
     resource_id: UUID4
     amount: Decimal
     is_own_material: bool
+
 
 class MachineUsageRequest(BaseRequest):
 
@@ -34,6 +36,7 @@ class MachineUsageRequest(BaseRequest):
     duration_seconds: int
 
     as_org_id: Optional[UUID4]
+
 
 class UserCreateRequest(BaseRequest):
     # RPI Identification Information
@@ -103,6 +106,7 @@ class MachineFailRequest(BaseRequest):
 class ResourceCreateRequest(BaseRequest):
     name: str
     brand: Optional[str]
+    color: Optional[str]
     units: str
     cost: Decimal = Field(max_digits=10, decimal_places=5)
 
@@ -114,6 +118,7 @@ class ResourceGetRequest(BaseRequest):
 class ResourceEditRequest(BaseRequest):
     name: str
     brand: Optional[str]
+    color: Optional[str]
     units: str
     cost: Decimal
 
