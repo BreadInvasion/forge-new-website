@@ -1,10 +1,10 @@
 """ Machine endpoints. """
 
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import InstrumentedAttribute, joinedload, selectinload
 
 from models.audit_log import AuditLog
 from models.machine import Machine
@@ -121,8 +121,27 @@ async def get_all_machines(
     ],
     limit: int = 20,
     offset: int = 0,
+    order_by: Literal[
+        "name",
+        "type",
+        "group",
+        "maintenance_mode",
+        "disabled",
+    ] = "name",
+    descending: bool = False,
 ):
     "Fetch all machines."
+
+    attr_key_map: dict[str, InstrumentedAttribute] = {
+        "name": Machine.name,
+        "type": MachineType.name,
+        "group": MachineGroup.name,
+        "maintenance_mode": Machine.maintenance_mode,
+        "disabled": Machine.disabled,
+    }
+    order_determinant = attr_key_map[order_by]
+    if descending:
+        order_determinant = order_determinant.desc()
 
     machines = (
         await session.scalars(
@@ -130,7 +149,7 @@ async def get_all_machines(
             .options(selectinload(Machine.active_usage))
             .options(selectinload(Machine.group))
             .options(selectinload(Machine.type))
-            .order_by(Machine.name)
+            .order_by(order_determinant)
             .offset(offset)
             .fetch(limit)
         )

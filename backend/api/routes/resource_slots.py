@@ -1,10 +1,10 @@
 """ Resource Slot endpoints. """
 
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import InstrumentedAttribute, selectinload
 
 from models.audit_log import AuditLog
 from models.resource import Resource
@@ -124,14 +124,31 @@ async def get_all_resource_slots(
     ],
     limit: int = 20,
     offset: int = 0,
+    order_by: Literal[
+        "db_name",
+        "display_name",
+        "allow_own_material",
+        "allow_empty",
+    ] = "db_name",
+    descending: bool = False,
 ):
     "Fetch all resource slots."
+
+    attr_key_map: dict[str, InstrumentedAttribute] = {
+        "db_name": ResourceSlot.db_name,
+        "display_name": ResourceSlot.display_name,
+        "allow_own_material": ResourceSlot.allow_own_material,
+        "allow_empty": ResourceSlot.allow_empty,
+    }
+    order_determinant = attr_key_map[order_by]
+    if descending:
+        order_determinant = order_determinant.desc()
 
     resource_slots = (
         await session.scalars(
             select(ResourceSlot)
             .options(selectinload(ResourceSlot.valid_resources))
-            .order_by(ResourceSlot.db_name)
+            .order_by(order_determinant)
             .offset(offset)
             .fetch(limit)
         )
