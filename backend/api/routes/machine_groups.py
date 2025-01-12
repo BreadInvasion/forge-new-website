@@ -95,6 +95,7 @@ async def get_machine_group(
     return MachineInfoGroupDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         machine_ids=[machine.id for machine in machine_group.machines],
+        num_machines=len(machine_group.machines),
         **machine_group.__dict__,
     )
 
@@ -112,9 +113,8 @@ async def get_all_machine_groups(
 
     machine_groups = (
         await session.scalars(
-            select(MachineGroup).options(
-                selectinload(MachineGroup.machines)
-            )
+            select(MachineGroup)
+            .options(selectinload(MachineGroup.machines))
             .order_by(MachineGroup.name)
             .offset(offset)
             .fetch(limit)
@@ -124,6 +124,7 @@ async def get_all_machine_groups(
     return [
         MachineInfoGroup(
             machine_ids=[machine.id for machine in machine_group.machines],
+            num_machines=len(machine_group.machines),
             **machine_group.__dict__,
         )
         for machine_group in machine_groups
