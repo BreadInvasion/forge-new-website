@@ -97,15 +97,19 @@ async def get_machine(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine with provided ID not found",
         )
-    audit_logs = (await session.scalars(
-        select(AuditLog).where(AuditLog.content.op("?")("machine_id")).order_by(AuditLog.time_created.desc())
-    )).all()
+    audit_logs = (
+        await session.scalars(
+            select(AuditLog)
+            .where(AuditLog.content.op("?")("machine_id"))
+            .order_by(AuditLog.time_created.desc())
+        )
+    ).all()
 
     return MachineDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         **machine.__dict__,
         group=machine.group.name,
-        type=machine.type.name
+        type=machine.type.name,
     )
 
 
@@ -141,9 +145,8 @@ async def get_all_machines(
             type=machine.type.name,
             **machine.__dict__,
         )
-        compiled_machines.append(machine_info)
-            
-    return compiled_machines
+        for machine in machines
+    ]
 
 
 @router.post("/machines/{machine_id}")
