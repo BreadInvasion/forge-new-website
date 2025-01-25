@@ -2,16 +2,8 @@ import React from 'react';
 import Table from '../components/Table';
 
 import '../styles/TabStyles.scss';
-// import { Machine } from 'src/components/Status/generateMockStatusData';
+import { MachineType } from 'src/interfaces';
 
-interface MachineType extends Record<string, any> {
-    id: string;
-    name: string;
-    resource_slots: number;
-    count: number;
-    resource_slot_ids: string[];
-    resource_types: string[];
-}
 
 const MachineTypes: React.FC = () => {
 

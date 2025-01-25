@@ -7,12 +7,12 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, suppressAlertInProtectedRoute } = useAuth();
 
   // Redirect to login if the user is not authenticated
   if (!isAuthenticated) {
-    alert("You must be logged in to access this page");
-    return <Navigate to="/login" />;
+    if (!suppressAlertInProtectedRoute) alert("You must be logged in to access this page");
+    return <Navigate to="/" />;
   }
 
   // Render the protected content if authenticated

@@ -63,7 +63,6 @@ export default function Register() {
 
     const [formValues, setFormValues] = useState<{ [key: string]: string }>({});
 
-    const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleInputChange = (input: string, value: string) => {
@@ -88,7 +87,7 @@ export default function Register() {
                     "first_name": formValues["first-name"],
                     "last_name": formValues["last-name"],
                     "major": formValues["major"],
-                    "gender_identity": 0,
+                    "gender_identity": "notdisclosed",
                     "pronouns": "not_shown",
                     "password": formValues["password"]
                 })

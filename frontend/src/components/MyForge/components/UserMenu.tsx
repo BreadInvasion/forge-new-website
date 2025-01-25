@@ -1,10 +1,9 @@
 import React from 'react';
-import * as Avatar from '@radix-ui/react-avatar';
-
-
-import '../styles/UserMenu.scss';
 import useAuth from '../../Auth/useAuth';
 import { Link } from 'react-router-dom';
+import * as Avatar from '@radix-ui/react-avatar';
+
+import '../styles/UserMenu.scss';
 
 const UserMenu: React.FC = () => {
 

@@ -1,14 +1,9 @@
 import React from 'react';
 import Table from '../components/Table';
+import { MachineGroup } from 'src/interfaces';
 
 import '../styles/TabStyles.scss';
-import { Machine } from 'src/components/Status/generateMockStatusData';
 
-interface MachineGroup extends Record<string, any> {
-    id: number;
-    name: string;
-    machines: string[];
-}
 
 const MachineGroups: React.FC = () => {
 
@@ -33,7 +28,7 @@ const MachineGroups: React.FC = () => {
                 })
                 .then(data => {
                     if ('id' in data && 'name' in data) {
-                        console.log('Machine:', data);
+                        // console.log('Machine:', data);
                         machines.push(data.name);
                     } else {
                         throw new Error('Data is not of type Machine');
@@ -62,7 +57,7 @@ const MachineGroups: React.FC = () => {
             })
             .then(data => {
                 if (Array.isArray(data) && data.every(item => 'id' in item && 'name' in item)) {
-                    console.log('Machine groups:', data);
+                    // console.log('Machine groups:', data);
                     const newData: MachineGroup[] = [];
                     for (const item of data) {
                         const machines = fetchMachines(item.machine_ids);

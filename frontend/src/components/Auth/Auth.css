@@ -1,0 +1,95 @@
+/* AlertDialog Overlay: covers full screen with blur & semi-transparent background */
+.AlertDialogOverlay {
+    position: fixed;
+    inset: 0;
+    /* top: 0; right: 0; bottom: 0; left: 0; */
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    /* You can adjust how strong the blur is (e.g., 5px, 8px) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+    /* Make sure it’s above regular content */
+}
+
+/* AlertDialog Content: the main dialog container */
+.AlertDialogContent {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Dialog Title: bigger, bolder text */
+.AlertDialogTitle {
+    font-size: 1.25rem;
+    /* ~20px */
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+/* Dialog Description: smaller secondary text */
+.AlertDialogDescription {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+/* Shared button styles */
+.Button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease,
+        transform 0.1s ease;
+    user-select: none;
+    /* prevent text selection on double click */
+    outline: none;
+
+    /* Primary style */
+    background-color: #4c77d0;
+    /* a nice bluish color */
+    color: #fff;
+}
+
+.Button:hover {
+    background-color: #3a5ea3;
+}
+
+.Button:focus {
+    /* Outline or box-shadow to show focus */
+    box-shadow: 0 0 0 2px rgba(76, 119, 208, 0.4);
+}
+
+.Button:active {
+    transform: scale(0.98);
+}
+
+/* Red variant (for destructive action) */
+.Button.red {
+    background-color: #d04c4c;
+}
+
+.Button.red:hover {
+    background-color: #a33a3a;
+}
+
+.Button.red:focus {
+    box-shadow: 0 0 0 2px rgba(208, 76, 76, 0.4);
+}

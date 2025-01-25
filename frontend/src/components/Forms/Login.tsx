@@ -3,10 +3,12 @@ import { FormEvent, useState } from 'react';
 import useAuth from '../Auth/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { UserInterface, userState } from 'src/GlobalAtoms';
+import { userState } from 'src/GlobalAtoms';
+import { User } from 'src/interfaces';
 
 import './styles/Login.scss';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
+import { AuthAPI } from 'src/apis/AuthAPI';
 
 interface CustomJwtPayload extends JwtPayload {
     expires_at?: number;
@@ -21,18 +23,12 @@ export default function Login() {
     const { setAuth, setUser } = useAuth();
     const navigate = useNavigate();
 
-    const getUserData = async (token: string): Promise<UserInterface | null> => {
+    const getUserData = async (): Promise<User | null> => {
         try {
-            const response = await fetch('http://localhost:3000/api/me', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                }
-            });
+            const response = await AuthAPI.me();
 
-            if (response.ok) {
-                const result = await response.json();
+            if (response.status === 200) {
+                const result = await response.data;
 
                 return result;
             } else {
@@ -47,32 +43,25 @@ export default function Login() {
     const handleLogin = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
 
-        const formData = new FormData();
-        formData.append('username', username);
-        formData.append('password', password);
-
         try {
-            const response = await fetch('http://localhost:3000/api/login', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (response.ok) {
-                const result = await response.json();
+            const response = await AuthAPI.login(username, password);
+            
+            if (response.status === 200) {
+                const result = response.data;
                 const token = result.access_token;
+                const expiration = Math.floor(Date.now() / 1000) + 3 * 60;
+                console.log('Expires at:', expiration * 1000);
+                console.log('Expires in (minutes):', (expiration * 1000 - Date.now()) / 1000 / 60);
 
-                if (token) {
-                    setAuth(true);
-                    localStorage.setItem('authToken', token);
-                    const decodedToken: CustomJwtPayload = jwtDecode<JwtPayload>(token);
-                    localStorage.setItem('token_expiration', decodedToken.expires_at?.toString() || '0');
-                    const userData = await getUserData(token);
-                    if (userData) {
-                        setUser(userData);
-                        localStorage.setItem('user', JSON.stringify(userData));
-                    }
-                    navigate('/myforge');
+                setAuth(true);
+                localStorage.setItem('authToken', token);
+                localStorage.setItem('token_expiration', expiration.toString() || '0');
+                const userData = await getUserData();
+                if (userData) {
+                    setUser(userData);
+                    localStorage.setItem('user', JSON.stringify(userData));
                 }
+                navigate('/myforge');
             } else {
                 console.error('Login failed:', response.status);
                 console.error('Login failed:', response.statusText);

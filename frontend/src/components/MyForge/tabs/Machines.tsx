@@ -1,19 +1,9 @@
 import React from 'react';
 import Table from '../components/Table';
+import { Machine } from 'src/interfaces';
 
 import '../styles/TabStyles.scss';
-// import { Machine } from 'src/components/Status/generateMockStatusData';
 
-interface Machine extends Record<string, any> {
-    id: string;
-    name: string;
-    group: string;
-    group_id: string;
-    type: string;
-    type_id: string;
-    maintenance_mode: boolean;
-    disabled: boolean;
-}
 
 const Machines: React.FC = () => {
 
