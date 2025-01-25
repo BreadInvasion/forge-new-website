@@ -119,6 +119,7 @@ class MachineTypeInfo(BaseModel):
     num_machines: int
     resource_names: set[str]
     resource_slot_ids: list[UUID4]
+    cost_per_hour: Decimal
 
 
 class MachineTypeDetails(MachineTypeInfo):

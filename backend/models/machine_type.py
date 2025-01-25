@@ -37,4 +37,4 @@ class MachineType(Base):
 
     # How much to charge (in dollars per hour) when using this machine,
     # regardless of inputs.
-    cost_per_hour: Mapped[Decimal] = mapped_column(DECIMAL(precision=10, scale=5))
+    cost_per_hour: Mapped[Decimal] = mapped_column(DECIMAL(precision=10, scale=5), server_default="0")

@@ -8,7 +8,7 @@ from sqlalchemy.orm import InstrumentedAttribute, joinedload, selectinload
 
 from models.audit_log import AuditLog
 from models.machine import Machine
-from models.machine_type import MachineType
+from models.machine_type import MachineType, MachineTypeSlotAssociation
 from models.resource_slot import ResourceSlot
 from schemas.requests import MachineTypeCreateRequest, MachineTypeEditRequest
 from schemas.responses import (
@@ -152,7 +152,8 @@ async def get_all_machine_types(
         .where(Machine.type_id == MachineType.id)
         .as_scalar(),
         "slots": select(func.count())
-        .select_from(MachineType.resource_slots)
+        .select_from(MachineTypeSlotAssociation)
+        .where(MachineTypeSlotAssociation.machine_type_id == MachineType.id)
         .as_scalar(),
     }
     order_determinant = attr_key_map[order_by]
