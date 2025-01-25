@@ -57,7 +57,7 @@ async def create_machine_type(
             detail="Could not find all of the provided resource slots",
         )
 
-    new_machine_type = MachineType(name=request.name, resource_slots=resource_slots)
+    new_machine_type = MachineType(name=request.name, resource_slots=resource_slots, cost_per_hour=request.cost_per_hour)
     session.add(new_machine_type)
     await session.commit()
     await session.refresh(new_machine_type)
@@ -243,6 +243,7 @@ async def edit_machine_type(
             if set(machine_type.resource_slots) != set(resource_slots)
             else None
         ),
+        "cost_per_hour": request.cost_per_hour if machine_type.cost_per_hour != request.cost_per_hour else None,
     }
 
     machine_type.name = request.name

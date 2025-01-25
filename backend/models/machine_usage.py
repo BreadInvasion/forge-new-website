@@ -1,4 +1,5 @@
-from sqlalchemy import DateTime, ForeignKey, func
+from decimal import Decimal
+from sqlalchemy import DECIMAL, DateTime, ForeignKey, func
 from .base import Base
 
 from datetime import datetime
@@ -38,7 +39,7 @@ class MachineUsage(Base):
     failed: Mapped[bool] = mapped_column(default=False)
     failed_at: Mapped[Optional[datetime]]
 
-    cost: Mapped[float]
+    cost: Mapped[Decimal] = mapped_column(DECIMAL(precision=10, scale=5))
 
     resources_used: Mapped[list["ResourceUsageQuantity"]] = relationship(
         back_populates="machine_usage", cascade="all, delete"

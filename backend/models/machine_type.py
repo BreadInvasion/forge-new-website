@@ -1,9 +1,10 @@
+from decimal import Decimal
 from typing import TYPE_CHECKING
 from .base import Base
 
 from uuid import uuid4, UUID
 
-from sqlalchemy import UUID as DB_UUID, ForeignKey
+from sqlalchemy import DECIMAL, UUID as DB_UUID, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
@@ -33,3 +34,7 @@ class MachineType(Base):
     resource_slots: Mapped[list["ResourceSlot"]] = relationship(
         secondary="machine_type_slot_associations"
     )
+
+    # How much to charge (in dollars per hour) when using this machine,
+    # regardless of inputs.
+    cost_per_hour: Mapped[Decimal] = mapped_column(DECIMAL(precision=10, scale=5))

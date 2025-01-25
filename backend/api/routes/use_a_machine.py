@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Annotated
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -136,6 +137,8 @@ async def use_a_machine(
     
     resource_usage_quantities: list[ResourceUsageQuantity] = []
     total_cost = 0
+
+    total_cost += round(Decimal(request.duration_seconds / 3600) * (machine.type.cost_per_hour), 2)
 
     for resource_slot_id, usage_info in request.resource_usages.items():
         resource_slot = next(
