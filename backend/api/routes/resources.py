@@ -89,7 +89,12 @@ async def get_resource(
     audit_logs = (
         await session.scalars(
             select(AuditLog)
-            .where(AuditLog.content.op("?")("resource_id"))
+            .where(
+                and_(
+                    AuditLog.content.op("?")("resource_id"),
+                    AuditLog.content["resource_id"] == resource_id,
+                )
+            )
             .order_by(AuditLog.time_created.desc())
         )
     ).all()

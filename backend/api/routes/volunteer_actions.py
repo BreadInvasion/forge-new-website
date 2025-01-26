@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -14,6 +13,7 @@ from schemas.enums import LogType, Permissions
 from ..deps import DBSession, PermittedUserChecker
 
 router = APIRouter()
+
 
 @router.post("/clear/{machine_id}")
 async def clear_machine(
@@ -35,25 +35,26 @@ async def clear_machine(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Could not find a machine with the provided ID",
         )
-    
+
     if not machine.active_usage:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="This machine does not have an active usage",
         )
-    
+
     audit_log = AuditLog(
         type=LogType.MACHINE_USAGE_CLEARED,
         content={
             "machine_usage_id": str(machine.active_usage.id),
             "user_rcsid": current_user.RCSID,
-        }
+        },
     )
     session.add(audit_log)
 
     machine.active_usage = None
     session.add(machine)
     await session.commit()
+
 
 @router.post("/fail/{machine_id}")
 async def fail_machine(
@@ -75,19 +76,19 @@ async def fail_machine(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Could not find a machine with the provided ID",
         )
-    
+
     if not machine.active_usage:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="This machine does not have an active usage",
         )
-    
+
     audit_log = AuditLog(
         type=LogType.MACHINE_USAGE_FAILED,
         content={
             "machine_usage_id": str(machine.active_usage.id),
             "user_rcsid": current_user.RCSID,
-        }
+        },
     )
     session.add(audit_log)
 

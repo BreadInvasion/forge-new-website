@@ -210,7 +210,16 @@ class GetChargeSheetsRequest(BaseRequest):
 
 class SemesterCreateRequest(BaseRequest):
     semester_type: SemesterType
-    calendar_year: int
+    calendar_year: int = Field(ge=2020, le=9999)
+
+
+class SemesterEditRequest(BaseRequest):
+    semester_type: SemesterType
+    calendar_year: int = Field(ge=2020, le=9999)
+
+
+class ActivateSemesterRequest(BaseRequest):
+    semester_id: UUID4
 
 
 class RoleCreateRequest(BaseRequest):

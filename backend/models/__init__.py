@@ -9,6 +9,6 @@ from .resource_slot import ResourceSlot, ResourceSlotAssociation
 from .resource_usage_quantity import ResourceUsageQuantity
 from .resource import Resource
 from .role import Role, UserRoleAssociation
-from .semester import Semester, OrgSemesterAssociation, UserSemesterAssociation
+from .semester import Semester
 from .state import State
 from .user import User

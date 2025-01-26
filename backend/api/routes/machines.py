@@ -3,7 +3,7 @@
 from typing import Annotated, Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.orm import InstrumentedAttribute, joinedload, selectinload
 
 from models.audit_log import AuditLog
@@ -29,6 +29,8 @@ async def create_machine(
         User, Depends(PermittedUserChecker({Permissions.CAN_CREATE_MACHINES}))
     ],
 ):
+    """Create a new machine with the provided properties."""
+
     existing_machine = await session.scalar(
         select(Machine).where(Machine.name == request.name)
     )
@@ -83,7 +85,7 @@ async def get_machine(
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_MACHINES}))
     ],
 ):
-    "Fetch the machine with the provided ID."
+    """Fetch the machine with the provided ID."""
 
     machine = await session.scalar(
         select(Machine)
@@ -100,7 +102,12 @@ async def get_machine(
     audit_logs = (
         await session.scalars(
             select(AuditLog)
-            .where(AuditLog.content.op("?")("machine_id"))
+            .where(
+                and_(
+                    AuditLog.content.op("?")("machine_id"),
+                    AuditLog.content["machine_id"] == machine_id,
+                )
+            )
             .order_by(AuditLog.time_created.desc())
         )
     ).all()
@@ -130,7 +137,7 @@ async def get_all_machines(
     ] = "name",
     descending: bool = False,
 ):
-    "Fetch all machines."
+    """Fetch all machines."""
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
         "name": Machine.name,
@@ -248,7 +255,7 @@ async def delete_machine(
         User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_MACHINES}))
     ],
 ):
-    "Delete the machine with the provided ID."
+    """Delete the machine with the provided ID."""
 
     machine = await session.scalar(select(Machine).where(Machine.id == machine_id))
     if not machine:

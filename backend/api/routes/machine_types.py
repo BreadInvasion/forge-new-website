@@ -3,7 +3,7 @@
 from typing import Annotated, Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func, ScalarSelect, select
+from sqlalchemy import and_, func, ScalarSelect, select
 from sqlalchemy.orm import InstrumentedAttribute, joinedload, selectinload
 
 from models.audit_log import AuditLog
@@ -35,7 +35,7 @@ async def create_machine_type(
         User, Depends(PermittedUserChecker({Permissions.CAN_CREATE_MACHINE_TYPES}))
     ],
 ):
-    "Create a new machine type with the provided name and resource slots."
+    """Create a new machine type with the provided name and resource slots."""
 
     existing_machine_type = await session.scalar(
         select(MachineType).where(MachineType.name == request.name)
@@ -57,7 +57,11 @@ async def create_machine_type(
             detail="Could not find all of the provided resource slots",
         )
 
-    new_machine_type = MachineType(name=request.name, resource_slots=resource_slots, cost_per_hour=request.cost_per_hour)
+    new_machine_type = MachineType(
+        name=request.name,
+        resource_slots=resource_slots,
+        cost_per_hour=request.cost_per_hour,
+    )
     session.add(new_machine_type)
     await session.commit()
     await session.refresh(new_machine_type)
@@ -84,7 +88,7 @@ async def get_machine_type(
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_MACHINE_TYPES}))
     ],
 ):
-    "Fetch the machine type with the provided ID."
+    """Fetch the machine type with the provided ID."""
 
     machine_type = await session.scalar(
         select(MachineType)
@@ -104,7 +108,12 @@ async def get_machine_type(
     audit_logs = (
         await session.scalars(
             select(AuditLog)
-            .where(AuditLog.content.op("?")("machine_type_id"))
+            .where(
+                and_(
+                    AuditLog.content.op("?")("machine_type_id"),
+                    AuditLog.content["machine_type_id"] == type_id,
+                )
+            )
             .order_by(AuditLog.time_created.desc())
         )
     ).all()
@@ -143,7 +152,7 @@ async def get_all_machine_types(
     order_by: Literal["name", "num_machines", "slots"] = "name",
     descending: bool = False,
 ):
-    "Fetch all machine types."
+    """Fetch all machine types."""
 
     attr_key_map: dict[str, InstrumentedAttribute | ScalarSelect] = {
         "name": MachineType.name,
@@ -244,7 +253,11 @@ async def edit_machine_type(
             if set(machine_type.resource_slots) != set(resource_slots)
             else None
         ),
-        "cost_per_hour": request.cost_per_hour if machine_type.cost_per_hour != request.cost_per_hour else None,
+        "cost_per_hour": (
+            request.cost_per_hour
+            if machine_type.cost_per_hour != request.cost_per_hour
+            else None
+        ),
     }
 
     machine_type.name = request.name
@@ -271,7 +284,7 @@ async def delete_machine_type(
         User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_MACHINE_TYPES}))
     ],
 ):
-    "Delete the machine type with the provided ID."
+    """Delete the machine type with the provided ID."""
 
     machine_type = await session.scalar(
         select(MachineType).where(MachineType.id == type_id)

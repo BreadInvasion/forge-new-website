@@ -102,6 +102,13 @@ class Permissions(StrEnum):
 
     # For changing the active school semester
     CAN_SEE_SEMESTERS = "canSeeSemesters"
+
+    ## Manual admin database interaction
+    CAN_CREATE_SEMESTERS = "canCreateSemesters"
+    CAN_EDIT_SEMESTERS = "canEditSemesters"
+    CAN_DELETE_SEMESTERS = "canDeleteSemesters"
+
+    ## Routine active semester changes
     CAN_CHANGE_SEMESTER = "canChangeSemester"
 
     CAN_VIEW_FAILURE_LOGS = "canViewFailureLogs"
@@ -176,6 +183,8 @@ class LogType(StrEnum):
     SEMESTER_CREATED = "semester_created"
     SEMESTER_EDITED = "semester_edited"
     SEMESTER_DELETED = "semester_deleted"
+
+    ACTIVE_SEMESTER_CHANGED = "active_semester_changed"
 
     USER_CREATED = "user_created"
     USER_EDITED = "user_edited"

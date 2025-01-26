@@ -3,12 +3,18 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from models.machine import Machine
-from schemas.responses import AllMachinesStatusResponse, MachineInfo, MachineStatus, MachineStatusGroup
+from schemas.responses import (
+    AllMachinesStatusResponse,
+    MachineInfo,
+    MachineStatus,
+    MachineStatusGroup,
+)
 from ..deps import DBSession
 
 from itertools import groupby
 
 router = APIRouter()
+
 
 @router.get("/machinestatus")
 async def get_machines_status(
@@ -18,8 +24,12 @@ async def get_machines_status(
 
     machines = (
         await session.scalars(
-            select(Machine).options(selectinload(Machine.active_usage)).options(selectinload(Machine.group)).options(selectinload(Machine.type))
-    )).all()
+            select(Machine)
+            .options(selectinload(Machine.active_usage))
+            .options(selectinload(Machine.group))
+            .options(selectinload(Machine.type))
+        )
+    ).all()
 
     group_dict = groupby(machines, key=lambda x: x.group_id)
     group_list = []
@@ -28,17 +38,31 @@ async def get_machines_status(
         machines = list(group)
 
         machine_statuses = [
-            MachineStatus.model_validate({
-                "in_use": machine.active_usage is not None,
-                "failed": machine.active_usage.failed if machine.active_usage else False,
-                "failed_at": machine.active_usage.failed_at if machine.active_usage else None,
-                "usage_start": machine.active_usage.time_started if machine.active_usage else None,
-                "usage_duration": machine.active_usage.duration_seconds if machine.active_usage else None,
-                **machine.__dict__,
-            }) for machine in machines
+            MachineStatus.model_validate(
+                {
+                    "in_use": machine.active_usage is not None,
+                    "failed": (
+                        machine.active_usage.failed if machine.active_usage else False
+                    ),
+                    "failed_at": (
+                        machine.active_usage.failed_at if machine.active_usage else None
+                    ),
+                    "usage_start": (
+                        machine.active_usage.time_started
+                        if machine.active_usage
+                        else None
+                    ),
+                    "usage_duration": (
+                        machine.active_usage.duration_seconds
+                        if machine.active_usage
+                        else None
+                    ),
+                    **machine.__dict__,
+                }
+            )
+            for machine in machines
         ]
 
-        
         first_machine = machines[0]
         # We portray it like this just to make linter happy
         if first_machine.group is None:
@@ -51,7 +75,4 @@ async def get_machines_status(
                 )
             )
 
-    return AllMachinesStatusResponse(
-        groups=group_list,
-        loners=loner_list
-    )
+    return AllMachinesStatusResponse(groups=group_list, loners=loner_list)

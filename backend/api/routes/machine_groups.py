@@ -33,7 +33,7 @@ async def create_machine_group(
         User, Depends(PermittedUserChecker({Permissions.CAN_CREATE_MACHINE_GROUPS}))
     ],
 ):
-    "Create a new machine type with the provided name."
+    """Create a new machine type with the provided name."""
 
     existing_machine_group = await session.scalar(
         select(MachineGroup).where(MachineGroup.name == request.name)
@@ -71,7 +71,7 @@ async def get_machine_group(
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_MACHINE_GROUPS}))
     ],
 ):
-    "Fetch the machine group with the provided ID."
+    """Fetch the machine group with the provided ID."""
 
     machine_group = await session.scalar(
         select(MachineGroup)
@@ -87,7 +87,12 @@ async def get_machine_group(
     audit_logs = (
         await session.scalars(
             select(AuditLog)
-            .where(AuditLog.content.op("?")("machine_group_id"))
+            .where(
+                and_(
+                    AuditLog.content.op("?")("machine_group_id"),
+                    AuditLog.content["machine_group_id"] == group_id,
+                )
+            )
             .order_by(AuditLog.time_created.desc())
         )
     ).all()
@@ -109,7 +114,7 @@ async def get_all_machine_groups(
     limit: int = 20,
     offset: int = 0,
 ):
-    "Fetch all machine groups."
+    """Fetch all machine groups."""
 
     machine_groups = (
         await session.scalars(
@@ -197,7 +202,7 @@ async def delete_machine_group(
         User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_MACHINE_GROUPS}))
     ],
 ):
-    "Delete the machine group with the provided ID."
+    """Delete the machine group with the provided ID."""
 
     machine_group = await session.scalar(
         select(MachineGroup)

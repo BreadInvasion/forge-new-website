@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Optional
 from pydantic import BaseModel, ConfigDict, UUID4, Field
 
-from .enums import GenderStatsType, LogType, PronounType
+from .enums import GenderStatsType, LogType, PronounType, SemesterType
 
 
 class BaseResponse(BaseModel):
@@ -97,6 +97,16 @@ class ResourceInfo(BaseModel):
 
 
 class ResourceDetails(ResourceInfo):
+    audit_logs: list[AuditLogModel]
+
+
+class SemesterInfo(BaseModel):
+    id: UUID4
+    semester_type: SemesterType
+    calendar_year: int = Field(ge=2020, le=9999)
+
+
+class SemesterDetails(SemesterInfo):
     audit_logs: list[AuditLogModel]
 
 

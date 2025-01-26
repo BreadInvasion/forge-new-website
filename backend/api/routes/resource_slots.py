@@ -3,7 +3,7 @@
 from typing import Annotated, Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.orm import InstrumentedAttribute, selectinload
 
 from models.audit_log import AuditLog
@@ -104,7 +104,12 @@ async def get_resource_slot(
     audit_logs = (
         await session.scalars(
             select(AuditLog)
-            .where(AuditLog.content.op("?")("resource_slot_id"))
+            .where(
+                and_(
+                    AuditLog.content.op("?")("resource_slot_id"),
+                    AuditLog.content["resource_slot_id"] == resource_slot_id,
+                )
+            )
             .order_by(AuditLog.time_created.desc())
         )
     ).all()
