@@ -1,0 +1,11 @@
+# This file determines who "owns" the various parts of the codebase
+# for the purposes of required approvals on merge requests.
+# Contact @breadinvasion to request changes.
+/.github/CODEOWNERS @breadinvasion
+
+# Currently, all PRs will require an approval from
+# @breadinvasion (mostly from an architectural
+# perspective, but also as a perspective from a
+# working engineer). This may change as we get
+# to a more stable state.
+* @breadinvasion
