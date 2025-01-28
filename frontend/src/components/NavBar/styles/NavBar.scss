@@ -1,4 +1,5 @@
 @use "./NavBar.variables.scss" as nav;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* Base NavMenu Children */
 .nav-menu-root {
@@ -35,15 +36,19 @@
     border-radius: 4px;
     color: nav.$text-color;
 }
+
 .list-item:hover {
     background-color: nav.$highlight-color;
 }
 
 .nav-menu-trigger {
+    // alignment of dropdowns and normal links looks a tad strange.
+    // it may be a good idea to swap the dropdown caret for an
+    // indicator that doesn't change the width of the container.
     display: flex;
     align-items: center;
     text-decoration: none;
-    font-family: "Roboto Condensed";
+    font-family: "Noto Sans";
     font-weight: 700;
     border-radius: 4px;
     font-size: 1.25rem;
@@ -60,7 +65,7 @@
 
 .link {
     text-decoration: none;
-    font-family: "Roboto Condensed";
+    font-family: "Noto Sans";
     font-weight: 700;
     border-radius: 4px;
     font-size: 1.25rem;
@@ -70,22 +75,24 @@
 
 .logo-link {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
+    align-items: left;
     gap: 0.5rem;
     text-decoration: none;
     background-color: transparent;
     padding: 0.75rem 1.75rem;
-
     margin-right: auto;
+    min-width: 18rem;
 }
 
 .logo-text {
     color: nav.$text-color;
-    font-family: Montserrat;
+    font-family: "Montserrat";
     font-size: 1.875rem;
     font-weight: 700;
     text-transform: uppercase;
+    overflow: visible;
+    white-space: nowrap;
 }
 
 .nav-menu-content {
