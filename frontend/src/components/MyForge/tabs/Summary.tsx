@@ -35,8 +35,6 @@ const Summary = () => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-around',
-        fill: '100%',
-        gap: '10px',
         padding: '10px',
         width: 'inherit',
     } as React.CSSProperties;
@@ -46,12 +44,6 @@ const Summary = () => {
         justifyContent: 'space-around',
         gap: '10px',
         padding: '10px'
-    } as React.CSSProperties;
-
-    const iconStyle = {
-        marginRight: '10px',
-        width: '24px',
-        height: '24px',
     } as React.CSSProperties;
 
     // TODO replace these with object data
@@ -87,7 +79,6 @@ const ListObject = ({ id, name, value }: ListObjectProps) => {
 
     const listStyle = {
         flex: '1',
-        margin: '10px'
     }
 
     return (
@@ -111,13 +102,9 @@ const DisplayObject = ({ id, name, semester_cost }: DisplayObjectProps) => {
         minWidth: '150px'
     } as React.CSSProperties;
 
-    const titleStyle = {
-        textAlign: 'left',
-    } as React.CSSProperties;
-
     return (
         <div className='mf-display mf-component' style={displayStyle}>
-            <h3 style={titleStyle}>{name}</h3>
+            <h3>{name}</h3>
             <h2>${semester_cost}</h2>
         </div>
     );
