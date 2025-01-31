@@ -54,8 +54,8 @@ const Summary = () => {
                 <SingleObject id='current' name='Current Usage' value={usage_value} /> 
             </div>
             <div className='mf-flex-row' style={rowStyle}>
-                <ChartObject id='chart_hours' name='Machine Usage Hours' value={hours_chart}/> 
-                <ChartObject id='chart_cost' name='Machine Usage Cost' value={cost_chart}/> 
+                <ChartObject id='chart_hours' name='Machine Usage Hours' unit="hours" value={hours_chart}/> 
+                <ChartObject id='chart_cost' name='Machine Usage Cost' unit="cost" value={cost_chart}/> 
             </div>
             <div className='mf-flex-row' style={rowStyle}>
                 <ListObject id='uages' name='Machine Usage History' value=''/>
@@ -144,10 +144,11 @@ const LinkObject = ({ id, name, value }: LinkObjectProps) => {
 interface ChartObjectProps {
     id: string;
     name: string;
+    unit: string;
     value: any;
 }
 
-const ChartObject = ({ id, name, value }: ChartObjectProps) => {
+const ChartObject = ({ id, name, unit, value }: ChartObjectProps) => {
 
     const chartStyle = {
        flex: '1',
@@ -178,7 +179,9 @@ const ChartObject = ({ id, name, value }: ChartObjectProps) => {
                     data={value.map((item: any, index: number) => {
                         return { title: item.machine, value: item.usage, color: colors[index], }
                     })}
-                    label={({ dataEntry }) => `${Math.round(dataEntry.value)} hrs`}
+                    label={({ dataEntry }) => 
+                        (unit == 'cost') ? `$${Math.round(dataEntry.value)}` : `${Math.round(dataEntry.value)} hrs`
+                    }
                     labelStyle={{
                         fontSize: '50%',
                         fontFamily: 'sans-serif',
