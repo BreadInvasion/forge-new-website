@@ -29,12 +29,14 @@
 }
 
 .list-item {
+    transform: translate(0pt);
     display: flex;
     align-items: center;
     justify-content: center;
     height: auto;
     border-radius: 4px;
     color: nav.$text-color;
+    transition-duration: nav.$responsive-speed;
 }
 
 .list-item:hover {
@@ -42,9 +44,6 @@
 }
 
 .nav-menu-trigger {
-    // alignment of dropdowns and normal links looks a tad strange.
-    // it may be a good idea to swap the dropdown caret for an
-    // indicator that doesn't change the width of the container.
     display: flex;
     align-items: center;
     text-decoration: none;
@@ -71,21 +70,30 @@
     font-size: 1.25rem;
     padding: 0.25rem 0.5rem;
     color: inherit;
+    width: fit-content;
+}
+
+.forge-logo {
+    height: 100%;
 }
 
 .logo-link {
     display: flex;
     justify-content: left;
     align-items: left;
-    gap: 0.5rem;
+    gap: .75rem;
     text-decoration: none;
     background-color: transparent;
-    padding: 0.75rem 1.75rem;
-    margin-right: auto;
+    padding: 0.75rem 1rem;
+    position: absolute;
+    left: 0;
     min-width: 18rem;
+    width: fit-content;
+    z-index: 1;
 }
 
 .logo-text {
+    transition-duration: nav.$responsive-speed;
     color: nav.$text-color;
     font-family: "Montserrat";
     font-size: 1.875rem;
@@ -112,9 +120,6 @@
 }
 .nav-menu-content[data-state="open"] {
     animation: scale-in 200ms ease;
-}
-.nav-menu-content[data-state="closed"] {
-    animation: scale-out 200ms ease;
 }
 
 .nav-menu-content .link:hover {
@@ -151,6 +156,8 @@
     color: nav.$text-color;
     background-color: transparent;
     cursor: pointer;
+    overflow: visible;
+    white-space: nowrap;
 
 }
 .sign-in-button:hover {
@@ -158,11 +165,29 @@
 }
 
 /* Other Components */
-.caret-down {
+.caret-down, .hamburger-icon {
     color: nav.$text-color;
-    transition: transform 250ms ease;
+    transition: nav.$responsive-speed ease;
 }
-.caret-down[data-state="open"] {
+
+.user-trigger:has(.hamburger-icon) {
+    width: 0;
+    height: 0;
+    scale: -20%;
+    transform: translate(100pt);
+    opacity: 0;
+    transition-duration: nav.$responsive-speed;
+    position: absolute;
+    z-index: -3;
+}
+
+.hamburger-icon {
+    position: absolute;
+    width: 15pt;
+    height: 20pt;
+}
+
+.user-trigger[data-state="open"] .caret-down, .user-trigger[data-state="open"] .hamburger-icon {
     transform: rotate(-180deg);
 }
 
@@ -181,18 +206,15 @@
 
 .separator {
     background-color: nav.$border-color;
+    transition: nav.$responsive-speed;
     border-radius: 1px;
     height: 2px;
     width: 100%;
-    margin: 0.25rem 0;
+    margin-left: -1.5rem;
 }
 .separator.horizontal {
     height: 100%;
     width: 2px;
-}
-
-.forge-logo {
-    height: 100%;
 }
 
 .text {
@@ -255,5 +277,52 @@
     }
     &[data-state=hidden] {
         animation: fade-out 200ms ease;
+    }
+}
+
+.nav-avatar-root {
+    @extend .avatar-root !optional;
+    height: 32px;
+    width: 32px;
+    border-radius: 100%;
+    text-align: center;
+    background-color: nav.$highlight-color;
+    color: nav.$text-color;
+}
+
+.nav-avatar-fallback {
+    @extend .avatar-fallback !optional;
+    font-size: 10pt;
+}
+
+.nav-avatar-image {
+    @extend .avatar-image !optional;
+    height: 100%;
+    width: 100%;
+}
+
+@media screen and (width < nav.$mobile-breakpoint) {
+    .logo-text, .list-item {
+        transform: translate(0, -200pt);
+        opacity: 0;
+        scale: 0%;
+    }
+    .hamburger-icon {
+        size: 100%;
+        transform: translate(0);
+        margin-right: .2rem;
+        opacity: 1;
+    }
+    .user-trigger:has(.hamburger-icon) {
+        transform: translate(0pt, 0pt);
+        position: relative;
+        width: 15pt;
+        height: 20pt;
+        scale: 100%;
+        opacity: 1;
+        z-index: 0;
+    }
+    .separator {
+        margin-left: 0;
     }
 }

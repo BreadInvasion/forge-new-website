@@ -10,9 +10,10 @@ $popup-highlight: #b4b4b4; // grayDark.gray11 equivalent
 
 $mobile-breakpoint: 900px;
 
+$responsive-speed: .5s;
+
 @mixin itemStyles {
     text-decoration: none;
-    font-family: "Roboto Condensed";
     font-weight: 700;
     border-radius: 4px;
     font-size: 1.25rem;

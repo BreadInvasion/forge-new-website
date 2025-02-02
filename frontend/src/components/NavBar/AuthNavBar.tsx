@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
-import useAuth from '../Auth/useAuth';
 import { useResetRecoilState } from 'recoil';
-import { UserInterface, userState } from 'src/GlobalAtoms';
+import { userNameState, userState } from 'src/GlobalAtoms';
+import { User } from 'src/interfaces';
 import * as NavMenu from "@radix-ui/react-navigation-menu";
 import { ReactComponent as ForgeSVG } from 'src/assets/img/logo.svg';
 import { CaretDownIcon } from '@radix-ui/react-icons';
+import * as Avatar from '../MyForge/components/Avatar';
+import * as Hamburger from './Hamburger';
 
-// import './styles/Avatar.scss';
 import './styles/UserMenu.scss';
 import './styles/NavBar.scss';
 
-
 interface NavBarProps {
-    user: UserInterface;
+    user: User;
     setAuth: (value: boolean) => void;
 }
 
@@ -30,10 +30,15 @@ const UserMenu: React.FC<NavBarProps> = ({user, setAuth}) => {
 
     return (
         <NavMenu.Item className='user-item'>
-            <NavMenu.Trigger className='user-trigger' >
+            <NavMenu.Trigger className='user-trigger'>
+                <Avatar.default 
+                    user = {user}
+                    isNav = {true}
+                />
                 {user.RCSID} <CaretDownIcon className='caret-down' aria-hidden />
             </NavMenu.Trigger>
-            <NavMenu.Content className='user-content' >
+            <NavMenu.Content className='user-content'>
+                <NavMenu.Link className='link' href="/myforge/create">Create</NavMenu.Link>
                 <NavMenu.Link className='link' href="/myforge">Summary</NavMenu.Link>
                 <NavMenu.Link className='link' href="/myforge/usages">Usages</NavMenu.Link>
                 <NavMenu.Link className='link' href="/" onSelect={(e) => onSignOut()}>Logout</NavMenu.Link>
@@ -45,7 +50,7 @@ const UserMenu: React.FC<NavBarProps> = ({user, setAuth}) => {
 export const AuthNavBar: React.FC<NavBarProps> = ({user, setAuth}) => {
 
     return (
-        <NavMenu.Root className='nav-menu-root'>
+        <NavMenu.Root className='nav-menu-root' delayDuration={4000 /* Prevent closing immediately after opening */}>
 
             <NavMenu.Link className='logo-link' href="/">
                 <ForgeSVG className='forge-logo' />
@@ -54,34 +59,19 @@ export const AuthNavBar: React.FC<NavBarProps> = ({user, setAuth}) => {
 
             <NavMenu.List className='nav-menu-list'>
                 <NavMenu.Item className='list-item'>
-                    <NavMenu.Trigger className='nav-menu-trigger'>
-                        Create <CaretDownIcon className='caret-down' aria-hidden />
-                    </NavMenu.Trigger>
-                    <NavMenu.Content className='nav-menu-content'>
-                        <NavMenu.Link className='link' href="/create/3dprint">3D Print</NavMenu.Link>
-                        <NavMenu.Link className='link' href="/create/laser">Laser Engrave</NavMenu.Link>
-                        <NavMenu.Link className='link' href="/create/sticker">Sticker Print</NavMenu.Link>
-                        <NavMenu.Link className='link' href="/create/all">See All Machines</NavMenu.Link>
-                    </NavMenu.Content>
-                </NavMenu.Item>
-                <NavMenu.Item className='list-item'>
                     <NavMenu.Link className='link' href="/status">Status</NavMenu.Link>
-                </NavMenu.Item>
-                <NavMenu.Item className='list-item'>
-                    <NavMenu.Trigger className='nav-menu-trigger' >
-                        Learn <CaretDownIcon className='caret-down' aria-hidden />
-                    </NavMenu.Trigger>
-                    <NavMenu.Content className='nav-menu-content' >
-                        <NavMenu.Link className='link' href="/learn/aboutus">About Us</NavMenu.Link>
-                        <NavMenu.Link className='link' href="/learn/3d-printing-guide">3D Printing Guide</NavMenu.Link>
-                        <NavMenu.Link className='link' href="/learn/laser-engraving-guide">Laser Engraving Guide</NavMenu.Link>
-                        <NavMenu.Link className='link' href="/learn/sticker-preparation">Sticker Preparation</NavMenu.Link>
-                        <NavMenu.Link className='link' href="/learn/troubleshooting">Troubleshooting</NavMenu.Link>
-                    </NavMenu.Content>
                 </NavMenu.Item>
                 <NavMenu.Item className='list-item'>
                     <NavMenu.Link className='link' href="/hours">Hours</NavMenu.Link>
                 </NavMenu.Item>
+                <NavMenu.Item className='list-item'>
+                    <NavMenu.Link className='link' href="/learn">Wiki</NavMenu.Link>
+                </NavMenu.Item>
+                <NavMenu.Item className='list-item'>
+                    <NavMenu.Link className='link' href="/learn/aboutus">About Us</NavMenu.Link>
+                </NavMenu.Item>
+
+                <Hamburger.default />
 
                 <div className='separator horizontal' />
 
@@ -92,12 +82,6 @@ export const AuthNavBar: React.FC<NavBarProps> = ({user, setAuth}) => {
                 </NavMenu.Indicator>
 
             </NavMenu.List>
-
-
-
-            {/* Need to put User Icon and Dropdown here which replaces the SignInButton after Logged in */}
-
-
         </NavMenu.Root>
     )
 };
