@@ -10,7 +10,7 @@ import './styles/NavBar.scss';
 export const NavBar: React.FC = () => {
 
     return (
-        <NavMenu.Root className='nav-menu-root' delayDuration={4000 /* Prevent closing immediately after opening */}>
+        <NavMenu.Root className='nav-menu-root' delayDuration={1000 /* Prevent closing immediately after opening */}>
 
             <NavMenu.Link className='logo-link' href="/">
                 <ForgeSVG className='forge-logo' />
@@ -28,7 +28,7 @@ export const NavBar: React.FC = () => {
                     <NavMenu.Link className='link' href="/learn">Wiki</NavMenu.Link>
                 </NavMenu.Item>
                 <NavMenu.Item className='list-item'>
-                    <NavMenu.Link className='link' href="/learn/aboutus">About Us</NavMenu.Link>
+                    <NavMenu.Link className='link' href="/learn/about">About Us</NavMenu.Link>
                 </NavMenu.Item>
 
                 <Hamburger.default />
@@ -44,12 +44,6 @@ export const NavBar: React.FC = () => {
                 </NavMenu.Indicator>
 
             </NavMenu.List>
-
-
-
-            {/* Need to put User Icon and Dropdown here which replaces the SignInButton after Logged in */}
-
-
         </NavMenu.Root>
     )
 };

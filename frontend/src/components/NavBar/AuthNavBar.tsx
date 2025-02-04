@@ -35,7 +35,7 @@ const UserMenu: React.FC<NavBarProps> = ({user, setAuth}) => {
                     user = {user}
                     isNav = {true}
                 />
-                {user.RCSID} <CaretDownIcon className='caret-down' aria-hidden />
+                {user.RCSID} <CaretDownIcon className='caret-down dropdown-spinner' aria-hidden />
             </NavMenu.Trigger>
             <NavMenu.Content className='user-content'>
                 <NavMenu.Link className='link' href="/myforge/create">Create</NavMenu.Link>
@@ -50,7 +50,7 @@ const UserMenu: React.FC<NavBarProps> = ({user, setAuth}) => {
 export const AuthNavBar: React.FC<NavBarProps> = ({user, setAuth}) => {
 
     return (
-        <NavMenu.Root className='nav-menu-root' delayDuration={4000 /* Prevent closing immediately after opening */}>
+        <NavMenu.Root className='nav-menu-root' delayDuration={1000 /* Prevent closing immediately after opening */}>
 
             <NavMenu.Link className='logo-link' href="/">
                 <ForgeSVG className='forge-logo' />
@@ -68,7 +68,7 @@ export const AuthNavBar: React.FC<NavBarProps> = ({user, setAuth}) => {
                     <NavMenu.Link className='link' href="/learn">Wiki</NavMenu.Link>
                 </NavMenu.Item>
                 <NavMenu.Item className='list-item'>
-                    <NavMenu.Link className='link' href="/learn/aboutus">About Us</NavMenu.Link>
+                    <NavMenu.Link className='link' href="/learn/about">About Us</NavMenu.Link>
                 </NavMenu.Item>
 
                 <Hamburger.default />

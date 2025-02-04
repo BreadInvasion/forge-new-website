@@ -26,8 +26,6 @@ services:
       - WATCHFILES_FORCE_POLLING=true
     volumes:
       - ./backend:/build
-    ports:
-      - "8000:8000"
   frontend:
     restart: unless-stopped
     build: ./frontend

@@ -36,7 +36,7 @@
     height: auto;
     border-radius: 4px;
     color: nav.$text-color;
-    transition-duration: nav.$responsive-speed;
+    transition-duration: nav.$transition-speed;
 }
 
 .list-item:hover {
@@ -93,7 +93,7 @@
 }
 
 .logo-text {
-    transition-duration: nav.$responsive-speed;
+    transition-duration: nav.$transition-speed;
     color: nav.$text-color;
     font-family: "Montserrat";
     font-size: 1.875rem;
@@ -167,7 +167,7 @@
 /* Other Components */
 .caret-down, .hamburger-icon {
     color: nav.$text-color;
-    transition: nav.$responsive-speed ease;
+    transition: nav.$transition-speed ease;
 }
 
 .user-trigger:has(.hamburger-icon) {
@@ -176,7 +176,7 @@
     scale: -20%;
     transform: translate(100pt);
     opacity: 0;
-    transition-duration: nav.$responsive-speed;
+    transition-duration: nav.$transition-speed;
     position: absolute;
     z-index: -3;
 }
@@ -187,7 +187,7 @@
     height: 20pt;
 }
 
-.user-trigger[data-state="open"] .caret-down, .user-trigger[data-state="open"] .hamburger-icon {
+.user-trigger[data-state="open"] .dropdown-spinner{
     transform: rotate(-180deg);
 }
 
@@ -206,7 +206,7 @@
 
 .separator {
     background-color: nav.$border-color;
-    transition: nav.$responsive-speed;
+    transition: nav.$transition-speed;
     border-radius: 1px;
     height: 2px;
     width: 100%;

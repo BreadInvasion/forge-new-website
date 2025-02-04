@@ -37,7 +37,7 @@ export default function App() {
                     <Route path="/login" Component={Login} />
                     <Route path="/register" Component={Register} />
                     <Route path="/learn" Component={ComingSoon} />
-                    <Route path="/learn/aboutus" Component={ComingSoon} />
+                    <Route path="/learn/about" Component={ComingSoon} />
                     <Route path="/learn/3d-printing-guide" Component={ComingSoon} />
                     <Route path="/learn/laser-engraving-guide" Component={ComingSoon} />
                     <Route path="/learn/sticker-preparation" Component={ComingSoon} />

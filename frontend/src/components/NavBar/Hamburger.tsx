@@ -7,7 +7,7 @@ const Hamburger: React.FC = () => {
     return (
         <NavMenu.Item className='user-item'>
             <NavMenu.Trigger className='user-trigger'>
-                <HamburgerMenuIcon className='hamburger-icon' aria-hidden/>
+                <HamburgerMenuIcon className='hamburger-icon dropdown-spinner' aria-hidden/>
             </NavMenu.Trigger>
             <NavMenu.Content className='user-content' >
                 <NavMenu.Link className='link' href="/status">Status</NavMenu.Link>
