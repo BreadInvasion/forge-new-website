@@ -16,6 +16,7 @@ const Register = lazy(() => import('./components/Forms/Register'));
 const ComingSoon = lazy(() => import('./components/Home/ComingSoon'));
 const NewStatus = lazy(() => import('./components/Status/NewStatus'));
 const MyForge = lazy(() => import('./components/MyForge/MyForge'));
+const Hours = lazy(() => import('./components/Hours/googleCalendar'));
 
 // import Home from './components/Home/Home';
 // import NewStatus from './components/Status/NewStatus';
@@ -41,7 +42,7 @@ export default function App() {
                     <Route path="/learn/laser-engraving-guide" Component={ComingSoon} />
                     <Route path="/learn/sticker-preparation" Component={ComingSoon} />
                     <Route path="/learn/troubleshooting" Component={ComingSoon} />
-                    <Route path="/hours" Component={ComingSoon} />
+                    <Route path="/hours" Component={Hours} />
                     <Route path="/myforge/*" element={
                         <ProtectedRoute>
                             <MyForge />
