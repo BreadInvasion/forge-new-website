@@ -1,0 +1,142 @@
+.use-a-machine {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-image: url(../benchy_rain.png), linear-gradient(to bottom left, rgb(165, 165, 165), rgb(164, 164, 164));
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.usage-form {
+    margin-inline: auto;
+    margin-block: 10px;
+    background-color: #eeeeee;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    // align-items: center;
+    gap: 5px;
+    width: 50%;
+}
+
+.usage-form button {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 2vh;
+    width: min-content;
+    background-color: #333;
+    color: #eeeeee;
+    cursor: pointer;
+}
+
+.usage-form .divider {
+    width: 100%;
+    height: 1px;
+    margin: 0;
+    padding: 0;
+    background-color: #333;
+}
+
+.usage-form > label {
+    font-size: 3vh;
+    color: #333;
+}
+
+.usage-form > h2 {
+    font-size: 3vh;
+    color: #333;
+    text-align: center;
+}
+
+.form-icon {
+    background-image: url(../logo.svg); // Since the form is in the /myforge route, need to backtrack to public
+}
+
+.usage-duration {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.usage-duration > label {
+    font-size: 3vh;
+    color: #333;
+    text-align: center;
+}
+
+.usage-duration > input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 2vh;
+    border: 1px solid #333;
+}
+
+
+.resource-usage-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.resource-usage-form label {
+    font-size: 3vh;
+    color: #333;
+}
+
+.resource-usage-form table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.resource-usage-form thead {
+    color: #333;
+    text-align: center;
+}
+
+.resource-usage-form tbody {
+    background-color: #eeeeee;
+    color: #333;
+    text-align: center;
+}
+
+.own-material {
+    width: 10%;
+}
+
+.amount {
+    width: 10%;
+}
+
+.resource-usage-form th {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.resource-usage-form td {
+    padding: 5px 10px;
+}
+
+.resource-usage-form select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1.875vh;
+    width: 100%;
+    border: 1px solid #333;
+}
+
+.resource-usage-form input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 2vh;
+    width: 100%;
+    border: 1px solid #333;
+}
