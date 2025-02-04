@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { CheckboxInput, DropdownInput, TextInput } from './Form';
+import { CheckboxInput, DropdownInput, Form, TextInput } from './Form';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../Auth/useAuth';
 // import { ReactComponent as Logo } from 'logo.svg';
@@ -8,7 +8,7 @@ import useAuth from '../Auth/useAuth';
 import './styles/Form.scss';
 import './styles/Register.scss';
 
-    
+
 const formFields = [
     {
         type: "text",
@@ -61,18 +61,10 @@ const formFields = [
 
 export default function Register() {
 
-    const [formValues, setFormValues] = useState<{ [key: string]: string }>({});
-
     const navigate = useNavigate();
 
-    const handleInputChange = (input: string, value: string) => {
-        setFormValues((prevValues) => ({
-            ...prevValues,
-            [input]: value,
-        }));
-    };
-    
-    const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+
+    const handleRegister = async (e: React.FormEvent<HTMLFormElement>, formValues: { [key: string]: string }) => {
         e.preventDefault();
 
         try {
@@ -108,55 +100,13 @@ export default function Register() {
 
     return (
         <div className='page-container'>
-            <form className='form-container' onSubmit={handleRegister}>
-                <div className='form-icon' />
-                <label>Register</label>
-                {formFields.map((field) => {
-                    switch (field.type) {
-                        case "text":
-                        case "password":
-                            return (
-                                <TextInput
-                                    key={field.id}
-                                    label={field.label}
-                                    id={field.id}
-                                    value={formValues[field.id] ? formValues[field.id] : ""}
-                                    onChange={handleInputChange}
-                                    type={field.type}
-                                />
-                            );
-                        case "dropdown":
-                            return (
-                                <DropdownInput
-                                    key={field.id}
-                                    label={field.label}
-                                    id={field.id}
-                                    value={formValues[field.id] ? formValues[field.id] : ""}
-                                    placeholder={field.placeholder}
-                                    onChange={handleInputChange}
-                                    options={["Computer Science", "ITWS", "Math", "Physics", "Biology"]}
-                                    type={field.type}
-                                />
-                            );
-                        case "checkbox":
-                            return (
-                                <CheckboxInput
-                                    key={field.id}
-                                    label={field.label}
-                                    id={field.id}
-                                    value={formValues[field.id] ? formValues[field.id] : ""}
-                                    onChange={handleInputChange}
-                                    type={field.type}
-                                />
-                            );
-                        default:
-                            return null;
-                    }
-                })}
-                <button className='submit-button' type="submit" >
-                    Submit
-                </button>
-            </form>
+            <Form
+                formFields={formFields}
+                handleSubmit={handleRegister} 
+                submitLabel="Register" 
+                title="Register"
+                showIcon={true} 
+            />
         </div>
     )
 }
