@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { useResetRecoilState } from 'recoil';
 import { userNameState, userState } from 'src/GlobalAtoms';
 import { User } from 'src/interfaces';
@@ -31,10 +31,7 @@ const UserMenu: React.FC<NavBarProps> = ({user, setAuth}) => {
     return (
         <NavMenu.Item className='user-item'>
             <NavMenu.Trigger className='user-trigger'>
-                <Avatar.default 
-                    user = {user}
-                    isNav = {true}
-                />
+                <Avatar.default user={user} isNav={true} />
                 {user.RCSID} <CaretDownIcon className='caret-down dropdown-spinner' aria-hidden />
             </NavMenu.Trigger>
             <NavMenu.Content className='user-content'>

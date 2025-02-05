@@ -101,6 +101,7 @@
     text-transform: uppercase;
     overflow: visible;
     white-space: nowrap;
+    width: 100%;
 }
 
 .nav-menu-content {
@@ -137,8 +138,6 @@
     margin-top: -10px;
     z-index: 1;
     transition: width, transform 250ms ease;
-
-    
 }
 .indicator[data-state="visible"] {
     animation: fade-in 200ms ease;
@@ -320,7 +319,7 @@
         height: 20pt;
         scale: 100%;
         opacity: 1;
-        z-index: 0;
+        z-index: 999; // prevent going under logo icon
     }
     .separator {
         margin-left: 0;
