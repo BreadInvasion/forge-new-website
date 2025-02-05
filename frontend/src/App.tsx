@@ -2,11 +2,10 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './components/Auth/AuthContext';
 import { ProtectedRoute } from './components/Auth/ProtectedRoute';
-import { NavBar } from './components/NavBar/NavBar';
 
 import './App.scss';
 import useAuth from './components/Auth/useAuth';
-import { AuthNavBar } from './components/NavBar/AuthNavBar';
+import { NavBar } from './components/NavBar/NavBar';
 
 const Home = lazy(() => import('./components/Home/Home'));
 const Footer = lazy(() => import('./components/Footer/Footer'));
@@ -29,7 +28,7 @@ export default function App() {
 
     return (
         <Router>
-            {!isAuthenticated ? <NavBar /> : <AuthNavBar user={user} setAuth={setAuth}/>}
+            <NavBar user={user} setAuth={setAuth} isAuthed={isAuthenticated}/>
             <Suspense fallback={<div>Loading...</div>}>
                 <Routes>
                     <Route path="/" Component={Home} />
