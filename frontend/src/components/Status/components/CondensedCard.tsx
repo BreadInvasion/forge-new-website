@@ -1,5 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
+import Toggle from "@radix-ui/react-toggle"
+import { useState } from 'react';
+import { EraserIcon } from "@radix-ui/react-icons";
+import {useToggle} from "./ToggleContext";
+
 
 const getEndTime = (startTime: string, totalTime: number) => {
     const start = new Date(startTime);
@@ -78,11 +83,15 @@ const StatusText = styled.p`
 
 const CondensedCard = (props: MachineProps) => {
 
-    const { name, icon, user, startTime, totalTime } = props;
+    const { name, icon, user, startTime, totalTime} = props;
+    const { highlight } = useToggle();
 
     return (
-
-    <Card symbol={icon ? icon : name} progress={getProgress(startTime, totalTime)}>
+    <Card 
+				symbol={icon ? icon : name} 
+				progress={getProgress(startTime, totalTime)}
+				highlight={highlight}
+		>
         <MachineName>{name}</MachineName>
         {user && <StatusText>User: <br/>{user}</StatusText>}
         {!user && <StatusText>Available</StatusText>}
