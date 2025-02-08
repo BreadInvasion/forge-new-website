@@ -2,6 +2,7 @@ import React from 'react';
 import useAuth from '../../Auth/useAuth';
 import { PieChart } from 'react-minimal-pie-chart';
 import {ReactComponent as DiscordIcon} from '../../../assets/img/discord-mark-blue.svg'; 
+import { MachineUsage } from 'src/interfaces';
 import '../styles/Summary.scss';
 
 // Temp hardcoded values 
