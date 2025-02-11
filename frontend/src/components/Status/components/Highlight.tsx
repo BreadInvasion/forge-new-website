@@ -15,6 +15,7 @@ const Highlight: React.FC = () => {
     return (
         <HighlightCard>
             <h2>Highlight</h2>
+            
         </HighlightCard>
     );
 };

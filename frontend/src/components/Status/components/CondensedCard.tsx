@@ -28,7 +28,7 @@ export interface MachineProps {
     totalTime: number | undefined;
 }
 
-const Card = styled.div<{symbol: string, progress: number}>`
+const Card = styled.div<{symbol: string, progress: number; highlight?: boolean}>`
     background-color: #f5f5f5;
     border-radius: 5px;
     padding: 5px;
