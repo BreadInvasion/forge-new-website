@@ -1,7 +1,8 @@
 import React from 'react';
 import useAuth from '../../Auth/useAuth';
 import { Link } from 'react-router-dom';
-import * as Avatar from '@radix-ui/react-avatar';
+// import * as Avatar from '@radix-ui/react-avatar';
+import * as Avatar from './Avatar';
 
 import '../styles/UserMenu.scss';
 
@@ -17,16 +18,10 @@ const UserMenu: React.FC = () => {
                 - if user is eboard, avatar should have a purple border
             */}
             <div className='user-summary'>
-                <Avatar.Root className="avatar-root">
-                    <Avatar.Image
-                        className="avatar-image"
-                        src="./TB_Logo.png"
-                        alt="User Avatar"
-                    />
-                    <Avatar.Fallback className="avatar-fallback">
-                        TB
-                    </Avatar.Fallback>
-                </Avatar.Root>
+                <Avatar.default 
+                    user = {user}
+                    isNav = {false}
+                />
 
                 <h2>{user.first_name} {user.last_name}</h2>
                 <h3>EBoard Member</h3>

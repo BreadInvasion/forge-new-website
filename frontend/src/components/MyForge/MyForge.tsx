@@ -15,6 +15,7 @@ const Resources = lazy(() => import('./tabs/Resources'));
 const ResourceSlots = lazy(() => import('./tabs/ResourceSlots'));
 const Users = lazy(() => import('./tabs/Users'));
 const Usages = lazy(() => import('./tabs/Usages'));
+const ComingSoon = lazy(() => import( '../Home/ComingSoon'));
 
 
 
