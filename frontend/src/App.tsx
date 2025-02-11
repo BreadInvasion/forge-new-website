@@ -16,7 +16,7 @@ const Register = lazy(() => import('./components/Forms/Register'));
 const ComingSoon = lazy(() => import('./components/Home/ComingSoon'));
 const NewStatus = lazy(() => import('./components/Status/NewStatus'));
 const MyForge = lazy(() => import('./components/MyForge/MyForge'));
-const Hours = lazy(() => import('./components/Hours/googleCalendar'));
+const Hours = lazy(() => import('./components/Hours/Hours'));
 
 // import Home from './components/Home/Home';
 // import NewStatus from './components/Status/NewStatus';
