@@ -41,7 +41,7 @@ const UserMenu: React.FC = () => {
                 </ul>
                 <hr className='divider' />
                 <ul className='user-options volunteer'>
-                    <li><Link to='/myforge/failure_form' className='btn'>Failure Form</Link></li>
+                    <li><Link to='/myforge/fail' className='btn'>Failure Form</Link></li>
                 </ul>
                 <hr className='divider' />
                 <ul className='user-options manager'>
