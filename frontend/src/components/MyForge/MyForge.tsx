@@ -14,6 +14,7 @@ const Resources = lazy(() => import('./tabs/Resources'));
 const ResourceSlots = lazy(() => import('./tabs/ResourceSlots'));
 const Users = lazy(() => import('./tabs/Users'));
 const Usages = lazy(() => import('./tabs/Usages'));
+const ComingSoon = lazy(() => import( '../Home/ComingSoon'));
 
 
 
@@ -35,7 +36,7 @@ const MyForge: React.FC = () => {
                     <Routes>
                         <Route index element={<Summary />} />
                         <Route path="summary" element={<Summary />} />
-                        <Route path="create" element={<DynamicMachineForm />} />
+                        <Route path="create" element={<ComingSoon />} />
                         <Route path="machines" element={<Machines />} />
                         <Route path="machine_types" element={<MachineTypes />} />
                         <Route path="machine_groups" element={<MachineGroups />} />
