@@ -24,14 +24,15 @@ export const Prusas = styled.div`
     justify-content: center;
 `;
 
-export const Card = styled.div<{ symbol?: string }>`
+export const Card = styled.div<{ symbol?:string; minimized?:boolean; highlight?:boolean}>`
     display: flex;
     height: min-content;
     padding: 15px;
     aspect-ratio: 5 / 4;
     justify-content: space-between;
     border-radius: 20px;
-    border: 1px solid #000000;
+    border: ${({highlight }) => (highlight ? "1px solid #000000" : "2px solid #EE4B2B")};
+    font-size: ${({ minimized }) => (minimized ? "2.5vh" : "3.5vh")};
     ${props => props?.symbol && `
         background-image: url(src/assets/img/symbols/${props.symbol}.svg);
         background-size: auto 90%;
@@ -43,28 +44,28 @@ export const Card = styled.div<{ symbol?: string }>`
     box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.5);
 `;
 
-export const Info = styled.div`
+export const Info = styled.div<{minimized?: boolean}>`
+    font-size: ${({ minimized }) => (minimized ? "2.5vh" : "3.5vh")};
+    color: #000000;
     height: auto;
     display: flex;
     gap: 5%;
     flex-direction: column;
 `;
 
-export const MachineName = styled.h3`
-    color: #000;
-
+export const MachineName = styled.h3<{minimized?: boolean}>`
+    font-size: ${({ minimized }) => (minimized ? "3.5vh" : "4.5vh")};
+    color: #000000;
     font-family: Montserrat;
     text-transform: uppercase;
-
     margin: 0;
     padding: 0;
 `;
 
-export const StatusText = styled.span<{area?: string}>`
-    color: #000;
-
+export const StatusText = styled.span<{area?: string, minimized?:boolean}>`
+    font-size: ${({ minimized }) => (minimized ? "0.9vw" : "1.2vw")};
+    color: #000000;
     font-family: Montserrat;
-    font-size: 0.9vw;
     font-style: normal;
     font-weight: 600;
     line-height: normal;

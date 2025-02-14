@@ -1,10 +1,10 @@
 import React from 'react';
 import { ExclamationTriangleIcon, Component1Icon } from '@radix-ui/react-icons';
-import {
-    Card,
-    Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Progress, ProgressBar, Prusas, StatusText,
+import styled from 'styled-components';
+import {Card, Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Progress, ProgressBar, Prusas, StatusText,
 } from './StatusComponents';
 import { machines, otherMachines } from './generateMockStatusData';
+import Status from './Status';
 
 const getEndTime = (startTime: string, totalTime: number) => {
     const start = new Date(startTime);
@@ -24,15 +24,21 @@ export interface MachineProps {
     name: string;
     icon?: string;
     user: string | undefined;
-    material: string;
+    material: string | undefined;
     weight: number | undefined;
     startTime: string | undefined;
     totalTime: number | undefined;
 }
 
-const MachineCard = (props: MachineProps) => {
+export interface MachineCardProps{
+    minimized?: boolean;
+    highlight?: boolean;
+}
 
-    const { name, icon, user, material, weight, startTime, totalTime } = props;
+const MachineCard = (props: MachineProps, any: MachineCardProps) => {
+
+    const { name, icon, user, material, weight, startTime, totalTime} = props;
+    const {minimized = true, highlight = false} = any;
 
     return (
 
@@ -40,9 +46,10 @@ const MachineCard = (props: MachineProps) => {
         <Info>
             <MachineName>{name}</MachineName>
             <StatusText>User: {user ? user : 'N/A'}</StatusText>
-            <StatusText>Material: {material}</StatusText>
-            <StatusText>Weight: {weight ? weight+'g' : 'N/A'}</StatusText>
+            {!minimized && <StatusText>Material: {material}</StatusText>}
+            {!minimized && <StatusText>Weight: {weight ? weight+'g' : 'N/A'}</StatusText>}
             <StatusText area="date">Est. Completion<br/> {startTime && totalTime ? getEndTime(startTime, totalTime) : 'N/A'}</StatusText>
+            
         </Info>
         <ProgressBar>
             {startTime && totalTime && <Progress progress={getProgress(startTime, totalTime)}/>}
