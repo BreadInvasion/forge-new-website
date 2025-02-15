@@ -133,3 +133,14 @@
 .pagination button:last-of-type:hover {
     background-color: #c9c9c9;
 }
+
+.icon * {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    transition-duration: .1s;
+}
+
+.icon a:hover {
+    color: #11bb11;
+}

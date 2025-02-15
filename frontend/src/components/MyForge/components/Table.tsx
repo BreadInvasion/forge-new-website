@@ -67,8 +67,7 @@ function Table<T extends Record<string, any>>(props: TableProps<T>) {
                         {columns.map((column, index) => (
                             <th key={String(column) + index}>{String(column)}</th>
                         ))}
-                        <th id="edit-col">Edit</th>
-                        <th id="delete-col">Delete</th>
+                        <th id="edit-col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -83,13 +82,9 @@ function Table<T extends Record<string, any>>(props: TableProps<T>) {
                             ))}
                             <td className="icon">
                                 <a href={editPath}>
-                                    <Pencil2Icon width={20} height={20} />
+                                    <Pencil2Icon />
                                 </a>
-                            </td>
-                            <td className="icon">
-                                <TrashIcon
-                                    width={20}
-                                    height={20}
+                                <TrashIcon 
                                     onClick={() => onDelete && onDelete(rowIndex)}
                                 />
                             </td>
