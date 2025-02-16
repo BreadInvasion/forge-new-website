@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent, FormEvent, ReactNode, Suspense, useMemo } from "react";
+import React, { useEffect, useState, ChangeEvent, FormEvent, ReactNode, Suspense, useMemo, createContext, useContext } from "react";
 import { OmniAPI } from "src/apis/OmniAPI";
 import { CheckboxInput, CustomForm, CustomFormField, DropdownInput, FormIcon, TextInput } from "src/components/Forms/Form";
 import { emptyMachine, Machine, Resource } from "src/interfaces";
@@ -44,8 +44,17 @@ export const DynamicMachineForm: React.FC = () => {
     const [selectedMachineId, setSelectedMachineId] = useState<string>("_");
     const [schema, setSchema] = useState<MachineSchemaResponse>({});
     const [formData, setFormData] = useState<{ [key: string]: any }>({});
-    const [slotValues, setSlotValues] = useState<ResourceSlotElement[]>([]);
+    const [slotValues, setSlotValues] = useState<ResourceSlotElement[]>([{
+        slot_id: "_",
+        name: "_",
+        brand: "_",
+        color: "_",
+        amount: 0,
+        own: false,
+        cost: 0,
+    }]);
     const [resourceUsageForm, setResourceUsageForm] = useState<ReactNode>(null);
+    const [page, setPage] = useState<number>(1);
 
     /**
      * Initial Step on Load
@@ -97,7 +106,7 @@ export const DynamicMachineForm: React.FC = () => {
 
         const initialValues: ResourceSlotElement[] = schema.resource_slots.map((slot: ResourceSlotSchema) => ({
             slot_id: slot.resource_slot_id,
-            material_id: "_",
+            name: "_",
             brand: "_",
             color: "_",
             amount: 0,
@@ -124,32 +133,11 @@ export const DynamicMachineForm: React.FC = () => {
      */
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
-        /* Machine usage endpoint schema
-        {
-            "resource_usages": {
-              "additionalProp1": {
-                "resource_id": "string",
-                "amount": 0,
-                "is_own_material": true
-              },
-              "additionalProp2": {
-                "resource_id": "string",
-                "amount": 0,
-                "is_own_material": true
-              },
-              "additionalProp3": {
-                "resource_id": "string",
-                "amount": 0,
-                "is_own_material": true
-              }
-            },
-            "duration_seconds": 0,
-            "as_org_id": "string"
-        }*/
-        const resource_usages: {[key: string]: any} = {};
+
+        const resource_usages: { [key: string]: any } = {};
         slotValues.map((slot) => {
             resource_usages[slot.slot_id] = {
-                resource_id: slot.name || "_",
+                resource_id: slot.name,
                 amount: slot.amount,
                 is_own_material: slot.own,
             };
@@ -164,6 +152,7 @@ export const DynamicMachineForm: React.FC = () => {
         };
 
         console.log("Usage Data:", usageData);
+
 
         const response = await OmniAPI.use(selectedMachineId, usageData);
 
@@ -185,87 +174,94 @@ export const DynamicMachineForm: React.FC = () => {
             <form className="usage-form" onSubmit={handleSubmit}>
                 <FormIcon />
                 <h2>Machine Usage Form</h2>
+                {page == 1 &&
+                    <div className="machine-selection">
+                        <label>1. Machine Selection</label>
+                        <select
+                            className='styled-dropdown'
+                            value={selectedMachineId}
+                            onChange={(e) => handleSelectMachine(e.target.value)}
+                        >
+                            <option className='styled-dropdown-placeholder' value="_" hidden>{"Please Select a Machine"}</option>
+                            {machines.map((machine: Machine) => (
+                                <option className='styled-dropdown-option' key={machine.id} value={machine.id}>{machine.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                }
 
-                <label>1. Machine Selection</label>
-                <select
-                    className='styled-dropdown'
-                    defaultValue="_"
-                    onChange={(e) => handleSelectMachine(e.target.value)}
-                    required
-                >
-                    <option className='styled-dropdown-placeholder' value="_" hidden>{"Please Select a Machine"}</option>
-                    {machines.map((machine: Machine) => (
-                        <option className='styled-dropdown-option' key={machine.id} value={machine.id}>{machine.name}</option>
-                    ))}
-                </select>
 
-                {resourceUsageForm && <>
-                    <div className="divider" />
+                {page == 2 && resourceUsageForm}
+                
 
-                    {resourceUsageForm}
-
-                    <div className="divider" />
-
+                {page == 3 &&
                     <div className="usage-duration">
                         <label>3. Usage Duration</label>
-                        <input 
-                            type="number" 
-                            placeholder="Hours" 
+                        <input
+                            type="number"
+                            placeholder="Hours"
                             onChange={(e) => setFormData((prev) => ({ ...prev, 'hours': e.target.value }))}
+                            value={formData.hours}
                         />
-                        <input 
-                            type="number" 
+                        <input
+                            type="number"
                             placeholder="Minutes"
                             onChange={(e) => setFormData((prev) => ({ ...prev, 'minutes': e.target.value }))}
+                            value={formData.minutes}
                         />
                     </div>
+                }
 
-                    <div className="divider" />
+                {page == 4 &&
+                    <div className="usage-policies">
+                        <input
+                            id='checkbox-usage-policy'
+                            className='styled-checkbox'
+                            type="checkbox"
+                            onChange={(e) => setFormData((prev) => ({ ...prev, 'policy': e.target.value }))}
+                        />
+                        <label
+                            htmlFor='checkbox-usage-policy'
+                            className='checkbox-label'
+                        >
+                            Do you agree to the Machine Usage Policy?
+                        </label>
+                        <input
+                            id='checkbox-org-usage'
+                            className='styled-checkbox'
+                            type="checkbox"
+                            onChange={(e) => setFormData((prev) => ({ ...prev, 'org': e.target.value }))}
+                        />
+                        <label
+                            htmlFor='checkbox-org-usage'
+                            className='checkbox-label'
+                        >
+                            Is this machine usage for an organization?
+                        </label>
 
-                    <input
-                        id='checkbox-usage-policy'
-                        className='styled-checkbox'
-                        type="checkbox"
-                        onChange={(e) => setFormData((prev) => ({ ...prev, 'policy': e.target.value }))}
-                    />
-                    <label 
-                        htmlFor='checkbox-usage-policy' 
-                        className='checkbox-label'
-                    >
-                        Do you agree to the Machine Usage Policy?
-                    </label>
+                        <input
+                            id='checkbox-reprint'
+                            className='styled-checkbox'
+                            type="checkbox"
+                            onChange={(e) => setFormData((prev) => ({ ...prev, 'reprint': e.target.value }))}
+                        />
+                        <label
+                            htmlFor='checkbox-reprint'
+                            className='checkbox-label'
+                        >
+                            Is this a reprint?
+                        </label>
+                    </div>
+                }
 
-                    <input
-                        id='checkbox-org-usage'
-                        className='styled-checkbox'
-                        type="checkbox"
-                        onChange={(e) => setFormData((prev) => ({ ...prev, 'org': e.target.value }))}
-                    />
-                    <label 
-                        htmlFor='checkbox-org-usage' 
-                        className='checkbox-label'
-                    >
-                        Is this machine usage for an organization?
-                    </label>
+                <div className="pagination-buttons">
+                    <button type="button" onClick={() => setPage(page - 1)} disabled={page === 1}>Back</button>
+                    {page !== 4 && <button type="button" onClick={() => setPage(page + 1)} disabled={page === 4}>Next</button>}
+                    {page == 4 && <button type="submit">Submit</button>}
+                </div>
 
-                    <input
-                        id='checkbox-reprint'
-                        className='styled-checkbox'
-                        type="checkbox"
-                        onChange={(e) => setFormData((prev) => ({ ...prev, 'reprint': e.target.value }))}
-                    />
-                    <label 
-                        htmlFor='checkbox-reprint' 
-                        className='checkbox-label'
-                    >
-                        Is this a reprint?
-                    </label>
-
-                    <button type="submit">Submit</button>
-                </>}
             </form>
-        </div>
-
+        </div >
     );
 };
 
