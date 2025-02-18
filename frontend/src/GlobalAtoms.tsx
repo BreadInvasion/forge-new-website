@@ -1,7 +1,6 @@
 import { atom, selector } from 'recoil';
 import { User, defaultUser } from './interfaces';
 
-
 export const userState = atom<User>({
     key: 'userState',
     default: defaultUser,
