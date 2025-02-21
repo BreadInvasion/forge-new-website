@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import Annotated, List, Optional
-from pydantic import UUID4, AfterValidator, BaseModel, EmailStr, Field, SecretStr
+from pydantic import UUID4, AfterValidator, BaseModel, EmailStr, Field, SecretStr, BeforeValidator
 
 from .enums import GenderStatsType, Permissions, PronounType, SemesterType
 
@@ -10,8 +10,14 @@ def check_RIN(RIN: str) -> str:
     assert len(RIN) == 9
     return RIN
 
+def empty_string_to_none(UUID: str) -> Optional[UUID4]:
+        if UUID == "":
+            return None
+        return UUID4(UUID)
 
 RIN = Annotated[str, AfterValidator(check_RIN)]
+
+OptionalUUID = Annotated[Optional[UUID4], BeforeValidator(empty_string_to_none)]
 
 
 class BaseRequest(BaseModel):
@@ -35,7 +41,7 @@ class MachineUsageRequest(BaseRequest):
     resource_usages: dict[UUID4, ResourceUsage]
     duration_seconds: int
 
-    as_org_id: Optional[UUID4]
+    as_org_id: OptionalUUID   
 
 
 class UserCreateRequest(BaseRequest):
@@ -159,14 +165,14 @@ class MachineTypeEditRequest(BaseRequest):
 
 class MachineCreateRequest(BaseRequest):
     name: str
-    group_id: Optional[UUID4]
+    group_id: OptionalUUID
     type_id: UUID4
 
 
 class MachineEditRequest(BaseRequest):
     name: str
     type_id: UUID4
-    group_id: Optional[UUID4]
+    group_id: OptionalUUID
     maintenance_mode: bool
     disabled: bool
 

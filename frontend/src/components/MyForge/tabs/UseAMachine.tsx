@@ -41,9 +41,9 @@ interface MachineSchemaResponse {
 export const DynamicMachineForm: React.FC = () => {
 
     const [machines, setMachines] = useState<Machine[]>([]);
-    const [selectedMachineId, setSelectedMachineId] = useState<string>("_");
+    const [selectedMachineId, setSelectedMachineId] = useState<string>("0");
     const [schema, setSchema] = useState<MachineSchemaResponse>({});
-    const [formData, setFormData] = useState<{ [key: string]: any }>({});
+    const [formData, setFormData] = useState<{ [key: string]: any }>({ hours: 0, minutes: 0, policy: false, org: false, reprint: false });
     const [slotValues, setSlotValues] = useState<ResourceSlotElement[]>([{
         slot_id: "_",
         name: "_",
@@ -85,7 +85,7 @@ export const DynamicMachineForm: React.FC = () => {
      * Fetch Machine Schema on Machine Selection
      */
     useEffect(() => {
-        if (selectedMachineId == "_") return;
+        if (selectedMachineId == "0") return;
 
         const fetchSchema = async () => {
             const schemaData: MachineSchemaResponse = await OmniAPI.get("use", `${selectedMachineId}/schema`);
@@ -120,7 +120,14 @@ export const DynamicMachineForm: React.FC = () => {
         const resourceUsageProps = {
             slots: schema.resource_slots,
             initialValues,
-            setSlots: setSlotValues,
+            setSlots: (updatedSlot: ResourceSlotElement) => {
+                setSlotValues((prevSlots) => {
+                    const newSlots = [...prevSlots];
+                    const slotIndex = newSlots.findIndex((slot) => slot.slot_id === updatedSlot.slot_id);
+                    newSlots[slotIndex] = updatedSlot;
+                    return newSlots;
+                });
+            }
         };
 
         const newResourceUsageForm = <ResourceUsageForm key={fieldId} {...resourceUsageProps} />;
@@ -134,21 +141,25 @@ export const DynamicMachineForm: React.FC = () => {
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
 
-        const resource_usages: { [key: string]: any } = {};
+        console.log(slotValues);
+
+        const resource_usages: { [key: string]: { resource_id: string, amount: number, is_own_material: boolean } } = {};
         slotValues.map((slot) => {
-            resource_usages[slot.slot_id] = {
-                resource_id: slot.name,
-                amount: slot.amount,
-                is_own_material: slot.own,
-            };
+            if (slot.resource_id) {
+                resource_usages[slot.slot_id] = {
+                    resource_id: slot.resource_id,
+                    amount: slot.amount * 1,
+                    is_own_material: slot.own as boolean,
+                };
+            }
         });
 
         const duration_seconds = (formData.hours * 3600) + (formData.minutes * 60);
-
+        console.log("Resource Usages:", resource_usages);
         const usageData = {
-            resource_usages,
-            duration_seconds,
-            as_org_id: formData.org || false,
+            as_org_id: formData.org ? formData.org : "",
+            duration_seconds: duration_seconds,
+            resource_usages: resource_usages,
         };
 
         console.log("Usage Data:", usageData);
@@ -182,7 +193,7 @@ export const DynamicMachineForm: React.FC = () => {
                             value={selectedMachineId}
                             onChange={(e) => handleSelectMachine(e.target.value)}
                         >
-                            <option className='styled-dropdown-placeholder' value="_" hidden>{"Please Select a Machine"}</option>
+                            <option className='styled-dropdown-placeholder' value="0" hidden>{"Please Select a Machine"}</option>
                             {machines.map((machine: Machine) => (
                                 <option className='styled-dropdown-option' key={machine.id} value={machine.id}>{machine.name}</option>
                             ))}
@@ -192,7 +203,7 @@ export const DynamicMachineForm: React.FC = () => {
 
 
                 {page == 2 && resourceUsageForm}
-                
+
 
                 {page == 3 &&
                     <div className="usage-duration">
@@ -282,6 +293,7 @@ interface ResourceSlotSchema {
  */
 interface ResourceSlotElement {
     slot_id: string;
+    resource_id?: string;
     name: string;
     brand?: string;
     color?: string;
@@ -294,7 +306,7 @@ interface ResourceSlotElement {
 interface ResourceUsageFormProps {
     slots: ResourceSlotSchema[];
     initialValues: ResourceSlotElement[];
-    setSlots: (slots: ResourceSlotElement[]) => void;
+    setSlots: (updatedSlot: ResourceSlotElement) => void;
 }
 
 /* This is a CustomField for the CustomForm Component to use */
@@ -334,11 +346,7 @@ const ResourceUsageForm: React.FC<ResourceUsageFormProps> = ({ slots, initialVal
                                 key={slot.resource_slot_id + index}
                                 slot={slot}
                                 slotValue={initialValues[index]}
-                                setSlotValue={(slotValue) => {
-                                    const newSlotValues = [...initialValues];
-                                    newSlotValues[index] = slotValue;
-                                    setSlots(newSlotValues);
-                                }}
+                                setSlotValue={setSlots}
                                 showBrand={showBrand}
                                 showColor={showColor}
                             />
@@ -436,17 +444,22 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
     };
 
     useEffect(() => {
-        if (selectedDetails.name !== "_") {
-            setSlotValue({
-                slot_id: selectedDetails.slot_id,
-                name: selectedDetails.name,
-                brand: selectedDetails.brand,
-                color: selectedDetails.color,
-                amount: Number.isNaN(selectedDetails.amount) ? 0 : selectedDetails.amount,
-                own: selectedDetails.own,
-                cost: cost,
-            });
-        }
+        const matchedResource = validResources.find(resource =>
+            resource.name === selectedDetails.name &&
+            (resource.brand === selectedDetails.brand || selectedDetails.brand === "_") &&
+            (resource.color === selectedDetails.color || selectedDetails.color === "_")
+        );
+
+        setSlotValue({
+            slot_id: selectedDetails.slot_id,
+            resource_id: matchedResource?.id,
+            name: selectedDetails.name,
+            brand: selectedDetails.brand,
+            color: selectedDetails.color,
+            amount: Number.isNaN(selectedDetails.amount) ? 0 : selectedDetails.amount,
+            own: selectedDetails.own,
+            cost: cost,
+        });
     }, [selectedDetails, setSlotValue]);
 
     useEffect(() => {
@@ -455,7 +468,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
 
     return (
         <tr>
-            <td>{slot.display_name}</td>
+            <td>{slot.resource_slot_id}</td>
             {/* Material Dropdown (Always available) */}
             <td>
                 <select
