@@ -59,68 +59,77 @@ function Table<T extends Record<string, any>>(props: TableProps<T>) {
     // Generate an array of pages to display (limited by MAX_PAGE_BUTTONS)
     const pagesToShow = createPageRange(currentPage, totalPages, MAX_PAGE_BUTTONS);
 
-    return (
-        <div className="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        {columns.map((column, index) => (
-                            <th key={String(column) + index}>{String(column)}</th>
-                        ))}
-                        <th id="edit-col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentData.map((row: T, rowIndex) => (
-                        <tr key={rowIndex}>
+    if (data.length == 0) {
+        return(
+            <div>
+                <br />
+                <i>No items are present.</i>
+            </div>
+        );
+    } else {
+        return (
+            <div className="table-container">
+                <table>
+                    <thead>
+                        <tr>
                             {columns.map((column, index) => (
-                                <td key={String(column) + index + rowIndex}>
-                                    {Array.isArray(row[column])
-                                        ? row[column].join(', ')
-                                        : String(row[column])}
-                                </td>
+                                <th key={String(column) + index}>{String(column)}</th>
                             ))}
-                            <td className="icon">
-                                <a href={editPath}>
-                                    <Pencil2Icon />
-                                </a>
-                                <TrashIcon 
-                                    onClick={() => onDelete && onDelete(rowIndex)}
-                                />
-                            </td>
+                            <th id="edit-col">Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {currentData.map((row: T, rowIndex) => (
+                            <tr key={rowIndex}>
+                                {columns.map((column, index) => (
+                                    <td key={String(column) + index + rowIndex}>
+                                        {Array.isArray(row[column])
+                                            ? row[column].join(', ')
+                                            : String(row[column])}
+                                    </td>
+                                ))}
+                                <td className="icon">
+                                    <a href={editPath}>
+                                        <Pencil2Icon />
+                                    </a>
+                                    <TrashIcon 
+                                        onClick={() => onDelete && onDelete(rowIndex)}
+                                    />
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
 
-            <div className='pagination-container'>
-                <div className='page-info'>
-                    Page {currentPage} of {totalPages}
-                </div>
+                <div className='pagination-container'>
+                    <div className='page-info'>
+                        Page {currentPage} of {totalPages}
+                    </div>
 
-                <div className='pagination'>
-                    <button onClick={handlePrevious} disabled={currentPage === 1}>
-                        Previous
-                    </button>
-
-                    {/* Render each page button */}
-                    {pagesToShow.map((page) => (
-                        <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={page === currentPage ? 'active' : ''}
-                        >
-                            {page}
+                    <div className='pagination'>
+                        <button onClick={handlePrevious} disabled={currentPage === 1}>
+                            Previous
                         </button>
-                    ))}
 
-                    <button onClick={handleNext} disabled={currentPage === totalPages}>
-                        Next
-                    </button>
+                        {/* Render each page button */}
+                        {pagesToShow.map((page) => (
+                            <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={page === currentPage ? 'active' : ''}
+                            >
+                                {page}
+                            </button>
+                        ))}
+
+                        <button onClick={handleNext} disabled={currentPage === totalPages}>
+                            Next
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    }
 };
 
 export default Table;
