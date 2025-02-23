@@ -42,6 +42,7 @@ async def get_my_usages(
     machine_usages = (
         await session.scalars(
             select(MachineUsage)
+            .join(MachineUsage.machine)
             .options(selectinload(MachineUsage.machine))
             .options(selectinload(MachineUsage.semester))
             .where(MachineUsage.user_id == current_user.id)
