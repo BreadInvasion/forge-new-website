@@ -54,7 +54,7 @@ async def get_my_usages(
     return [
         UsageResponse(
             machine_name=usage.machine.name,
-            semester=f"{usage.semester.semester_type} {usage.semester.calendar_year}" if usage.semester else "<None>",
+            semester=f"{usage.semester.semester_type} {usage.semester.calendar_year}" if usage.semester else None,
             time_started=usage.time_started,
             cost=usage.cost,
         )

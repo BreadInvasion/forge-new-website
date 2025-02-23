@@ -165,7 +165,7 @@ class MachineUsageSchema(BaseResponse):
     maintenance_mode: bool
 
 class UsageResponse(BaseResponse):
-    semester: str
+    semester: str | None
     time_started: datetime
     machine_name: str
     cost: Decimal
