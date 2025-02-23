@@ -25,6 +25,7 @@ async def get_my_usages(
     order_by: Literal[
         "time_started",
         "cost",
+        "name",
     ] = "time_started",
     descending: bool = False,
 ):
