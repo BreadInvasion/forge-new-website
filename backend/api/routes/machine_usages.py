@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.orm import InstrumentedAttribute, selectinload
 
+from models.machine import Machine
 from models.machine_usage import MachineUsage
 from schemas.responses import UsageResponse
 
@@ -32,6 +33,7 @@ async def get_my_usages(
     attr_key_map: dict[str, InstrumentedAttribute] = {
         "time_started": MachineUsage.time_started,
         "cost": MachineUsage.cost,
+        "name": Machine.name,
     }
     order_determinant = attr_key_map[order_by]
     if descending:
