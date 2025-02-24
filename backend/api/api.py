@@ -6,6 +6,7 @@ from .routes import (
     auth,
     machine_groups,
     machine_types,
+    machine_usages,
     machines,
     officer_actions,
     public,
@@ -20,6 +21,7 @@ api_router = APIRouter()
 api_router.include_router(auth.router, tags=["auth"])
 api_router.include_router(machine_groups.router, tags=["machine_groups"])
 api_router.include_router(machine_types.router, tags=["machine_types"])
+api_router.include_router(machine_usages.router, tags=["machine_usages"])
 api_router.include_router(machines.router, tags=["machines"])
 api_router.include_router(officer_actions.router, tags=["officer_actions"])
 api_router.include_router(public.router, tags=["public"])
