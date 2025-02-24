@@ -5,6 +5,8 @@ import {Card, Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Pr
 } from './StatusComponents';
 import { machines, otherMachines } from './generateMockStatusData';
 import Status from './Status';
+import { useHighlight } from './components//HighlightContext';
+
 
 const getEndTime = (startTime: string, totalTime: number) => {
     const start = new Date(startTime);
@@ -28,6 +30,7 @@ export interface MachineProps {
     weight: number | undefined;
     startTime: string | undefined;
     totalTime: number | undefined;
+    status: string;
 }
 
 export interface MachineCardProps{
@@ -37,12 +40,19 @@ export interface MachineCardProps{
 
 const MachineCard = (props: MachineProps, any: MachineCardProps) => {
 
-    const { name, icon, user, material, weight, startTime, totalTime} = props;
+    const { name, icon, user, material, weight, startTime, totalTime, status} = props;
     const {minimized = true, highlight = false} = any;
+
+    const { highlight: globalHighlight } = useHighlight();
+
+    const [clearToggle, setClearToggle] = React.useState(false);
+    const handleClearToggle = () => setClearToggle(!clearToggle);
+
+    const shouldHighlight = minimized && clearToggle && status === "Failed" && globalHighlight;
 
     return (
 
-    <Card symbol={icon ? icon : name}>
+    <Card symbol={icon ? icon : name} minimized={minimized} highlight={shouldHighlight}>
         <Info>
             <MachineName>{name}</MachineName>
             <StatusText>User: {user ? user : 'N/A'}</StatusText>
@@ -54,6 +64,7 @@ const MachineCard = (props: MachineProps, any: MachineCardProps) => {
         <ProgressBar>
             {startTime && totalTime && <Progress progress={getProgress(startTime, totalTime)}/>}
         </ProgressBar>
+        <button onClick={handleClearToggle}>Clear</button>
     </Card>
     );
 }

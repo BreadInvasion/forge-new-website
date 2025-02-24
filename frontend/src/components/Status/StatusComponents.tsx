@@ -31,7 +31,7 @@ export const Card = styled.div<{ symbol?:string; minimized?:boolean; highlight?:
     aspect-ratio: 5 / 4;
     justify-content: space-between;
     border-radius: 20px;
-    border: ${({highlight }) => (highlight ? "1px solid #000000" : "2px solid #EE4B2B")};
+    border: ${({highlight }) => (highlight ? "3px solid #FF0000" : "2px solid #EE4B2B")};
     font-size: ${({ minimized }) => (minimized ? "2.5vh" : "3.5vh")};
     ${props => props?.symbol && `
         background-image: url(src/assets/img/symbols/${props.symbol}.svg);

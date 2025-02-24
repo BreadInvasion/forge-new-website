@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Toggle from "@radix-ui/react-toggle"
 import { useState } from 'react';
 import { EraserIcon } from "@radix-ui/react-icons";
-import {useToggle} from "./ToggleContext";
+import {useToggle} from "./HighlightContext";
 
 
 const getEndTime = (startTime: string, totalTime: number) => {

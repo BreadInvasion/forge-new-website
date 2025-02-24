@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Filter from "./Filter";
 import { ToolButton, FilterItem, FilterX } from "./FilterComponents";
 import { Toggle } from "@radix-ui/react-toggle";
-import { useToggle } from "./ToggleContext";
+import { useHighlight } from "./HighlightContext";
 
 const ToolbarContainer = styled.div`
     grid-area: tools;
@@ -44,7 +44,7 @@ const ActiveFilters = styled.div`
 
 const Toolbar: React.FC = () => {
 
-    const {highlight, showHighlight} = useToggle();
+    const {highlight, setHighlight} = useHighlight();
 
     const filters = [
         {
@@ -103,7 +103,7 @@ const Toolbar: React.FC = () => {
             <ToolButton aria-label="Clear"> 
                 <Toggle
                 pressed={highlight}
-                onPressedChange={showHighlight}
+                onPressedChange={setHighlight}
                 >
                     <EraserIcon />
                     
