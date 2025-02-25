@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent, FormEvent, ReactNode, Suspense, useMemo } from "react";
+import React, { useEffect, useState, ChangeEvent, FormEvent, ReactNode, Suspense, useMemo, createContext, useContext } from "react";
 import { OmniAPI } from "src/apis/OmniAPI";
 import { CheckboxInput, CustomForm, CustomFormField, DropdownInput, FormIcon, TextInput } from "src/components/Forms/Form";
 import { emptyMachine, Machine, Resource } from "src/interfaces";
@@ -41,11 +41,20 @@ interface MachineSchemaResponse {
 export const DynamicMachineForm: React.FC = () => {
 
     const [machines, setMachines] = useState<Machine[]>([]);
-    const [selectedMachineId, setSelectedMachineId] = useState<string>("_");
+    const [selectedMachineId, setSelectedMachineId] = useState<string>("0");
     const [schema, setSchema] = useState<MachineSchemaResponse>({});
-    const [formData, setFormData] = useState<{ [key: string]: any }>({});
-    const [slotValues, setSlotValues] = useState<ResourceSlotElement[]>([]);
+    const [formData, setFormData] = useState<{ [key: string]: any }>({ hours: 0, minutes: 0, policy: false, org: false, reprint: false });
+    const [slotValues, setSlotValues] = useState<ResourceSlotElement[]>([{
+        slot_id: "_",
+        name: "_",
+        brand: "_",
+        color: "_",
+        amount: 0,
+        own: false,
+        cost: 0,
+    }]);
     const [resourceUsageForm, setResourceUsageForm] = useState<ReactNode>(null);
+    const [page, setPage] = useState<number>(1);
 
     /**
      * Initial Step on Load
@@ -76,7 +85,7 @@ export const DynamicMachineForm: React.FC = () => {
      * Fetch Machine Schema on Machine Selection
      */
     useEffect(() => {
-        if (selectedMachineId == "_") return;
+        if (selectedMachineId == "0") return;
 
         const fetchSchema = async () => {
             const schemaData: MachineSchemaResponse = await OmniAPI.get("use", `${selectedMachineId}/schema`);
@@ -97,7 +106,7 @@ export const DynamicMachineForm: React.FC = () => {
 
         const initialValues: ResourceSlotElement[] = schema.resource_slots.map((slot: ResourceSlotSchema) => ({
             slot_id: slot.resource_slot_id,
-            material_id: "_",
+            name: "_",
             brand: "_",
             color: "_",
             amount: 0,
@@ -111,7 +120,14 @@ export const DynamicMachineForm: React.FC = () => {
         const resourceUsageProps = {
             slots: schema.resource_slots,
             initialValues,
-            setSlots: setSlotValues,
+            setSlots: (updatedSlot: ResourceSlotElement) => {
+                setSlotValues((prevSlots) => {
+                    const newSlots = [...prevSlots];
+                    const slotIndex = newSlots.findIndex((slot) => slot.slot_id === updatedSlot.slot_id);
+                    newSlots[slotIndex] = updatedSlot;
+                    return newSlots;
+                });
+            }
         };
 
         const newResourceUsageForm = <ResourceUsageForm key={fieldId} {...resourceUsageProps} />;
@@ -124,46 +140,30 @@ export const DynamicMachineForm: React.FC = () => {
      */
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
-        /* Machine usage endpoint schema
-        {
-            "resource_usages": {
-              "additionalProp1": {
-                "resource_id": "string",
-                "amount": 0,
-                "is_own_material": true
-              },
-              "additionalProp2": {
-                "resource_id": "string",
-                "amount": 0,
-                "is_own_material": true
-              },
-              "additionalProp3": {
-                "resource_id": "string",
-                "amount": 0,
-                "is_own_material": true
-              }
-            },
-            "duration_seconds": 0,
-            "as_org_id": "string"
-        }*/
-        const resource_usages: {[key: string]: any} = {};
+
+        console.log(slotValues);
+
+        const resource_usages: { [key: string]: { resource_id: string, amount: number, is_own_material: boolean } } = {};
         slotValues.map((slot) => {
-            resource_usages[slot.slot_id] = {
-                resource_id: slot.name || "_",
-                amount: slot.amount,
-                is_own_material: slot.own,
-            };
+            if (slot.resource_id) {
+                resource_usages[slot.slot_id] = {
+                    resource_id: slot.resource_id,
+                    amount: slot.amount * 1,
+                    is_own_material: slot.own as boolean,
+                };
+            }
         });
 
         const duration_seconds = (formData.hours * 3600) + (formData.minutes * 60);
-
+        console.log("Resource Usages:", resource_usages);
         const usageData = {
-            resource_usages,
-            duration_seconds,
-            as_org_id: formData.org || false,
+            as_org_id: formData.org ? formData.org : "",
+            duration_seconds: duration_seconds,
+            resource_usages: resource_usages,
         };
 
         console.log("Usage Data:", usageData);
+
 
         const response = await OmniAPI.use(selectedMachineId, usageData);
 
@@ -185,87 +185,94 @@ export const DynamicMachineForm: React.FC = () => {
             <form className="usage-form" onSubmit={handleSubmit}>
                 <FormIcon />
                 <h2>Machine Usage Form</h2>
+                {page == 1 &&
+                    <div className="machine-selection">
+                        <label>1. Machine Selection</label>
+                        <select
+                            className='styled-dropdown'
+                            value={selectedMachineId}
+                            onChange={(e) => handleSelectMachine(e.target.value)}
+                        >
+                            <option className='styled-dropdown-placeholder' value="0" hidden>{"Please Select a Machine"}</option>
+                            {machines.map((machine: Machine) => (
+                                <option className='styled-dropdown-option' key={machine.id} value={machine.id}>{machine.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                }
 
-                <label>1. Machine Selection</label>
-                <select
-                    className='styled-dropdown'
-                    defaultValue="_"
-                    onChange={(e) => handleSelectMachine(e.target.value)}
-                    required
-                >
-                    <option className='styled-dropdown-placeholder' value="_" hidden>{"Please Select a Machine"}</option>
-                    {machines.map((machine: Machine) => (
-                        <option className='styled-dropdown-option' key={machine.id} value={machine.id}>{machine.name}</option>
-                    ))}
-                </select>
 
-                {resourceUsageForm && <>
-                    <div className="divider" />
+                {page == 2 && resourceUsageForm}
 
-                    {resourceUsageForm}
 
-                    <div className="divider" />
-
+                {page == 3 &&
                     <div className="usage-duration">
                         <label>3. Usage Duration</label>
-                        <input 
-                            type="number" 
-                            placeholder="Hours" 
+                        <input
+                            type="number"
+                            placeholder="Hours"
                             onChange={(e) => setFormData((prev) => ({ ...prev, 'hours': e.target.value }))}
+                            value={formData.hours}
                         />
-                        <input 
-                            type="number" 
+                        <input
+                            type="number"
                             placeholder="Minutes"
                             onChange={(e) => setFormData((prev) => ({ ...prev, 'minutes': e.target.value }))}
+                            value={formData.minutes}
                         />
                     </div>
+                }
 
-                    <div className="divider" />
+                {page == 4 &&
+                    <div className="usage-policies">
+                        <input
+                            id='checkbox-usage-policy'
+                            className='styled-checkbox'
+                            type="checkbox"
+                            onChange={(e) => setFormData((prev) => ({ ...prev, 'policy': e.target.value }))}
+                        />
+                        <label
+                            htmlFor='checkbox-usage-policy'
+                            className='checkbox-label'
+                        >
+                            Do you agree to the Machine Usage Policy?
+                        </label>
+                        <input
+                            id='checkbox-org-usage'
+                            className='styled-checkbox'
+                            type="checkbox"
+                            onChange={(e) => setFormData((prev) => ({ ...prev, 'org': e.target.value }))}
+                        />
+                        <label
+                            htmlFor='checkbox-org-usage'
+                            className='checkbox-label'
+                        >
+                            Is this machine usage for an organization?
+                        </label>
 
-                    <input
-                        id='checkbox-usage-policy'
-                        className='styled-checkbox'
-                        type="checkbox"
-                        onChange={(e) => setFormData((prev) => ({ ...prev, 'policy': e.target.value }))}
-                    />
-                    <label 
-                        htmlFor='checkbox-usage-policy' 
-                        className='checkbox-label'
-                    >
-                        Do you agree to the Machine Usage Policy?
-                    </label>
+                        <input
+                            id='checkbox-reprint'
+                            className='styled-checkbox'
+                            type="checkbox"
+                            onChange={(e) => setFormData((prev) => ({ ...prev, 'reprint': e.target.value }))}
+                        />
+                        <label
+                            htmlFor='checkbox-reprint'
+                            className='checkbox-label'
+                        >
+                            Is this a reprint?
+                        </label>
+                    </div>
+                }
 
-                    <input
-                        id='checkbox-org-usage'
-                        className='styled-checkbox'
-                        type="checkbox"
-                        onChange={(e) => setFormData((prev) => ({ ...prev, 'org': e.target.value }))}
-                    />
-                    <label 
-                        htmlFor='checkbox-org-usage' 
-                        className='checkbox-label'
-                    >
-                        Is this machine usage for an organization?
-                    </label>
+                <div className="pagination-buttons">
+                    <button type="button" onClick={() => setPage(page - 1)} disabled={page === 1}>Back</button>
+                    {page !== 4 && <button type="button" onClick={() => setPage(page + 1)} disabled={page === 4}>Next</button>}
+                    {page == 4 && <button type="submit">Submit</button>}
+                </div>
 
-                    <input
-                        id='checkbox-reprint'
-                        className='styled-checkbox'
-                        type="checkbox"
-                        onChange={(e) => setFormData((prev) => ({ ...prev, 'reprint': e.target.value }))}
-                    />
-                    <label 
-                        htmlFor='checkbox-reprint' 
-                        className='checkbox-label'
-                    >
-                        Is this a reprint?
-                    </label>
-
-                    <button type="submit">Submit</button>
-                </>}
             </form>
-        </div>
-
+        </div >
     );
 };
 
@@ -286,6 +293,7 @@ interface ResourceSlotSchema {
  */
 interface ResourceSlotElement {
     slot_id: string;
+    resource_id?: string;
     name: string;
     brand?: string;
     color?: string;
@@ -298,7 +306,7 @@ interface ResourceSlotElement {
 interface ResourceUsageFormProps {
     slots: ResourceSlotSchema[];
     initialValues: ResourceSlotElement[];
-    setSlots: (slots: ResourceSlotElement[]) => void;
+    setSlots: (updatedSlot: ResourceSlotElement) => void;
 }
 
 /* This is a CustomField for the CustomForm Component to use */
@@ -338,11 +346,7 @@ const ResourceUsageForm: React.FC<ResourceUsageFormProps> = ({ slots, initialVal
                                 key={slot.resource_slot_id + index}
                                 slot={slot}
                                 slotValue={initialValues[index]}
-                                setSlotValue={(slotValue) => {
-                                    const newSlotValues = [...initialValues];
-                                    newSlotValues[index] = slotValue;
-                                    setSlots(newSlotValues);
-                                }}
+                                setSlotValue={setSlots}
                                 showBrand={showBrand}
                                 showColor={showColor}
                             />
@@ -440,17 +444,22 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
     };
 
     useEffect(() => {
-        if (selectedDetails.name !== "_") {
-            setSlotValue({
-                slot_id: selectedDetails.slot_id,
-                name: selectedDetails.name,
-                brand: selectedDetails.brand,
-                color: selectedDetails.color,
-                amount: Number.isNaN(selectedDetails.amount) ? 0 : selectedDetails.amount,
-                own: selectedDetails.own,
-                cost: cost,
-            });
-        }
+        const matchedResource = validResources.find(resource =>
+            resource.name === selectedDetails.name &&
+            (resource.brand === selectedDetails.brand || selectedDetails.brand === "_") &&
+            (resource.color === selectedDetails.color || selectedDetails.color === "_")
+        );
+
+        setSlotValue({
+            slot_id: selectedDetails.slot_id,
+            resource_id: matchedResource?.id,
+            name: selectedDetails.name,
+            brand: selectedDetails.brand,
+            color: selectedDetails.color,
+            amount: Number.isNaN(selectedDetails.amount) ? 0 : selectedDetails.amount,
+            own: selectedDetails.own,
+            cost: cost,
+        });
     }, [selectedDetails, setSlotValue]);
 
     useEffect(() => {
@@ -459,7 +468,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
 
     return (
         <tr>
-            <td>{slot.display_name}</td>
+            <td>{slot.resource_slot_id}</td>
             {/* Material Dropdown (Always available) */}
             <td>
                 <select

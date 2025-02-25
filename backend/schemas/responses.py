@@ -174,6 +174,7 @@ class MachineInfo(BaseModel):
     type_name: str
     maintenance_mode: bool
     disabled: bool
+    active_usage_id: UUID4 | None
 
 
 class MachineDetails(MachineInfo):
