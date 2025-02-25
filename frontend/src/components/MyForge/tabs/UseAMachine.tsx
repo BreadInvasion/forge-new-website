@@ -225,6 +225,14 @@ export const DynamicMachineForm: React.FC = () => {
                 alert(validateResourceUsage(invalidSlot));
                 return;
             }
+
+            slotValues.forEach((slot) => {
+                if (slot.amount > 1000 && !slot.own) {
+                    alert(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please alert a volunteer or room manager after you start the print, so they are aware.`);
+                } else if (slot.amount > 1000 && slot.own) {
+                    alert(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please make sure you have enough material to complete the print - you will not able to use Forge resources to complete the print.`);
+                }
+            });
         }
 
         //Check if duration is valid
