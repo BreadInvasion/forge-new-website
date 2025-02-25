@@ -2,11 +2,10 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './components/Auth/AuthContext';
 import { ProtectedRoute } from './components/Auth/ProtectedRoute';
-import { NavBar } from './components/NavBar/NavBar';
 
 import './App.scss';
 import useAuth from './components/Auth/useAuth';
-import { AuthNavBar } from './components/NavBar/AuthNavBar';
+import { NavBar } from './components/NavBar/NavBar';
 
 const Home = lazy(() => import('./components/Home/Home'));
 const Footer = lazy(() => import('./components/Footer/Footer'));
@@ -16,6 +15,7 @@ const Register = lazy(() => import('./components/Forms/Register'));
 const ComingSoon = lazy(() => import('./components/Home/ComingSoon'));
 const NewStatus = lazy(() => import('./components/Status/NewStatus'));
 const MyForge = lazy(() => import('./components/MyForge/MyForge'));
+const Hours = lazy(() => import('./components/Hours/Hours'));
 
 // import Home from './components/Home/Home';
 // import NewStatus from './components/Status/NewStatus';
@@ -29,19 +29,20 @@ export default function App() {
 
     return (
         <Router>
-            {!isAuthenticated ? <NavBar /> : <AuthNavBar user={user} setAuth={setAuth}/>}
+            <NavBar user={user} setAuth={setAuth} isAuthed={isAuthenticated}/>
             <Suspense fallback={<div>Loading...</div>}>
                 <Routes>
                     <Route path="/" Component={Home} />
                     <Route path="/status" Component={NewStatus} />
                     <Route path="/login" Component={Login} />
                     <Route path="/register" Component={Register} />
-                    <Route path="/learn/aboutus" Component={ComingSoon} />
+                    <Route path="/learn" Component={ComingSoon} />
+                    <Route path="/learn/about" Component={ComingSoon} />
                     <Route path="/learn/3d-printing-guide" Component={ComingSoon} />
                     <Route path="/learn/laser-engraving-guide" Component={ComingSoon} />
                     <Route path="/learn/sticker-preparation" Component={ComingSoon} />
                     <Route path="/learn/troubleshooting" Component={ComingSoon} />
-                    <Route path="/hours" Component={ComingSoon} />
+                    <Route path="/hours" Component={Hours} />
                     <Route path="/myforge/*" element={
                         <ProtectedRoute>
                             <MyForge />
