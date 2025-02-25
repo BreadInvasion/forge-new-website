@@ -8,10 +8,11 @@ import '../../Forms/styles/Form.scss';
 import '../styles/UseAMachine.scss';
 
 export const FailAMachineForm: React.FC = () => {
+    
     const [machines, setMachines] = useState<Machine[]>([]);
     const [selectedMachineId, setSelectedMachineId] = useState<string>("_");
-    // I think this data is for the email? TODO
-    const [estimatedPercentCompleted, setEstimatedPercentCompleted] = useState<number | undefined>(undefined);
+    // I think this data is for the email the user gets sent? TODO
+    const [estimatedPercentCompleted, setEstimatedPercentCompleted] = useState(0);
     const [printerErrorMessage, setPrinterErrorMessage] = useState<string>("");
     const [noticeableFaults, setNoticeableFaults] = useState<string[]>([]);
 
@@ -22,7 +23,6 @@ export const FailAMachineForm: React.FC = () => {
     useEffect(() => {
         const fetchMachines = async () => {
             const allMachines: Machine[] = await OmniAPI.getAll("machines");
-            console.log("All machines:", allMachines);
             setMachines(allMachines);
         };
 
@@ -56,7 +56,6 @@ export const FailAMachineForm: React.FC = () => {
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
 
-        console.log(selectedMachineId);
         const response = await OmniAPI.fail(selectedMachineId);
         console.log("Response:", response);
 
