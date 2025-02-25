@@ -62,6 +62,16 @@ export const FailAMachineForm: React.FC = () => {
         // Clear form
         const form = document.querySelector(".usage-form") as HTMLFormElement;
         form.reset();
+        resetFormFields();
+    };
+
+    /**
+     * Reset Form Fields
+     */
+    const resetFormFields = () => {
+        setEstimatedPercentCompleted(0);
+        setPrinterErrorMessage("");
+        setNoticeableFaults([]);
     };
     
     return (
