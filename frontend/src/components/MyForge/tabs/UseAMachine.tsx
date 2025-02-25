@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import '../../Forms/styles/Form.scss';
 import '../styles/UseAMachine.scss';
+import { AxiosError } from "axios";
 
 
 interface MachineSchemaResponse {
@@ -141,6 +142,11 @@ export const DynamicMachineForm: React.FC = () => {
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
 
+        if (!formData.policy) {
+            alert("Please accept the usage policy.");
+            return;
+        }
+
         console.log(slotValues);
 
         const resource_usages: { [key: string]: { resource_id: string, amount: number, is_own_material: boolean } } = {};
@@ -164,20 +170,71 @@ export const DynamicMachineForm: React.FC = () => {
 
         console.log("Usage Data:", usageData);
 
+        try {
+            const response = await OmniAPI.use(selectedMachineId, usageData);
+            console.log("Usage Response:", response);
+            if (response == null) {
+                alert("Usage submitted successfully.");
+                window.location.reload();
+            } else {
+                throw new Error("An error occurred. Please try again.");
+            }
 
-        const response = await OmniAPI.use(selectedMachineId, usageData);
-
-        console.log("Response:", response);
-
-        setFormData({});
-        setSlotValues([]);
-        setResourceUsageForm(null);
-
-        // Clear form
-        const form = document.querySelector(".usage-form") as HTMLFormElement;
-        form.reset();
+        } catch (error: any) {
+            if (error.status == 409) {
+                alert("This machine is already in use. Please clear it before submitting a new usage.");
+                window.location.reload();
+            } else if (error.status == 404) {
+                alert("The selected machine does not exist.");
+                window.location.reload();
+            } else if (error.status == 403) {
+                alert("You are not permitted to use this machine.");
+                window.location.reload();
+            } else {
+                alert("An error occurred. Please try again.");
+                window.location.reload();
+            }
+        }
     };
 
+    const validateResourceUsage = (slotValue: ResourceSlotElement) => {
+        if (!schema.resource_slots.find((slot: ResourceSlotSchema) => slot.resource_slot_id === slotValue.slot_id)?.allow_own_material && slotValue.own) {
+            const displayName = schema.resource_slots.find((slot: ResourceSlotSchema) => slot.resource_slot_id === slotValue.slot_id)?.display_name;
+            return `${displayName} does not allow personal material.`
+        }
+
+        if (!schema.resource_slots.find((slot: ResourceSlotSchema) => slot.resource_slot_id === slotValue.slot_id)?.allow_empty && slotValue.amount <= 0 && !slotValue.own) {
+            const displayName = schema.resource_slots.find((slot: ResourceSlotSchema) => slot.resource_slot_id === slotValue.slot_id)?.display_name;
+            return `Please enter an amount greater than 0 for ${displayName}.`
+        }
+
+        return null;
+    }
+
+    const handlePageChange = (page: number) => {
+        //Check if machine is selected
+        if (page == 2 && selectedMachineId == "0") {
+            alert("Please select a machine first.");
+            return;
+        }
+
+        //Check if resource is selected
+        if (page == 3) {
+            const invalidSlot = slotValues.find((slot) => validateResourceUsage(slot));
+            if (invalidSlot) {
+                alert(validateResourceUsage(invalidSlot));
+                return;
+            }
+        }
+
+        //Check if duration is valid
+        if (page == 4 && (formData.hours == 0 && formData.minutes == 0)) {
+            alert("Please enter a valid duration.");
+            return;
+        }
+
+        setPage(page);
+    };
 
 
     return (
@@ -267,7 +324,7 @@ export const DynamicMachineForm: React.FC = () => {
 
                 <div className="pagination-buttons">
                     <button type="button" onClick={() => setPage(page - 1)} disabled={page === 1}>Back</button>
-                    {page !== 4 && <button type="button" onClick={() => setPage(page + 1)} disabled={page === 4}>Next</button>}
+                    {page !== 4 && <button type="button" onClick={() => handlePageChange(page + 1)} disabled={page === 4}>Next</button>}
                     {page == 4 && <button type="submit">Submit</button>}
                 </div>
 
@@ -468,7 +525,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
 
     return (
         <tr>
-            <td>{slot.resource_slot_id}</td>
+            <td>{slot.display_name}</td>
             {/* Material Dropdown (Always available) */}
             <td>
                 <select
