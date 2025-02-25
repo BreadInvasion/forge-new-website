@@ -92,7 +92,7 @@ async def get_resource(
             .where(
                 and_(
                     AuditLog.content.op("?")("resource_id"),
-                    AuditLog.content["resource_id"] == resource_id,
+                    AuditLog.content["resource_id"].astext == str(resource_id),
                 )
             )
             .order_by(AuditLog.time_created.desc())
