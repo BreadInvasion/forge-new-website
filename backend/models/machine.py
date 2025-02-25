@@ -27,8 +27,10 @@ class Machine(Base):
     group: Mapped[Optional["MachineGroup"]] = relationship()
     group_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("machine_groups.id"), nullable=True)
 
-    active_usage_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("machine_usages.id"), nullable=True)
-    active_usage: Mapped[Optional["MachineUsage"]] = relationship(foreign_keys=[active_usage_id])
+    active_usage_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("machine_usages.id"), nullable=True, unique=True)
+    active_usage: Mapped[Optional["MachineUsage"]] = relationship(
+        foreign_keys=[active_usage_id], uselist=False, post_update=True
+    )
 
 
 

@@ -105,13 +105,15 @@ async def get_machine(
             .where(
                 and_(
                     AuditLog.content.op("?")("machine_id"),
-                    AuditLog.content["machine_id"] == machine_id,
+                    AuditLog.content["machine_id"].astext == str(machine_id),
                 )
             )
             .order_by(AuditLog.time_created.desc())
         )
     ).all()
 
+    print("DEBUG: ", machine.active_usage)
+    
     return MachineDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         **machine.__dict__,
