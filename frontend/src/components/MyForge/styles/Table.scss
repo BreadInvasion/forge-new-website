@@ -23,6 +23,7 @@
     border-bottom: 1px solid #a0a0a0;
     border-right: 1px solid #a0a0a0;
 }
+
 .table-container th:first-of-type {
     width: 20%;
     border-radius: 0.5rem 0 0 0;
@@ -30,6 +31,7 @@
 .table-container th:last-of-type {
     border-right: none;
     border-radius: 0 0.5rem 0 0;
+    min-width: 3rem;
 }
 
 .table-container td {
@@ -41,7 +43,11 @@
 
 .table-container td:last-of-type {
     border-right: none;
-    border-bottom: none;
+    .edit,.trash { opacity: 0;}
+}
+
+.table-container tr:hover{
+    .edit,.trash { opacity: 1; }
 }
 
 .table-container tr:hover {
@@ -56,25 +62,38 @@
     td { border-bottom: none; }
     td:first-of-type {border-radius: 0 0 0 .5rem;}
     td:last-of-type {border-radius: 0 0 .5rem 0;}
-    }
+}
 
-.table-container svg {
-    cursor: pointer;
+.table-container {
+    th:nth-last-child(2) {border-right:none;}
+    td:nth-last-child(2) {border-right:none;}
 }
-.table-container td svg:hover {
+
+.edit:hover {
+    color: #1b1;
+}
+
+.trash:hover {
     color: #f00;
-}
-.table-container td a svg:hover {
-    color: inherit;
 }
 
 #edit-col {
-    width: 8%;
+    width: 10%;
     text-align: center;
 }
 
 .icon {
     text-align: center;
+    display: flex;
+    flex-direction: row;
+}
+
+.icon * {
+    transition-duration: .1s;
+    display: block;
+    width:16pt;
+    height:16pt;
+    padding-right: 5px;
 }
 
 .pagination-container {
@@ -138,15 +157,4 @@
 }
 .pagination button:last-of-type:hover {
     background-color: #c9c9c9;
-}
-
-.icon * {
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-    transition-duration: .1s;
-}
-
-.icon a:hover {
-    color: #11bb11;
 }
