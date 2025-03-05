@@ -40,16 +40,32 @@ const AccordionDemo: React.FC = () => (
     height: "100vh", 
     overflowY: "auto", 
     padding: "20px",
-    border: "1px solid #eaeaea",
-    borderRadius: "8px"
+    borderRadius: "8px",
+    width: "100%",
+    maxWidth: "800px",
+    margin: "0 auto",
+    boxSizing: "border-box"
   }}>
-    <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "28px", position: "static", top: 0, background: "white", zIndex: 3 }}>
+    <h2 style={{ 
+      textAlign: "center", 
+      marginBottom: "20px", 
+      fontSize: "clamp(24px, 5vw, 28px)", 
+      position: "static", 
+      top: 0, 
+      background: "white", 
+      zIndex: 3,
+      width: "100%" 
+    }}>
       Frequently Asked Questions
     </h2>
     
     {/* First dropdown group */}
     <div className="accordion-section">
-      <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
+      <h2 style={{ 
+        textAlign: "center", 
+        marginBottom: "20px", 
+        fontSize: "clamp(20px, 4vw, 24px)" 
+      }}>
         General Questions
       </h2>
       <Accordion.Root
@@ -111,7 +127,11 @@ const AccordionDemo: React.FC = () => (
 
     {/* Second dropdown group */}
     <div className="accordion-section">
-      <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
+      <h2 style={{ 
+        textAlign: "center", 
+        marginBottom: "20px", 
+        fontSize: "clamp(20px, 4vw, 24px)" 
+      }}>
         Sticker Printer
       </h2>
       <Accordion.Root
@@ -153,7 +173,11 @@ const AccordionDemo: React.FC = () => (
 
     {/* Third dropdown group */}
     <div className="accordion-section">
-      <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
+      <h2 style={{ 
+        textAlign: "center", 
+        marginBottom: "20px", 
+        fontSize: "clamp(20px, 4vw, 24px)" 
+      }}>
       3D Printers
       </h2>
       <Accordion.Root
@@ -223,7 +247,11 @@ const AccordionDemo: React.FC = () => (
 
     {/* Fourth dropdown group */}
     <div className="accordion-section">
-      <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
+      <h2 style={{ 
+        textAlign: "center", 
+        marginBottom: "20px", 
+        fontSize: "clamp(20px, 4vw, 24px)" 
+      }}>
       Laser Cutter
       </h2>
       <Accordion.Root
@@ -267,7 +295,11 @@ const AccordionDemo: React.FC = () => (
 
     {/* Fifth dropdown group */}
     <div className="accordion-section">
-      <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
+      <h2 style={{ 
+        textAlign: "center", 
+        marginBottom: "20px", 
+        fontSize: "clamp(20px, 4vw, 24px)" 
+      }}>
       Resin Printer
       </h2>
       <Accordion.Root
@@ -310,7 +342,11 @@ const AccordionDemo: React.FC = () => (
 
     {/* Sixth dropdown group */}
     <div className="accordion-section">
-      <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
+      <h2 style={{ 
+        textAlign: "center", 
+        marginBottom: "20px", 
+        fontSize: "clamp(20px, 4vw, 24px)" 
+      }}>
       Sewing machine
       </h2>
       <Accordion.Root
@@ -338,7 +374,11 @@ const AccordionDemo: React.FC = () => (
 
     {/* Seventh dropdown group */}
     <div className="accordion-section">
-      <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
+      <h2 style={{ 
+        textAlign: "center", 
+        marginBottom: "20px", 
+        fontSize: "clamp(20px, 4vw, 24px)" 
+      }}>
       Button Maker
       </h2>
       <Accordion.Root
@@ -365,7 +405,11 @@ const AccordionDemo: React.FC = () => (
 
     {/* Eighth dropdown group */}
     <div className="accordion-section">
-      <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
+      <h2 style={{ 
+        textAlign: "center", 
+        marginBottom: "20px", 
+        fontSize: "clamp(20px, 4vw, 24px)" 
+      }}>
       Drawing Tablet
       </h2>
       <Accordion.Root
