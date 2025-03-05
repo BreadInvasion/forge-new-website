@@ -24,6 +24,8 @@ h3 {
 	box-shadow: 0 2px 10px var(--black-a4);
 	margin: 0 auto;
 	flex: 0 0 auto;
+	position: relative; 
+	z-index: 1; 
 }
 
 .AccordionItem {
@@ -98,6 +100,21 @@ h3 {
 }
 .AccordionTrigger[data-state="open"] > .AccordionChevron {
 	transform: rotate(180deg);
+}
+
+.accordion-section {
+	position: relative;
+	z-index: 0;
+	margin-bottom: 40px; 
+}
+
+.accordion-section h2 {
+	position: sticky;
+	top: 0;
+	background-color: white;
+	padding: 10px 0;
+	margin-top: 0;
+	z-index: 2;
 }
 
 @keyframes slideDown {

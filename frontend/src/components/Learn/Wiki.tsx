@@ -43,11 +43,12 @@ const AccordionDemo: React.FC = () => (
     border: "1px solid #eaeaea",
     borderRadius: "8px"
   }}>
-    <div>
-      <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "28px" }}>
-        Frequently Asked Questions
-      </h2>
-      {/* First dropdown group */}
+    <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "28px", position: "static", top: 0, background: "white", zIndex: 3 }}>
+      Frequently Asked Questions
+    </h2>
+    
+    {/* First dropdown group */}
+    <div className="accordion-section">
       <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
         General Questions
       </h2>
@@ -109,7 +110,7 @@ const AccordionDemo: React.FC = () => (
     </div>
 
     {/* Second dropdown group */}
-    <div style={{ marginTop: "40px" }}>
+    <div className="accordion-section">
       <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
         Sticker Printer
       </h2>
@@ -151,7 +152,7 @@ const AccordionDemo: React.FC = () => (
     </div>
 
     {/* Third dropdown group */}
-    <div style={{ marginTop: "40px" }}>
+    <div className="accordion-section">
       <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
       3D Printers
       </h2>
@@ -221,7 +222,7 @@ const AccordionDemo: React.FC = () => (
     </div>    
 
     {/* Fourth dropdown group */}
-    <div style={{ marginTop: "40px" }}>
+    <div className="accordion-section">
       <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
       Laser Cutter
       </h2>
@@ -265,7 +266,7 @@ const AccordionDemo: React.FC = () => (
     </div> 
 
     {/* Fifth dropdown group */}
-    <div style={{ marginTop: "40px" }}>
+    <div className="accordion-section">
       <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
       Resin Printer
       </h2>
@@ -308,7 +309,7 @@ const AccordionDemo: React.FC = () => (
     </div>
 
     {/* Sixth dropdown group */}
-    <div style={{ marginTop: "40px" }}>
+    <div className="accordion-section">
       <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
       Sewing machine
       </h2>
@@ -336,7 +337,7 @@ const AccordionDemo: React.FC = () => (
     </div>
 
     {/* Seventh dropdown group */}
-    <div style={{ marginTop: "40px" }}>
+    <div className="accordion-section">
       <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
       Button Maker
       </h2>
@@ -363,7 +364,7 @@ const AccordionDemo: React.FC = () => (
     </div>
 
     {/* Eighth dropdown group */}
-    <div style={{ marginTop: "40px" }}>
+    <div className="accordion-section">
       <h2 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
       Drawing Tablet
       </h2>
