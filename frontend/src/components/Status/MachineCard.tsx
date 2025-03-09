@@ -1,17 +1,16 @@
 import React from 'react';
 import { ExclamationTriangleIcon, Component1Icon } from '@radix-ui/react-icons';
 import styled from 'styled-components';
-import {Card, Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Progress, ProgressBar, Prusas, StatusText,
-} from './StatusComponents';
+import { Card, Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Progress, ProgressBar, Prusas, StatusText } from './StatusComponents';
 import { machines, otherMachines } from './generateMockStatusData';
-import Status from './Status';
-import { useHighlight } from './components//HighlightContext';
+import { useHighlight } from './components/HighlightContext';
+import { useSelectedMachine } from './SelectedMachineContext';
+import { Status } from './generateMockStatusData';
 
-
-const getEndTime = (startTime: string, totalTime: number) => {
+export const getEndTime = (startTime: string, totalTime: number) => {
     const start = new Date(startTime);
     const end = new Date(start.getTime() + totalTime * 60000);
-    return end.toLocaleString('en-US', {month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true});
+    return end.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
 }
 
 const getProgress = (startTime: string | undefined, totalTime: number | undefined) => {
@@ -19,7 +18,8 @@ const getProgress = (startTime: string | undefined, totalTime: number | undefine
     const start = new Date(startTime);
     const end = new Date(start.getTime() + totalTime * 60000);
     const now = new Date();
-    return 75;
+    const progress = ((now.getTime() - start.getTime()) / (end.getTime() - start.getTime())) * 100;
+    return Math.min(Math.max(progress, 0), 100);
 }
 
 export interface MachineProps {
@@ -30,42 +30,65 @@ export interface MachineProps {
     weight: number | undefined;
     startTime: string | undefined;
     totalTime: number | undefined;
-    status: string;
-}
-
-export interface MachineCardProps{
+    status: Status;
     minimized?: boolean;
     highlight?: boolean;
+    clear?: boolean;
+    onClear?: () => void;
 }
 
-const MachineCard = (props: MachineProps, any: MachineCardProps) => {
+const statusToString = (status: Status): string => {
+    switch (status) {
+        case Status.Idle:
+            return 'Idle';
+        case Status.InProgress:
+            return 'In Progress';
+        case Status.Failed:
+            return 'Failed';
+        case Status.Maintenance:
+            return 'Maintenance';
+        default:
+            return 'Unknown';
+    }
+};
 
-    const { name, icon, user, material, weight, startTime, totalTime, status} = props;
-    const {minimized = true, highlight = false} = any;
+const StyledCard = styled(Card)<{ minimized?: boolean, highlight?: boolean, clear?: boolean }>`
+    border-radius: ${({ minimized }) => (minimized ? '0.5rem' : '0.2rem')}; 
+    border: ${({ clear, highlight }) => (clear && highlight ? '2px solid red' : 'none')};
+`;
 
-    const { highlight: globalHighlight } = useHighlight();
+const MachineCard = (props: MachineProps) => {
+    const { name, icon, user, material, weight, startTime, totalTime, status, minimized = true, highlight = false, clear = false, onClear } = props;
 
-    const [clearToggle, setClearToggle] = React.useState(false);
-    const handleClearToggle = () => setClearToggle(!clearToggle);
+    const { setSelectedMachine } = useSelectedMachine();
 
-    const shouldHighlight = minimized && clearToggle && status === "Failed" && globalHighlight;
+    const handleClick = () => {
+        setSelectedMachine({ name, icon, user, material, weight, startTime, totalTime, status });
+    };
+
+    const handleClearClick = () => {
+        if (onClear) {
+            onClear();
+        }
+    };
 
     return (
-
-    <Card symbol={icon ? icon : name} minimized={minimized} highlight={shouldHighlight}>
-        <Info>
-            <MachineName>{name}</MachineName>
-            <StatusText>User: {user ? user : 'N/A'}</StatusText>
-            {!minimized && <StatusText>Material: {material}</StatusText>}
-            {!minimized && <StatusText>Weight: {weight ? weight+'g' : 'N/A'}</StatusText>}
-            <StatusText area="date">Est. Completion<br/> {startTime && totalTime ? getEndTime(startTime, totalTime) : 'N/A'}</StatusText>
-            
-        </Info>
-        <ProgressBar>
-            {startTime && totalTime && <Progress progress={getProgress(startTime, totalTime)}/>}
-        </ProgressBar>
-        <button onClick={handleClearToggle}>Clear</button>
-    </Card>
+        <StyledCard symbol={icon ? icon : name} minimized={minimized} highlight={highlight} clear={clear} onClick={handleClick}>
+            <Info>
+                <MachineName>{name}</MachineName>
+                <StatusText>User: {user ? user : 'N/A'}</StatusText>
+                {!minimized && <StatusText>Material: {material}</StatusText>}
+                {!minimized && <StatusText>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>}
+                <StatusText area="date">Est. Completion<br /> {startTime && totalTime ? getEndTime(startTime, totalTime) : 'N/A'}</StatusText>
+                {!minimized && <StatusText>Status: {statusToString(status)}</StatusText>}
+            </Info>
+            {minimized && (
+                <ProgressBar horizontal>
+                    {startTime && totalTime && <Progress progress={getProgress(startTime, totalTime)} horizontal />}
+                </ProgressBar>
+            )}
+            {minimized && <button onClick={handleClearClick}>Clear</button>}
+        </StyledCard>
     );
 }
 

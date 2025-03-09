@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
 import { grayDark, whiteA } from '@radix-ui/colors';
 
-//Works for 90% of phones (With the settings for background and all that) Has some trouble with tablets
+// Works for 90% of phones (With the settings for background and all that) Has some trouble with tablets
 const mobileBreakpoint = "850px";
 
 /******************************* Prusa Shelf ******************************** */
@@ -24,27 +24,28 @@ export const Prusas = styled.div`
     justify-content: center;
 `;
 
-export const Card = styled.div<{ symbol?:string; minimized?:boolean; highlight?:boolean}>`
+export const Card = styled.div<{ symbol?: string; minimized?: boolean; highlight?: boolean }>`
     display: flex;
     height: min-content;
     padding: 15px;
     aspect-ratio: 5 / 4;
     justify-content: space-between;
     border-radius: 20px;
-    border: ${({highlight }) => (highlight ? "3px solid #FF0000" : "2px solid #EE4B2B")};
+    border: ${({ highlight }) => (highlight ? "3px solid #FF0000" : "2px solid #EE4B2B")};
     font-size: ${({ minimized }) => (minimized ? "2.5vh" : "3.5vh")};
     ${props => props?.symbol && `
         background-image: url(src/assets/img/symbols/${props.symbol}.svg);
         background-size: auto 90%;
         background-repeat: no-repeat;
         background-position: center;
-    `}
+   
+ `}
 
     filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
     box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.5);
 `;
 
-export const Info = styled.div<{minimized?: boolean}>`
+export const Info = styled.div<{ minimized?: boolean }>`
     font-size: ${({ minimized }) => (minimized ? "2.5vh" : "3.5vh")};
     color: #000000;
     height: auto;
@@ -53,7 +54,7 @@ export const Info = styled.div<{minimized?: boolean}>`
     flex-direction: column;
 `;
 
-export const MachineName = styled.h3<{minimized?: boolean}>`
+export const MachineName = styled.h3<{ minimized?: boolean }>`
     font-size: ${({ minimized }) => (minimized ? "3.5vh" : "4.5vh")};
     color: #000000;
     font-family: Montserrat;
@@ -62,7 +63,7 @@ export const MachineName = styled.h3<{minimized?: boolean}>`
     padding: 0;
 `;
 
-export const StatusText = styled.span<{area?: string, minimized?:boolean}>`
+export const StatusText = styled.span<{ area?: string, minimized?: boolean }>`
     font-size: ${({ minimized }) => (minimized ? "0.9vw" : "1.2vw")};
     color: #000000;
     font-family: Montserrat;
@@ -71,7 +72,7 @@ export const StatusText = styled.span<{area?: string, minimized?:boolean}>`
     line-height: normal;
 `;
 
-export const ProgressBar = styled.div<{horizontal?: string}>`
+export const ProgressBar = styled.div<{horizontal?: boolean}>`
     width: 10%;
     height: 100%;
     background-color: ${whiteA.whiteA11};
@@ -80,10 +81,10 @@ export const ProgressBar = styled.div<{horizontal?: string}>`
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
     ${props => props.horizontal && `
         width: auto;
-        height: 100%;
+        height: 10%;
         min-height: 10px;
         flex-direction: row;
         justify-content: flex-start;
@@ -97,7 +98,7 @@ export const Progress = styled.div<{ progress: number, horizontal?: boolean }>`
     border-radius: 1vw;
     ${props => props.horizontal && `
         width: ${props.progress}%;
-        height: 100%;
+        height: 10%;
     `}
 `;
 
@@ -121,9 +122,9 @@ export const ListItem = styled.div`
     align-items: center;
     padding: 5px;
     gap: 1%;
-
     filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
     box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.5);
+
 `;
 export const ListIcon = styled.div<{ symbol?: string }>`
     height: 100%;

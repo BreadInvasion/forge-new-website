@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-
+import MachineCard from '../MachineCard';
+import { useSelectedMachine } from '../SelectedMachineContext';
 
 const HighlightCard = styled.div`
-    grid-area: highlight;
     background-color: red;
     border-radius: 0.5rem;
     padding: 1rem;
@@ -12,10 +12,32 @@ const HighlightCard = styled.div`
 `;
 
 const Highlight: React.FC = () => {
+    const { selectedMachine } = useSelectedMachine();
+
+    if (!selectedMachine) {
+        return (
+            <HighlightCard>
+                <h2>Selected Machine: </h2>
+                <p>No machine selected</p>
+            </HighlightCard>
+        );
+    }
+
     return (
         <HighlightCard>
-            <h2>Highlight</h2>
-            
+            <h2>Highlighted Card: </h2>
+            <MachineCard
+                name={selectedMachine.name}
+                icon={selectedMachine.icon}
+                status={selectedMachine.status}
+                user={selectedMachine.user}
+                startTime={selectedMachine.startTime}
+                totalTime={selectedMachine.totalTime}
+                weight={selectedMachine.weight}
+                material={selectedMachine.material}
+                highlight={false}
+                minimized={false}
+            />
         </HighlightCard>
     );
 };
