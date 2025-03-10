@@ -164,6 +164,12 @@ class MachineUsageSchema(BaseResponse):
 
     maintenance_mode: bool
 
+class UsageResponse(BaseResponse):
+    semester: str | None
+    time_started: datetime
+    machine_name: str
+    cost: Decimal
+
 
 class MachineInfo(BaseModel):
     id: UUID4

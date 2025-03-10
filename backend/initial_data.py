@@ -22,9 +22,11 @@ from schemas.enums import GenderStatsType, PronounType, Permissions
 async def main() -> None:
     print("Start initial data")
     async with async_session() as session:
-        super_user_role = await session.scalar(select(Role).where(Role.name == "Super Admin"))
-        
-        if not super_user_role:
+        superuser_role = await session.scalar(
+            select(Role).where(Role.name == "Super Admin")
+        )
+
+        if not superuser_role:
             superuser_role = Role(
                 name="Super Admin",
                 permissions=[Permissions.IS_SUPERUSER],
@@ -35,21 +37,12 @@ async def main() -> None:
 
             session.add(superuser_role)
             await session.commit()
-            
-            super_user_role = superuser_role
-            
+            await session.refresh(superuser_role)
+
             print("Superuser role was created")
         else:
             print("Superuser role already exists in database")
-        
-        superuser_role = Role(
-                name="Super Admin",
-                permissions=[Permissions.IS_SUPERUSER],
-                inverse_permissions=[],
-                display_role=False,
-                priority=10000,
-            )
-        
+
         user = await session.scalar(select(User).where(User.RCSID == "haddlm"))
 
         if not user:
@@ -67,17 +60,17 @@ async def main() -> None:
                 is_rpi_staff=False,
                 is_graduating=False,
             )
-            
+
             session.add(new_superuser)
             await session.commit()
             print("Superuser was created")
         else:
             print("Superuser already exists in database")
-        
+
         user = await session.scalar(select(User).where(User.RCSID == "byrnet2"))
 
         if not user:
-            
+
             new_superuser = User(
                 RCSID="byrnet2",
                 RIN="662029936",
@@ -91,13 +84,12 @@ async def main() -> None:
                 is_rpi_staff=False,
                 is_graduating=False,
             )
-            
+
             session.add(new_superuser)
             await session.commit()
             print("Thomas Superuser was created")
         else:
             print("Thomas Superuser already exists in database")
-    
 
         print("Initial data created")
 
