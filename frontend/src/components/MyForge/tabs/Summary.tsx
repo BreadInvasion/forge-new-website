@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from "react";
 import useAuth from '../../Auth/useAuth';
 import { PieChart } from 'react-minimal-pie-chart';
 import {ReactComponent as DiscordIcon} from '../../../assets/img/discord-mark-blue.svg'; 
 import { MachineUsage } from 'src/interfaces';
+import { OmniAPI } from "src/apis/OmniAPI";
 import '../styles/Summary.scss';
 
 // Temp hardcoded values 
@@ -28,9 +29,26 @@ const cost_chart = [
     { machine: 'Resin Printer', usage: 15 },
 ]
 
-const Summary = () => {
+const Summary: React.FC = () => {
 
     const { user } = useAuth();
+
+    const [machineUsages, setMachineUsages] = React.useState<MachineUsage[]>([]);
+
+    useEffect(() => {
+            const getUsages = async () => {
+                try {
+                    const response = await OmniAPI.get("usages", "me");
+                    console.log(response);
+                    const data: MachineUsage[] = response;
+                    setMachineUsages(data);
+                } catch (error) {
+                    console.error("Error fetching machine usages:", error);
+                }
+            };
+    
+            getUsages();
+        }, []);
 
     const flexStyle = {
         display: 'flex',
@@ -59,7 +77,7 @@ const Summary = () => {
                 <ChartObject id='chart_cost' name='Machine Usage Cost' unit="cost" value={cost_chart}/> 
             </div>
             <div className='mf-flex-row' style={rowStyle}>
-                <ListObject id='uages' name='Machine Usage History' value=''/>
+                <ListObject id='uages' name='Machine Usage History' value={machineUsages}/>
             </div>
             <div className='mf-flex-row' style={rowStyle}>
                 <LinkObject id='discord' name='Join Our Discord!' value='https://discord.gg/vnPvMPadNy'/>
@@ -73,18 +91,24 @@ export default Summary;
 interface ListObjectProps {
     id: string;
     name: string;
-    value: any;
+    value: MachineUsage[];
 }
 
 const ListObject = ({ id, name, value }: ListObjectProps) => {
 
     const listStyle = {
         flex: '1',
-    }
+    } as React.CSSProperties;
 
     return (
         <div className='mf-list mf-component' style={listStyle}>
-            <h4>placeholder for usages</h4>
+            <ul>
+                {value.map((usage) => (
+                    <li key={usage.id}>
+                        <strong>{usage.machine_name}</strong> - {usage.time_started.toString()} - ${Number(usage.cost).toFixed(2)}
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }

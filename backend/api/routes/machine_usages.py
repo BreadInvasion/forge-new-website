@@ -32,6 +32,7 @@ async def get_my_usages(
     """Fetch machine usage records for current user."""
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
+        "id": MachineUsage.id,
         "time_started": MachineUsage.time_started,
         "cost": MachineUsage.cost,
         "name": Machine.name,
@@ -55,6 +56,7 @@ async def get_my_usages(
 
     return [
         UsageResponse(
+            id=usage.id,
             machine_name=usage.machine.name,
             semester=f"{usage.semester.semester_type} {usage.semester.calendar_year}" if usage.semester else None,
             time_started=usage.time_started,

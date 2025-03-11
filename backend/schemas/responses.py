@@ -165,6 +165,7 @@ class MachineUsageSchema(BaseResponse):
     maintenance_mode: bool
 
 class UsageResponse(BaseResponse):
+    id: UUID4
     semester: str | None
     time_started: datetime
     machine_name: str

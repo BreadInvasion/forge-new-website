@@ -70,11 +70,10 @@ export interface MachineGroup extends Record<string, any> {
 export interface MachineUsage extends Record<string, any> {
     id: number;
     machine_id: number;
-    machine: string;
+    machine_name: string;
     semester_id: number;
     semester: string;
-    user_id: number;
-    user: string;
+    cost: number;
     time_started: Date;
     duration: number;
     failed: boolean;
