@@ -40,7 +40,6 @@ const AccordionDemo: React.FC = () => (
     height: "100vh", 
     overflowY: "auto", 
     padding: "20px",
-    borderRadius: "8px",
     width: "100%",
     maxWidth: "800px",
     margin: "0 auto",
