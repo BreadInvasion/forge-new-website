@@ -102,13 +102,15 @@ async def use_a_machine(
         .options(selectinload(Machine.active_usage))
     )
 
-    if not machine or (
-        machine.disabled
-        and not has_permissions_any(
+    can_edit_machines_permissions = await has_permissions_any(
             session,
             current_user.id,
             {Permissions.CAN_EDIT_MACHINES, Permissions.IS_SUPERUSER},
         )
+
+    if not machine or (
+        machine.disabled
+        and not can_edit_machines_permissions
     ):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -124,19 +126,22 @@ async def use_a_machine(
     current_semester = await session.scalar(
         select(State.active_semester).options(selectinload(State.active_semester))
     )
-    if not current_semester and not has_permissions_any(
+    
+    between_semesters_permission = await has_permissions_any(
         session=session,
         user_id=current_user.id,
         permissions={
             Permissions.CAN_USE_MACHINES_BETWEEN_SEMESTERS,
             Permissions.IS_SUPERUSER,
         },
-    ):
+    )
+    
+    if not current_semester and not between_semesters_permission:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have permission to log machine usages between semesters",
         )
-
+        
     required_resource_slot_ids = {
         resource_slot.id
         for resource_slot in machine.type.resource_slots
@@ -159,13 +164,15 @@ async def use_a_machine(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="One or more provided resource slots not found",
         )
-
+        
     resource_usage_quantities: list[ResourceUsageQuantity] = []
     total_cost = 0
 
     total_cost += round(
         Decimal(request.duration_seconds / 3600) * (machine.type.cost_per_hour), 2
     )
+    
+    print("DEBUG LINE 1: ", total_cost)
 
     for resource_slot_id, usage_info in request.resource_usages.items():
         resource_slot = next(
@@ -205,7 +212,10 @@ async def use_a_machine(
         )
 
         if not usage_info.is_own_material:
+            print("DEBUG LINE 2: ", usage_info.amount, resource_used.cost)
             total_cost += usage_info.amount * resource_used.cost
+
+    print("DEBUG LINE 3: ", total_cost)
 
     machine_usage = MachineUsage(
         machine=machine,
@@ -221,7 +231,7 @@ async def use_a_machine(
     session.add(machine)
     await session.commit()
     await session.refresh(machine_usage)
-
+    
     audit_log = AuditLog(
         type=LogType.MACHINE_USED,
         content={

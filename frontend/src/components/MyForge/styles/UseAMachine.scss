@@ -1,0 +1,184 @@
+.use-a-machine {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-image: url(../benchy_rain.png), linear-gradient(to bottom left, rgb(165, 165, 165), rgb(164, 164, 164));
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.usage-form {
+    margin-inline: auto;
+    margin-block: auto;
+    background-color: #eeeeee;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: auto !important;
+}
+
+.usage-form button {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 2vh;
+    width: min-content;
+    background-color: #333;
+    color: #eeeeee;
+    cursor: pointer;
+}
+
+.usage-form .divider {
+    width: 100%;
+    height: 1px;
+    margin: 0;
+    padding: 0;
+    background-color: #333;
+}
+
+.usage-form  label {
+    font-size: large;
+    color: #333;
+    text-wrap: nowrap;
+    overflow: visible;
+}
+
+.usage-form > h2 {
+    font-size: x-large;
+    color: #333;
+    text-align: center;
+}
+
+.form-icon {
+    background-image: url(../logo.svg); // Since the form is in the /myforge route, need to backtrack to public
+}
+
+.machine-selection {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: max-content;
+}
+
+.usage-duration {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: max-content;
+
+}
+
+.usage-duration > input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 2vh;
+    border: 1px solid #333;
+}
+
+
+.resource-usage-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.resource-usage-form table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.resource-usage-form thead {
+    color: #333;
+    text-align: center;
+}
+
+.resource-usage-form tbody {
+    background-color: #eeeeee;
+    color: #333;
+    text-align: center;
+}
+
+.own-material {
+    width: 10%;
+}
+
+.amount {
+    width: 10%;
+}
+
+.resource-usage-form th {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.resource-usage-form td {
+    padding: 5px 10px;
+}
+
+.resource-usage-form select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1.875vh;
+    width: 100%;
+    border: 1px solid #333;
+}
+
+.resource-usage-form input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 2vh;
+    width: 100%;
+    border: 1px solid #333;
+}
+
+.usage-policies {
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.pagination-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+    justify-content: space-between;
+    margin-inline: auto;
+    margin-block: 1rem;
+}
+
+.pagination-buttons button {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 2vh;
+    width: min-content;
+    background-color: #ba0000;
+    color: #eeeeee;
+    cursor: pointer;
+}
+
+.pagination-buttons button:hover {
+    background-color: #8a0000;
+}
+
+.pagination-buttons button:disabled {
+    background-color: #de7f7f;
+    cursor: not-allowed;
+}
+
+.usage-duration input {
+    text-align: right;
+}
