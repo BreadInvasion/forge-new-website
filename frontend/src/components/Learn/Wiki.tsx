@@ -428,7 +428,18 @@ const AccordionDemo: React.FC = () => (
 
         </Accordion.Root>
           </div>
-
+            <h2 style={{ 
+            textAlign: "center", 
+            marginBottom: "20px", 
+            fontSize: "18px", 
+            position: "relative", 
+            top: 0, 
+            background: "#eeeeee", 
+            zIndex: 3,
+            width: "100%" 
+            }}>
+            If you have any questions, Please visit the Forge and ask the volunteers!
+            </h2>
     </div>
 
   </div>
