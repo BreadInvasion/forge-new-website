@@ -15,20 +15,6 @@ const usage_value = {
     cost: 10.00,
 }
 
-const hours_chart = [
-    { machine: 'Laser Cutter', usage: 10 },
-    { machine: 'Alpha', usage: 5 },
-    { machine: 'Beta', usage: 15 },
-    { machine: 'Resin Printer', usage: 15 },
-]
-
-const cost_chart = [
-    { machine: 'Laser Cutter', usage: 1 },
-    { machine: 'Alpha', usage: 10 },
-    { machine: 'Beta', usage: 5 },
-    { machine: 'Resin Printer', usage: 15 },
-]
-
 const Summary: React.FC = () => {
 
     const { user } = useAuth();
@@ -49,6 +35,26 @@ const Summary: React.FC = () => {
     
             getUsages();
         }, []);
+
+    const aggregateData = (usages: MachineUsage[], key: 'hours' | 'cost') => {
+        const aggregated = usages.reduce((acc, usage) => {
+            if (!acc[usage.machine_name]) {
+                acc[usage.machine_name] = 0;
+            }
+            acc[usage.machine_name] += Number(usage[key]);
+            return acc;
+        }, {} as Record<string, number>);
+
+        console.log(aggregated);
+        console.log(aggregated.count);
+        return Object.entries(aggregated).map(([machine, usage]) => ({
+            machine,
+            usage,
+        }));
+    };
+
+    const hours_chart = aggregateData(machineUsages, 'hours');
+    const cost_chart = aggregateData(machineUsages, 'cost');
 
     const flexStyle = {
         display: 'flex',
