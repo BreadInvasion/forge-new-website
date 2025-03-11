@@ -168,6 +168,7 @@ class UsageResponse(BaseResponse):
     id: UUID4
     semester: str | None
     time_started: datetime
+    duration: int
     machine_name: str
     cost: Decimal
 

@@ -36,12 +36,17 @@ const Summary: React.FC = () => {
             getUsages();
         }, []);
 
-    const aggregateData = (usages: MachineUsage[], key: 'hours' | 'cost') => {
+    const aggregateData = (usages: MachineUsage[], key: 'duration' | 'cost') => {
         const aggregated = usages.reduce((acc, usage) => {
             if (!acc[usage.machine_name]) {
                 acc[usage.machine_name] = 0;
             }
-            acc[usage.machine_name] += Number(usage[key]);
+            if (key === 'duration') {
+                acc[usage.machine_name] += Number(usage[key])/3600;
+            }
+            else {
+                acc[usage.machine_name] += Number(usage[key]);
+            }
             return acc;
         }, {} as Record<string, number>);
 
@@ -53,7 +58,7 @@ const Summary: React.FC = () => {
         }));
     };
 
-    const hours_chart = aggregateData(machineUsages, 'hours');
+    const hours_chart = aggregateData(machineUsages, 'duration');
     const cost_chart = aggregateData(machineUsages, 'cost');
 
     const flexStyle = {
