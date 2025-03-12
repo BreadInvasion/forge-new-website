@@ -6,18 +6,11 @@ import { MachineUsage } from 'src/interfaces';
 import { OmniAPI } from "src/apis/OmniAPI";
 import '../styles/Summary.scss';
 
-// Temp hardcoded values 
-
-const usage_value = {
-    id: 1,
-    machine: 'Laser Cutter',
-    time: '2021-09-01T12:00:00Z',
-    cost: 10.00,
-}
-
 const Summary: React.FC = () => {
 
     const { user } = useAuth();
+
+    const [currentUsage, setCurrentUsage] = React.useState<MachineUsage | null>(null);
 
     const [machineUsages, setMachineUsages] = React.useState<MachineUsage[]>([]);
 
@@ -25,7 +18,6 @@ const Summary: React.FC = () => {
         const getUsages = async () => {
             try {
                 const response = await OmniAPI.get("usages", "me");
-                console.log(response);
                 const data: MachineUsage[] = response;
                 setMachineUsages(data);
             } catch (error) {
@@ -60,12 +52,12 @@ const Summary: React.FC = () => {
     
                 return acc;
             }, {} as Record<string, { cost: number; hours: number }>);
-    
+
             setCostData(Object.entries(sums).map(([machine, { cost }]) => ({ 
                 machine, 
                 usage: cost 
             })));
-            
+
             setHoursData(Object.entries(sums).map(([machine, { hours }]) => ({
                 machine, 
                 usage: hours
@@ -74,6 +66,38 @@ const Summary: React.FC = () => {
     
         getChartData(machineUsages);
     }, [machineUsages]);
+
+    useEffect(() => {
+        if (machineUsages.length === 0) return;
+   
+        const getCurrentUsage = async () => {
+            try {
+                const response = await OmniAPI.getAll("machinestatus") ;
+                response.groups.forEach(group => {
+                    group.machines.forEach(machine => {
+                        if (machine.in_use && machine.user_id == user.id) {
+                            const machineUsage: MachineUsage = {
+                                id: machine.id,
+                                machine_id: machine.id,
+                                machine_name: machine.name,
+                                user_id: machine.user_id,
+                                time_started: machine.usage_start,
+                                duration: machine.usage_duration,
+                                failed: machine.failed,
+                                failed_at: machine.failed_at,
+                            };
+                            setCurrentUsage(machineUsage);
+                            return;
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error("Error fetching machine usages:", error);
+            }
+        };
+        
+        getCurrentUsage();
+    }, []);
 
     const flexStyle = {
         display: 'flex',
@@ -94,7 +118,7 @@ const Summary: React.FC = () => {
         <div className='mf-flex-container' style={flexStyle}>
             <div className='mf-flex-row' style={rowStyle} >
                 <DisplayObject id='cost' name='Semester Cost' semester_cost={user.semester_balance} />
-                <SingleObject id='current' name='Current Usage' value={usage_value} /> 
+                <SingleObject id='current' name='Current Usage' value={currentUsage} /> 
             </div>
             <div className='mf-flex-row' style={rowStyle}>
                 <ChartObject id='chart_hours' name='Machine Usage Hours' unit="hours" value={hoursData}/> 
@@ -246,7 +270,7 @@ const ChartObject = ({ id, name, unit, value }: ChartObjectProps) => {
 interface SingleObjectProps {
     id: string;
     name: string;
-    value: any
+    value: MachineUsage | null
 }
 
 const SingleObject = ({ id, name, value }: SingleObjectProps) => {
@@ -266,11 +290,17 @@ const SingleObject = ({ id, name, value }: SingleObjectProps) => {
     return (
         <div className='mf-single mf-component' style={singleStyle}>
             <h3 style={{ textAlign: 'left' }}>{name}</h3>
-            <h2>{value.machine}</h2>
-            <div style={infoStyle}>
-                <h4>{value.time}</h4>
-                <h4>${value.cost}</h4>
-            </div>
+            {value ? (
+                <>
+                    <h2>{value.machine_name}</h2>
+                    <div style={infoStyle}>
+                        <h4>{value.time_started.toString()}</h4>
+                        <h4>{Number(value.duration)/60} minutes</h4>
+                    </div>
+                </>
+            ) : (
+                <h2>No current usages</h2>
+            )}
         </div>
     );
 }
