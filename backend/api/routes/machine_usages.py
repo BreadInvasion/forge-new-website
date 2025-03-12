@@ -37,6 +37,7 @@ async def get_my_usages(
         "duration": MachineUsage.duration_seconds,
         "cost": MachineUsage.cost,
         "name": Machine.name,
+        "user_id": MachineUsage.user_id,
     }
     order_determinant = attr_key_map[order_by]
     if descending:
@@ -63,6 +64,7 @@ async def get_my_usages(
             time_started=usage.time_started,
             duration=usage.duration_seconds,
             cost=usage.cost,
+            user_id=usage.user_id,
         )
         for usage in machine_usages
     ]

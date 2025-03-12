@@ -73,6 +73,7 @@ export interface MachineUsage extends Record<string, any> {
     machine_name: string;
     semester_id: number;
     semester: string;
+    user_id: number;
     cost: number;
     time_started: Date;
     duration: number;
