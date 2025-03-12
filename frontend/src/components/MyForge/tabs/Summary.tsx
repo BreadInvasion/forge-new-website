@@ -22,44 +22,58 @@ const Summary: React.FC = () => {
     const [machineUsages, setMachineUsages] = React.useState<MachineUsage[]>([]);
 
     useEffect(() => {
-            const getUsages = async () => {
-                try {
-                    const response = await OmniAPI.get("usages", "me");
-                    console.log(response);
-                    const data: MachineUsage[] = response;
-                    setMachineUsages(data);
-                } catch (error) {
-                    console.error("Error fetching machine usages:", error);
-                }
-            };
+        const getUsages = async () => {
+            try {
+                const response = await OmniAPI.get("usages", "me");
+                console.log(response);
+                const data: MachineUsage[] = response;
+                setMachineUsages(data);
+            } catch (error) {
+                console.error("Error fetching machine usages:", error);
+            }
+        };
     
-            getUsages();
-        }, []);
+        getUsages();
+    }, []);
 
-    const aggregateData = (usages: MachineUsage[], key: 'duration' | 'cost') => {
-        const aggregated = usages.reduce((acc, usage) => {
-            if (!acc[usage.machine_name]) {
-                acc[usage.machine_name] = 0;
-            }
-            if (key === 'duration') {
-                acc[usage.machine_name] += Number(usage[key])/3600;
-            }
-            else {
-                acc[usage.machine_name] += Number(usage[key]);
-            }
-            return acc;
-        }, {} as Record<string, number>);
-
-        console.log(aggregated);
-        console.log(aggregated.count);
-        return Object.entries(aggregated).map(([machine, usage]) => ({
-            machine,
-            usage,
-        }));
-    };
-
-    const hours_chart = aggregateData(machineUsages, 'duration');
-    const cost_chart = aggregateData(machineUsages, 'cost');
+    interface ChartUsageData {
+        machine: string;
+        usage: number;
+    }
+    
+    const [costData, setCostData] = React.useState<ChartUsageData[]>([]);
+    const [hoursData, setHoursData] = React.useState<ChartUsageData[]>([]);
+    
+    useEffect(() => {
+        if (machineUsages.length === 0) return;
+    
+        const getChartData = (usages: MachineUsage[]) => {
+            const sums = usages.reduce((acc, usage) => {
+                const machine = usage.machine_name;
+    
+                if (!acc[machine]) {
+                    acc[machine] = { cost: 0, hours: 0 };
+                }
+    
+                acc[machine].cost += Number(usage.cost);
+                acc[machine].hours += Number(usage.duration) / 3600;
+    
+                return acc;
+            }, {} as Record<string, { cost: number; hours: number }>);
+    
+            setCostData(Object.entries(sums).map(([machine, { cost }]) => ({ 
+                machine, 
+                usage: cost 
+            })));
+            
+            setHoursData(Object.entries(sums).map(([machine, { hours }]) => ({
+                machine, 
+                usage: hours
+            })));
+        };
+    
+        getChartData(machineUsages);
+    }, [machineUsages]);
 
     const flexStyle = {
         display: 'flex',
@@ -76,7 +90,6 @@ const Summary: React.FC = () => {
         padding: '10px'
     } as React.CSSProperties;
 
-    // TODO replace these with object data
     return (
         <div className='mf-flex-container' style={flexStyle}>
             <div className='mf-flex-row' style={rowStyle} >
@@ -84,8 +97,8 @@ const Summary: React.FC = () => {
                 <SingleObject id='current' name='Current Usage' value={usage_value} /> 
             </div>
             <div className='mf-flex-row' style={rowStyle}>
-                <ChartObject id='chart_hours' name='Machine Usage Hours' unit="hours" value={hours_chart}/> 
-                <ChartObject id='chart_cost' name='Machine Usage Cost' unit="cost" value={cost_chart}/> 
+                <ChartObject id='chart_hours' name='Machine Usage Hours' unit="hours" value={hoursData}/> 
+                <ChartObject id='chart_cost' name='Machine Usage Cost' unit="cost" value={costData}/> 
             </div>
             <div className='mf-flex-row' style={rowStyle}>
                 <ListObject id='uages' name='Machine Usage History' value={machineUsages}/>
