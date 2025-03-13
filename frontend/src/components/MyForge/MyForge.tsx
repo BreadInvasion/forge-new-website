@@ -5,6 +5,7 @@ import { Outlet, Route, Routes } from 'react-router-dom';
 import './styles/MyForge.scss';
 import './styles/TabStyles.scss';
 import { DynamicMachineForm } from './tabs/UseAMachine';
+import { FailAMachineForm } from './tabs/FailAMachine';
 
 const Summary = lazy(() => import('./tabs/Summary'));
 const Machines = lazy(() => import('./tabs/Machines'));
@@ -36,7 +37,8 @@ const MyForge: React.FC = () => {
                     <Routes>
                         <Route index element={<Summary />} />
                         <Route path="summary" element={<Summary />} />
-                        <Route path="create" element={<ComingSoon />} />
+                        <Route path="create" element={<DynamicMachineForm />} />
+                        <Route path="fail" element={<FailAMachineForm />} />
                         <Route path="machines" element={<Machines />} />
                         <Route path="machine_types" element={<MachineTypes />} />
                         <Route path="machine_groups" element={<MachineGroups />} />
