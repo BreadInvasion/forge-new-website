@@ -116,7 +116,6 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         if (showWarningDialog) return;
 
         setLastActivity(Date.now());
-        console.log("User activity detected.");
 
         const tokenExp = localStorage.getItem("token_expiration");
         if (!tokenExp) return;
@@ -165,7 +164,6 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         if (!isAuthenticated) return;
 
         const intervalId = setInterval(() => {
-            console.log("Checking token expiration...");
             const tokenExp = localStorage.getItem("token_expiration");
             if (!tokenExp) {
                 logout();
@@ -173,7 +171,6 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             }
 
             const timeLeft = Number(tokenExp) * 1000 - Date.now();
-            console.log("Time left (minutes):", timeLeft / 1000 / 60);
             if (timeLeft <= 0) {
                 // token is expired => logout
                 logout();

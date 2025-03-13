@@ -1,8 +1,7 @@
-import React, { useEffect, useState, ChangeEvent, FormEvent, ReactNode, Suspense, useMemo } from "react";
+import React, { useEffect, useState, FormEvent } from "react";
 import { OmniAPI } from "src/apis/OmniAPI";
-import { CheckboxInput, CustomForm, CustomFormField, DropdownInput, FormIcon, TextInput } from "src/components/Forms/Form";
-import { emptyMachine, Machine, Resource } from "src/interfaces";
-import { v4 as uuidv4 } from "uuid";
+import { FormIcon } from "src/components/Forms/Form";
+import { Machine } from "src/interfaces";
 
 import '../../Forms/styles/Form.scss';
 import '../styles/UseAMachine.scss';
@@ -11,7 +10,7 @@ export const FailAMachineForm: React.FC = () => {
     
     const [machines, setMachines] = useState<Machine[]>([]);
     const [selectedMachineId, setSelectedMachineId] = useState<string>("_");
-    // I think this data is for the email the user gets sent? TODO
+    // I think this data is for the email the user gets sent? There isn't a way to pass it in the request TODO:
     const [estimatedPercentCompleted, setEstimatedPercentCompleted] = useState(0);
     const [printerErrorMessage, setPrinterErrorMessage] = useState<string>("");
     const [noticeableFaults, setNoticeableFaults] = useState<string[]>([]);
