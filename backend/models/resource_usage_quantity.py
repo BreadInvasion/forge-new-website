@@ -22,7 +22,7 @@ class ResourceUsageQuantity(Base):
         DB_UUID(as_uuid=True), ForeignKey("machine_usages.id"), primary_key=True
     )
     machine_usage: Mapped["MachineUsage"] = relationship(
-        foreign_keys=[machine_usage_id], uselist=False
+        back_populates="resources_used", foreign_keys=[machine_usage_id], uselist=False
     )
 
     resource_id: Mapped[UUID] = mapped_column(

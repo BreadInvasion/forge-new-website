@@ -172,8 +172,6 @@ async def use_a_machine(
         Decimal(request.duration_seconds / 3600) * (machine.type.cost_per_hour), 2
     )
     
-    print("DEBUG LINE 1: ", total_cost)
-
     for resource_slot_id, usage_info in request.resource_usages.items():
         resource_slot = next(
             resource_slot
