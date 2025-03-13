@@ -64,6 +64,7 @@ export const OmniAPI = {
         return response.data;
     },
     use: async (machine_id: string, data: Record<string, any>) => {
+        console.log("use", machine_id, JSON.stringify(data));
         const response = await api.request({
             url: `/use/${machine_id}`,
             method: "POST",
