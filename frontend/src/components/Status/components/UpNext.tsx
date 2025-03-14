@@ -56,7 +56,7 @@ const UpNext: React.FC = () => {
             {inProgressMachines.map((machine, index) => (
                 <MachineItem key={index}>
                     <StatusText>{index + 1}. {machine.name} : being used by {machine.user ? machine.user : 'N/A'}<br/></StatusText>
-                    <EstCompletion area="date">Est. Completion: {getEndTime(machine.startTime!, machine.totalTime!)}</EstCompletion>
+                    <EstCompletion $area="date">Est. Completion: {getEndTime(machine.startTime!, machine.totalTime!)}</EstCompletion>
                 </MachineItem>
             ))}
         </UpNextContainer>

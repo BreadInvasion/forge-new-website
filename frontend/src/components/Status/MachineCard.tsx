@@ -25,40 +25,37 @@ const getProgress = (startTime: string | undefined, totalTime: number | undefine
 export interface MachineProps {
     name: string;
     icon?: string;
-    user: string | undefined;
+    user?: string;
     material: string | undefined;
-    weight: number | undefined;
-    startTime: string | undefined;
-    totalTime: number | undefined;
+    weight?: number;
+    startTime?: string;
+    totalTime?: number;
     status: Status;
-    minimized?: boolean;
-    highlight?: boolean;
-    clear?: boolean;
+}
+
+export interface MachineCardProps extends MachineProps {
+    machine: MachineProps;
+    $highlight: boolean;
+    $minimized: boolean;
+    $clear: boolean;
     onClear?: () => void;
 }
 
-const statusToString = (status: Status): string => {
-    switch (status) {
-        case Status.Idle:
-            return 'Idle';
-        case Status.InProgress:
-            return 'In Progress';
-        case Status.Failed:
-            return 'Failed';
-        case Status.Maintenance:
-            return 'Maintenance';
-        default:
-            return 'Unknown';
-    }
-};
-
-const StyledCard = styled(Card)<{ minimized?: boolean, highlight?: boolean, clear?: boolean }>`
-    border-radius: ${({ minimized }) => (minimized ? '0.5rem' : '0.2rem')}; 
-    border: ${({ clear, highlight }) => (clear && highlight ? '2px solid red' : 'none')};
+const StyledCard = styled(Card)<{ $symbol?: string; $minimized?: boolean, $highlight?: boolean, $clear?: boolean }>`
+    border-radius: ${({ $minimized }) => ($minimized ? '0.5rem' : '0.2rem')}; 
+    border: ${({ $clear, $highlight }) => ($clear && $highlight ? '2px solid red' : 'none')};
+    ${({ $symbol }) =>
+        $symbol &&
+        `
+        background-image: url(src/assets/img/symbols/${$symbol}.svg);
+        background-size: auto 90%;
+        background-repeat: no-repeat;
+        background-position: center;
+    `}
 `;
 
-const MachineCard = (props: MachineProps) => {
-    const { name, icon, user, material, weight, startTime, totalTime, status, minimized = true, highlight = false, clear = false, onClear } = props;
+const MachineCard: React.FC<MachineCardProps> = ({ machine, $clear = false, $minimized = true, $highlight = false, onClear }) => {
+    const { name, icon, user, material, weight, startTime, totalTime, status } = machine;
 
     const { setSelectedMachine } = useSelectedMachine();
 
@@ -73,21 +70,27 @@ const MachineCard = (props: MachineProps) => {
     };
 
     return (
-        <StyledCard symbol={icon ? icon : name} minimized={minimized} highlight={highlight} clear={clear} onClick={handleClick}>
+        <StyledCard 
+            $symbol={icon ? icon : name} 
+            $minimized={$minimized} 
+            $highlight={$highlight} 
+            $clear={$clear} 
+            onClick={handleClick}
+        >
             <Info>
                 <MachineName>{name}</MachineName>
                 <StatusText>User: {user ? user : 'N/A'}</StatusText>
-                {!minimized && <StatusText>Material: {material}</StatusText>}
-                {!minimized && <StatusText>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>}
-                <StatusText area="date">Est. Completion<br /> {startTime && totalTime ? getEndTime(startTime, totalTime) : 'N/A'}</StatusText>
-                {!minimized && <StatusText>Status: {statusToString(status)}</StatusText>}
+                {!$minimized && <StatusText $minimized={$minimized}>Material: {material}</StatusText>}
+                {!$minimized && <StatusText $minimized={$minimized}>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>}
+                <StatusText $area="date" $minimized={$minimized}>Est. Completion<br /> {startTime && totalTime ? getEndTime(startTime, totalTime) : 'N/A'}</StatusText>
+                {!$minimized && <StatusText $minimized={$minimized}>Status: {status}</StatusText>}
             </Info>
-            {minimized && (
-                <ProgressBar horizontal>
-                    {startTime && totalTime && <Progress progress={getProgress(startTime, totalTime)} horizontal />}
+            {$minimized && (
+                <ProgressBar $horizontal>
+                    {startTime && totalTime && <Progress $progress={getProgress(startTime, totalTime)} $horizontal />}
                 </ProgressBar>
             )}
-            {minimized && <button onClick={handleClearClick}>Clear</button>}
+            {$minimized && <button onClick={handleClearClick}>Clear</button>}
         </StyledCard>
     );
 }

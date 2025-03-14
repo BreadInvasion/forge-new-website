@@ -35,8 +35,10 @@ const Highlight: React.FC = () => {
                 totalTime={selectedMachine.totalTime}
                 weight={selectedMachine.weight}
                 material={selectedMachine.material}
-                highlight={false}
-                minimized={false}
+                machine={selectedMachine}
+                $highlight={false}
+                $minimized={false}
+                $clear={false}
             />
         </HighlightCard>
     );

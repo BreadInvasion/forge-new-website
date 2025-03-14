@@ -52,6 +52,10 @@ export default function Status() {
                             startTime={machine.startTime}
                             totalTime={machine.totalTime}
                             status={machine.status}
+                            machine={machine}
+                            $highlight={false}
+                            $minimized={true}
+                            $clear={false}
                             />
                     ))}
                     </Prusas>

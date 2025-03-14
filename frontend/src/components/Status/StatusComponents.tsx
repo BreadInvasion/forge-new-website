@@ -1,4 +1,4 @@
-import { styled } from 'styled-components';
+import styled from 'styled-components';
 import { grayDark, whiteA } from '@radix-ui/colors';
 
 // Works for 90% of phones (With the settings for background and all that) Has some trouble with tablets
@@ -63,8 +63,8 @@ export const MachineName = styled.h3<{ minimized?: boolean }>`
     padding: 0;
 `;
 
-export const StatusText = styled.span<{ area?: string, minimized?: boolean }>`
-    font-size: ${({ minimized }) => (minimized ? "0.9vw" : "1.2vw")};
+export const StatusText = styled.span<{ $area?: string, $minimized?: boolean }>`
+    font-size: ${({ $minimized }) => ($minimized ? "0.9vw" : "1.2vw")};
     color: #000000;
     font-family: Montserrat;
     font-style: normal;
@@ -72,7 +72,7 @@ export const StatusText = styled.span<{ area?: string, minimized?: boolean }>`
     line-height: normal;
 `;
 
-export const ProgressBar = styled.div<{horizontal?: boolean}>`
+export const ProgressBar = styled.div<{$horizontal?: boolean}>`
     width: 10%;
     height: 100%;
     background-color: ${whiteA.whiteA11};
@@ -82,7 +82,7 @@ export const ProgressBar = styled.div<{horizontal?: boolean}>`
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    ${props => props.horizontal && `
+    ${props => props.$horizontal && `
         width: auto;
         height: 10%;
         min-height: 10px;
@@ -91,13 +91,13 @@ export const ProgressBar = styled.div<{horizontal?: boolean}>`
     `}
 `;
 
-export const Progress = styled.div<{ progress: number, horizontal?: boolean }>`
+export const Progress = styled.div<{ $progress: number, $horizontal?: boolean }>`
     width: 100%;
-    height: ${props => props.progress}%;
+    height: ${props => props.$progress}%;
     background-color: green;
     border-radius: 1vw;
-    ${props => props.horizontal && `
-        width: ${props.progress}%;
+    ${props => props.$horizontal && `
+        width: ${props.$progress}%;
         height: 10%;
     `}
 `;
