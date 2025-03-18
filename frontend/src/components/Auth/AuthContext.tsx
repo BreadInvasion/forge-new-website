@@ -121,7 +121,10 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         if (!tokenExp) return;
 
         const timeLeft = Number(tokenExp) * 1000 - Date.now();
-        await refreshToken();
+        //await refreshToken();
+        if (timeLeft < LOGOUT_TIME_WARNING * 60 * 1000) {
+            await refreshToken();
+        }
 
     }, [showWarningDialog, refreshToken]);
 
@@ -172,6 +175,12 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             if (timeLeft <= 0) {
                 // token is expired => logout
                 logout();
+                return;
+            }
+
+            // don't warn if there was recent activity
+            if (lastActivity + LOGOUT_TIME_LIMIT * 60 * 1000 < Date.now()) {
+                refreshToken();
                 return;
             }
 
