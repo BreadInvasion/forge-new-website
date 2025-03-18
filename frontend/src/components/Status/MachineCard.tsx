@@ -1,9 +1,6 @@
 import React from 'react';
-import { ExclamationTriangleIcon, Component1Icon } from '@radix-ui/react-icons';
 import styled from 'styled-components';
-import { Card, Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Progress, ProgressBar, Prusas, StatusText } from './StatusComponents';
-import { machines, otherMachines } from './generateMockStatusData';
-import { useHighlight } from './components/HighlightContext';
+import { Card, MachineName, Progress, ProgressBar, StatusText } from './StatusComponents';
 import { useSelectedMachine } from './SelectedMachineContext';
 import { Status } from './generateMockStatusData';
 
@@ -35,29 +32,46 @@ export interface MachineProps {
 
 export interface MachineCardProps extends MachineProps {
     machine: MachineProps;
-    $highlight: boolean;
+    $highlightFailed: boolean;
     $minimized: boolean;
     $clear: boolean;
     onClear?: () => void;
 }
 
-const StyledCard = styled(Card)<{ $symbol?: string; $minimized?: boolean, $highlight?: boolean, $clear?: boolean }>`
-    border-radius: ${({ $minimized }) => ($minimized ? '0.5rem' : '0.2rem')}; 
-    border: ${({ $clear, $highlight }) => ($clear && $highlight ? '2px solid red' : 'none')};
-    ${({ $symbol }) =>
-        $symbol &&
-        `
-        background-image: url(src/assets/img/symbols/${$symbol}.svg);
-        background-size: auto 90%;
-        background-repeat: no-repeat;
-        background-position: center;
-    `}
+const statusToString = (status: Status): string => {
+    switch (status) {
+        case Status.Idle:
+            return 'Idle';
+        case Status.InProgress:
+            return 'In Progress';
+        case Status.Failed:
+            return 'Failed';
+        case Status.Maintenance:
+            return 'Maintenance';
+        default:
+            return 'Unknown';
+    }
+};
+
+const StyledButton = styled.button`
+    background-color:rgb(228, 23, 19); 
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 2.0vh; 
+    text-align: center;
+    cursor: pointer; 
+    transition: background-color 0.2s ease;
+    &:hover {
+        background-color:rgb(186, 7, 7);
+    }
 `;
 
-const MachineCard: React.FC<MachineCardProps> = ({ machine, $clear = false, $minimized = true, $highlight = false, onClear }) => {
+const MachineCard: React.FC<MachineCardProps> = ({ machine, $clear, $minimized, $highlightFailed, onClear }) => {
     const { name, icon, user, material, weight, startTime, totalTime, status } = machine;
 
-    const { setSelectedMachine } = useSelectedMachine();
+    const {setSelectedMachine } = useSelectedMachine();
 
     const handleClick = () => {
         setSelectedMachine({ name, icon, user, material, weight, startTime, totalTime, status });
@@ -70,28 +84,23 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $clear = false, $min
     };
 
     return (
-        <StyledCard 
+        <Card 
             $symbol={icon ? icon : name} 
             $minimized={$minimized} 
-            $highlight={$highlight} 
-            $clear={$clear} 
+            $highlightFailed={$highlightFailed && status === Status.Failed}
+            progress={$minimized ? getProgress(startTime, totalTime) : 0}
             onClick={handleClick}
         >
-            <Info>
                 <MachineName>{name}</MachineName>
                 <StatusText>User: {user ? user : 'N/A'}</StatusText>
                 {!$minimized && <StatusText $minimized={$minimized}>Material: {material}</StatusText>}
                 {!$minimized && <StatusText $minimized={$minimized}>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>}
+                {!$minimized && <StatusText $minimized={$minimized}>Start Time: {startTime} </StatusText>}
+                {!$minimized && <StatusText $minimized={$minimized}>Total Time: {totalTime} </StatusText>}
                 <StatusText $area="date" $minimized={$minimized}>Est. Completion<br /> {startTime && totalTime ? getEndTime(startTime, totalTime) : 'N/A'}</StatusText>
-                {!$minimized && <StatusText $minimized={$minimized}>Status: {status}</StatusText>}
-            </Info>
-            {$minimized && (
-                <ProgressBar $horizontal>
-                    {startTime && totalTime && <Progress $progress={getProgress(startTime, totalTime)} $horizontal />}
-                </ProgressBar>
-            )}
-            {$minimized && <button onClick={handleClearClick}>Clear</button>}
-        </StyledCard>
+                {!$minimized && <StatusText $minimized={$minimized}>Status: {statusToString(status)}</StatusText>}
+            {$highlightFailed && status === Status.Failed && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
+        </Card>
     );
 }
 

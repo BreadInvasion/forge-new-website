@@ -7,7 +7,7 @@ import { Status } from '../generateMockStatusData';
 
 const UpNextContainer = styled.div`
     padding: 1rem;
-    background-color: #f5f5f5;
+    background-color:rgb(57, 153, 62);
     border-radius: 0.5rem;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     margin-top: 1rem;

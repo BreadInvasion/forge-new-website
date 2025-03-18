@@ -4,11 +4,15 @@ import MachineCard from '../MachineCard';
 import { useSelectedMachine } from '../SelectedMachineContext';
 
 const HighlightCard = styled.div`
-    background-color: red;
+    background-color:rgb(176, 0, 0);
     border-radius: 0.5rem;
     padding: 1rem;
     margin-bottom: 0.5rem;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    h2 { 
+        margin-bottom: 1rem;
+        color: white; 
+    }
 `;
 
 const Highlight: React.FC = () => {
@@ -36,7 +40,7 @@ const Highlight: React.FC = () => {
                 weight={selectedMachine.weight}
                 material={selectedMachine.material}
                 machine={selectedMachine}
-                $highlight={false}
+                $highlightFailed={false}
                 $minimized={false}
                 $clear={false}
             />

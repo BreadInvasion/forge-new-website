@@ -4,7 +4,6 @@ import styled from "styled-components";
 import Filter from "./Filter";
 import { ToolButton, FilterItem, FilterX } from "./FilterComponents";
 import { Toggle } from "@radix-ui/react-toggle";
-import { useHighlight } from "./HighlightContext";
 
 const ToolbarContainer = styled.div`
     grid-area: tools;
@@ -13,6 +12,10 @@ const ToolbarContainer = styled.div`
     gap: 10px;
 `;
 
+interface ToolbarProps {
+    highlightFailed?: boolean;
+    setHighlightFailed?: (value : boolean) => void;
+}
 const ActiveFilters = styled.div`
     display: flex;
     gap: 5px;
@@ -42,9 +45,7 @@ const ActiveFilters = styled.div`
 
 `;
 
-const Toolbar: React.FC = () => {
-
-    const {highlight, setHighlight} = useHighlight();
+const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed}) => {
 
     const filters = [
         {
@@ -69,7 +70,6 @@ const Toolbar: React.FC = () => {
         setActiveFilters((prevFilters) =>
             prevFilters.filter((filter) => filter !== value)
         );
-
     };
 
     useEffect(() => {
@@ -83,7 +83,6 @@ const Toolbar: React.FC = () => {
                 left: e.deltaY,
                 behavior: 'smooth'
             });
-            
         });
 
         return () => {
@@ -93,7 +92,6 @@ const Toolbar: React.FC = () => {
 
     return (
         <ToolbarContainer>
-
             <ToolButton aria-label="Edit">
                 <Pencil1Icon />
             </ToolButton>
@@ -102,14 +100,14 @@ const Toolbar: React.FC = () => {
             </ToolButton>
             <ToolButton aria-label="Clear"> 
                 <Toggle
-                pressed={highlight}
-                onPressedChange={setHighlight}
+                    pressed={highlightFailed}
+                    onPressedChange={setHighlightFailed}
+                    asChild
                 >
+                <div>
                     <EraserIcon />
-                    
+                </div>
                 </Toggle>    
-               
-
             </ToolButton>
             <Filter 
                 filters={filters} 

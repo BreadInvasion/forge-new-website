@@ -1,19 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ExclamationTriangleIcon, Component1Icon } from '@radix-ui/react-icons';
-import { Card, Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Progress, ProgressBar, Prusas, StatusText } from './StatusComponents';
+import { Prusas} from './StatusComponents';
 import { machines, otherMachines } from './generateMockStatusData';
 import { SelectedMachineProvider } from './SelectedMachineContext';
 import MachineCard from './MachineCard';
-import { HighlightProvider } from './components/HighlightContext';
-import Highlight from './components/Highlight';
 import UpNext from './components/UpNext';
-
-const Container = styled.div`
+import Highlight from './components/Highlight';
+import Toolbar from './components/Toolbar';
+const Page = styled.div`
+    width: 100%;
+    height: 100%;
     display: grid;
     grid-template-columns: 3fr 1fr;
-    gap: 1rem;
-    padding: 1rem;
+    grid-template-rows: auto 4fr 1fr 1fr;
+    grid-template-areas:
+        "tools highlight"
+        "status highlight"
+        "status up-next"
+        "status up-next";
+    padding: 0.5rem 1rem;
 `;
 
 const Sidebar = styled.div`
@@ -21,6 +27,8 @@ const Sidebar = styled.div`
     flex-direction: column;
     padding-right: 2rem;
 `;
+
+/*
 const getEndTime = (startTime: string, totalTime: number) => {
     const start = new Date(startTime);
     const end = new Date(start.getTime() + totalTime * 60000);
@@ -34,16 +42,19 @@ const getProgress = (startTime: string | undefined, totalTime: number | undefine
     const now = new Date();
     return 75;
 }
+*/
 
 export default function Status() {
+    const [highlightFailed, setHighlightFailed] = useState(false);
+    
     return (
         <SelectedMachineProvider>
-            <HighlightProvider>
-                <Container>
+            <Page>
+                <Toolbar highlightFailed={highlightFailed} setHighlightFailed={setHighlightFailed} />
                     <Prusas>
                     {machines.map((machine, index) => (
                         <MachineCard
-                            key={index}
+                            key={`${machine.name}-${index}`}
                             name={machine.name}
                             icon={machine.icon}
                             user={machine.user}
@@ -53,7 +64,7 @@ export default function Status() {
                             totalTime={machine.totalTime}
                             status={machine.status}
                             machine={machine}
-                            $highlight={false}
+                            $highlightFailed={highlightFailed}
                             $minimized={true}
                             $clear={false}
                             />
@@ -63,8 +74,7 @@ export default function Status() {
                         <Highlight />
                         <UpNext />
                     </Sidebar>
-                </Container>
-            </HighlightProvider>     
+                </Page>
         </SelectedMachineProvider>
     );
 }

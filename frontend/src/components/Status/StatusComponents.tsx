@@ -8,68 +8,68 @@ const mobileBreakpoint = "850px";
 
 
 export const Prusas = styled.div`
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10%,15%));
-    grid-auto-rows: 1fr;
-    grid-auto-flow: row;
-    grid-gap: 1%;
-    // display: flex;
-    // gap: 1%;
-    // flex-wrap: wrap;
-    padding: 1% 2%;
-    overflow-y: auto;
-    align-items: center;
+    grid-area: status;
+    display: flex;
+    flex-wrap: wrap;
     justify-content: center;
+    column-gap: 10px;
 `;
 
-export const Card = styled.div<{ symbol?: string; minimized?: boolean; highlight?: boolean }>`
+export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highlightFailed?: boolean, progress: number }>`
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    padding: 3px;
     display: flex;
-    height: min-content;
-    padding: 15px;
-    aspect-ratio: 5 / 4;
+    flex-direction: column;
     justify-content: space-between;
-    border-radius: 20px;
-    border: ${({ highlight }) => (highlight ? "3px solid #FF0000" : "2px solid #EE4B2B")};
-    font-size: ${({ minimized }) => (minimized ? "2.5vh" : "3.5vh")};
-    ${props => props?.symbol && `
-        background-image: url(src/assets/img/symbols/${props.symbol}.svg);
+    align-items: center;
+    gap: 0.1rem;
+    width: ${({ $minimized }) => ($minimized ? '9vw' : '20vw')};
+    height: ${({ $minimized }) => ($minimized ? '9vw' : '15vw')};
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    border-radius: ${({ $minimized }) => ($minimized ? '5px' : '10px')}; 
+    box-shadow: ${({ $highlightFailed }) =>
+        $highlightFailed ? '0 0 10px 2px red' : '0 0 5px rgba(0, 0, 0, 0.5)'};
+    border: ${({ $minimized }) => ($minimized ? '1px solid #ccc' : '1px solid #999')};
+    font-size: ${({ $minimized }) => ($minimized ? "2.5vh" : "3.0vh")};
+    ${props => props?.$symbol && `
+        background-image: url(src/assets/img/symbols/${props.$symbol}.svg);
         background-size: auto 90%;
         background-repeat: no-repeat;
         background-position: center;
-   
- `}
+    `}
+    position: relative;
 
-    filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
-    box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.5);
-`;
-
-export const Info = styled.div<{ minimized?: boolean }>`
-    font-size: ${({ minimized }) => (minimized ? "2.5vh" : "3.5vh")};
-    color: #000000;
-    height: auto;
-    display: flex;
-    gap: 5%;
-    flex-direction: column;
+    &::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: ${props => props.progress}%;
+        background-color: rgba(0, 255, 0, 0.2);
+        border-radius: 5px;
+    }
 `;
 
 export const MachineName = styled.h3<{ minimized?: boolean }>`
-    font-size: ${({ minimized }) => (minimized ? "3.5vh" : "4.5vh")};
-    color: #000000;
-    font-family: Montserrat;
+    font-size: ${({ minimized }) => (minimized ? "3.5vh" : "3.5vh")};
+    font-weight: 600;
+    color: #000;
     text-transform: uppercase;
-    margin: 0;
-    padding: 0;
+    font-family: Montserrat;
+    text-align: center;
 `;
 
-export const StatusText = styled.span<{ $area?: string, $minimized?: boolean }>`
-    font-size: ${({ $minimized }) => ($minimized ? "0.9vw" : "1.2vw")};
-    color: #000000;
+export const StatusText = styled.p<{ $area?: string, $minimized?: boolean }>`
+    font-size: ${({ $minimized }) => ($minimized ? "1.3vh" : "2.2vh")};
+    color: #000;
+    text-align: center;
+    text-jusitfy: center;
     font-family: Montserrat;
-    font-style: normal;
     font-weight: 600;
-    line-height: normal;
 `;
 
 export const ProgressBar = styled.div<{$horizontal?: boolean}>`
@@ -126,11 +126,11 @@ export const ListItem = styled.div`
     box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.5);
 
 `;
-export const ListIcon = styled.div<{ symbol?: string }>`
+export const ListIcon = styled.div<{ $symbol?: string }>`
     height: 100%;
     aspect-ratio: 1 / 1;
 
-    background-image: url(src/assets/img/symbols/${props => props.symbol}.svg);
+    background-image: url(src/assets/img/symbols/${props => props.$symbol}.svg);
     background-size: auto 90%;
     background-repeat: no-repeat;
     background-position: center;

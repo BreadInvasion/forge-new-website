@@ -1,10 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Toggle from "@radix-ui/react-toggle"
-import { useState } from 'react';
-import { EraserIcon } from "@radix-ui/react-icons";
-import {useHighlight} from './HighlightContext';
-
 
 const getEndTime = (startTime: string, totalTime: number) => {
     const start = new Date(startTime);
@@ -28,7 +23,7 @@ export interface MachineProps {
     totalTime: number | undefined;
 }
 
-const Card = styled.div<{ symbol?: string, progress: number; highlight?: boolean }>`
+const Card = styled.div<{symbol: string, progress: number}>`
     background-color: #f5f5f5;
     border-radius: 5px;
     padding: 5px;
@@ -37,8 +32,8 @@ const Card = styled.div<{ symbol?: string, progress: number; highlight?: boolean
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    width: 15vw;
-    height: 15vw;
+    width: 9vw;
+    height: 9vw;
     aspect-ratio: 1 / 1;
     flex-shrink: 0;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
@@ -76,22 +71,18 @@ const StatusText = styled.p`
     font-size: 2.5vh;
     color: #000;
     text-align: center;
-    text-justify: center;
+    text-jusitfy: center;
     font-family: Montserrat;
     font-weight: 600;
 `;
 
-const CondensedCard = (props: MachineProps ) => {
+const CondensedCard = (props: MachineProps) => {
 
-    const { name, icon, user, startTime, totalTime} = props;
-    const { highlight } = useHighlight();
+    const { name, icon, user, startTime, totalTime } = props;
 
     return (
-    <Card 
-				symbol={icon ? icon : name} 
-				progress={getProgress(startTime, totalTime)}
-				highlight={highlight}
-		>
+
+    <Card symbol={icon ? icon : name} progress={getProgress(startTime, totalTime)}>
         <MachineName>{name}</MachineName>
         {user && <StatusText>User: <br/>{user}</StatusText>}
         {!user && <StatusText>Available</StatusText>}
