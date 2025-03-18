@@ -121,9 +121,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         if (!tokenExp) return;
 
         const timeLeft = Number(tokenExp) * 1000 - Date.now();
-        if (timeLeft < LOGOUT_TIME_WARNING * 60 * 1000) {
-            await refreshToken();
-        }
+        await refreshToken();
 
     }, [showWarningDialog, refreshToken]);
 

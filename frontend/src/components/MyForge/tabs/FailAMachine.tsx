@@ -54,10 +54,14 @@ export const FailAMachineForm: React.FC = () => {
      */
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
-
-        const response = await OmniAPI.fail(selectedMachineId);
-        console.log("Response:", response);
-
+        const temp = selectedMachineId;
+        try {
+            const response = await OmniAPI.fail(temp);
+            console.log("Response:", response);
+        } catch (error) {
+            console.error("Error:", error);
+        }
+        
         // Clear form
         const form = document.querySelector(".usage-form") as HTMLFormElement;
         form.reset();
