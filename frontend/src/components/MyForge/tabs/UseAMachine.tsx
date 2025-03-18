@@ -160,7 +160,7 @@ export const DynamicMachineForm: React.FC = () => {
             }
         });
 
-        const duration_seconds = (formData.hours * 3600) + (formData.minutes * 60);
+        const duration_seconds = (Math.ceil(Number(formData.hours)) * 3600) + (Math.ceil(Number(formData.minutes)) * 60);
         console.log("Resource Usages:", resource_usages);
         const usageData = {
             as_org_id: formData.org ? formData.org : null,
