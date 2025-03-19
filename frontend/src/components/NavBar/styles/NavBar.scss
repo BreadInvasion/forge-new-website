@@ -29,6 +29,7 @@
 }
 
 .list-item {
+    transition-duration: nav.$layout-transition-speed;
     transform: translate(0pt);
     display: flex;
     align-items: center;
@@ -36,7 +37,6 @@
     height: auto;
     border-radius: 4px;
     color: nav.$text-color;
-    transition-duration: nav.$transition-speed;
 }
 
 .list-item:hover {
@@ -70,7 +70,8 @@
     font-size: 1.25rem;
     padding: 0.25rem 0.5rem;
     color: inherit;
-    width: fit-content;
+    width: auto;
+    transition-duration: nav.$hover-transition-speed;
 }
 
 .forge-logo {
@@ -93,7 +94,7 @@
 }
 
 .logo-text {
-    transition-duration: nav.$transition-speed;
+    transition-duration: nav.$layout-transition-speed;
     color: nav.$text-color;
     font-family: "Montserrat";
     font-size: 1.875rem;
@@ -166,7 +167,7 @@
 /* Other Components */
 .caret-down, .hamburger-icon {
     color: nav.$text-color;
-    transition: nav.$transition-speed ease;
+    transition: nav.$layout-transition-speed ease;
 }
 
 .user-trigger:has(.hamburger-icon) {
@@ -175,7 +176,7 @@
     scale: -20%;
     transform: translate(100pt);
     opacity: 0;
-    transition-duration: nav.$transition-speed;
+    transition-duration: nav.$layout-transition-speed;
     position: absolute;
     z-index: -3;
 }
@@ -205,7 +206,7 @@
 
 .separator {
     background-color: nav.$border-color;
-    transition: nav.$transition-speed;
+    transition: nav.$layout-transition-speed;
     border-radius: 1px;
     height: 2px;
     width: 100%;

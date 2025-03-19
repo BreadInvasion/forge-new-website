@@ -65,7 +65,7 @@ hr.divider {
     width: auto;
     height: 2px;
     background-color: um.$divider-gray;
-    margin: 10px 0;
+    margin: 7px .5rem;
     border-style: none;
     border-bottom: 2px solid um.$divider-gray;
 }
@@ -74,7 +74,7 @@ div.divider {
     width: auto;
     height: 2px;
     background-color: um.$divider-gray;
-    margin: 20px 1rem;
+    margin: 7px 1rem 3px 1rem;
 }
 
 .options-container {
@@ -110,19 +110,32 @@ div.divider {
     flex-direction: column;
     height: auto;
     overflow: visible;
-    gap: 1rem;
-    direction: ltr;
+    gap: 0.5rem;
+    direction: ltr;  
 }
 
-.user-options li {
-    list-style: none;
-    margin: 0;
-    // padding: 0.25rem;
-    border-radius: 5px;
-    color: um.$black;
-    font-weight: 500;
-    cursor: pointer;
+.user-options {
+    * {
+        transition-duration: .15s;
+    }
+
+    li {
+        list-style: none;
+        margin: 0;
+        padding: 0.05rem;
+        border-radius: 5px;
+        color: um.$black;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    
+    li:hover {
+        * {
+            transform: translateX(1rem) scale(1.1);
+        }
+    }
 }
+
 
 .member li {
     background-color: um.$muted-red;

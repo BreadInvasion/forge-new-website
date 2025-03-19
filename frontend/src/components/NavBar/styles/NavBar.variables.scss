@@ -10,7 +10,8 @@ $popup-highlight: #b4b4b4; // grayDark.gray11 equivalent
 
 $mobile-breakpoint: 900px;
 
-$transition-speed: .5s; // Speed of the transition between mobile and desktop layouts
+$layout-transition-speed: .5s; // Speed of the transition between mobile and desktop layouts
+$hover-transition-speed: .15s; // Speed of hover effect transition
 
 @mixin itemStyles {
     text-decoration: none;

@@ -34,6 +34,15 @@ function createPageRange(
     return pages;
 }
 
+function toTitle(snakeStr: string): string {
+    return snakeStr
+        .replace("_rpi", "_RPI") // Fixed like a true CS major 😎
+        .replace("rpi_", "RPI") // Same here 💅💅
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+        .join(' ');
+}
+
 function Table<T extends Record<string, any>>(props: TableProps<T>) {
     const { columns, data, editPath, onDelete } = props;
 
@@ -73,7 +82,7 @@ function Table<T extends Record<string, any>>(props: TableProps<T>) {
                     <thead>
                         <tr>
                             {columns.map((column, index) => (
-                                <th key={String(column) + index}>{String(column)}</th>
+                                <th key={String(column) + index}>{toTitle(String(column))}</th>
                             ))}
                             <th id="edit-col"></th>
                         </tr>
