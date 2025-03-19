@@ -1,3 +1,36 @@
+.table-head {
+    margin-bottom: -1rem;
+    padding: 0px 2rem 0px 2rem;
+    direction: ltr;
+    display: block;
+    width: 100%;
+    * { display: inline-block; }
+    a {
+        float: right;
+        border: 1px solid #a7a7a7;
+        border-radius: 1rem;
+        color:#1b1;
+        width: 20pt;
+        height: 20pt;
+        text-align: center;
+        overflow: hidden;
+        text-decoration: none;
+        font-size: 20pt;
+        font-weight: 600;
+        line-height: 15pt;
+        z-index:100;
+        transition-duration: .15s;
+        background-color: #F3F4F6;
+    }
+    a:hover {
+        font-size: 25pt;
+        line-height: 13pt;
+        font-weight: 800;
+        background-color: #eeffee;
+    }
+    h2 { float: left;}
+}
+
 .table-container {
     margin-top: 20px;
     width: 100%;
@@ -131,9 +164,7 @@
 }
 
 .pagination button:disabled {
-    background-color: #a7a7a7;
-    color: #262d3b;
-    cursor: not-allowed;
+    display:none;
 }
 
 .pagination button.active {

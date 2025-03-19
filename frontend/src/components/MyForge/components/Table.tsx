@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import '../styles/Table.scss';
-import { Pencil2Icon, TrashIcon } from '@radix-ui/react-icons';
+import { Pencil2Icon, TrashIcon, ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons';
 
 interface TableProps<T extends Record<string, any>> {
     columns: (keyof T)[];
@@ -41,6 +41,21 @@ function toTitle(snakeStr: string): string {
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
         .join(' ');
+}
+
+interface TableHeadProps {
+    heading?: string;
+    addPath?: string;
+}
+
+export function TableHead(props: TableHeadProps) {
+    const {heading, addPath} = props;
+    return(
+        <div className="table-head">
+            <h2>{heading}</h2>
+            <a href={addPath}>+</a>
+        </div>
+    );
 }
 
 function Table<T extends Record<string, any>>(props: TableProps<T>) {
@@ -117,7 +132,7 @@ function Table<T extends Record<string, any>>(props: TableProps<T>) {
 
                     <div className='pagination'>
                         <button onClick={handlePrevious} disabled={currentPage === 1}>
-                            Previous
+                            <ArrowLeftIcon />
                         </button>
 
                         {/* Render each page button */}
@@ -132,7 +147,7 @@ function Table<T extends Record<string, any>>(props: TableProps<T>) {
                         ))}
 
                         <button onClick={handleNext} disabled={currentPage === totalPages}>
-                            Next
+                            <ArrowRightIcon />
                         </button>
                     </div>
                 </div>

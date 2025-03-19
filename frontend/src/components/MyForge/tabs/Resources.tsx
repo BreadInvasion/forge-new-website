@@ -1,5 +1,6 @@
 import React from 'react';
 import Table from '../components/Table';
+import { TableHead } from '../components/Table';
 import { Resource } from 'src/interfaces';
 
 import '../styles/TabStyles.scss';
@@ -40,10 +41,10 @@ const Resources: React.FC = () => {
 
     return (
         <div className='tab-column-cover align-center'>
-            <h2>Resources</h2>
-            <button className='add-button'>
-                <a href='/myforge/machines/add'>Add Resource</a>
-            </button>
+            <TableHead
+                heading="Resources"
+                addPath='/myforge/resources/add'
+            />
             <Table<Resource>
                 columns={columns}
                 data={data}

@@ -1,5 +1,6 @@
 import React from 'react';
 import Table from '../components/Table';
+import { TableHead } from '../components/Table';
 import { Machine } from 'src/interfaces';
 
 import '../styles/TabStyles.scss';
@@ -39,10 +40,10 @@ const Machines: React.FC = () => {
 
     return (
         <div className='tab-column-cover align-center'>
-            <h2>All Machines</h2>
-            <button className='add-button'>
-                <a href='/myforge/machines/add'>Add Machine</a>
-            </button>
+            <TableHead
+                heading="Machines"
+                addPath='/myforge/machines/add'
+            />
             <Table<Machine>
                 columns={columns}
                 data={data}

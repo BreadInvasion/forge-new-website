@@ -1,5 +1,6 @@
 import React from 'react';
 import Table from '../components/Table';
+import { TableHead } from '../components/Table';
 import { MachineGroup } from 'src/interfaces';
 
 import '../styles/TabStyles.scss';
@@ -105,10 +106,10 @@ const MachineGroups: React.FC = () => {
 
     return (
         <div className='tab-column-cover align-center'>
-            <h2>Machine Groups</h2>
-            <button className='add-button'>
-                <a href='/myforge/machinegroups/add'>Add Machine Group</a>
-            </button>
+            <TableHead
+                heading="Machine Groups"
+                addPath='/myforge/machinegroups/add'
+            />
             <Table<MachineGroup>
                 columns={columns}
                 data={data}

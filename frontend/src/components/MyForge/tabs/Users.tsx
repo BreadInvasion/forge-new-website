@@ -1,5 +1,6 @@
 import React from 'react';
 import Table from '../components/Table';
+import { TableHead } from '../components/Table';
 import { User } from 'src/interfaces';
 
 import '../styles/TabStyles.scss';
@@ -41,10 +42,10 @@ const Users: React.FC = () => {
 
     return (
         <div className='tab-column-cover align-center'>
-            <h2>Users</h2>
-            <button className='add-button'>
-                <a href='/myforge/users/add'>Add User</a>
-            </button>
+            <TableHead
+                heading="Users"
+                addPath='/myforge/users/add'
+            />
             <Table<User>
                 columns={columns}
                 data={data}
