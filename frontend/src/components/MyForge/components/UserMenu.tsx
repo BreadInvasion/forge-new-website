@@ -44,7 +44,6 @@ const UserMenu: React.FC = () => {
                     <li><Link to='/myforge/machine_groups' className='btn'>Machine Groups</Link></li>
                     <li><Link to='/myforge/machines' className='btn'>Machines</Link></li>
                     <li><Link to='/myforge/resources' className='btn'>Resources</Link></li>
-                    <li><Link to='/myforge/usages' className='btn'>Usages</Link></li>
                     <li><Link to='/myforge/users' className='btn'>Users</Link></li>
                 </ul>
                 <hr className='divider' />
