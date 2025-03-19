@@ -39,9 +39,9 @@ const MachineTypes: React.FC = () => {
 
     return (
         <div className='tab-column-cover align-center'>
-            <h2>All Machines</h2>
+            <h2>Machine Types</h2>
             <button className='add-button'>
-                <a href='/myforge/machines/add'>Add Machine</a>
+                <a href='/myforge/machinetypes/add'>Add Machine Type</a>
             </button>
             <Table<MachineType>
                 columns={columns}
