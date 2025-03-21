@@ -160,7 +160,7 @@ export const DynamicMachineForm: React.FC = () => {
             }
         });
 
-        const duration_seconds = (formData.hours * 3600) + (formData.minutes * 60);
+        const duration_seconds = Math.ceil((formData.hours * 3600) + (formData.minutes * 60));
         console.log("Resource Usages:", resource_usages);
         const usageData = {
             as_org_id: formData.org ? formData.org : null,
@@ -276,19 +276,21 @@ export const DynamicMachineForm: React.FC = () => {
                         <input
                             type="number"
                             inputMode="numeric"
+                            pattern="[0-9]*"
                             step="1"
                             min="0"
                             placeholder="Hours"
-                            onChange={(e) => setFormData((prev) => ({ ...prev, 'hours': Math.ceil(e.target.valueAsNumber) }))}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, 'hours': e.target.valueAsNumber }))}
                             value={formData.hours}
                         />
                         <input
                             type="number"
                             inputMode="numeric"
+                            pattern="[0-9]*"
                             step="1"
                             min="0"
                             placeholder="Minutes"
-                            onChange={(e) => setFormData((prev) => ({ ...prev, 'minutes': Math.ceil(e.target.valueAsNumber) }))}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, 'minutes': e.target.valueAsNumber }))}
                             value={formData.minutes}
                         />
                     </div>
