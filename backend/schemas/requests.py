@@ -10,15 +10,7 @@ def check_RIN(RIN: str) -> str:
     assert len(RIN) == 9
     return RIN
 
-def empty_string_to_none(UUID: str) -> Optional[UUID4]:
-        if UUID == "":
-            return None
-        return UUID4(UUID)
-
 RIN = Annotated[str, AfterValidator(check_RIN)]
-
-OptionalUUID = Annotated[Optional[UUID4], BeforeValidator(empty_string_to_none)]
-
 
 class BaseRequest(BaseModel):
     # may define additional fields or config shared across requests
@@ -41,8 +33,7 @@ class MachineUsageRequest(BaseRequest):
     resource_usages: dict[UUID4, ResourceUsage]
     duration_seconds: int
 
-    as_org_id: OptionalUUID   
-
+    as_org_id: Optional[UUID4]
 
 class UserCreateRequest(BaseRequest):
     # RPI Identification Information
