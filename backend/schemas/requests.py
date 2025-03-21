@@ -34,7 +34,6 @@ class MachineUsageRequest(BaseRequest):
     duration_seconds: int
     as_org_id: Optional[UUID4]
 
-
 class UserCreateRequest(BaseRequest):
     # RPI Identification Information
     RCSID: str
