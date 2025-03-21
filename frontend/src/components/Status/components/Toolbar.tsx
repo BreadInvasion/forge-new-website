@@ -14,7 +14,9 @@ const ToolbarContainer = styled.div`
 
 interface ToolbarProps {
     highlightFailed?: boolean;
-    setHighlightFailed?: (value : boolean) => void;
+    setHighlightFailed: (value : boolean) => void;
+    activeFilters: string[];
+    setActiveFilters: React.Dispatch<React.SetStateAction<string[]>>;
 }
 const ActiveFilters = styled.div`
     display: flex;
@@ -45,8 +47,8 @@ const ActiveFilters = styled.div`
 
 `;
 
-const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed}) => {
-
+const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, activeFilters, setActiveFilters}) => {
+    
     const filters = [
         {
             name: "Machine Type",
@@ -57,7 +59,6 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed}) 
             value: ["In Progress", "Completed", "Available", "Failed"]
         }
     ]
-    const [activeFilters, setActiveFilters] = useState<string[]>([]);
     
     const handleFilterClick = (value: string) => {
         if(!activeFilters.includes(value)) {
@@ -93,9 +94,15 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed}) 
     return (
         <ToolbarContainer>
             <ToolButton aria-label="Edit">
+                {/* Edit is for Room Managers and Admin/Super users only and will
+                 bring the user to a form where they can edit the details of the 
+                 usage */}
                 <Pencil1Icon />
             </ToolButton>
-            <ToolButton aria-label="Report">
+            <ToolButton aria-label="Fail">
+                { /*Fail will also be available to Volunteer level users,
+                 and when selected any machine they click on will redirect 
+                 to a Failure Form. */ }
                 <ExclamationTriangleIcon />
             </ToolButton>
             <ToolButton aria-label="Clear"> 

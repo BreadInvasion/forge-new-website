@@ -11,19 +11,14 @@ const UpNextContainer = styled.div`
     border-radius: 0.5rem;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     margin-top: 1rem;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #000000;
-`;
-
-const Header = styled.h2`
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
 `;
 
 const MachineItem = styled.div`
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem; 
+    padding: 0.5rem; 
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); 
 `;
 
 const EstCompletion = styled(StatusText)`
@@ -39,12 +34,11 @@ const UpNext: React.FC = () => {
             const endB = new Date(b.startTime!).getTime() + b.totalTime! * 60000;
             return endA - endB;
         })
-        .slice(0, 3);
 
     if (inProgressMachines.length === 0) {
         return (
             <UpNextContainer>
-                <Header>Machines Up Next</Header>
+                <h2>Machines Up Next</h2>
                 <p>All machines are available</p>
             </UpNextContainer>
         );
@@ -52,7 +46,7 @@ const UpNext: React.FC = () => {
 
     return (
         <UpNextContainer>
-            <Header>Machines Up Next</Header>
+            <h2>Machines Up Next</h2>
             {inProgressMachines.map((machine, index) => (
                 <MachineItem key={index}>
                     <StatusText>{index + 1}. {machine.name} : being used by {machine.user ? machine.user : 'N/A'}<br/></StatusText>

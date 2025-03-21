@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Card, MachineName, Progress, ProgressBar, StatusText } from './StatusComponents';
+import { Card, MachineName, StatusText } from './StatusComponents';
 import { useSelectedMachine } from './SelectedMachineContext';
 import { Status } from './generateMockStatusData';
 
@@ -15,8 +15,7 @@ const getProgress = (startTime: string | undefined, totalTime: number | undefine
     const start = new Date(startTime);
     const end = new Date(start.getTime() + totalTime * 60000);
     const now = new Date();
-    const progress = ((now.getTime() - start.getTime()) / (end.getTime() - start.getTime())) * 100;
-    return Math.min(Math.max(progress, 0), 100);
+    return Math.random() * 100;
 }
 
 export interface MachineProps {
@@ -38,7 +37,7 @@ export interface MachineCardProps extends MachineProps {
     onClear?: () => void;
 }
 
-const statusToString = (status: Status): string => {
+export const statusToString = (status: Status): string => {
     switch (status) {
         case Status.Idle:
             return 'Idle';
@@ -63,6 +62,8 @@ const StyledButton = styled.button`
     text-align: center;
     cursor: pointer; 
     transition: background-color 0.2s ease;
+    z-index: 10;
+    position: relative;
     &:hover {
         background-color:rgb(186, 7, 7);
     }
@@ -77,11 +78,19 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $clear, $minimized, 
         setSelectedMachine({ name, icon, user, material, weight, startTime, totalTime, status });
     };
 
-    const handleClearClick = () => {
-        if (onClear) {
-            onClear();
+const handleClearClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        if (status === Status.Failed) {
+            machine.status = Status.Idle; 
+            machine.user = undefined;
+            machine.material = undefined;   
+            machine.weight = undefined;
+            machine.startTime = undefined;
+            machine.totalTime = undefined;
+            setSelectedMachine({ name, icon, user, material, weight, startTime, totalTime, status });
         }
     };
+    
 
     return (
         <Card 
@@ -97,9 +106,10 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $clear, $minimized, 
                 {!$minimized && <StatusText $minimized={$minimized}>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>}
                 {!$minimized && <StatusText $minimized={$minimized}>Start Time: {startTime} </StatusText>}
                 {!$minimized && <StatusText $minimized={$minimized}>Total Time: {totalTime} </StatusText>}
+                {!$minimized && <StatusText $minimized={$minimized}>Progress: {Math.round(getProgress(startTime, totalTime) * 100) / 100} % </StatusText>}
                 <StatusText $area="date" $minimized={$minimized}>Est. Completion<br /> {startTime && totalTime ? getEndTime(startTime, totalTime) : 'N/A'}</StatusText>
                 {!$minimized && <StatusText $minimized={$minimized}>Status: {statusToString(status)}</StatusText>}
-            {$highlightFailed && status === Status.Failed && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
+                {$highlightFailed && status === Status.Failed && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
         </Card>
     );
 }

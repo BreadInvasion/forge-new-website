@@ -7,18 +7,20 @@ const mobileBreakpoint = "850px";
 /******************************* Prusa Shelf ******************************** */
 
 
-export const Prusas = styled.div`
+export const GridContainer = styled.div`
     grid-area: status;
     display: flex;
+    gap: 1rem;
     flex-wrap: wrap;
     justify-content: center;
     column-gap: 10px;
+    
 `;
 
 export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highlightFailed?: boolean, progress: number }>`
     background-color: #f5f5f5;
     border-radius: 5px;
-    padding: 3px;
+    padding: 5px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

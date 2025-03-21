@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { ExclamationTriangleIcon, Component1Icon } from '@radix-ui/react-icons';
-import { Prusas} from './StatusComponents';
-import { machines, otherMachines } from './generateMockStatusData';
+import { GridContainer } from './StatusComponents';
+import { machines } from './generateMockStatusData';
 import { SelectedMachineProvider } from './SelectedMachineContext';
-import MachineCard from './MachineCard';
+import MachineCard, { statusToString} from './MachineCard';
 import UpNext from './components/UpNext';
 import Highlight from './components/Highlight';
 import Toolbar from './components/Toolbar';
@@ -13,7 +12,6 @@ const Page = styled.div`
     height: 100%;
     display: grid;
     grid-template-columns: 3fr 1fr;
-    grid-template-rows: auto 4fr 1fr 1fr;
     grid-template-areas:
         "tools highlight"
         "status highlight"
@@ -23,9 +21,11 @@ const Page = styled.div`
 `;
 
 const Sidebar = styled.div`
+    grid-area: highlight; //
     display: flex;
-    flex-direction: column;
+    flex-direction: column; 
     padding-right: 2rem;
+   
 `;
 
 /*
@@ -46,13 +46,30 @@ const getProgress = (startTime: string | undefined, totalTime: number | undefine
 
 export default function Status() {
     const [highlightFailed, setHighlightFailed] = useState(false);
+    const [activeFilters, setActiveFilters] = useState<string[]>([]);
     
+    const filteredMachines = machines.filter((machine) => {
+        if (activeFilters.length === 0) return true;
+
+        return activeFilters.some((filter) => {
+            return (
+                filter === machine.name || // Match machine name
+                filter === statusToString(machine.status) // Match machine status
+            );
+        });
+    });
+
     return (
         <SelectedMachineProvider>
             <Page>
-                <Toolbar highlightFailed={highlightFailed} setHighlightFailed={setHighlightFailed} />
-                    <Prusas>
-                    {machines.map((machine, index) => (
+                <Toolbar 
+                    highlightFailed={highlightFailed} 
+                    setHighlightFailed={setHighlightFailed} 
+                    activeFilters={activeFilters}
+                    setActiveFilters={setActiveFilters}
+                />
+                   <GridContainer>
+                   {filteredMachines.map((machine, index) => (
                         <MachineCard
                             key={`${machine.name}-${index}`}
                             name={machine.name}
@@ -66,10 +83,9 @@ export default function Status() {
                             machine={machine}
                             $highlightFailed={highlightFailed}
                             $minimized={true}
-                            $clear={false}
                             />
                     ))}
-                    </Prusas>
+                    </GridContainer>
                     <Sidebar>
                         <Highlight />
                         <UpNext />
