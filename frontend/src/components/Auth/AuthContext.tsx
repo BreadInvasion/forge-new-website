@@ -121,8 +121,9 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         if (!tokenExp) return;
 
         const timeLeft = Number(tokenExp) * 1000 - Date.now();
-        
-        if (timeLeft < LOGOUT_TIME_WARNING * 60 * 1000) {
+
+        // if token is over a minute old, refresh
+        if (timeLeft < (LOGOUT_TIME_LIMIT - 1) * 60 * 1000) {
             await refreshToken();
         }
 
