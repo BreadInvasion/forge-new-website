@@ -32,7 +32,6 @@ class MachineUsageRequest(BaseRequest):
     # Map resource slot id to resource usage quantity details
     resource_usages: dict[UUID4, ResourceUsage]
     duration_seconds: int
-
     as_org_id: Optional[UUID4]
 
 class UserCreateRequest(BaseRequest):
@@ -156,14 +155,14 @@ class MachineTypeEditRequest(BaseRequest):
 
 class MachineCreateRequest(BaseRequest):
     name: str
-    group_id: OptionalUUID
+    group_id: Optional[UUID4]
     type_id: UUID4
 
 
 class MachineEditRequest(BaseRequest):
     name: str
     type_id: UUID4
-    group_id: OptionalUUID
+    group_id: Optional[UUID4]
     maintenance_mode: bool
     disabled: bool
 

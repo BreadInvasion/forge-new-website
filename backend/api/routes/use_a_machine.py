@@ -171,7 +171,7 @@ async def use_a_machine(
     total_cost += round(
         Decimal(request.duration_seconds / 3600) * (machine.type.cost_per_hour), 2
     )
-
+    
     for resource_slot_id, usage_info in request.resource_usages.items():
         resource_slot = next(
             resource_slot
@@ -210,10 +210,7 @@ async def use_a_machine(
         )
 
         if not usage_info.is_own_material:
-            print("DEBUG LINE 2: ", usage_info.amount, resource_used.cost)
             total_cost += usage_info.amount * resource_used.cost
-
-    print("DEBUG LINE 3: ", total_cost)
 
     machine_usage = MachineUsage(
         machine=machine,
