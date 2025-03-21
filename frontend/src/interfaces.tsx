@@ -86,8 +86,8 @@ export interface MachineUsage extends Record<string, any> {
 export interface Resource extends Record<string, any> {
     id: string;
     name: string;
-    resource_slots: number;
-    count: number;
-    resource_slot_ids: string[];
-    resource_types: string[];
+    brand?: string;
+    color?: string;
+    units: string;
+    cost: string;
 };
