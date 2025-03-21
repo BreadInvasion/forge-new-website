@@ -57,9 +57,13 @@ export const FailAMachineForm: React.FC = () => {
         const temp = selectedMachineId;
         try {
             const response = await OmniAPI.fail(temp);
-            console.log("Response:", response);
+            if (response != null) {
+                console.log("Response:", response);
+                alert("An error occurred, please try again.");
+            }
         } catch (error) {
             console.error("Error:", error);
+            alert("An error occurred, please try again.");
         }
         
         // Clear form
