@@ -60,6 +60,7 @@ class MachineStatus(BaseResponse):
     in_use: bool
     usage_start: Optional[datetime] = None
     usage_duration: Optional[int] = None
+    user_id: Optional[UUID4] = None
     maintenance_mode: bool
     disabled: bool
     failed: bool
@@ -165,10 +166,13 @@ class MachineUsageSchema(BaseResponse):
     maintenance_mode: bool
 
 class UsageResponse(BaseResponse):
+    id: UUID4
     semester: str | None
     time_started: datetime
+    duration: int
     machine_name: str
     cost: Decimal
+    user_id: UUID4 | None
 
 
 class MachineInfo(BaseModel):

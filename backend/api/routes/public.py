@@ -57,6 +57,11 @@ async def get_machines_status(
                         if machine.active_usage
                         else None
                     ),
+                    "user_id": (
+                        machine.active_usage.user_id
+                        if machine.active_usage
+                        else None
+                    ),
                     **machine.__dict__,
                 }
             )
