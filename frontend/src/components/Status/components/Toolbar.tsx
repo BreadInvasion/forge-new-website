@@ -48,7 +48,7 @@ const ActiveFilters = styled.div`
 `;
 
 const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, activeFilters, setActiveFilters}) => {
-    
+
     const filters = [
         {
             name: "Machine Type",

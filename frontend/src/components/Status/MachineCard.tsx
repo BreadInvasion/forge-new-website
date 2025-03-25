@@ -34,7 +34,6 @@ export interface MachineCardProps extends MachineProps {
     $highlightFailed: boolean;
     $minimized: boolean;
     $clear: boolean;
-    onClear?: () => void;
 }
 
 export const statusToString = (status: Status): string => {
@@ -69,7 +68,7 @@ const StyledButton = styled.button`
     }
 `;
 
-const MachineCard: React.FC<MachineCardProps> = ({ machine, $clear, $minimized, $highlightFailed, onClear }) => {
+const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlightFailed}) => {
     const { name, icon, user, material, weight, startTime, totalTime, status } = machine;
 
     const {setSelectedMachine } = useSelectedMachine();
