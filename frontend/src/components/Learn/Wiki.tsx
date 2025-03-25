@@ -4,39 +4,37 @@ import classNames from "classnames";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import "./styles.css";
 
-const AccordionTrigger = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentPropsWithoutRef<typeof Accordion.Trigger>
->(({ children, className, ...props }, forwardedRef) => (
-  <Accordion.Header className="AccordionHeader">
-    <Accordion.Trigger
-      className={classNames("AccordionTrigger", className)}
-      {...props}
-      ref={forwardedRef}
-    >
-      {children}
-      <ChevronDownIcon className="AccordionChevron" aria-hidden />
-    </Accordion.Trigger>
-  </Accordion.Header>
-));
-AccordionTrigger.displayName = "AccordionTrigger";
+type AccordionTriggerProps = React.ComponentPropsWithRef<typeof Accordion.Trigger>;
 
-const AccordionContent = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof Accordion.Content>
->(({ children, className, ...props }, forwardedRef) => (
-  <Accordion.Content
-    className={classNames("AccordionContent", className)}
-    {...props}
-    ref={forwardedRef}
-  >
-    <div className="AccordionContentText">{children}</div>
-  </Accordion.Content>
-));
-AccordionContent.displayName = "AccordionContent";
+const AccordionTrigger: React.FC<AccordionTriggerProps> = ({ children, className, ...props }) => {
+  return (
+    <Accordion.Header className="AccordionHeader">
+      <Accordion.Trigger
+        className={classNames("AccordionTrigger", className)}
+        {...props}
+      >
+        {children}
+        <ChevronDownIcon className="AccordionChevron" aria-hidden />
+      </Accordion.Trigger>
+    </Accordion.Header>
+  );
+};
+
+type AccordionContentProps = React.ComponentPropsWithRef<typeof Accordion.Content>;
+
+const AccordionContent: React.FC<AccordionContentProps> = ({ children, className, ...props }) => {
+  return (
+    <Accordion.Content
+      className={classNames("AccordionContent", className)}
+      {...props}
+    >
+      <div className="AccordionContentText">{children}</div>
+    </Accordion.Content>
+  );
+};
 
 const AccordionDemo: React.FC = () => (
-  <div className = "wiki" style={{ display: "flex", justifyContent: "center" }}>
+  <div className="wiki" style={{ display: "flex", justifyContent: "center" }}>
     <div style={{ 
       height: "100%", 
       overflowY: "auto", 
