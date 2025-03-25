@@ -32,12 +32,10 @@ async def get_my_usages(
     """Fetch machine usage records for current user."""
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
-        "id": MachineUsage.id,
         "time_started": MachineUsage.time_started,
         "duration": MachineUsage.duration_seconds,
         "cost": MachineUsage.cost,
         "name": Machine.name,
-        "user_id": MachineUsage.user_id,
     }
     order_determinant = attr_key_map[order_by]
     if descending:
