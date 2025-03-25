@@ -172,13 +172,13 @@ const DisplayObject = ({ id, name, semester_cost }: DisplayObjectProps) => {
     const displayStyle = {
         flex: '1',
         padding: '10px',
-        minWidth: '150px'
+        minWidth: '150px',
     } as React.CSSProperties;
 
     return (
         <div className='mf-display mf-component' style={displayStyle}>
-            <h3>{name}</h3>
-            <h2>${semester_cost}</h2>
+            <h4>{name}</h4>
+            <h3>${semester_cost}</h3>
         </div>
     );
 }
@@ -289,13 +289,13 @@ const SingleObject = ({ id, name, value }: SingleObjectProps) => {
 
     return (
         <div className='mf-single mf-component' style={singleStyle}>
-            <h3 style={{ textAlign: 'left' }}>{name}</h3>
+            <h4 style={{ textAlign: 'left' }}>{name}</h4>
             {value ? (
                 <>
-                    <h2>{value.machine_name}</h2>
+                    <h3>{value.machine_name}</h3>
                     <div style={infoStyle}>
-                        <h4>{value.time_started.toString()}</h4>
-                        <h4>{Number(value.duration)/60} minutes</h4>
+                        <h4>{new Date(value.time_started).toLocaleDateString()}</h4>
+                        <h4>{Math.ceil(Number(value.duration)/60)} minutes</h4>
                     </div>
                 </>
             ) : (
