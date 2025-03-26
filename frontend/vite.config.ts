@@ -33,7 +33,8 @@ export default defineConfig({
                 changeOrigin: false,
                 rewrite: (path) => path.replace(/^\/api/, ''),
               },
-        }
+        },
+        allowedHosts: ["frontend"]
     },
     esbuild: {
         target: 'esnext',
