@@ -57,7 +57,7 @@ export const Status : React.FC = () => {
     useEffect(() => {
             const fetchMachines = async () => {
                 try {
-                    const response = await OmniAPI.getAll("machinestatus");
+                    const response = await OmniAPI.getPublic("machinestatus");
                     console.log(response);
     
                     const data: AllMachinesStatusResponse = response;
