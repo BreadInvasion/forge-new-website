@@ -2,54 +2,41 @@ import React from 'react';
 import styled from 'styled-components';
 import { Card, MachineName, StatusText } from './StatusComponents';
 import { useSelectedMachine } from './SelectedMachineContext';
-import { Status } from './generateMockStatusData';
 
-export const getEndTime = (startTime: string, totalTime: number) => {
-    const start = new Date(startTime);
-    const end = new Date(start.getTime() + totalTime * 60000);
+export const getEndTime = (usage_start: string, usage_duration: number) => {
+    const start = new Date(usage_start);
+    const end = new Date(start.getTime() + usage_duration * 60000);
     return end.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
 }
 
-const getProgress = (startTime: string | undefined, totalTime: number | undefined) => {
-    if (!startTime || !totalTime) return 0;
-    const start = new Date(startTime);
-    const end = new Date(start.getTime() + totalTime * 60000);
+const getProgress = (usage_start: string | undefined, usage_duration: number | undefined) => {
+    if (!usage_start || !usage_duration) return 0;
+    const start = new Date(usage_start);
+    const end = new Date(start.getTime() + usage_duration * 60000);
     const now = new Date();
     return Math.random() * 100;
 }
 
 export interface MachineProps {
-    name: string;
-    icon?: string;
-    user?: string;
-    material: string | undefined;
-    weight?: number;
-    startTime?: string;
-    totalTime?: number;
-    status: Status;
+    id: string;     //id
+    name: string;   //machine name
+    in_use: boolean;    //status
+    usage_start?: string;   //start time
+    usage_duration?: number; //total time
+    user?: string; //user -> need to get from id
+    maintenance_mode: boolean; //status
+    disabled: boolean;  //status
+    failed: boolean;    //status
+    failed_at?: string; //failed time
+    material?: string;  //material -> need to get from id
+    weight?: number;   //weight -> need to get from id
 }
 
 export interface MachineCardProps extends MachineProps {
     machine: MachineProps;
     $highlightFailed: boolean;
     $minimized: boolean;
-    $clear: boolean;
 }
-
-export const statusToString = (status: Status): string => {
-    switch (status) {
-        case Status.Idle:
-            return 'Idle';
-        case Status.InProgress:
-            return 'In Progress';
-        case Status.Failed:
-            return 'Failed';
-        case Status.Maintenance:
-            return 'Maintenance';
-        default:
-            return 'Unknown';
-    }
-};
 
 const StyledButton = styled.button`
     background-color:rgb(228, 23, 19); 
@@ -68,47 +55,48 @@ const StyledButton = styled.button`
     }
 `;
 
+
 const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlightFailed}) => {
-    const { name, icon, user, material, weight, startTime, totalTime, status } = machine;
+    const { id, name, user, material, weight, usage_start, usage_duration, failed } = machine;
 
     const {setSelectedMachine } = useSelectedMachine();
 
     const handleClick = () => {
-        setSelectedMachine({ name, icon, user, material, weight, startTime, totalTime, status });
+        setSelectedMachine({ name, user, material, weight, usage_start, usage_duration, failed });
     };
 
-const handleClearClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleClearClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
-        if (status === Status.Failed) {
-            machine.status = Status.Idle; 
+        if (failed) {
+            machine.failed = false; 
             machine.user = undefined;
             machine.material = undefined;   
             machine.weight = undefined;
-            machine.startTime = undefined;
-            machine.totalTime = undefined;
-            setSelectedMachine({ name, icon, user, material, weight, startTime, totalTime, status });
+            machine.usage_start = undefined;
+            machine.usage_duration= undefined;
+            setSelectedMachine({ name, user, material, weight, usage_start, usage_duration, failed });
         }
     };
     
 
     return (
         <Card 
-            $symbol={icon ? icon : name} 
+            $symbol={name} 
             $minimized={$minimized} 
-            $highlightFailed={$highlightFailed && status === Status.Failed}
-            progress={$minimized ? getProgress(startTime, totalTime) : 0}
+            $highlightFailed={$highlightFailed && failed}
+            progress={$minimized ? getProgress(usage_start, usage_duration) : 0}
             onClick={handleClick}
         >
                 <MachineName>{name}</MachineName>
                 <StatusText>User: {user ? user : 'N/A'}</StatusText>
                 {!$minimized && <StatusText $minimized={$minimized}>Material: {material}</StatusText>}
                 {!$minimized && <StatusText $minimized={$minimized}>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>}
-                {!$minimized && <StatusText $minimized={$minimized}>Start Time: {startTime} </StatusText>}
-                {!$minimized && <StatusText $minimized={$minimized}>Total Time: {totalTime} </StatusText>}
-                {!$minimized && <StatusText $minimized={$minimized}>Progress: {Math.round(getProgress(startTime, totalTime) * 100) / 100} % </StatusText>}
-                <StatusText $area="date" $minimized={$minimized}>Est. Completion<br /> {startTime && totalTime ? getEndTime(startTime, totalTime) : 'N/A'}</StatusText>
-                {!$minimized && <StatusText $minimized={$minimized}>Status: {statusToString(status)}</StatusText>}
-                {$highlightFailed && status === Status.Failed && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
+                {!$minimized && <StatusText $minimized={$minimized}>Start Time: {usage_start} </StatusText>}
+                {!$minimized && <StatusText $minimized={$minimized}>Total Time: {usage_duration} </StatusText>}
+                {!$minimized && <StatusText $minimized={$minimized}>Progress: {Math.round(getProgress(usage_start, usage_duration) * 100) / 100} % </StatusText>}
+                <StatusText $area="date" $minimized={$minimized}>Est. Completion<br /> {usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</StatusText>
+                {!$minimized && <StatusText $minimized={$minimized}>Status: {failed}</StatusText>}
+                {$highlightFailed && failed && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
         </Card>
     );
 }
