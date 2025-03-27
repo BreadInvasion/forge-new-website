@@ -25,17 +25,20 @@ async def get_machines_status(
     machines = (
         await session.scalars(
             select(Machine)
-            .options(selectinload(Machine.active_usage))
             .options(selectinload(Machine.group))
+            .options(selectinload(Machine.active_usage))
             .options(selectinload(Machine.type))
         )
     ).all()
+
+    machines.sort(key=lambda x: x.group_id if x.group_id is not None else "")
 
     group_dict = groupby(machines, key=lambda x: x.group_id)
     group_list = []
     loner_list = []
     for _, group in group_dict:
         machines = list(group)
+        machines.sort(key=lambda machine: machine.name)
 
         machine_statuses = [
             MachineStatus.model_validate(
