@@ -1,11 +1,7 @@
 FROM python:3.12.0-slim-bullseye
 
 ENV PYTHONUNBUFFERED 1
-WORKDIR /build
-
-# Create venv, add it to path and install requirements
-RUN python -m venv /venv
-ENV PATH="/venv/bin:$PATH"
+WORKDIR /botdir
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
@@ -18,5 +14,5 @@ COPY bot.py .
 RUN addgroup --gid 1001 --system bot && \
     adduser --gid 1001 --shell /bin/false --disabled-password --uid 1001 bot
 
-RUN chown -R bot:bot /build
+RUN chown -R bot:bot /botdir
 CMD ["python3", "bot.py"]
