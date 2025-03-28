@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from models.machine import Machine
+from models.machine_usage import MachineUsage
 from schemas.responses import (
     AllMachinesStatusResponse,
     MachineInfo,
@@ -25,8 +26,8 @@ async def get_machines_status(
     machines = (
         await session.scalars(
             select(Machine)
+            .options(selectinload(Machine.active_usage).selectinload(MachineUsage.user))
             .options(selectinload(Machine.group))
-            .options(selectinload(Machine.active_usage))
             .options(selectinload(Machine.type))
         )
     ).all()
@@ -60,6 +61,11 @@ async def get_machines_status(
                     "usage_duration": (
                         machine.active_usage.duration_seconds
                         if machine.active_usage
+                        else None
+                    ),
+                    "user_name": (
+                        f"{machine.active_usage.user.first_name} {machine.active_usage.user.last_name[0]}."
+                        if machine.active_usage and machine.active_usage.user
                         else None
                     ),
                     **machine.__dict__,
