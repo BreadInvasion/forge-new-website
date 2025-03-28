@@ -31,12 +31,14 @@ async def get_machines_status(
         )
     ).all()
 
-    machines.sort(key=lambda x: x.group_id if x.group_id is not None else "")
+    group_dict = {}
+    for machine in machines:
+        key = machine.group_id if machine.group_id is not None else ""
+        group_dict.setdefault(key, []).append(machine)
 
-    group_dict = groupby(machines, key=lambda x: x.group_id)
     group_list = []
     loner_list = []
-    for _, group in group_dict:
+    for _, group in group_dict.items():
         machines = list(group)
         machines.sort(key=lambda machine: machine.name)
 
