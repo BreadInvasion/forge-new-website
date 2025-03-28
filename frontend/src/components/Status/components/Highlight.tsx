@@ -31,18 +31,21 @@ const Highlight: React.FC = () => {
         <HighlightCard>
             <h2>Highlighted Card: </h2>
             <MachineCard
+                id={selectedMachine.id}
                 name={selectedMachine.name}
-                icon={selectedMachine.icon}
-                status={selectedMachine.status}
+                in_use={selectedMachine.in_use}
+                usage_start={selectedMachine.usage_start}
+                usage_duration={selectedMachine.usage_duration}
                 user={selectedMachine.user}
-                startTime={selectedMachine.startTime}
-                totalTime={selectedMachine.totalTime}
+                maintenance_mode={selectedMachine.maintenance_mode}
+                disabled={selectedMachine.disabled}
+                failed={selectedMachine.failed}
+                failed_at={selectedMachine.failed_at}
                 weight={selectedMachine.weight}
                 material={selectedMachine.material}
                 machine={selectedMachine}
                 $highlightFailed={false}
                 $minimized={false}
-                $clear={false}
             />
         </HighlightCard>
     );

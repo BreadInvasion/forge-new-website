@@ -50,8 +50,8 @@ const UpNext: React.FC = () => {
     const inProgressMachines = machines
     .filter((machine) => machine.in_use)
     .sort((a, b) => {
-            const endA = new Date(a.startTime!).getTime() + a.totalTime! * 60000;
-            const endB = new Date(b.startTime!).getTime() + b.totalTime! * 60000;
+            const endA = new Date(a.usage_start!).getTime() + a.usage_duration! * 60000;
+            const endB = new Date(b.usage_start!).getTime() + b.usage_duration! * 60000;
             return endA - endB;
         })
 
@@ -70,7 +70,7 @@ const UpNext: React.FC = () => {
             {inProgressMachines.map((machine, index) => (
                 <MachineItem key={index}>
                     <StatusText>{index + 1}. {machine.name} : being used by {machine.user ? machine.user : 'N/A'}<br/></StatusText>
-                    <EstCompletion $area="date">Est. Completion: {getEndTime(machine.startTime!, machine.totalTime!)}</EstCompletion>
+                    <EstCompletion $area="date">Est. Completion: {getEndTime(machine.usage_start!, machine.usage_duration!)}</EstCompletion>
                 </MachineItem>
             ))}
         </UpNextContainer>

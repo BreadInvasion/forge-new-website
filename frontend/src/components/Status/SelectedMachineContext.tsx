@@ -1,13 +1,18 @@
 import React, { createContext, useContext, useState } from 'react';
 
 interface MachineDetails {
+    id: string;
     name: string;
-    user: string | undefined;
-    material: string | undefined;
-    weight: number | undefined;
+    in_use: boolean | undefined;
     usage_start: string | undefined;
     usage_duration: number | undefined;
-    failed: boolean | undefined ;
+    user: string | undefined;
+    maintenance_mode: boolean | undefined;
+    disabled: boolean | undefined;
+    failed: boolean | undefined;
+    failed_at: string | undefined;
+    material: string | undefined;
+    weight: number | undefined;
 }
 
 interface SelectedMachineContextProps {

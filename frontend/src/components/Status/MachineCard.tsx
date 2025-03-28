@@ -14,7 +14,7 @@ const getProgress = (usage_start: string | undefined, usage_duration: number | u
     const start = new Date(usage_start);
     const end = new Date(start.getTime() + usage_duration * 60000);
     const now = new Date();
-    return Math.random() * 100;
+    return Math.min(1, Math.max(0, (now.getTime() - start.getTime()) / (end.getTime() - start.getTime())));
 }
 
 export interface MachineProps {
@@ -24,8 +24,8 @@ export interface MachineProps {
     usage_start?: string;   //start time
     usage_duration?: number; //total time
     user?: string; //user -> need to get from id
-    maintenance_mode: boolean; //status
-    disabled: boolean;  //status
+    maintenance_mode?: boolean; //status
+    disabled?: boolean;  //status
     failed?: boolean;    //status
     failed_at?: string; //failed time
     material?: string;  //material -> need to get from id
@@ -57,12 +57,12 @@ const StyledButton = styled.button`
 
 
 const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlightFailed}) => {
-    const { name, user, material, weight, usage_start, usage_duration, failed } = machine;
+    const {id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material} = machine;
 
     const {setSelectedMachine } = useSelectedMachine();
 
     const handleClick = () => {
-        setSelectedMachine({ name, user, material, weight, usage_start, usage_duration, failed});
+        setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material});
     };
 
     const handleClearClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -74,7 +74,7 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
             machine.weight = undefined;
             machine.usage_start = undefined;
             machine.usage_duration= undefined;
-            setSelectedMachine({ name, user, material, weight, usage_start, usage_duration, failed });
+            setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material});
         }
     };
     
