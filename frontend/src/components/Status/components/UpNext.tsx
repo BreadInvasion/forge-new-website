@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getEndTime, MachineProps } from '../MachineCard';
-import { machines } from '../generateMockStatusData';
+import { getEndTime} from '../MachineCard';
+import { OmniAPI } from 'src/apis/OmniAPI';
+import { MachineStatus } from 'src/interfaces';
 import { StatusText } from '../StatusComponents';
-import { Status } from '../generateMockStatusData';
 
 const UpNextContainer = styled.div`
     padding: 1rem;
@@ -27,9 +27,29 @@ const EstCompletion = styled(StatusText)`
 `;
 
 const UpNext: React.FC = () => {
+    const [machines, setMachines] = useState<MachineStatus[]>([]);
+    
+    useEffect(() => {
+            const fetchMachines = async () => {
+                try {
+                    const response = await OmniAPI.getPublic("machinestatus");
+
+                    const flattenedMachines = [
+                        ...response.loners,
+                        ...response.groups.flatMap((group: { machines: MachineStatus[] }) => group.machines),
+                    ];
+                    setMachines(flattenedMachines);
+                } catch (error) {
+                    console.error('Error fetching machines:', error);
+                }
+            };
+    
+            fetchMachines();
+        }, []);
+
     const inProgressMachines = machines
-        .filter(machine => machine.status === Status.InProgress)
-        .sort((a, b) => {
+    .filter((machine) => machine.in_use)
+    .sort((a, b) => {
             const endA = new Date(a.startTime!).getTime() + a.totalTime! * 60000;
             const endB = new Date(b.startTime!).getTime() + b.totalTime! * 60000;
             return endA - endB;

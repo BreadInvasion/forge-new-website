@@ -3,10 +3,10 @@ import { OmniAPI } from "src/apis/OmniAPI";
 import styled from 'styled-components';
 import { GridContainer } from './StatusComponents';
 import { SelectedMachineProvider } from './SelectedMachineContext';
-import MachineCard from './MachineCard';
 import UpNext from './components/UpNext';
 import Highlight from './components/Highlight';
 import Toolbar from './components/Toolbar';
+import MachineCard from './MachineCard';
 import { Machine, AllMachinesStatusResponse } from "src/interfaces";
 
 const Page = styled.div`
@@ -30,8 +30,26 @@ const Sidebar = styled.div`
    
 `;
 
+/*
+const getEndTime = (startTime: string, totalTime: number) => {
+    const start = new Date(startTime);
+    const end = new Date(start.getTime() + totalTime * 60000);
+    return end.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
+}
+
+const getProgress = (startTime: string | undefined, totalTime: number | undefined) => {
+    if (!startTime || !totalTime) return 0;
+    const start = new Date(startTime);
+    const end = new Date(start.getTime() + totalTime * 60000);
+    const now = new Date();
+    return 75;
+}
+*/
+
 export const Status : React.FC = () => {
+    const [MachinesResponse, setAllMachinesResponse] = useState<AllMachinesStatusResponse | null>(null);
     const [machines, setMachines] = useState<Machine[]>([]);
+    
     const [highlightFailed, setHighlightFailed] = useState(false);
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     
@@ -42,6 +60,7 @@ export const Status : React.FC = () => {
                     console.log(response);
     
                     const data: AllMachinesStatusResponse = response;
+                    setAllMachinesResponse(data);
                     
                     const flattenedMachines = [
                         ...data.loners,
@@ -68,18 +87,16 @@ export const Status : React.FC = () => {
         }, []);
 
 
-
     const filteredMachines = machines.filter((machine) => {
         if (activeFilters.length === 0) return true;
 
         return activeFilters.some((filter) => {
             return (
                 filter === machine.name || // Match machine name
-                filter === machine.failed // Match machine status
+                filter === machine.status // Match machine status
             );
         });
     });
-   
 
     return (
         <SelectedMachineProvider>
@@ -93,24 +110,24 @@ export const Status : React.FC = () => {
                    <GridContainer>
                    {filteredMachines.map((machine, index) => (
                         <MachineCard
-                            key={`${machine.name}-${index}`} 
-                            id={machine.id}//mchines id 
+                            key={`${machine.name}-${index}`} //mchines id 
+                            id={machine.id}
                             name={machine.name}
-                            in_use={machine.in_use} // in use or not
+                            in_use={machine.in_use}
+                            usage_start={machine.startTime} 
+                            usage_duration={machine.totalTime} 
                             user={machine.user} //
-                            material={machine.material} // 
-                            weight={machine.weight}
-                            usage_start={machine.usage_start} 
-                            usage_duration={machine.usage_duration} 
+                            maintenance_mode={machine.maintenance_mode} // in use and maintenance mode (disabled?)
+                            disabled={machine.disabled} // in use and disabled (disabled?)
                             failed={machine.failed}// in use and failed (disabled?)
                             failed_at={machine.failed_at} //
-                            maintenance_mode={machine.maintenance_mode} //
-                            disabled={machine.disabled} // disabled or not
-                            
+                            material={machine.material} // 
+                            weight={machine.weight}
+                            machine={machine} 
                             $highlightFailed={highlightFailed}
                             $minimized={true}
                             />
-                    ))}
+                    ))} 
                     </GridContainer>
                     <Sidebar>
                         <Highlight />

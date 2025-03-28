@@ -1,16 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const getEndTime = (startTime: string, totalTime: number) => {
-    const start = new Date(startTime);
-    const end = new Date(start.getTime() + totalTime * 60000);
+const getEndTime = (usage_start: string, usage_duration: number) => {
+    const start = new Date(usage_start);
+    const end = new Date(start.getTime() + usage_duration * 60000);
     return end.toLocaleString('en-US', {month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true});
 }
 
-const getProgress = (startTime: string | undefined, totalTime: number | undefined) => {
-    if (!startTime || !totalTime) return 0;
-    const start = new Date(startTime);
-    const end = new Date(start.getTime() + totalTime * 60000);
+const getProgress = (usage_start: string | undefined, usage_duration: number | undefined) => {
+    if (!usage_start || !usage_duration) return 0;
+    const start = new Date(usage_start);
+    const end = new Date(start.getTime() + usage_duration * 60000);
     const now = new Date();
     return Math.random() * 100;
 }
@@ -19,8 +19,8 @@ export interface MachineProps {
     name: string;
     icon?: string;
     user: string | undefined;
-    startTime: string | undefined;
-    totalTime: number | undefined;
+    usage_start: string | undefined;
+    usage_duration: number | undefined;
 }
 
 const Card = styled.div<{symbol: string, progress: number}>`
@@ -78,11 +78,11 @@ const StatusText = styled.p`
 
 const CondensedCard = (props: MachineProps) => {
 
-    const { name, icon, user, startTime, totalTime } = props;
+    const { name, user, usage_start, usage_duration } = props;
 
     return (
 
-    <Card symbol={icon ? icon : name} progress={getProgress(startTime, totalTime)}>
+    <Card symbol={name} progress={getProgress(usage_start, usage_duration)}>
         <MachineName>{name}</MachineName>
         {user && <StatusText>User: <br/>{user}</StatusText>}
         {!user && <StatusText>Available</StatusText>}

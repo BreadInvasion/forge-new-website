@@ -20,13 +20,13 @@ const getProgress = (usage_start: string | undefined, usage_duration: number | u
 export interface MachineProps {
     id: string;     //id
     name: string;   //machine name
-    in_use: boolean;    //status
+    in_use?: boolean;    //status
     usage_start?: string;   //start time
     usage_duration?: number; //total time
     user?: string; //user -> need to get from id
     maintenance_mode: boolean; //status
     disabled: boolean;  //status
-    failed: boolean;    //status
+    failed?: boolean;    //status
     failed_at?: string; //failed time
     material?: string;  //material -> need to get from id
     weight?: number;   //weight -> need to get from id
@@ -57,12 +57,12 @@ const StyledButton = styled.button`
 
 
 const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlightFailed}) => {
-    const { id, name, user, material, weight, usage_start, usage_duration, failed } = machine;
+    const { name, user, material, weight, usage_start, usage_duration, failed } = machine;
 
     const {setSelectedMachine } = useSelectedMachine();
 
     const handleClick = () => {
-        setSelectedMachine({ name, user, material, weight, usage_start, usage_duration, failed });
+        setSelectedMachine({ name, user, material, weight, usage_start, usage_duration, failed});
     };
 
     const handleClearClick = (event: React.MouseEvent<HTMLButtonElement>) => {

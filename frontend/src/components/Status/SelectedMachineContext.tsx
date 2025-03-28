@@ -1,15 +1,13 @@
 import React, { createContext, useContext, useState } from 'react';
-import { Status } from './generateMockStatusData';
 
 interface MachineDetails {
     name: string;
-    icon?: string;
     user: string | undefined;
     material: string | undefined;
     weight: number | undefined;
-    startTime: string | undefined;
-    totalTime: number | undefined;
-    status: Status;
+    usage_start: string | undefined;
+    usage_duration: number | undefined;
+    failed: boolean | undefined ;
 }
 
 interface SelectedMachineContextProps {
