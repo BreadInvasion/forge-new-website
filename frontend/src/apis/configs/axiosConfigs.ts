@@ -42,12 +42,13 @@ api.interceptors.request.use(
 );
 
 // defining a custom error handler for all APIs
-const errorHandler = (error: { response: { status: any } }) => {
+const errorHandler = (error: { response: { status: any, data: { detail: any } } }) => {
     const statusCode = error.response?.status
+    const message = error.response?.data?.detail
 
     // logging only errors that are not 401
     if (statusCode && statusCode !== 401) {
-        console.error(error)
+        console.error(`Error ${statusCode}: ${message}`)
     }
 
     return Promise.reject(error)

@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import Annotated, List, Optional
-from pydantic import UUID4, AfterValidator, BaseModel, EmailStr, Field, SecretStr
+from pydantic import UUID4, AfterValidator, BaseModel, EmailStr, Field, SecretStr, BeforeValidator
 
 from .enums import GenderStatsType, Permissions, PronounType, SemesterType
 
@@ -10,9 +10,7 @@ def check_RIN(RIN: str) -> str:
     assert len(RIN) == 9
     return RIN
 
-
 RIN = Annotated[str, AfterValidator(check_RIN)]
-
 
 class BaseRequest(BaseModel):
     # may define additional fields or config shared across requests
@@ -34,9 +32,7 @@ class MachineUsageRequest(BaseRequest):
     # Map resource slot id to resource usage quantity details
     resource_usages: dict[UUID4, ResourceUsage]
     duration_seconds: int
-
     as_org_id: Optional[UUID4]
-
 
 class UserCreateRequest(BaseRequest):
     # RPI Identification Information

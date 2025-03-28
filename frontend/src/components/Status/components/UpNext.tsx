@@ -72,7 +72,6 @@ const UpNext: React.FC = () => {
                     <StatusText>{index + 1}. {machine.name} : being used by {machine.user ? machine.user : 'N/A'}<br/></StatusText>
                     <EstCompletion $area="date">Est. Completion: {getEndTime(machine.usage_start!, machine.usage_duration!)}</EstCompletion>
                 </MachineItem>
-            ))}
         </UpNextContainer>
     );
 };

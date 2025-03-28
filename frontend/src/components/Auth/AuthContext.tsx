@@ -23,6 +23,9 @@ interface AuthContextType {
     logout: () => void;
 }
 
+const LOGOUT_TIME_LIMIT = 5;    // minutes user can stay logged in
+const LOGOUT_TIME_WARNING = 2;  // minutes before loguot when warning will show
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -88,7 +91,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 const result = await response.data;
 
                 const token = result.access_token;
-                const expiration = Math.floor(Date.now() / 1000) + 3 * 60; // 3 minutes from now in seconds
+                const expiration = Math.floor(Date.now() / 1000) + LOGOUT_TIME_LIMIT * 60; 
 
                 setAuth(true);
                 localStorage.setItem('authToken', token);
@@ -113,13 +116,14 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         if (showWarningDialog) return;
 
         setLastActivity(Date.now());
-        console.log("User activity detected.");
 
         const tokenExp = localStorage.getItem("token_expiration");
         if (!tokenExp) return;
 
         const timeLeft = Number(tokenExp) * 1000 - Date.now();
-        if (timeLeft < 2 * 60 * 1000) {
+
+        // if token is over a minute old, refresh
+        if (timeLeft < (LOGOUT_TIME_LIMIT - 1) * 60 * 1000) {
             await refreshToken();
         }
 
@@ -162,7 +166,6 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         if (!isAuthenticated) return;
 
         const intervalId = setInterval(() => {
-            console.log("Checking token expiration...");
             const tokenExp = localStorage.getItem("token_expiration");
             if (!tokenExp) {
                 logout();
@@ -170,22 +173,27 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             }
 
             const timeLeft = Number(tokenExp) * 1000 - Date.now();
-            console.log("Time left (minutes):", timeLeft / 1000 / 60);
             if (timeLeft <= 0) {
                 // token is expired => logout
                 logout();
                 return;
             }
 
-            // If less than 2 minutes remain, show the Radix AlertDialog (once)
-            if (timeLeft < 2 * 60 * 1000 && !warningShown) {
+            // don't warn if there was recent activity
+            if (lastActivity + LOGOUT_TIME_LIMIT * 60 * 1000 < Date.now()) {
+                refreshToken();
+                return;
+            }
+
+            // If less than LOGOUT_TIME_WARNING minutes remain, show the Radix AlertDialog (once)
+            if (timeLeft < LOGOUT_TIME_WARNING * 60 * 1000 && !warningShown) {
                 setWarningShown(true);
                 setShowWarningDialog(true);
 
-                // Start a 2-minute timer to auto-logout if no response
+                // Start a LOGOUT_TIME_WARNING-minute timer to auto-logout if no response
                 const timerId = window.setTimeout(() => {
                     logout();
-                }, 2 * 60 * 1000);
+                }, LOGOUT_TIME_LIMIT * 60 * 1000);
                 setLogoutTimerId(timerId);
             }
         }, 15_000); // check every 15s
@@ -249,8 +257,8 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                             Your session will expire soon
                         </AlertDialog.Title>
                         <AlertDialog.Description className="AlertDialogDescription">
-                            You have less than 2 minutes remaining. Would you like to stay
-                            logged in?
+                            {`You have less than ${LOGOUT_TIME_WARNING} minutes remaining. Would you like to stay
+                            logged in?`}
                         </AlertDialog.Description>
                         <div style={{ display: "flex", gap: 25, justifyContent: "flex-end" }}>
                             {/* 
