@@ -62,3 +62,34 @@ async def get_my_usages(
         )
         for usage in machine_usages
     ]
+
+
+@router.get("/usages/current/me")
+async def get_my_usages(
+    session: DBSession,
+    current_user: Annotated[
+        User, Depends(PermittedUserChecker(set()))
+    ],
+):
+    """Fetch current machine usages for current user."""
+
+    machine_usages = (
+        await session.scalars(
+            select(MachineUsage)
+            .join(MachineUsage.machine)
+            .options(selectinload(MachineUsage.machine))
+            .options(selectinload(MachineUsage.semester))
+            .where(MachineUsage.user_id == current_user.id)
+            .where(Machine.active_usage)
+        )
+    ).all()
+
+    return [
+        UsageResponse(
+            machine_name=usage.machine.name,
+            semester=f"{usage.semester.semester_type} {usage.semester.calendar_year}" if usage.semester else None,
+            time_started=usage.time_started,
+            cost=usage.cost,
+        )
+        for usage in machine_usages
+    ]
