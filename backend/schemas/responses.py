@@ -64,6 +64,7 @@ class MachineStatus(BaseResponse):
     disabled: bool
     failed: bool
     failed_at: Optional[datetime] = None
+    user_name: Optional[str] = None
 
 
 class MachineStatusGroup(BaseResponse):
