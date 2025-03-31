@@ -4,13 +4,13 @@ interface MachineDetails {
     id: string;
     name: string;
     in_use: boolean | undefined;
-    usage_start: string | undefined;
+    usage_start: Date | undefined;
     usage_duration: number | undefined;
     user: string | undefined;
     maintenance_mode: boolean | undefined;
     disabled: boolean | undefined;
     failed: boolean | undefined;
-    failed_at: string | undefined;
+    failed_at: Date | undefined;
     material: string | undefined;
     weight: number | undefined;
 }

@@ -2,16 +2,17 @@ import React from 'react';
 import styled from 'styled-components';
 import { Card, MachineName, StatusText } from './StatusComponents';
 import { useSelectedMachine } from './SelectedMachineContext';
+import Status from './Status';
 
-export const getEndTime = (usage_start: string, usage_duration: number) => {
-    const start = new Date(usage_start);
+export const getEndTime = (usage_start: Date, usage_duration: number) => {
+    const start = typeof usage_start === 'string' ? new Date(usage_start) : usage_start; // Convert to Date if it's a string
     const end = new Date(start.getTime() + usage_duration * 60000);
     return end.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
 }
 
-const getProgress = (usage_start: string | undefined, usage_duration: number | undefined) => {
+const getProgress = (usage_start: Date | undefined, usage_duration: number | undefined) => {
     if (!usage_start || !usage_duration) return 0;
-    const start = new Date(usage_start);
+    const start = typeof usage_start === 'string' ? new Date(usage_start) : usage_start; // Convert to Date if it's a string
     const end = new Date(start.getTime() + usage_duration * 60000);
     const now = new Date();
     return Math.min(1, Math.max(0, (now.getTime() - start.getTime()) / (end.getTime() - start.getTime())));
@@ -21,13 +22,13 @@ export interface MachineProps {
     id: string;     //id
     name: string;   //machine name
     in_use?: boolean;    //status
-    usage_start?: string;   //start time
+    usage_start?: Date;   //start time
     usage_duration?: number; //total time
     user?: string; //user -> need to get from id
     maintenance_mode?: boolean; //status
     disabled?: boolean;  //status
     failed?: boolean;    //status
-    failed_at?: string; //failed time
+    failed_at?: Date; //failed time
     material?: string;  //material -> need to get from id
     weight?: number;   //weight -> need to get from id
 }
@@ -74,10 +75,20 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
             machine.weight = undefined;
             machine.usage_start = undefined;
             machine.usage_duration= undefined;
+            machine.in_use = false;
             setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material});
         }
     };
-    
+
+    const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: boolean, disabled?: boolean) => {
+        const statuses = [];
+        if (in_use) statuses.push("In Use");
+        if (failed) statuses.push("Failed");
+        if (maintenance_mode) statuses.push("Under Maintenance");
+        if (disabled) statuses.push("Disabled");
+        if (!in_use && !failed && !maintenance_mode && !disabled) statuses.push("Available");
+        return statuses.length > 0 ? statuses.join(", ") : "Operational";
+    };
 
     return (
         <Card 
@@ -89,15 +100,17 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
         >
                 <MachineName>{name}</MachineName>
                 <StatusText>User: {user ? user : 'N/A'}</StatusText>
-                {!$minimized && <StatusText $minimized={$minimized}>Material: {material}</StatusText>}
+                {!$minimized && <StatusText $minimized={$minimized}>Material: {material ? material : 'N/A'}</StatusText>}
                 {!$minimized && <StatusText $minimized={$minimized}>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>}
-                {!$minimized && <StatusText $minimized={$minimized}>Start Time: {usage_start} </StatusText>}
-                {!$minimized && <StatusText $minimized={$minimized}>Total Time: {usage_duration} </StatusText>}
-                {!$minimized && <StatusText $minimized={$minimized}>Progress: {Math.round(getProgress(usage_start, usage_duration) * 100) / 100} % </StatusText>}
+                {!$minimized && in_use && <StatusText $minimized={$minimized}>Start Time<br /> {usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })} </StatusText>}
+                {!$minimized && in_use && <StatusText $minimized={$minimized}>Total Time: {usage_duration} </StatusText>}
+                {!$minimized && in_use && <StatusText $minimized={$minimized}>Progress: {Math.round(getProgress(usage_start, usage_duration) * 100) / 100} % </StatusText>}
                 <StatusText $area="date" $minimized={$minimized}>Est. Completion<br /> {usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</StatusText>
-                {!$minimized && <StatusText $minimized={$minimized}>Status: {failed}</StatusText>}
+                {!$minimized && <StatusText $minimized={$minimized}>Status: {getStatusText(in_use, failed, maintenance_mode, disabled)}</StatusText>}
+                {!$minimized && failed && <StatusText $minimized={$minimized}>Failed at: {failed_at?.toDateString()}</StatusText>}
+                {/*if failed, show fail message*/}
                 {$highlightFailed && failed && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
-        </Card>
+       </Card>
     );
 }
 

@@ -19,7 +19,7 @@ export interface MachineProps {
     name: string;
     icon?: string;
     user: string | undefined;
-    usage_start: string | undefined;
+    usage_start: Date | undefined;
     usage_duration: number | undefined;
 }
 

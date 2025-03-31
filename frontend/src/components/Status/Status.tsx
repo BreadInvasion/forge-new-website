@@ -73,6 +73,16 @@ export const Status : React.FC = () => {
                         group_id: machine.group_id || null,
                         type: machine.type || null,
                         type_id: machine.type_id || null,
+                        id: machine.id,
+                        name: machine.name,
+                        in_use: machine.in_use,
+                        usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined, // Convert to Date
+                        usage_duration: machine.usage_duration,
+                        user_id: machine.user_id,
+                        maintenance_mode: machine.maintenance_mode,
+                        disabled: machine.disabled,
+                        failed: machine.failed,
+                        failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined, // Convert to Date
                     }));
     
                     console.log("Machines:", transformedMachines);
@@ -89,12 +99,12 @@ export const Status : React.FC = () => {
 
     const filteredMachines = machines.filter((machine) => {
         if (activeFilters.length === 0) return true;
-
         return activeFilters.some((filter) => {
-            return (
-                filter === machine.name || // Match machine name
-                filter === machine.status // Match machine status
-            );
+            if (filter === "In Progress" && machine.in_use) return true;
+            if (filter === "Available" && !machine.in_use && !machine.failed && !machine.maintenance_mode) return true;
+            if (filter === "Failed" && machine.failed) return true;
+            if (filter === "Maintenance" && machine.maintenance_mode) return true;
+            return false;
         });
     });
 

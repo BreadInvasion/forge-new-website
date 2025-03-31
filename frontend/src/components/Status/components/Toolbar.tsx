@@ -1,5 +1,5 @@
 import { Pencil1Icon, ExclamationTriangleIcon, Cross2Icon, EraserIcon } from "@radix-ui/react-icons";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
 import Filter from "./Filter";
 import { ToolButton, FilterItem, FilterX } from "./FilterComponents";
@@ -56,7 +56,7 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
         },
         {
             name: "Status",
-            value: ["In Progress", "Completed", "Available", "Failed"]
+            value: ["In Progress", "Completed", "Available", "Failed", "Maintenance"]
         }
     ]
     

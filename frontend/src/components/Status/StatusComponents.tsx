@@ -27,8 +27,8 @@ export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highli
     align-items: center;
     gap: 0.1rem;
     width: ${({ $minimized }) => ($minimized ? '9vw' : '20vw')};
-    height: ${({ $minimized }) => ($minimized ? '9vw' : '15vw')};
-    aspect-ratio: 1 / 1;
+    height: ${({ $minimized }) => ($minimized ? '9vw' : 'auto')};
+    aspect-ratio: ${({ $minimized }) => ($minimized ? '1 / 1' : 'auto')};
     flex-shrink: 0;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     border-radius: ${({ $minimized }) => ($minimized ? '5px' : '10px')}; 
