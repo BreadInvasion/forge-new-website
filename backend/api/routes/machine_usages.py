@@ -56,13 +56,11 @@ async def get_my_usages(
 
     return [
         UsageResponse(
-            id=usage.id,
             machine_name=usage.machine.name,
             semester=f"{usage.semester.semester_type} {usage.semester.calendar_year}" if usage.semester else None,
             time_started=usage.time_started,
             duration=usage.duration_seconds,
             cost=usage.cost,
-            user_id=usage.user_id,
         )
         for usage in machine_usages
     ]
@@ -93,6 +91,7 @@ async def get_my_usages(
             machine_name=usage.machine.name,
             semester=f"{usage.semester.semester_type} {usage.semester.calendar_year}" if usage.semester else None,
             time_started=usage.time_started,
+            duration=usage.duration_seconds,
             cost=usage.cost,
         )
         for usage in machine_usages

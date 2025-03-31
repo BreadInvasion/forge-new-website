@@ -68,19 +68,11 @@ export interface MachineGroup extends Record<string, any> {
 };
 
 export interface MachineUsage extends Record<string, any> {
-    id: number;
-    machine_id: number;
-    machine_name: string;
-    semester_id: number;
-    semester: string;
-    user_id: number;
-    cost: number;
-    time_started: Date;
-    duration: number;
-    failed: boolean;
-    failed_at?: Date;
-    notes: number;
-    resources: string[];
+    semester: string
+    time_started: Date
+    duration: number
+    machine_name: string
+    cost: number
 };
 
 export interface Resource extends Record<string, any> {

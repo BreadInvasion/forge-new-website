@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import useAuth from '../../Auth/useAuth';
 import { PieChart } from 'react-minimal-pie-chart';
 import {ReactComponent as DiscordIcon} from '../../../assets/img/discord-mark-blue.svg'; 
@@ -11,8 +11,16 @@ const Summary: React.FC = () => {
     const { user } = useAuth();
 
     const [currentUsage, setCurrentUsage] = React.useState<MachineUsage | null>(null);
-
+    const [currentUsageCount, setCount] = useState<number>(0)
     const [machineUsages, setMachineUsages] = React.useState<MachineUsage[]>([]);
+
+    const [costData, setCostData] = React.useState<ChartUsageData[]>([]);
+    const [hoursData, setHoursData] = React.useState<ChartUsageData[]>([]);
+
+    interface ChartUsageData {
+        machine: string;
+        usage: number;
+    }
 
     useEffect(() => {
         const getUsages = async () => {
@@ -27,14 +35,6 @@ const Summary: React.FC = () => {
     
         getUsages();
     }, []);
-
-    interface ChartUsageData {
-        machine: string;
-        usage: number;
-    }
-    
-    const [costData, setCostData] = React.useState<ChartUsageData[]>([]);
-    const [hoursData, setHoursData] = React.useState<ChartUsageData[]>([]);
     
     useEffect(() => {
         if (machineUsages.length === 0) return;
@@ -72,32 +72,18 @@ const Summary: React.FC = () => {
    
         const getCurrentUsage = async () => {
             try {
-                const response = await OmniAPI.getAll("machinestatus") ;
-                response.groups.forEach(group => {
-                    group.machines.forEach(machine => {
-                        if (machine.in_use && machine.user_id == user.id) {
-                            const machineUsage: MachineUsage = {
-                                id: machine.id,
-                                machine_id: machine.id,
-                                machine_name: machine.name,
-                                user_id: machine.user_id,
-                                time_started: machine.usage_start,
-                                duration: machine.usage_duration,
-                                failed: machine.failed,
-                                failed_at: machine.failed_at,
-                            };
-                            setCurrentUsage(machineUsage);
-                            return;
-                        }
-                    });
-                });
+                const response = await OmniAPI.get("usages/current", "me");
+                console.log(response);
+                const data: MachineUsage[] = response;
+                setCurrentUsage(data[0]);
+                setCount(data.length);
             } catch (error) {
-                console.error("Error fetching machine usages:", error);
+                console.error("Error fetching current machine usages:", error);
             }
         };
         
         getCurrentUsage();
-    }, []);
+    }, [machineUsages]);
 
     const flexStyle = {
         display: 'flex',
@@ -118,7 +104,7 @@ const Summary: React.FC = () => {
         <div className='mf-flex-container' style={flexStyle}>
             <div className='mf-flex-row' style={rowStyle} >
                 <DisplayObject id='cost' name='Semester Cost' semester_cost={user.semester_balance} />
-                <SingleObject id='current' name='Current Usage' value={currentUsage} /> 
+                <SingleObject id='current' name='Current Usage' value={currentUsage} count={currentUsageCount} /> 
             </div>
             <div className='mf-flex-row' style={rowStyle}>
                 <ChartObject id='chart_hours' name='Machine Usage Hours' unit="hours" value={hoursData}/> 
@@ -152,7 +138,7 @@ const ListObject = ({ id, name, value }: ListObjectProps) => {
         <div className='mf-list mf-component' style={listStyle}>
             <ul>
                 {value.map((usage) => (
-                    <li key={usage.id}>
+                    <li key={usage.time_started.toString()}>
                         <strong>{usage.machine_name}</strong> - {usage.time_started.toString()} - ${Number(usage.cost).toFixed(2)}
                     </li>
                 ))}
@@ -271,9 +257,10 @@ interface SingleObjectProps {
     id: string;
     name: string;
     value: MachineUsage | null
+    count: number
 }
 
-const SingleObject = ({ id, name, value }: SingleObjectProps) => {
+const SingleObject = ({ id, name, value, count }: SingleObjectProps) => {
 
     const singleStyle = {
         flex: '2',
@@ -289,7 +276,9 @@ const SingleObject = ({ id, name, value }: SingleObjectProps) => {
 
     return (
         <div className='mf-single mf-component' style={singleStyle}>
-            <h4 style={{ textAlign: 'left' }}>{name}</h4>
+            <h4 style={{ textAlign: 'left' }}>
+                {name} {count > 1 ? `(${count})` : ""}
+            </h4>
             {value ? (
                 <>
                     <h3>{value.machine_name}</h3>
