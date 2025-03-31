@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from models.machine import Machine
+from models.machine_usage import MachineUsage
 from schemas.responses import (
     AllMachinesStatusResponse,
     MachineInfo,
@@ -25,17 +26,22 @@ async def get_machines_status(
     machines = (
         await session.scalars(
             select(Machine)
-            .options(selectinload(Machine.active_usage))
+            .options(selectinload(Machine.active_usage).selectinload(MachineUsage.user))
             .options(selectinload(Machine.group))
             .options(selectinload(Machine.type))
         )
     ).all()
 
-    group_dict = groupby(machines, key=lambda x: x.group_id)
+    group_dict = {}
+    for machine in machines:
+        key = machine.group_id if machine.group_id is not None else ""
+        group_dict.setdefault(key, []).append(machine)
+
     group_list = []
     loner_list = []
-    for _, group in group_dict:
+    for _, group in group_dict.items():
         machines = list(group)
+        machines.sort(key=lambda machine: machine.name)
 
         machine_statuses = [
             MachineStatus.model_validate(
@@ -57,9 +63,9 @@ async def get_machines_status(
                         if machine.active_usage
                         else None
                     ),
-                    "user_id": (
-                        machine.active_usage.user_id
-                        if machine.active_usage
+                    "user_name": (
+                        f"{machine.active_usage.user.first_name} {machine.active_usage.user.last_name[0]}."
+                        if machine.active_usage and machine.active_usage.user
                         else None
                     ),
                     **machine.__dict__,
