@@ -33,7 +33,7 @@ export default defineConfig({
                 changeOrigin: false,
                 rewrite: (path) => path.replace(/^\/api/, ''),
               },
-        }
+        },
     },
     esbuild: {
         target: 'esnext',
