@@ -1,0 +1,260 @@
+.page-container {
+  width: 100%;
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Top section with background image */
+.top-section {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url(../Blurred-forge.png), linear-gradient(to bottom left, rgb(165, 165, 165), rgb(164, 164, 164));
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+.top-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  padding: 0 40px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.title {
+  font-size: 96px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.title::after {
+  display: block;
+  height: 4px;
+  width: 100px;
+  background: #AF0909;
+  content: '';
+  margin: 10px auto 0;
+}
+
+.description {
+  font-size: 24px;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+.location {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.location strong {
+  font-size: 28px;
+}
+
+/* White background section */
+.white-section {
+  background-color: white;
+  min-height: 100vh;
+  width: 100%;
+  padding: 60px 0;
+}
+
+.content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.content-container h2 {
+  font-size: 36px;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #AF0909;
+  display: inline-block;
+}
+
+.content-container p {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 30px;
+}
+
+/* Services grid Styling */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.service-card {
+  background-color: #f9f9f9;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+}
+
+.service-card h3 {
+  font-size: 24px;
+  margin-bottom: 15px;
+  color: #AF0909;
+}
+
+/* Hours of Operations Styling*/
+.hours-section {
+  background-color: #f9f9f9;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.hours-section p {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+/* Instagram section styling */
+.instagram-section {
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+.instagram-embed-wrapper {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.instagram-embed-container {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Make Instagram embeds responsive */
+.instagram-embed-container iframe {
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+/* Navbar styling from original */
+header {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height: 5.55vh;
+  width: 100%;
+  z-index: 100;
+  background: transparent;
+}
+
+.nav_list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  margin-right: 50px;
+  margin-top: 15px;
+}
+
+.nav_list li {
+  float: right;
+  margin-right: 20px;
+  display: block;
+}
+
+.nav_item {
+  color: rgba(255, 255, 255, .5);
+  font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+  text-decoration: none;
+}
+
+.nav_item:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Social links styling from original */
+#social_links {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  color: rgba(255, 255, 255, .5);
+  padding-bottom: 15px;
+  padding-right: 50px;
+  font-size: 2em;
+}
+
+#social_links i:hover {
+  color: rgba(255, 255, 255, .75);
+}
+
+#social_links a {
+  color: rgba(255, 255, 255, .5);
+}
+
+#social_links a:hover {
+  color: rgba(255, 255, 255, .75);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .title {
+    font-size: 60px;
+  }
+  
+  .description {
+    font-size: 18px;
+  }
+  
+  .location {
+    font-size: 18px;
+    flex-direction: column;
+  }
+  
+  .location strong {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 40px;
+  }
+  
+  .hero-content {
+    padding: 0 20px;
+  }
+  
+  .content-container {
+    padding: 0 20px;
+  }
+}
