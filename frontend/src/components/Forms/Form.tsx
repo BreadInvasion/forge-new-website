@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import './styles/Form.scss';
+import Majors from './data/sorted_majors.json';
 
 interface FormElementProps {
     label?: string;
@@ -61,13 +62,13 @@ export const CheckboxInput = (props: FormElementProps & {required?: boolean }) =
     const { label, id, value, onChange, required } = props;
     return (
         <div className='input-container checkbox-input-container'>
-            {required && <span style={{ color: 'red' }}>*</span>}
             <input
                 id={'checkbox-' + id}
                 className='styled-checkbox'
                 type="checkbox"
                 onChange={(e) => onChange(id, e.target.checked ? "checked" : "")}
             />
+            {required && <span style={{ color: 'red' }}>*</span>}
             {label && <label htmlFor={'checkbox-' + id} className='checkbox-label'>{label}</label>}
         </div>
     );
@@ -134,7 +135,7 @@ export const Form = (props: FormProps) => {
                                 value={formValues[field.id] ? formValues[field.id] : ""}
                                 placeholder={field.placeholder}
                                 onChange={handleInputChange}
-                                options={["Computer Science", "ITWS", "Math", "Physics", "Biology"]}
+                                options = {Majors.Majors}
                                 type={field.type}
                             />
                         );

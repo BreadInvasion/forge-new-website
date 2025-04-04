@@ -8,7 +8,6 @@ import useAuth from '../Auth/useAuth';
 import './styles/Form.scss';
 import './styles/Register.scss';
 
-
 const formFields = [
     {
         type: "text",
@@ -64,7 +63,6 @@ const formFields = [
 export default function Register() {
 
     const navigate = useNavigate();
-
 
     const handleRegister = async (e: React.FormEvent<HTMLFormElement>, formValues: { [key: string]: string }) => {
         e.preventDefault();
