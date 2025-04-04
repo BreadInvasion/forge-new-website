@@ -1,6 +1,6 @@
 // src/interfaces.ts
 
-export interface User extends Record<string, any> {
+export interface User {
     id: string;
     is_rpi_staff: boolean;
     RCSID: string;
@@ -30,7 +30,7 @@ export const defaultUser: User = {
     semester_balance: '',
 };
 
-export interface Machine extends Record<string, any> {
+export interface Machine {
     id: string;
     name: string;
     group: string;
@@ -52,7 +52,7 @@ export const emptyMachine: Machine = {
     disabled: false,
 };
 
-export interface MachineType extends Record<string, any> {
+export interface MachineType {
     id: string;
     name: string;
     resource_slots: number;
@@ -61,13 +61,13 @@ export interface MachineType extends Record<string, any> {
     resource_types: string[];
 };
 
-export interface MachineGroup extends Record<string, any> {
+export interface MachineGroup {
     id: number;
     name: string;
     machines: string[];
 };
 
-export interface MachineUsage extends Record<string, any> {
+export interface MachineUsage {
     semester: string
     time_started: Date
     duration: number
@@ -75,7 +75,7 @@ export interface MachineUsage extends Record<string, any> {
     cost: number
 };
 
-export interface Resource extends Record<string, any> {
+export interface Resource {
     id: string;
     name: string;
     brand?: string;
