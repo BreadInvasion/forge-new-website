@@ -56,6 +56,13 @@ export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highli
         background-color: rgba(0, 255, 0, 0.2);
         border-radius: 5px;
     }
+    @media screen and (max-width: 768px) {
+        width: ${({ $minimized }) => ($minimized ? '17vh' : 'auto')};
+        height: ${({ $minimized }) => ($minimized? '15vh' : 'auto')};
+        aspect-ratio: auto;
+        border-radius: 10px; 
+        font-size: 3.0vh;
+    }
 `;
 
 export const MachineName = styled.h3<{ minimized?: boolean }>`

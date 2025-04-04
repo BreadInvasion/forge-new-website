@@ -22,14 +22,32 @@ const Page = styled.div`
         "status up-next";
     padding: 0.5rem 1rem;
     gap: 1rem;
+    @media screen and (max-width: 768px) {
+        display: flex;
+        flex-direction: column;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+            "tools"
+            "sidebar"
+            "status";
+    }
 `;
 
 const Sidebar = styled.div`
-    grid-area: highlight; //
+    grid-area: highlight;
     display: flex;
     flex-direction: column; 
     padding-right: 2rem;
-   
+    gap: 0;
+    @media screen and (max-width: 768px) {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: auto;
+        gap: 1rem;
+        grid-template-areas:
+            "highlight up-next";
+    }
 `;
 
 export const Status : React.FC = () => {

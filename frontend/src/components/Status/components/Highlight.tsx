@@ -15,6 +15,11 @@ const HighlightCard = styled.div`
     h2 { 
         margin-bottom: 1rem;
         color: white; 
+        flex-shrink: 0;
+    }
+    @media screen and (max-width: 768px) {
+        max-height: 300px;
+        overflow-y: auto;
     }
 `;
 
@@ -32,7 +37,7 @@ const Highlight: React.FC = () => {
 
     return (
         <HighlightCard>
-            <h2>Highlighted Card: </h2>
+            <h2>Selected Machine: </h2>
             <MachineCard
                 id={selectedMachine.id}
                 name={selectedMachine.name}

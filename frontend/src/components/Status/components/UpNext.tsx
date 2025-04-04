@@ -10,7 +10,6 @@ const UpNextContainer = styled.div`
     background-color:rgb(57, 153, 62);
     border-radius: 0.5rem;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-    margin-top: 1rem;
     max-height: 300px;
     overflow-y: auto;
 `;
@@ -70,15 +69,15 @@ const UpNext: React.FC = () => {
     if (inProgressMachines.length === 0) {
         return (
             <UpNextContainer>
-                <h2>Machines Up Next</h2>
-                <p>All machines are available</p>
+                <h2>Machines Up Next:</h2>
+                <p>All machines are available!</p>
             </UpNextContainer>
         );
     }
 
     return (
         <UpNextContainer>
-            <h2>Machines Up Next</h2>
+            <h2>Machines Up Next:</h2>
             {inProgressMachines.map((machine, index) => (
                 <MachineItem key={index}>
                     <StatusText>{index + 1}. {machine.name} : being used by <br/>{machine.user ? machine.user : 'N/A'}</StatusText>
