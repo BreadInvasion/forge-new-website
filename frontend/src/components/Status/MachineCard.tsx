@@ -66,17 +66,40 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
         setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material});
     };
 
-    const handleClearClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleClearClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
         if (failed) {
-            machine.failed = false; 
-            machine.user = undefined;
-            machine.material = undefined;   
-            machine.weight = undefined;
-            machine.usage_start = undefined;
-            machine.usage_duration= undefined;
-            machine.in_use = false;
-            setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material});
+            try {
+                const response = await fetch(`http://localhost:3000/api/clear/${machine.id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+    
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        alert('Machine not found. Please check the machine ID.');
+                    } else {
+                        throw new Error(`Failed to clear machine: ${response.statusText}`);
+                    }
+                }
+                machine.failed = false; 
+                machine.user = undefined;
+                machine.material = undefined;   
+                machine.weight = undefined;
+                machine.usage_start = undefined;
+                machine.usage_duration = undefined;
+                machine.in_use = false;
+                machine.maintenance_mode = false;
+                machine.disabled = false;
+                machine.failed_at = undefined;
+    
+                setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material });
+            } catch (error) {
+                console.error('Error clearing machine:', error);
+                alert('Failed to clear the machine. Please try again.');
+            }
         }
     };
 

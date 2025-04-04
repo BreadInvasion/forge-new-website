@@ -10,14 +10,14 @@ const mobileBreakpoint = "850px";
 export const GridContainer = styled.div`
     grid-area: status;
     display: flex;
-    gap: 1rem;
     flex-wrap: wrap;
+    gap: 1rem;
     justify-content: center;
+    align-items: stretch;
     column-gap: 10px;
-    
 `;
 
-export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highlightFailed?: boolean, progress: number }>`
+export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highlightFailed?: boolean; progress: number }>`
     background-color: #f5f5f5;
     border-radius: 5px;
     padding: 5px;
@@ -26,8 +26,10 @@ export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highli
     justify-content: space-between;
     align-items: center;
     gap: 0.1rem;
-    width: ${({ $minimized }) => ($minimized ? '9vw' : '20vw')};
-    height: ${({ $minimized }) => ($minimized ? '9vw' : 'auto')};
+    width: ${({ $minimized }) => ($minimized ? 'clamp(8vw, 10vw, 12vw)' : 'clamp(20vw, 25vw, 30vw)')};
+    max-width: 100%;
+    height: ${({ $minimized }) => ($minimized ? 'clamp(15vh, 17vh, 19vh)' : 'auto')};
+    max-height: 100%;
     aspect-ratio: ${({ $minimized }) => ($minimized ? '1 / 1' : 'auto')};
     flex-shrink: 0;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);

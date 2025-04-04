@@ -9,6 +9,9 @@ const HighlightCard = styled.div`
     padding: 1rem;
     margin-bottom: 0.5rem;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     h2 { 
         margin-bottom: 1rem;
         color: white; 

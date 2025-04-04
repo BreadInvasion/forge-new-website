@@ -21,31 +21,43 @@ const MachineItem = styled.div`
     border-bottom: 1px solid rgba(0, 0, 0, 0.1); 
 `;
 
-const EstCompletion = styled(StatusText)`
-    font-size: 1rem;
-    font-weight: bold;
-`;
-
 const UpNext: React.FC = () => {
-    const [machines, setMachines] = useState<MachineStatus[]>([]);
-    
-    useEffect(() => {
-            const fetchMachines = async () => {
-                try {
-                    const response = await OmniAPI.getPublic("machinestatus");
+    const [machines, setMachines] = useState<{ name: string; in_use: Boolean, user: string | undefined; usage_start?: Date; usage_duration?: number }[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
-                    const flattenedMachines = [
-                        ...response.loners,
-                        ...response.groups.flatMap((group: { machines: MachineStatus[] }) => group.machines),
-                    ];
-                    setMachines(flattenedMachines);
-                } catch (error) {
-                    console.error('Error fetching machines:', error);
-                }
-            };
-    
-            fetchMachines();
-        }, []);
+    useEffect(() => {
+        const fetchMachines = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const response = await OmniAPI.getPublic("machinestatus");
+
+                const flattenedMachines = [
+                    ...response.loners,
+                    ...response.groups.flatMap((group: { machines: MachineStatus[] }) => group.machines),
+                ];
+
+                const transformedMachines = flattenedMachines.map((machine) => ({
+                    name: machine.name,
+                    in_use: machine.in_use,
+                    user: machine.user_name, // Map user_name to user
+                    usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined,
+                    usage_duration: machine.usage_duration,
+                }));
+
+                setMachines(transformedMachines);
+            } catch (error) {
+                console.error('Error fetching machines:', error);
+                setError('Failed to fetch machine data. Please try again later.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMachines();
+    }, []);
 
     const inProgressMachines = machines
     .filter((machine) => machine.in_use)
@@ -69,8 +81,8 @@ const UpNext: React.FC = () => {
             <h2>Machines Up Next</h2>
             {inProgressMachines.map((machine, index) => (
                 <MachineItem key={index}>
-                    <StatusText>{index + 1}. {machine.name} : being used by {machine.user ? machine.user : 'N/A'}<br/></StatusText>
-                    <EstCompletion $area="date">Est. Completion: {getEndTime(machine.usage_start!, machine.usage_duration!)}</EstCompletion>
+                    <StatusText>{index + 1}. {machine.name} : being used by <br/>{machine.user ? machine.user : 'N/A'}</StatusText>
+                    <StatusText $area="date">Est. Completion: {getEndTime(machine.usage_start!, machine.usage_duration!)}</StatusText>
                 </MachineItem>
             ))}
         </UpNextContainer>

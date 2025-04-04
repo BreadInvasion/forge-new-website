@@ -1,5 +1,6 @@
 import { Pencil1Icon, ExclamationTriangleIcon, Cross2Icon, EraserIcon } from "@radix-ui/react-icons";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Filter from "./Filter";
 import { ToolButton, FilterItem, FilterX } from "./FilterComponents";
@@ -49,6 +50,18 @@ const ActiveFilters = styled.div`
 
 const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, activeFilters, setActiveFilters}) => {
 
+    const navigate = useNavigate();
+
+    const handleEditClick = () => {
+        // Navigate to the "Edit Machine" form
+        navigate("/myforge/usages");
+    };
+
+    const handleFailClick = () => {
+        // Navigate to the "Fail Machine" form
+        navigate("/myforge/fail");
+    };  
+
     const filters = [
         {
             name: "Machine Type",
@@ -93,19 +106,21 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
 
     return (
         <ToolbarContainer>
-            <ToolButton aria-label="Edit">
+            <ToolButton aria-label="Edit" onClick={handleEditClick}>
                 {/* Edit is for Room Managers and Admin/Super users only and will
                  bring the user to a form where they can edit the details of the 
                  usage */}
                 <Pencil1Icon />
             </ToolButton>
-            <ToolButton aria-label="Fail">
+            <ToolButton aria-label="Fail" onClick={handleFailClick}>
                 { /*Fail will also be available to Volunteer level users,
                  and when selected any machine they click on will redirect 
                  to a Failure Form. */ }
                 <ExclamationTriangleIcon />
             </ToolButton>
             <ToolButton aria-label="Clear"> 
+                {/*only available to Admin/Super users and will clear the
+                 failure status of a machine */}
                 <Toggle
                     pressed={highlightFailed}
                     onPressedChange={setHighlightFailed}

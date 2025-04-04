@@ -14,12 +14,14 @@ const Page = styled.div`
     height: 100%;
     display: grid;
     grid-template-columns: 3fr 1fr;
+    grid-template-rows: auto 1fr auto; 
     grid-template-areas:
         "tools highlight"
         "status highlight"
         "status up-next"
         "status up-next";
     padding: 0.5rem 1rem;
+    gap: 1rem;
 `;
 
 const Sidebar = styled.div`
@@ -29,22 +31,6 @@ const Sidebar = styled.div`
     padding-right: 2rem;
    
 `;
-
-/*
-const getEndTime = (startTime: string, totalTime: number) => {
-    const start = new Date(startTime);
-    const end = new Date(start.getTime() + totalTime * 60000);
-    return end.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
-}
-
-const getProgress = (startTime: string | undefined, totalTime: number | undefined) => {
-    if (!startTime || !totalTime) return 0;
-    const start = new Date(startTime);
-    const end = new Date(start.getTime() + totalTime * 60000);
-    const now = new Date();
-    return 75;
-}
-*/
 
 export const Status : React.FC = () => {
     const [MachinesResponse, setAllMachinesResponse] = useState<AllMachinesStatusResponse | null>(null);
@@ -76,13 +62,14 @@ export const Status : React.FC = () => {
                         id: machine.id,
                         name: machine.name,
                         in_use: machine.in_use,
-                        usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined, // Convert to Date
+                        usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined, 
                         usage_duration: machine.usage_duration,
-                        user_id: machine.user_id,
+                        user: machine.user_name,
                         maintenance_mode: machine.maintenance_mode,
                         disabled: machine.disabled,
                         failed: machine.failed,
-                        failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined, // Convert to Date
+                        failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined,
+                        /* weight, material?? */
                     }));
     
                     console.log("Machines:", transformedMachines);
@@ -104,6 +91,7 @@ export const Status : React.FC = () => {
             if (filter === "Available" && !machine.in_use && !machine.failed && !machine.maintenance_mode) return true;
             if (filter === "Failed" && machine.failed) return true;
             if (filter === "Maintenance" && machine.maintenance_mode) return true;
+            filter === machine.type;
             return false;
         });
     });
@@ -126,7 +114,7 @@ export const Status : React.FC = () => {
                             in_use={machine.in_use}
                             usage_start={machine.startTime} 
                             usage_duration={machine.totalTime} 
-                            user={machine.user} //
+                            user={machine.user_name} //
                             maintenance_mode={machine.maintenance_mode} // in use and maintenance mode (disabled?)
                             disabled={machine.disabled} // in use and disabled (disabled?)
                             failed={machine.failed}// in use and failed (disabled?)
