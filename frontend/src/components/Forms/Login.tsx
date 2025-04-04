@@ -45,6 +45,7 @@ export default function Login() {
 
         try {
             const response = await AuthAPI.login(username, password);
+            console.log('Login response:', response);
             
             if (response.status === 200) {
                 const result = response.data;
@@ -65,9 +66,16 @@ export default function Login() {
             } else {
                 console.error('Login failed:', response.status);
                 console.error('Login failed:', response.statusText);
+                alert('Login failed:' + " " + response.status);
+                alert('Login failed:' + " " + response.statusText);
             }
         } catch (error) {
             console.error('Error:', error);
+            if (error.status === 401) {
+                alert('Invalid username or password');
+            } else{
+                alert('Error occured:' + error);
+            }
         }
     };
 

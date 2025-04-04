@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import './styles/Form.scss';
+import Majors from './data/sorted_majors.json';
 
 interface FormElementProps {
     label?: string;
@@ -57,8 +58,8 @@ export const DropdownInput = (props: DropdownInputProps) => {
     );
 }
 
-export const CheckboxInput = (props: FormElementProps) => {
-    const { label, id, value, onChange } = props;
+export const CheckboxInput = (props: FormElementProps & {required?: boolean }) => {
+    const { label, id, value, onChange, required } = props;
     return (
         <div className='input-container checkbox-input-container'>
             <input
@@ -67,6 +68,7 @@ export const CheckboxInput = (props: FormElementProps) => {
                 type="checkbox"
                 onChange={(e) => onChange(id, e.target.checked ? "checked" : "")}
             />
+            {required && <span style={{ color: 'red' }}>*</span>}
             {label && <label htmlFor={'checkbox-' + id} className='checkbox-label'>{label}</label>}
         </div>
     );
@@ -77,6 +79,7 @@ export interface FormField {
     label?: string;
     type: string;
     placeholder?: string;
+    required: boolean | undefined;
 }
 
 interface FormProps {
@@ -132,7 +135,7 @@ export const Form = (props: FormProps) => {
                                 value={formValues[field.id] ? formValues[field.id] : ""}
                                 placeholder={field.placeholder}
                                 onChange={handleInputChange}
-                                options={["Computer Science", "ITWS", "Math", "Physics", "Biology"]}
+                                options = {Majors.Majors}
                                 type={field.type}
                             />
                         );
@@ -145,6 +148,7 @@ export const Form = (props: FormProps) => {
                                 value={formValues[field.id] ? formValues[field.id] : ""}
                                 onChange={handleInputChange}
                                 type={field.type}
+                                required = {field.required}
                             />
                         );
                     default:
@@ -238,6 +242,7 @@ export const CustomForm = (props: CustomFormProps) => {
                                 value={field.id ? field.id : ""}
                                 onChange={field.handleChange}
                                 type={field.type}
+                                required={field.required}
                             />
                         );
                     case "custom":
