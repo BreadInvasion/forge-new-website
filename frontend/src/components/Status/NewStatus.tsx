@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Toolbar from './components/Toolbar';
 import StatusGrid from './components/StatusGrid';
 import Highlight from './components/Highlight';
+import { SelectedMachineProvider } from './SelectedMachineContext';
 
 const Page = styled.div`
     width: 100%;
@@ -26,12 +27,14 @@ const Page = styled.div`
 
 const NewStatus: React.FC = () => {
     return (
+        <SelectedMachineProvider>
         <Page>
             <Toolbar />
             <StatusGrid />
             <Highlight />
             <div style={{gridArea: "up-next", backgroundColor: "green"}}>Up Next</div>
         </Page>
+        </SelectedMachineProvider>
     );
 };
 

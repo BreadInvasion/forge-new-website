@@ -1,4 +1,4 @@
-import { api } from "./configs/axiosConfigs";
+import { api, publicApi } from "./configs/axiosConfigs";
 
 export const OmniAPI = {
     getAll: async (type: string) => {
@@ -83,6 +83,17 @@ export const OmniAPI = {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        });
+
+        return response.data;
+    },
+    getPublic: async (type: string) => {
+        const response = await publicApi.request({
+            url: `/${type}`,
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
             },
         });
 
