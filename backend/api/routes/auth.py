@@ -101,7 +101,11 @@ async def get_current_user(
         major=current_user.major,
         gender_identity=current_user.gender_identity,
         pronouns=current_user.pronouns,
-        role_ids=[role.id for role in current_user.roles],
+        permissions=list({
+            permission 
+            for role in current_user.roles 
+            for permission in role.permissions
+            }),
         is_graduating=current_user.is_graduating,
         semester_balance=Decimal(semester_balance),
     )

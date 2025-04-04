@@ -10,7 +10,7 @@ export interface User extends Record<string, any> {
     major?: string;
     gender_identity: string;
     pronouns: string;
-    role_ids: string[];
+    permissions: UserPermissions[];
     is_graduating: boolean;
     semester_balance: string;
 };
@@ -25,7 +25,7 @@ export const defaultUser: User = {
     major: '',
     gender_identity: "notdisclosed",
     pronouns: '',
-    role_ids: [],
+    permissions: [],
     is_graduating: false,
     semester_balance: '',
 };
