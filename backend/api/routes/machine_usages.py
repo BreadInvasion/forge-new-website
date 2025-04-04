@@ -33,6 +33,7 @@ async def get_my_usages(
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
         "time_started": MachineUsage.time_started,
+        "duration": MachineUsage.duration_seconds,
         "cost": MachineUsage.cost,
         "name": Machine.name,
     }
@@ -58,6 +59,7 @@ async def get_my_usages(
             machine_name=usage.machine.name,
             semester=f"{usage.semester.semester_type} {usage.semester.calendar_year}" if usage.semester else None,
             time_started=usage.time_started,
+            duration=usage.duration_seconds,
             cost=usage.cost,
         )
         for usage in machine_usages
@@ -89,6 +91,7 @@ async def get_my_usages(
             machine_name=usage.machine.name,
             semester=f"{usage.semester.semester_type} {usage.semester.calendar_year}" if usage.semester else None,
             time_started=usage.time_started,
+            duration=usage.duration_seconds,
             cost=usage.cost,
         )
         for usage in machine_usages

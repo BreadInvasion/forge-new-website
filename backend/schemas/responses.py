@@ -168,6 +168,7 @@ class MachineUsageSchema(BaseResponse):
 class UsageResponse(BaseResponse):
     semester: str | None
     time_started: datetime
+    duration: int
     machine_name: str
     cost: Decimal
 

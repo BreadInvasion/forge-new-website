@@ -308,7 +308,8 @@ export const DynamicMachineForm: React.FC = () => {
                             htmlFor='checkbox-usage-policy'
                             className='checkbox-label'
                         >
-                            Do you agree to the Machine Usage Policy?
+                            <span style={{ color: 'red' }}>*</span>
+                            Do you agree to the Machine Usage Policy? 
                         </label>
                         <input
                             id='checkbox-org-usage'
