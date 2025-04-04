@@ -57,10 +57,11 @@ export const DropdownInput = (props: DropdownInputProps) => {
     );
 }
 
-export const CheckboxInput = (props: FormElementProps) => {
-    const { label, id, value, onChange } = props;
+export const CheckboxInput = (props: FormElementProps & {required?: boolean }) => {
+    const { label, id, value, onChange, required } = props;
     return (
         <div className='input-container checkbox-input-container'>
+            {required && <span style={{ color: 'red' }}>*</span>}
             <input
                 id={'checkbox-' + id}
                 className='styled-checkbox'
@@ -77,6 +78,7 @@ export interface FormField {
     label?: string;
     type: string;
     placeholder?: string;
+    required: boolean | undefined;
 }
 
 interface FormProps {
@@ -145,6 +147,7 @@ export const Form = (props: FormProps) => {
                                 value={formValues[field.id] ? formValues[field.id] : ""}
                                 onChange={handleInputChange}
                                 type={field.type}
+                                required = {field.required}
                             />
                         );
                     default:
@@ -238,6 +241,7 @@ export const CustomForm = (props: CustomFormProps) => {
                                 value={field.id ? field.id : ""}
                                 onChange={field.handleChange}
                                 type={field.type}
+                                required={field.required}
                             />
                         );
                     case "custom":
