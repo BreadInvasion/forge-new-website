@@ -104,9 +104,9 @@ async def get_user_by_rcsid(
         gender_identity=user.gender_identity,
         pronouns=user.pronouns,
         permissions=list({
-            permission 
-            for role in user.roles 
-            for permission in role.permissions
+                permission 
+                for role in user.roles 
+                for permission in role.permissions
             }),
         is_graduating=user.is_graduating,
         semester_balance=Decimal(semester_balance),
