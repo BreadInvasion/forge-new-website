@@ -105,7 +105,7 @@ async def get_current_user(
             permission 
             for role in current_user.roles 
             for permission in role.permissions
-            }),
+        }),
         is_graduating=current_user.is_graduating,
         semester_balance=Decimal(semester_balance),
     )

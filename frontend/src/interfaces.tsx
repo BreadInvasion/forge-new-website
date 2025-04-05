@@ -1,4 +1,5 @@
 // src/interfaces.ts
+import { UserPermission } from "enums";
 
 export interface User extends Record<string, any> {
     id: string;

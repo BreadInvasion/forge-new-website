@@ -107,7 +107,7 @@ async def get_user_by_rcsid(
             permission 
             for role in user.roles 
             for permission in role.permissions
-            }),
+        }),
         is_graduating=user.is_graduating,
         semester_balance=Decimal(semester_balance),
     )
@@ -163,7 +163,7 @@ async def get_user_by_rin(
             permission 
             for role in user.roles 
             for permission in role.permissions
-            }),
+        }),
         is_graduating=user.is_graduating,
         semester_balance=Decimal(semester_balance),
     )
@@ -256,7 +256,7 @@ async def get_all_users(
                 permission 
                 for role in user.roles 
                 for permission in role.permissions
-                }),
+            }),
             is_graduating=user.is_graduating,
             semester_balance=Decimal(
                 next(
