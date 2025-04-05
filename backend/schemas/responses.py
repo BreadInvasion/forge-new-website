@@ -49,6 +49,8 @@ class UserNoHash(BaseModel):
 
     role_ids: list[UUID4]
 
+    display_role: str | None
+
     is_graduating: bool
 
     semester_balance: Decimal = Field(max_digits=10, decimal_places=2)

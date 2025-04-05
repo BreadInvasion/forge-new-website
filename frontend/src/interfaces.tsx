@@ -11,6 +11,7 @@ export interface User {
     gender_identity: string;
     pronouns: string;
     role_ids: string[];
+    display_role: string;
     is_graduating: boolean;
     semester_balance: string;
 };
@@ -26,6 +27,7 @@ export const defaultUser: User = {
     gender_identity: "notdisclosed",
     pronouns: '',
     role_ids: [],
+    display_role: '',
     is_graduating: false,
     semester_balance: '',
 };
