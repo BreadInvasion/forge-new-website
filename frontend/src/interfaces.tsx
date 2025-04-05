@@ -10,7 +10,7 @@ export interface User extends Record<string, any> {
     major?: string;
     gender_identity: string;
     pronouns: string;
-    permissions: UserPermissions[];
+    permissions: UserPermission[];
     is_graduating: boolean;
     semester_balance: string;
 };

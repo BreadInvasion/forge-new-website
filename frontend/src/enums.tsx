@@ -1,4 +1,4 @@
-enum UserPermissions {
+export enum UserPermission {
     // Member
     CAN_USE_MACHINES = "canUseMachines",
     CAN_USE_MACHINES_BETWEEN_SEMESTERS = "canUseMachinesBetweenSemesters",
