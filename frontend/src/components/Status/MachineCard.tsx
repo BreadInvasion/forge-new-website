@@ -85,15 +85,9 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
                     }
                 }
                 machine.failed = false; 
-                machine.user = undefined;
-                machine.material = undefined;   
-                machine.weight = undefined;
-                machine.usage_start = undefined;
-                machine.usage_duration = undefined;
                 machine.in_use = false;
                 machine.maintenance_mode = false;
                 machine.disabled = false;
-                machine.failed_at = undefined;
     
                 setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material });
             } catch (error) {
