@@ -72,6 +72,8 @@ async def get_current_user(
     """If the user has a valid access token, return current user data"""
 
     current_semester_id = await session.scalar(select(State.active_semester_id))
+    
+    current_user_permissions = await get_user_permissions(session, current_user.id)
 
     semester_balance = (
         (
@@ -101,11 +103,7 @@ async def get_current_user(
         major=current_user.major,
         gender_identity=current_user.gender_identity,
         pronouns=current_user.pronouns,
-        permissions=list({
-            permission 
-            for role in current_user.roles 
-            for permission in role.permissions
-        }),
+        permissions=current_user_permissions,
         display_role=next((
                 role.name 
                 for role in current_user.roles 

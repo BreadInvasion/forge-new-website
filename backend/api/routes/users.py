@@ -8,6 +8,7 @@ from sqlalchemy.orm import selectinload, InstrumentedAttribute
 from models.state import State
 
 from ..deps import DBSession, PermittedUserChecker
+from ..utils import get_user_permissions
 
 from models.machine_usage import MachineUsage
 from models.role import Role
@@ -75,6 +76,8 @@ async def get_user_by_rcsid(
 
     current_semester_id = await session.scalar(select(State.active_semester_id))
 
+    user_permissions = await get_user_permissions(session, user.id)
+
     semester_balance = (
         (
             await session.scalar(
@@ -103,11 +106,7 @@ async def get_user_by_rcsid(
         major=user.major,
         gender_identity=user.gender_identity,
         pronouns=user.pronouns,
-        permissions=list({
-            permission 
-            for role in user.roles 
-            for permission in role.permissions
-        }),
+        permissions=user_permissions,
         display_role=next((
                 role.name 
                 for role in user.roles 
@@ -138,6 +137,8 @@ async def get_user_by_rin(
 
     current_semester_id = await session.scalar(select(State.active_semester_id))
 
+    user_permissions = await get_user_permissions(session, user.id)
+
     semester_balance = (
         (
             await session.scalar(
@@ -166,11 +167,7 @@ async def get_user_by_rin(
         major=user.major,
         gender_identity=user.gender_identity,
         pronouns=user.pronouns,
-        permissions=list({
-            permission 
-            for role in user.roles 
-            for permission in role.permissions
-        }),
+        permissions=user_permissions,
         display_role=next((
                 role.name 
                 for role in user.roles 
@@ -255,6 +252,11 @@ async def get_all_users(
         else None
     )
 
+    user_permissions = {
+        user.id: await get_user_permissions(session, user.id) 
+        for user in users
+    }
+
     return [
         UserNoHash(
             id=user.id,
@@ -266,11 +268,7 @@ async def get_all_users(
             major=user.major,
             gender_identity=user.gender_identity,
             pronouns=user.pronouns,
-            permissions=list({
-                permission 
-                for role in user.roles 
-                for permission in role.permissions
-            }),
+            permissions=user_permissions[user.id],
             display_role=next((
                     role.name 
                     for role in user.roles 
