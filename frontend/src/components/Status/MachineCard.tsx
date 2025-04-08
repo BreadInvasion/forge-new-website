@@ -117,15 +117,24 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
         >
                 <MachineName>{name}</MachineName>
                 <StatusText>User: {user ? user : 'N/A'}</StatusText>
-                {!$minimized && <StatusText $minimized={$minimized}>Material: {material ? material : 'N/A'}</StatusText>}
-                {!$minimized && <StatusText $minimized={$minimized}>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>}
-                {!$minimized && in_use && <StatusText $minimized={$minimized}>Start Time<br /> {usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })} </StatusText>}
-                {!$minimized && in_use && <StatusText $minimized={$minimized}>Total Time: {usage_duration} </StatusText>}
-                {!$minimized && in_use && <StatusText $minimized={$minimized}>Progress: {Math.round(getProgress(usage_start, usage_duration) * 100) / 100} % </StatusText>}
+                {!$minimized && (
+                    <>
+                        <StatusText $minimized={$minimized}>Material: {material ? material : 'N/A'}</StatusText>
+                        <StatusText $minimized={$minimized}>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>
+                        {in_use && (
+                            <>
+                            <StatusText $minimized={$minimized}>Start Time<br /> {usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })} </StatusText>
+                            <StatusText $minimized={$minimized}>Total Time: {usage_duration} </StatusText>
+                            <StatusText $minimized={$minimized}>Progress: {Math.round(getProgress(usage_start, usage_duration) * 100) / 100} % </StatusText>
+                            </>
+                        )}
+                        <StatusText $minimized={$minimized}>Status: {getStatusText(in_use, failed, maintenance_mode, disabled)}</StatusText>
+                        {failed &&(
+                            <StatusText $minimized={$minimized}>Failed at: {failed_at?.toDateString()}</StatusText>
+                        )}
+                    </>
+                )}
                 <StatusText $area="date" $minimized={$minimized}>Est. Completion<br /> {usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</StatusText>
-                {!$minimized && <StatusText $minimized={$minimized}>Status: {getStatusText(in_use, failed, maintenance_mode, disabled)}</StatusText>}
-                {!$minimized && failed && <StatusText $minimized={$minimized}>Failed at: {failed_at?.toDateString()}</StatusText>}
-                {/*if failed, show fail message*/}
                 {$highlightFailed && failed && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
        </Card>
     );
