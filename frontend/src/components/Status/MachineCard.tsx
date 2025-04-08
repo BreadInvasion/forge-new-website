@@ -5,32 +5,32 @@ import { useSelectedMachine } from './SelectedMachineContext';
 import Status from './Status';
 
 export const getEndTime = (usage_start: Date, usage_duration: number) => {
-    const start = typeof usage_start === 'string' ? new Date(usage_start) : usage_start; // Convert to Date if it's a string
+    const start = usage_start; 
     const end = new Date(start.getTime() + usage_duration * 60000);
     return end.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
 }
 
 const getProgress = (usage_start: Date | undefined, usage_duration: number | undefined) => {
     if (!usage_start || !usage_duration) return 0;
-    const start = typeof usage_start === 'string' ? new Date(usage_start) : usage_start; // Convert to Date if it's a string
+    const start = usage_start; 
     const end = new Date(start.getTime() + usage_duration * 60000);
     const now = new Date();
     return Math.min(1, Math.max(0, (now.getTime() - start.getTime()) / (end.getTime() - start.getTime())));
 }
 
 export interface MachineProps {
-    id: string;     //id
-    name: string;   //machine name
-    in_use?: boolean;    //status
-    usage_start?: Date;   //start time
-    usage_duration?: number; //total time
-    user?: string; //user -> need to get from id
-    maintenance_mode?: boolean; //status
-    disabled?: boolean;  //status
-    failed?: boolean;    //status
-    failed_at?: Date; //failed time
-    material?: string;  //material -> need to get from id
-    weight?: number;   //weight -> need to get from id
+    id: string;    
+    name: string;  
+    in_use?: boolean;  
+    usage_start?: Date;  
+    usage_duration?: number;
+    user?: string;
+    maintenance_mode?: boolean;
+    disabled?: boolean;
+    failed?: boolean; 
+    failed_at?: Date;
+    material?: string; 
+    weight?: number;  
 }
 
 export interface MachineCardProps extends MachineProps {
@@ -88,6 +88,7 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
                 machine.in_use = false;
                 machine.maintenance_mode = false;
                 machine.disabled = false;
+                machine.failed_at = undefined;
     
                 setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material });
             } catch (error) {

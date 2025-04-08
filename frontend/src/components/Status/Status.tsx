@@ -126,18 +126,18 @@ export const Status : React.FC = () => {
                    <GridContainer>
                    {filteredMachines.map((machine, index) => (
                         <MachineCard
-                            key={`${machine.name}-${index}`} //mchines id 
+                            key={`${machine.name}-${index}`}  
                             id={machine.id}
                             name={machine.name}
                             in_use={machine.in_use}
-                            usage_start={machine.startTime} 
-                            usage_duration={machine.totalTime} 
-                            user={machine.user_name} //
-                            maintenance_mode={machine.maintenance_mode} // in use and maintenance mode (disabled?)
-                            disabled={machine.disabled} // in use and disabled (disabled?)
-                            failed={machine.failed}// in use and failed (disabled?)
-                            failed_at={machine.failed_at} //
-                            material={machine.material} // 
+                            usage_start={machine.usage_start} 
+                            usage_duration={machine.usage_duration} 
+                            user={machine.user}
+                            maintenance_mode={machine.maintenance_mode} 
+                            disabled={machine.disabled}
+                            failed={machine.failed}
+                            failed_at={machine.failed_at}
+                            material={machine.material} 
                             weight={machine.weight}
                             machine={machine} 
                             $highlightFailed={highlightFailed}

@@ -41,7 +41,7 @@ const UpNext: React.FC = () => {
                 const transformedMachines = flattenedMachines.map((machine) => ({
                     name: machine.name,
                     in_use: machine.in_use,
-                    user: machine.user_name, // Map user_name to user
+                    user: machine.user_name, 
                     usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined,
                     usage_duration: machine.usage_duration,
                 }));
