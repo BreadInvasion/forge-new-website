@@ -35,6 +35,9 @@ services:
     ports:
       - "3000:3000"
       - "3010:3010"
+  discordbot:
+    restart: "unless-stopped"
+    build: ./discordbot
 
 volumes:
   postgres_data:
