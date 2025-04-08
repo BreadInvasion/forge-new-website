@@ -108,6 +108,13 @@ async def get_user_by_rcsid(
             for role in user.roles 
             for permission in role.permissions
         }),
+        display_role=next((
+                role.name 
+                for role in user.roles 
+                if role.display_role
+            ), 
+            ""
+        ),
         is_graduating=user.is_graduating,
         semester_balance=Decimal(semester_balance),
     )
@@ -164,6 +171,13 @@ async def get_user_by_rin(
             for role in user.roles 
             for permission in role.permissions
         }),
+        display_role=next((
+                role.name 
+                for role in user.roles 
+                if role.display_role
+            ), 
+            ""
+        ),
         is_graduating=user.is_graduating,
         semester_balance=Decimal(semester_balance),
     )
@@ -257,6 +271,13 @@ async def get_all_users(
                 for role in user.roles 
                 for permission in role.permissions
             }),
+            display_role=next((
+                    role.name 
+                    for role in user.roles 
+                    if role.display_role
+                ), 
+                ""
+            ),
             is_graduating=user.is_graduating,
             semester_balance=Decimal(
                 next(

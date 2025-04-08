@@ -49,6 +49,8 @@ class UserNoHash(BaseModel):
 
     permissions: list[str]
 
+    display_role: str | None
+
     is_graduating: bool
 
     semester_balance: Decimal = Field(max_digits=10, decimal_places=2)
@@ -168,6 +170,7 @@ class MachineUsageSchema(BaseResponse):
 class UsageResponse(BaseResponse):
     semester: str | None
     time_started: datetime
+    duration: int
     machine_name: str
     cost: Decimal
 

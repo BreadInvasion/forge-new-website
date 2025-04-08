@@ -25,6 +25,7 @@ const UserMenu: React.FC = () => {
                     isNav = {false}
                 />
                 <h2>{user.first_name} {user.last_name}</h2>
+                <h3>{user.display_role}</h3>
             </div>
             <div className="divider" />
             <nav className='options-container'>

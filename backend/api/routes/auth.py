@@ -106,6 +106,13 @@ async def get_current_user(
             for role in current_user.roles 
             for permission in role.permissions
         }),
+        display_role=next((
+                role.name 
+                for role in current_user.roles 
+                if role.display_role
+            ), 
+            ""
+        ),
         is_graduating=current_user.is_graduating,
         semester_balance=Decimal(semester_balance),
     )
