@@ -87,7 +87,7 @@ export interface Resource {
 };
 
 // MachineStatus block
-export interface MachineStatus extends Record<string, any> {
+export interface MachineStatus{
     id: string;
     name: string;
     in_use: boolean;
@@ -100,12 +100,12 @@ export interface MachineStatus extends Record<string, any> {
     failed_at: Date;
 }
 
-export interface MachineStatusGroup extends Record<string, any> {
+export interface MachineStatusGroup{
     name: string;
     machines: MachineStatus[];
 }
 
-export interface AllMachinesStatusResponse extends Record<string, any> {
+export interface AllMachinesStatusResponse{
     groups: MachineStatusGroup[];
     loners: MachineStatus[];
 }
