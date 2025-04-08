@@ -47,7 +47,7 @@ class UserNoHash(BaseModel):
 
     pronouns: PronounType
 
-    role_ids: list[UUID4]
+    permissions: list[str]
 
     display_role: str | None
 
