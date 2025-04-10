@@ -80,7 +80,7 @@ const UpNext: React.FC = () => {
             <h2>Machines Up Next:</h2>
             {inProgressMachines.map((machine, index) => (
                 <MachineItem key={index}>
-                    <StatusText>{index + 1}. {machine.name} : being used by <br/>{machine.user ? machine.user : 'N/A'}</StatusText>
+                    <StatusText>{index + 1}. {machine.name} : being used by {machine.user ? machine.user : 'N/A'}</StatusText>
                     <StatusText $area="date">Est. Completion: {getEndTime(machine.usage_start!, machine.usage_duration!)}</StatusText>
                 </MachineItem>
             ))}

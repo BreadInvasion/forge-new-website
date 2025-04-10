@@ -15,7 +15,8 @@ const getProgress = (usage_start: Date | undefined, usage_duration: number | und
     const start = usage_start; 
     const end = new Date(start.getTime() + usage_duration * 60000);
     const now = new Date();
-    return Math.min(1, Math.max(0, (now.getTime() - start.getTime()) / (end.getTime() - start.getTime())));
+    const progress = (now.getTime() - start.getTime()) / (end.getTime() - start.getTime());
+    return Math.min(100, Math.max(0, progress * 100));
 }
 
 export interface MachineProps {
@@ -116,22 +117,22 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
             progress={$minimized ? getProgress(usage_start, usage_duration) : 0}
             onClick={handleClick}
         >
-                <MachineName>{name}</MachineName>
-                <StatusText>User: {user ? user : 'N/A'}</StatusText>
+                <MachineName $minimized={$minimized}>{name}</MachineName>
+                <StatusText $minimized={$minimized}>User: {user ? user : 'N/A'}</StatusText>
                 {!$minimized && (
                     <>
-                        <StatusText $minimized={$minimized}>Material: {material ? material : 'N/A'}</StatusText>
-                        <StatusText $minimized={$minimized}>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>
+                        <StatusText>Material: {material ? material : 'N/A'}</StatusText>
+                        <StatusText>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>
                         {in_use && (
                             <>
-                            <StatusText $minimized={$minimized}>Start Time<br /> {usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })} </StatusText>
-                            <StatusText $minimized={$minimized}>Total Time: {usage_duration} </StatusText>
-                            <StatusText $minimized={$minimized}>Progress: {Math.round(getProgress(usage_start, usage_duration) * 100) / 100} % </StatusText>
+                            <StatusText>Start Time<br /> {usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })} </StatusText>
+                            <StatusText>Total Time: {usage_duration} </StatusText>
+                            <StatusText>Progress: {getProgress(usage_start, usage_duration)} % </StatusText>
                             </>
                         )}
-                        <StatusText $minimized={$minimized}>Status: {getStatusText(in_use, failed, maintenance_mode, disabled)}</StatusText>
+                        <StatusText>Status: {getStatusText(in_use, failed, maintenance_mode, disabled)}</StatusText>
                         {failed &&(
-                            <StatusText $minimized={$minimized}>Failed at: {failed_at?.toDateString()}</StatusText>
+                            <StatusText>Failed at: {failed_at?.toDateString()}</StatusText>
                         )}
                     </>
                 )}

@@ -5,7 +5,12 @@ import { grayDark, whiteA } from '@radix-ui/colors';
 const mobileBreakpoint = "850px";
 
 /******************************* Prusa Shelf ******************************** */
-
+export const StatusWrapper = styled.div`
+    flex-direction: column;
+    display: flex;
+    width: 100%;
+    height: 100%;
+`;
 
 export const GridContainer = styled.div`
     grid-area: status;
@@ -13,8 +18,9 @@ export const GridContainer = styled.div`
     flex-wrap: wrap;
     gap: 1rem;
     justify-content: center;
-    align-items: stretch;
+    align-items: flex-start;
     column-gap: 10px;
+    overflow-y: auto;
 `;
 
 export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highlightFailed?: boolean; progress: number }>`
@@ -25,12 +31,12 @@ export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highli
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    gap: 0.1rem;
-    width: ${({ $minimized }) => ($minimized ? 'clamp(8vw, 10vw, 12vw)' : 'clamp(20vw, 25vw, 30vw)')};
+    gap: 0rem;
+    width: ${({ $minimized }) => ($minimized ? 'clamp(120px, 9vw, 200px)' : 'clamp(200px, 25vw, 400px)')};
+    min-width: ${({ $minimized }) => ($minimized ? '100px' : '200px')};
     max-width: 100%;
-    height: ${({ $minimized }) => ($minimized ? 'clamp(15vh, 17vh, 19vh)' : 'auto')};
-    max-height: 100%;
-    aspect-ratio: ${({ $minimized }) => ($minimized ? '1 / 1' : 'auto')};
+    height: ${({ $minimized }) => ($minimized ? 'clamp(15vh, 15vh, 17vh)' : 'auto')};
+    aspect-ratio: auto;
     flex-shrink: 0;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     border-radius: ${({ $minimized }) => ($minimized ? '5px' : '10px')}; 
@@ -45,7 +51,6 @@ export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highli
         background-position: center;
     `}
     position: relative;
-
     &::before {
         content: '';
         position: absolute;
@@ -56,17 +61,16 @@ export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highli
         background-color: rgba(0, 255, 0, 0.2);
         border-radius: 5px;
     }
-    @media screen and (max-width: 768px) {
-        width: ${({ $minimized }) => ($minimized ? '17vh' : 'auto')};
-        height: ${({ $minimized }) => ($minimized? '15vh' : 'auto')};
+    @media screen and (max-width: 850px) {
+        width: ${({ $minimized }) => ($minimized ? '15vh' : 'auto')};
+        height: ${({ $minimized }) => ($minimized? '12vh' : 'auto')};
         aspect-ratio: auto;
         border-radius: 10px; 
-        font-size: 3.0vh;
     }
 `;
 
-export const MachineName = styled.h3<{ minimized?: boolean }>`
-    font-size: ${({ minimized }) => (minimized ? "3.5vh" : "3.5vh")};
+export const MachineName = styled.h3<{ $minimized?: boolean }>`
+    font-size: ${({ $minimized }) => ($minimized ? "2.5vh" : "3.0vh")};
     font-weight: 600;
     color: #000;
     text-transform: uppercase;
@@ -75,12 +79,15 @@ export const MachineName = styled.h3<{ minimized?: boolean }>`
 `;
 
 export const StatusText = styled.p<{ $area?: string, $minimized?: boolean }>`
-    font-size: ${({ $minimized }) => ($minimized ? "1.3vh" : "2.2vh")};
+    font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "2.0vh")};
     color: #000;
     text-align: center;
     text-jusitfy: center;
     font-family: Montserrat;
     font-weight: 600;
+    @media screen and (max-width: 850px) {
+        font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "1.7vh")};
+    }
 `;
 
 export const ProgressBar = styled.div<{$horizontal?: boolean}>`

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { OmniAPI } from "src/apis/OmniAPI";
 import styled from 'styled-components';
-import { GridContainer } from './StatusComponents';
+import { GridContainer, StatusWrapper} from './StatusComponents';
 import { SelectedMachineProvider } from './SelectedMachineContext';
 import UpNext from './components/UpNext';
 import Highlight from './components/Highlight';
@@ -21,8 +21,10 @@ const Page = styled.div`
         "status up-next"
         "status up-next";
     padding: 0.5rem 1rem;
-    gap: 1rem;
-    @media screen and (max-width: 768px) {
+    gap: 0.5 rem;
+    overflow-y: auto;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent; 
+    @media screen and (max-width: 850px) {
         display: flex;
         flex-direction: column;
         grid-template-columns: 1fr;
@@ -40,7 +42,11 @@ const Sidebar = styled.div`
     flex-direction: column; 
     padding-right: 2rem;
     gap: 0;
-    @media screen and (max-width: 768px) {
+    min-width: 250px;
+    @media screen and (max-width: 850px) {
+        padding: 0.5rem;
+        padding-top: 1rem;
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
         display: grid;
         grid-template-columns: 2fr 1fr;
         grid-template-rows: auto;
@@ -123,28 +129,30 @@ export const Status : React.FC = () => {
                     activeFilters={activeFilters}
                     setActiveFilters={setActiveFilters}
                 />
-                   <GridContainer>
-                   {filteredMachines.map((machine, index) => (
-                        <MachineCard
-                            key={`${machine.name}-${index}`}  
-                            id={machine.id}
-                            name={machine.name}
-                            in_use={machine.in_use}
-                            usage_start={machine.usage_start} 
-                            usage_duration={machine.usage_duration} 
-                            user={machine.user}
-                            maintenance_mode={machine.maintenance_mode} 
-                            disabled={machine.disabled}
-                            failed={machine.failed}
-                            failed_at={machine.failed_at}
-                            material={machine.material} 
-                            weight={machine.weight}
-                            machine={machine} 
-                            $highlightFailed={highlightFailed}
-                            $minimized={true}
-                            />
-                    ))} 
-                    </GridContainer>
+                <StatusWrapper>
+                    <GridContainer>
+                    {filteredMachines.map((machine, index) => (
+                            <MachineCard
+                                key={`${machine.name}-${index}`}  
+                                id={machine.id}
+                                name={machine.name}
+                                in_use={machine.in_use}
+                                usage_start={machine.usage_start} 
+                                usage_duration={machine.usage_duration} 
+                                user={machine.user}
+                                maintenance_mode={machine.maintenance_mode} 
+                                disabled={machine.disabled}
+                                failed={machine.failed}
+                                failed_at={machine.failed_at}
+                                material={machine.material} 
+                                weight={machine.weight}
+                                machine={machine} 
+                                $highlightFailed={highlightFailed}
+                                $minimized={true}
+                                />
+                        ))} 
+                        </GridContainer>
+                    </StatusWrapper>
                     <Sidebar>
                         <Highlight />
                         <UpNext />
