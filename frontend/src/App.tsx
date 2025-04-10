@@ -13,7 +13,7 @@ const Status = lazy(() => import('./components/Status/Status'));
 const Login = lazy(() => import('./components/Forms/Login'));
 const Register = lazy(() => import('./components/Forms/Register'));
 const ComingSoon = lazy(() => import('./components/Home/ComingSoon'));
-const NewStatus = lazy(() => import('./components/Status/NewStatus'));
+const NewStatus = lazy(() => import('./components/Status/Status'));
 const MyForge = lazy(() => import('./components/MyForge/MyForge'));
 const Hours = lazy(() => import('./components/Hours/Hours'));
 const Wiki = lazy(() => import('./components/Learn/Wiki'));

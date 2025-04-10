@@ -1,76 +1,104 @@
-import { styled } from 'styled-components';
+import styled from 'styled-components';
 import { grayDark, whiteA } from '@radix-ui/colors';
 
-//Works for 90% of phones (With the settings for background and all that) Has some trouble with tablets
+// Works for 90% of phones (With the settings for background and all that) Has some trouble with tablets
 const mobileBreakpoint = "850px";
 
 /******************************* Prusa Shelf ******************************** */
-
-
-export const Prusas = styled.div`
+export const StatusWrapper = styled.div`
+    flex-direction: column;
+    display: flex;
     width: 100%;
     height: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10%,15%));
-    grid-auto-rows: 1fr;
-    grid-auto-flow: row;
-    grid-gap: 1%;
-    // display: flex;
-    // gap: 1%;
-    // flex-wrap: wrap;
-    padding: 1% 2%;
-    overflow-y: auto;
-    align-items: center;
-    justify-content: center;
 `;
 
-export const Card = styled.div<{ symbol?: string }>`
+export const GridContainer = styled.div`
+    grid-area: status;
     display: flex;
-    height: min-content;
-    padding: 15px;
-    aspect-ratio: 5 / 4;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    align-items: flex-start;
+    column-gap: 10px;
+    @media screen and (max-width: 850px) {
+        overflow-y: auto;
+    }
+`;
+
+export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highlightFailed?: boolean; progress: number }>`
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    border-radius: 20px;
-    border: 1px solid #000000;
-    ${props => props?.symbol && `
-        background-image: url(src/assets/img/symbols/${props.symbol}.svg);
+    align-items: center;
+    gap: 0rem;
+    width: ${({ $minimized }) => ($minimized ? 'clamp(120px, 9vw, 200px)' : 'clamp(200px, 25vw, 400px)')};
+    min-width: ${({ $minimized }) => ($minimized ? '100px' : '200px')};
+    max-width: 100%;
+    height: ${({ $minimized }) => ($minimized ? 'clamp(15vh, 15vh, 17vh)' : 'auto')};
+    aspect-ratio: auto;
+    flex-shrink: 0;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    border-radius: ${({ $minimized }) => ($minimized ? '5px' : '10px')}; 
+    box-shadow: ${({ $highlightFailed }) =>
+        $highlightFailed ? '0 0 10px 2px red' : '0 0 5px rgba(0, 0, 0, 0.5)'};
+    border: ${({ $minimized }) => ($minimized ? '1px solid #ccc' : '1px solid #999')};
+    font-size: ${({ $minimized }) => ($minimized ? "2.5vh" : "3.0vh")};
+    transition: all 0.3s ease-in-out;
+    ${props => props?.$symbol && `
+        background-image: url(src/assets/img/symbols/${props.$symbol}.svg);
         background-size: auto 90%;
         background-repeat: no-repeat;
         background-position: center;
     `}
-
-    filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
-    box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.5);
+    position: relative;
+    &::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: ${props => props.progress}%;
+        background-color: rgba(0, 255, 0, 0.2);
+        border-radius: 5px;
+    }
+    ${({ $minimized }) =>$minimized && `&:hover {    
+        transform: scale(1.05); 
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
+        }
+    `}
+    @media screen and (max-width: 850px) {
+        width: ${({ $minimized }) => ($minimized ? '15vh' : 'auto')};
+        height: ${({ $minimized }) => ($minimized? '12vh' : 'auto')};
+        aspect-ratio: auto;
+        border-radius: 10px; 
+    }
 `;
 
-export const Info = styled.div`
-    height: auto;
-    display: flex;
-    gap: 5%;
-    flex-direction: column;
-`;
-
-export const MachineName = styled.h3`
-    color: #000;
-
-    font-family: Montserrat;
-    text-transform: uppercase;
-
-    margin: 0;
-    padding: 0;
-`;
-
-export const StatusText = styled.span<{area?: string}>`
-    color: #000;
-
-    font-family: Montserrat;
-    font-size: 0.9vw;
-    font-style: normal;
+export const MachineName = styled.h3<{ $minimized?: boolean }>`
+    font-size: ${({ $minimized }) => ($minimized ? "2.5vh" : "3.0vh")};
     font-weight: 600;
-    line-height: normal;
+    color: #000;
+    text-transform: uppercase;
+    font-family: Montserrat;
+    text-align: center;
 `;
 
-export const ProgressBar = styled.div<{horizontal?: string}>`
+export const StatusText = styled.p<{ $area?: string, $minimized?: boolean }>`
+    font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "2.0vh")};
+    color: #000;
+    text-align: center;
+    text-jusitfy: center;
+    font-family: Montserrat;
+    font-weight: 600;
+    @media screen and (max-width: 850px) {
+        font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "1.7vh")};
+    }
+`;
+
+export const ProgressBar = styled.div<{$horizontal?: boolean}>`
     width: 10%;
     height: 100%;
     background-color: ${whiteA.whiteA11};
@@ -79,24 +107,24 @@ export const ProgressBar = styled.div<{horizontal?: string}>`
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
-    ${props => props.horizontal && `
+    justify-content: flex-start;
+    ${props => props.$horizontal && `
         width: auto;
-        height: 100%;
+        height: 10%;
         min-height: 10px;
         flex-direction: row;
         justify-content: flex-start;
     `}
 `;
 
-export const Progress = styled.div<{ progress: number, horizontal?: boolean }>`
+export const Progress = styled.div<{ $progress: number, $horizontal?: boolean }>`
     width: 100%;
-    height: ${props => props.progress}%;
+    height: ${props => props.$progress}%;
     background-color: green;
     border-radius: 1vw;
-    ${props => props.horizontal && `
-        width: ${props.progress}%;
-        height: 100%;
+    ${props => props.$horizontal && `
+        width: ${props.$progress}%;
+        height: 10%;
     `}
 `;
 
@@ -120,15 +148,15 @@ export const ListItem = styled.div`
     align-items: center;
     padding: 5px;
     gap: 1%;
-
     filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
     box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.5);
+
 `;
-export const ListIcon = styled.div<{ symbol?: string }>`
+export const ListIcon = styled.div<{ $symbol?: string }>`
     height: 100%;
     aspect-ratio: 1 / 1;
 
-    background-image: url(src/assets/img/symbols/${props => props.symbol}.svg);
+    background-image: url(src/assets/img/symbols/${props => props.$symbol}.svg);
     background-size: auto 90%;
     background-repeat: no-repeat;
     background-position: center;

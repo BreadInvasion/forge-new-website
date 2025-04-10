@@ -1,11 +1,11 @@
 export interface Machine {
     name: string;
-    icon?: string; // Assuming icon is a string representing the path to an image
+    icon?: string; 
     user?: string;
     material: string;
-    weight?: number; // Assuming weight is a numeric value
-    totalTime?: number; // Assuming totalTime is a numeric value representing minutes or seconds
-    startTime?: string; // Assuming startTime is a string representing date/time
+    weight?: number; 
+    totalTime?: number; 
+    startTime?: string;
     status: Status;
 }
 

@@ -1,18 +1,24 @@
 import { Pencil1Icon, ExclamationTriangleIcon, Cross2Icon, EraserIcon } from "@radix-ui/react-icons";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Filter from "./Filter";
 import { ToolButton, FilterItem, FilterX } from "./FilterComponents";
-
-
+import { Toggle } from "@radix-ui/react-toggle";
 
 const ToolbarContainer = styled.div`
     grid-area: tools;
     display: flex;
-    padding-bottom: 10px;
+    padding-bottom: 1rem;
     gap: 10px;
 `;
 
+interface ToolbarProps {
+    highlightFailed?: boolean;
+    setHighlightFailed: (value : boolean) => void;
+    activeFilters: string[];
+    setActiveFilters: React.Dispatch<React.SetStateAction<string[]>>;
+}
 const ActiveFilters = styled.div`
     display: flex;
     gap: 5px;
@@ -42,7 +48,19 @@ const ActiveFilters = styled.div`
 
 `;
 
-const Toolbar: React.FC = () => {
+const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, activeFilters, setActiveFilters}) => {
+
+    const navigate = useNavigate();
+
+    const handleEditClick = () => {
+        // Navigate to the "Edit Machine" form
+        navigate("/myforge/usages");
+    };
+
+    const handleFailClick = () => {
+        // Navigate to the "Fail Machine" form
+        navigate("/myforge/fail");
+    };  
 
     const filters = [
         {
@@ -51,10 +69,9 @@ const Toolbar: React.FC = () => {
         },
         {
             name: "Status",
-            value: ["In Progress", "Completed", "Available", "Failed"]
+            value: ["In Progress", "Completed", "Available", "Failed", "Maintenance"]
         }
     ]
-    const [activeFilters, setActiveFilters] = useState<string[]>([]);
     
     const handleFilterClick = (value: string) => {
         if(!activeFilters.includes(value)) {
@@ -67,7 +84,6 @@ const Toolbar: React.FC = () => {
         setActiveFilters((prevFilters) =>
             prevFilters.filter((filter) => filter !== value)
         );
-
     };
 
     useEffect(() => {
@@ -81,7 +97,6 @@ const Toolbar: React.FC = () => {
                 left: e.deltaY,
                 behavior: 'smooth'
             });
-            
         });
 
         return () => {
@@ -91,16 +106,30 @@ const Toolbar: React.FC = () => {
 
     return (
         <ToolbarContainer>
-
-
-            <ToolButton aria-label="Edit">
+            <ToolButton aria-label="Edit" onClick={handleEditClick}>
+                {/* Edit is for Room Managers and Admin/Super users only and will
+                 bring the user to a form where they can edit the details of the 
+                 usage */}
                 <Pencil1Icon />
             </ToolButton>
-            <ToolButton aria-label="Report">
+            <ToolButton aria-label="Fail" onClick={handleFailClick}>
+                { /*Fail will also be available to Volunteer level users,
+                 and when selected any machine they click on will redirect 
+                 to a Failure Form. */ }
                 <ExclamationTriangleIcon />
             </ToolButton>
-            <ToolButton aria-label="Clear">
-                <EraserIcon />
+            <ToolButton aria-label="Clear"> 
+                {/*only available to Admin/Super users and will clear the
+                 failure status of a machine */}
+                <Toggle
+                    pressed={highlightFailed}
+                    onPressedChange={setHighlightFailed}
+                    asChild
+                >
+                <div>
+                    <EraserIcon />
+                </div>
+                </Toggle>    
             </ToolButton>
             <Filter 
                 filters={filters} 

@@ -1,47 +1,177 @@
-import React from 'react';
-import { ExclamationTriangleIcon, Component1Icon } from '@radix-ui/react-icons';
-import {
-    Card,
-    Info, ListIcon, ListInfo, ListItem, MachineName, OtherMachines, Progress, ProgressBar, Prusas, StatusText,
-} from './StatusComponents';
-import { machines, otherMachines } from './generateMockStatusData';
-import MachineCard from './MachineCard';
+import React, { useEffect, useState } from 'react';
+import { OmniAPI } from "src/apis/OmniAPI";
+import styled from 'styled-components';
+import { GridContainer, StatusWrapper} from './StatusComponents';
+import { SelectedMachineProvider } from './SelectedMachineContext';
+import UpNext from './components/UpNext';
+import Highlight from './components/Highlight';
+import Toolbar from './components/Toolbar';
+import MachineCard,{ getProgress } from './MachineCard';
+import { Machine, AllMachinesStatusResponse } from "src/interfaces";
 
-const getEndTime = (startTime: string, totalTime: number) => {
-    const start = new Date(startTime);
-    const end = new Date(start.getTime() + totalTime * 60000);
-    return end.toLocaleString('en-US', {month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true});
-}
+const Page = styled.div`
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: auto 1fr auto; 
+    grid-template-areas:
+        "tools highlight"
+        "status highlight"
+        "status up-next"
+        "status up-next";
+    padding: 0.5rem 1rem;
+    gap: 0.5 rem;
+    overflow-y: auto;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent; 
+    @media screen and (max-width: 850px) {
+        display: flex;
+        flex-direction: column;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+            "tools"
+            "sidebar"
+            "status";
+    }
+`;
 
-const getProgress = (startTime: string | undefined, totalTime: number | undefined) => {
-    if (!startTime || !totalTime) return 0;
-    const start = new Date(startTime);
-    const end = new Date(start.getTime() + totalTime * 60000);
-    const now = new Date();
-    return 75;
-}
+const Sidebar = styled.div`
+    grid-area: highlight;
+    display: flex;
+    flex-direction: column; 
+    padding-right: 2rem;
+    gap: 0;
+    min-width: 250px;
+    @media screen and (max-width: 850px) {
+        padding: 0.5rem;
+        padding-top: 1rem;
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: auto;
+        gap: 1rem;
+        grid-template-areas:
+            "highlight up-next";
+    }
+`;
 
-export default function Status() {
+export const Status : React.FC = () => {
+    const [MachinesResponse, setAllMachinesResponse] = useState<AllMachinesStatusResponse | null>(null);
+    const [machines, setMachines] = useState<Machine[]>([]);
+    
+    const [highlightFailed, setHighlightFailed] = useState(false);
+    const [activeFilters, setActiveFilters] = useState<string[]>([]);
+    
+    useEffect(() => {
+            const fetchMachines = async () => {
+                try {
+                    const response = await OmniAPI.getPublic("machinestatus");
+                    console.log(response);
+    
+                    const data: AllMachinesStatusResponse = response;
+                    setAllMachinesResponse(data);
+                    
+                    const flattenedMachines = [
+                        ...data.loners,
+                        ...data.groups.flatMap((group) => group.machines),
+                    ];
+    
+                    const transformedMachines = flattenedMachines.map((machine) => ({
+                        ...machine,
+                        group: machine.group || null,
+                        group_id: machine.group_id || null,
+                        type: machine.type || null,
+                        type_id: machine.type_id || null,
+                        id: machine.id,
+                        name: machine.name,
+                        in_use: machine.in_use,
+                        usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined, 
+                        usage_duration: machine.usage_duration,
+                        user: machine.user_name,
+                        maintenance_mode: machine.maintenance_mode,
+                        disabled: machine.disabled,
+                        failed: machine.failed,
+                        failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined,
+                    }));
+    
+                    console.log("Machines:", transformedMachines);
+                    setMachines(transformedMachines);
+                } catch (error) {
+                    console.error("Error fetching machines:", error);
+                }
+            };
+    
+            fetchMachines();
+        }, []);
+
+
+    const filteredMachines = machines.filter((machine) => {
+        if (activeFilters.length === 0) return true;
+        return activeFilters.some((filter) => {
+            const progress = getProgress(machine.usage_start, machine.usage_duration);
+            switch (filter) {
+                case "In Progress":
+                    return progress < 100 && progress > 0;
+                case "Completed":
+                    return progress === 100;
+                case "Available":
+                    return !machine.in_use && !machine.failed && !machine.maintenance_mode;
+                case "Failed":
+                    return machine.failed;
+                case "Maintenance":
+                    return machine.maintenance_mode;
+                default:
+                    return filter === machine.type; 
+            }
+        });
+    });
 
     return (
-            <Prusas>
-            {machines.map((machine, index) => (
-                <MachineCard
-                    key={index}
-                    name={machine.name}
-                    icon={machine.icon}
-                    user={machine.user}
-                    material={machine.material}
-                    weight={machine.weight}
-                    startTime={machine.startTime}
-                    totalTime={machine.totalTime}
+        <SelectedMachineProvider>
+            <Page>
+                <Toolbar 
+                    highlightFailed={highlightFailed} 
+                    setHighlightFailed={setHighlightFailed} 
+                    activeFilters={activeFilters}
+                    setActiveFilters={setActiveFilters}
                 />
-            ))}
-            </Prusas>
-            
+                <StatusWrapper>
+                    <GridContainer>
+                    {filteredMachines.map((machine, index) => (
+                            <MachineCard
+                                key={`${machine.name}-${index}`}  
+                                id={machine.id}
+                                name={machine.name}
+                                in_use={machine.in_use}
+                                usage_start={machine.usage_start} 
+                                usage_duration={machine.usage_duration} 
+                                user={machine.user}
+                                maintenance_mode={machine.maintenance_mode} 
+                                disabled={machine.disabled}
+                                failed={machine.failed}
+                                failed_at={machine.failed_at}
+                                material={machine.material} 
+                                weight={machine.weight}
+                                machine={machine} 
+                                $highlightFailed={highlightFailed}
+                                $minimized={true}
+                                />
+                        ))} 
+                        </GridContainer>
+                    </StatusWrapper>
+                    <Sidebar>
+                        <Highlight />
+                        <UpNext />
+                    </Sidebar>
+                </Page>
+        </SelectedMachineProvider>
     );
-}
-{/* <OtherMachines>
+};
+
+export default Status;
+/*
+{ <OtherMachines>
                 {otherMachines.map((machine, index) => (
                     <ListItem key={index}>
                         <ListIcon symbol={machine.icon} />
@@ -61,4 +191,4 @@ export default function Status() {
                         </ListInfo>
                     </ListItem>
                 ))}
-            </OtherMachines> */}
+            </OtherMachines> }*/
