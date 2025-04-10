@@ -20,7 +20,9 @@ export const GridContainer = styled.div`
     justify-content: center;
     align-items: flex-start;
     column-gap: 10px;
-    overflow-y: auto;
+    @media screen and (max-width: 850px) {
+        overflow-y: auto;
+    }
 `;
 
 export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highlightFailed?: boolean; progress: number }>`
@@ -44,6 +46,7 @@ export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highli
         $highlightFailed ? '0 0 10px 2px red' : '0 0 5px rgba(0, 0, 0, 0.5)'};
     border: ${({ $minimized }) => ($minimized ? '1px solid #ccc' : '1px solid #999')};
     font-size: ${({ $minimized }) => ($minimized ? "2.5vh" : "3.0vh")};
+    transition: all 0.3s ease-in-out;
     ${props => props?.$symbol && `
         background-image: url(src/assets/img/symbols/${props.$symbol}.svg);
         background-size: auto 90%;
@@ -61,6 +64,11 @@ export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highli
         background-color: rgba(0, 255, 0, 0.2);
         border-radius: 5px;
     }
+    ${({ $minimized }) =>$minimized && `&:hover {    
+        transform: scale(1.05); 
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
+        }
+    `}
     @media screen and (max-width: 850px) {
         width: ${({ $minimized }) => ($minimized ? '15vh' : 'auto')};
         height: ${({ $minimized }) => ($minimized? '12vh' : 'auto')};

@@ -9,7 +9,7 @@ import { Toggle } from "@radix-ui/react-toggle";
 const ToolbarContainer = styled.div`
     grid-area: tools;
     display: flex;
-    padding-bottom: 10px;
+    padding-bottom: 1rem;
     gap: 10px;
 `;
 

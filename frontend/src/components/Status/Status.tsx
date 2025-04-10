@@ -6,7 +6,7 @@ import { SelectedMachineProvider } from './SelectedMachineContext';
 import UpNext from './components/UpNext';
 import Highlight from './components/Highlight';
 import Toolbar from './components/Toolbar';
-import MachineCard from './MachineCard';
+import MachineCard,{ getProgress } from './MachineCard';
 import { Machine, AllMachinesStatusResponse } from "src/interfaces";
 
 const Page = styled.div`
@@ -93,12 +93,10 @@ export const Status : React.FC = () => {
                         disabled: machine.disabled,
                         failed: machine.failed,
                         failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined,
-                        /* weight, material?? */
                     }));
     
                     console.log("Machines:", transformedMachines);
                     setMachines(transformedMachines);
-    
                 } catch (error) {
                     console.error("Error fetching machines:", error);
                 }
@@ -111,12 +109,21 @@ export const Status : React.FC = () => {
     const filteredMachines = machines.filter((machine) => {
         if (activeFilters.length === 0) return true;
         return activeFilters.some((filter) => {
-            if (filter === "In Progress" && machine.in_use) return true;
-            if (filter === "Available" && !machine.in_use && !machine.failed && !machine.maintenance_mode) return true;
-            if (filter === "Failed" && machine.failed) return true;
-            if (filter === "Maintenance" && machine.maintenance_mode) return true;
-            filter === machine.type;
-            return false;
+            const progress = getProgress(machine.usage_start, machine.usage_duration);
+            switch (filter) {
+                case "In Progress":
+                    return progress < 100 && progress > 0;
+                case "Completed":
+                    return progress === 100;
+                case "Available":
+                    return !machine.in_use && !machine.failed && !machine.maintenance_mode;
+                case "Failed":
+                    return machine.failed;
+                case "Maintenance":
+                    return machine.maintenance_mode;
+                default:
+                    return filter === machine.type; 
+            }
         });
     });
 

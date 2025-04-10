@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { Card, MachineName, StatusText } from './StatusComponents';
 import { useSelectedMachine } from './SelectedMachineContext';
-import Status from './Status';
 
 export const getEndTime = (usage_start: Date, usage_duration: number) => {
     const start = usage_start; 
@@ -10,7 +9,7 @@ export const getEndTime = (usage_start: Date, usage_duration: number) => {
     return end.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
 }
 
-const getProgress = (usage_start: Date | undefined, usage_duration: number | undefined) => {
+export const getProgress = (usage_start: Date | undefined, usage_duration: number | undefined) => {
     if (!usage_start || !usage_duration) return 0;
     const start = usage_start; 
     const end = new Date(start.getTime() + usage_duration * 60000);
