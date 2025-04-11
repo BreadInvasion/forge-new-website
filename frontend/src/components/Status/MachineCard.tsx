@@ -5,14 +5,14 @@ import { useSelectedMachine } from './SelectedMachineContext';
 
 export const getEndTime = (usage_start: Date, usage_duration: number) => {
     const start = usage_start; 
-    const end = new Date(start.getTime() + usage_duration * 60000);
+    const end = new Date(start.getTime() + usage_duration * 1000);
     return end.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
 }
 
 export const getProgress = (usage_start: Date | undefined, usage_duration: number | undefined) => {
     if (!usage_start || !usage_duration) return 0;
     const start = usage_start; 
-    const end = new Date(start.getTime() + usage_duration * 60000);
+    const end = new Date(start.getTime() + usage_duration * 600);
     const now = new Date();
     const progress = (now.getTime() - start.getTime()) / (end.getTime() - start.getTime());
     return Math.min(100, Math.max(0, progress * 100));
