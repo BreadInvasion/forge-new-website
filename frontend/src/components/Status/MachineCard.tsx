@@ -126,7 +126,7 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
                             <>
                             <StatusText>Start Time<br /> {usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })} </StatusText>
                             <StatusText>Total Time: {usage_duration} </StatusText>
-                            <StatusText>Progress: {getProgress(usage_start, usage_duration)} % </StatusText>
+                            <StatusText>Progress: {getProgress(usage_start, usage_duration).toFixed(2)} % </StatusText>
                             </>
                         )}
                         <StatusText>Status: {getStatusText(in_use, failed, maintenance_mode, disabled)}</StatusText>
