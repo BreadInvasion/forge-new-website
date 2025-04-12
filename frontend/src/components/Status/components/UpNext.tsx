@@ -78,7 +78,7 @@ const UpNext: React.FC = () => {
         return (
             <UpNextContainer>
                 <h2>Machines Up Next:</h2>
-                <p>All machines are available!</p>
+                <p>No machines to be completed in the next 30 minutes.</p>
             </UpNextContainer>
         );
     }
