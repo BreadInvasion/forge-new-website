@@ -2,6 +2,11 @@ import discord, requests as r, pickle, os.path as p
 from dotenv import dotenv_values
 from discord import app_commands
 
+from datetime import date
+from datetime import datetime
+
+from datetime import datetime, timedelta
+
 token = dotenv_values(".env")["TOKEN"]
 intents = discord.Intents.default()
 intents.message_content = True
@@ -45,16 +50,52 @@ async def sync(inter: discord.Interaction):
         await inter.response.send_message(f"Command tree could not be synced.\nIs the bot present in the current context?\n\nMore details:\n```{e}```")
 
 @tree.command( name="status", description="Checks the status of all machines." )
-async def ping(inter: discord.Interaction):
+async def status(inter: discord.Interaction):
     print("[CMD] machine stats!")
     out_str = "# Machine Usage:\n\n"
+
     try:
         status_obj = r.get("http://backend:8000/machinestatus", headers={"accept": "application/json"}).json()
         # status_obj = json.loads(json_dat)
         for group in status_obj["groups"]:
             out_str += "## " + group["name"] + "\n"
             for mach in group["machines"]:
-                out_str += f"- {mach["name"]} {(":green_circle:" if mach["in_use"] else ":black_circle:") * (not mach["failed"])} {":dizzy_face:" * mach["failed"]} \n"
+
+                if not mach["in_use"] and not mach["failed"]:
+                    out_str += f'- {mach["name"]} :black_circle: \n'
+                    continue
+
+                if mach["failed"]:
+                    out_str += f'- {mach["name"]} :dizzy_face: \n'
+                    continue
+
+                if mach["maintenance_mode"]:
+                    out_str += f'- {mach["name"]} :construction: \n'
+                    continue
+
+                if mach["in_use"] and not mach["failed"]:
+                    # Calculate the difference in seconds from usage_end to now
+                    datetime_now = datetime.now()
+                    estimated_time_left = 0
+
+                    usage_duration = mach["usage_duration"]
+                    usage_start = mach["usage_start"]
+
+                    usage_start_day = usage_start.split("T")[0]
+                    usage_start_time = usage_start.split("T")[1]
+
+                    usage_start_year = int(usage_start_day.split("-")[0])
+                    usage_start_month = int(usage_start_day.split("-")[1])
+                    usage_start_day = int(usage_start_day.split("-")[2])
+
+                    usage_start_hour = int(usage_start_time.split(":")[0])
+                    usage_start_minute = int(usage_start_time.split(":")[1])
+                    usage_start_second = int(usage_start_time.split(":")[2][0:2])
+
+                    usage_start_datetime = datetime(usage_start_year, usage_start_month, usage_start_day, usage_start_hour, usage_start_minute, usage_start_second)
+                    usage_end_datetime = usage_start_datetime + timedelta(seconds=usage_duration)
+                    estimated_time_left = (usage_end_datetime - datetime_now).total_seconds()
+                    out_str += f'- {mach["name"]} {":Hourglass Not Done:" + str(estimated_time_left) + "until finish" if estimated_time_left > 0 else ":white_check_mark:" + "It's done!"} \n'
     except Exception as e:
         out_str += f"```\nERROR: {str(e)}\n```"
     await inter.response.send_message(out_str)
