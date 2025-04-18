@@ -66,7 +66,7 @@ const AboutUs = () => {
           </div>
 
           {/* Training Slides Section */}
-          <h2>Training Slides</h2>\
+          <h2>Training Slides</h2>
           <div className="training-slides">
             <iframe src="https://docs.google.com/presentation/d/1CmwkK1Evvp_0BWViicU-pT_XDuFGact-4_kRH7R0WnE/embed?" frameBorder="0" width="100%" height="600" className="w-full max-w-[480px] aspect-video"></iframe>
           </div>
