@@ -85,3 +85,27 @@ export interface Resource {
     units: string;
     cost: string;
 };
+
+// MachineStatus block
+export interface MachineStatus{
+    id: string;
+    name: string;
+    in_use: boolean;
+    usage_start: Date;
+    usage_duration: number;
+    user_id: string;
+    maintenance_mode: boolean;
+    disabled: boolean;
+    failed: boolean;
+    failed_at: Date;
+}
+
+export interface MachineStatusGroup{
+    name: string;
+    machines: MachineStatus[];
+}
+
+export interface AllMachinesStatusResponse{
+    groups: MachineStatusGroup[];
+    loners: MachineStatus[];
+}
