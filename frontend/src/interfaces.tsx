@@ -1,4 +1,5 @@
 // src/interfaces.ts
+import { UserPermission } from "enums";
 
 export interface User {
     id: string;
@@ -10,7 +11,7 @@ export interface User {
     major?: string;
     gender_identity: string;
     pronouns: string;
-    role_ids: string[];
+    permissions: UserPermission[];
     display_role: string;
     is_graduating: boolean;
     semester_balance: string;
@@ -26,7 +27,7 @@ export const defaultUser: User = {
     major: '',
     gender_identity: "notdisclosed",
     pronouns: '',
-    role_ids: [],
+    permissions: [],
     display_role: '',
     is_graduating: false,
     semester_balance: '',
