@@ -37,7 +37,6 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ children, className
   );
 };
 
-// Define section types for better organization
 interface AccordionSectionProps {
   title: string;
   defaultValue: string;
@@ -281,8 +280,21 @@ const AccordionDemo: React.FC = () => {
 
   return (
     <div className="wiki">
-
       <div className="faq-container">
+
+        <h1>Training Slides</h1>
+          <iframe src="https://docs.google.com/presentation/d/1CmwkK1Evvp_0BWViicU-pT_XDuFGact-4_kRH7R0WnE/embed?" 
+          frameBorder="0" width="100%" height="600" className="w-full max-w-[480px] aspect-video"></iframe>
+
+          <iframe src="https://docs.google.com/presentation/d/1kb65644XnRrhrCGokEjaftZFlsJD40XSzA9jwwkEsno/embed?"
+          frameBorder="0" width="100%" height="600" className="w-full max-w-[480px] aspect-video"></iframe>
+
+          <iframe src="https://docs.google.com/presentation/d/13bkWqiG3Y7H6se2dV5ionpyZpqBgSz8bTrstZuc839Q/embed?" 
+          frameBorder="0" width="100%" height="600" className="w-full max-w-[480px] aspect-video"></iframe>
+
+          <iframe src="https://docs.google.com/presentation/d/14hzSkw8vXyfpSizP4JA-aKf8_6uOOjVam2YJX1eX1fk/embed?" 
+          frameBorder="0" width="100%" height="600" className="w-full max-w-[480px] aspect-video"></iframe>
+
         <h1>Frequently Asked Questions</h1>
         
         {sections.map((section, index) => (
