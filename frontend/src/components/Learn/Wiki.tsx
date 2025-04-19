@@ -282,6 +282,20 @@ const AccordionDemo: React.FC = () => {
     <div className="wiki">
       <div className="faq-container">
 
+        <h1>Frequently Asked Questions</h1>
+        
+        {sections.map((section, index) => (
+          <AccordionSection 
+            key={`section-${index}`}
+            title={section.title}
+            defaultValue={section.defaultValue}
+            items={section.items}
+          />
+        ))}
+        
+        <h3>If you have any questions, Please visit the Forge and ask the volunteers!</h3>
+
+        <h1></h1>
         <h1>Training Slides</h1>
           <iframe src="https://docs.google.com/presentation/d/1CmwkK1Evvp_0BWViicU-pT_XDuFGact-4_kRH7R0WnE/embed?" 
           frameBorder="0" width="100%" height="600" className="w-full max-w-[480px] aspect-video"></iframe>
@@ -298,19 +312,6 @@ const AccordionDemo: React.FC = () => {
           <iframe src="https://docs.google.com/presentation/d/14hzSkw8vXyfpSizP4JA-aKf8_6uOOjVam2YJX1eX1fk/embed?" 
           frameBorder="0" width="100%" height="600" className="w-full max-w-[480px] aspect-video"></iframe>
           <h1></h1>
-          
-        <h1>Frequently Asked Questions</h1>
-        
-        {sections.map((section, index) => (
-          <AccordionSection 
-            key={`section-${index}`}
-            title={section.title}
-            defaultValue={section.defaultValue}
-            items={section.items}
-          />
-        ))}
-        
-        <h3>If you have any questions, Please visit the Forge and ask the volunteers!</h3>
       </div>
     </div>
   );
