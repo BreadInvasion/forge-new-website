@@ -61,8 +61,12 @@ const AboutUs = () => {
           {/* Hours of Operation Section */}
           <h2>Hours of Operation</h2>
           <div className="hours-section">
-            <p>Monday - Friday: 10:00 AM - 4:00 PM</p>
-            <p>Saturday - Sunday: Closed</p>
+            <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+            <p>Saturday: Closed</p>
+            <p>Sunday: Hours May Vary</p>
+            <button onClick={() => window.location.href = '/hours'}>
+              Check Our Volunteer Hours Here
+            </button>
           </div>
 
           {/* Instagram Embed Section */}
