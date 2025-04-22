@@ -1,11 +1,10 @@
 .table-head {
-    margin-bottom: -1rem;
-    padding: 0px 2rem 0px 2rem;
+    padding: 1rem 2rem 0px 2rem;
     direction: ltr;
     display: block;
     width: 100%;
     * { display: inline-block; }
-    a {
+    .addbtn {
         float: right;
         border: 1px solid #a7a7a7;
         border-radius: 1rem;
@@ -15,18 +14,14 @@
         text-align: center;
         overflow: hidden;
         text-decoration: none;
-        font-size: 20pt;
-        font-weight: 600;
-        line-height: 15pt;
-        z-index:100;
-        transition-duration: .15s;
+        line-height: 0pt;
+        transition: .15s ease-in-out;
         background-color: #F3F4F6;
+        cursor: pointer;
     }
-    a:hover {
-        font-size: 25pt;
-        line-height: 13pt;
-        font-weight: 800;
-        background-color: #eeffee;
+    .addbtn:hover {
+        scale: 1.2;
+        background-color: #e9ffe9;
     }
     h2 { float: left;}
 }
@@ -97,9 +92,6 @@
         td:last-of-type {border-radius: 0 0 .5rem 0;}
     }
 }
-.edit {
-    color: inherit;
-}
 
 .edit:hover {
     color: #1b1;
@@ -107,7 +99,6 @@
 
 .trash:hover {
     color: #f00;
-    cursor:pointer;
 }
 
 #edit-col {
@@ -127,6 +118,8 @@
     width: 20pt;
     height: inherit;
     padding-right: 5px;
+    cursor: pointer;
+    color: inherit;
 }
 
 .pagination-container {
@@ -188,4 +181,121 @@
 }
 .pagination button:last-of-type:hover {
     background-color: #c9c9c9;
+}
+
+.AEdiv {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes rt-dialog-overlay-no-op {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes rt-dialog-content-show {
+        from {
+            opacity: 0;
+            transform: translateY(5px) scale(0.97);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0px) scale(1);
+        }
+    }
+
+    @keyframes rt-dialog-content-hide {
+        from {
+            opacity: 1;
+            transform: translateY(0px) scale(1);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(5px) scale(0.99);
+        }
+    }
+
+    .DialogOverlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #33333366;
+        backdrop-filter: blur(5px);
+        /* Keep the overlay mounted until the children have animated */
+        &:where([data-state='closed']) {
+            animation: rt-dialog-overlay-no-op .25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        &:where([data-state='open'])::before {
+            animation: rt-fade-in .25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        &:where([data-state='closed'])::before {
+            opacity: 0;
+            animation: rt-fade-out .25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    }
+
+    .DialogContent {
+        z-index: 4;
+        width: 30rem;
+        top: 7.5rem;
+        padding-bottom: 4rem;
+        margin: 0 auto;
+        background-color: #c9c9c9;
+        position: relative;
+        &:where([data-state='open']) {
+            animation: rt-dialog-content-show .25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        &:where([data-state='closed']) {
+            opacity: 0;
+            animation: rt-dialog-content-hide .25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        border-radius: 1rem;
+        border: 2px solid #e9e9e9;
+    }
+
+    .Fieldset {
+        width: 12rem;
+        margin: 0 auto;
+        border: none;
+        input {
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: .2rem;
+            margin: .2rem;
+        }
+    }
+
+    .DialogTitle {
+        text-align: center;
+        padding: 1.5rem;
+    }
+
+    .SaveBtn {
+        position: absolute;
+        margin: 1rem;
+        right: 0;
+        bottom: 0;
+    }
+
+    .IconButton {
+        position: absolute;
+        right: 0;
+        margin: 1.75rem;
+        padding: .2rem;
+        scale: 1.25;
+        cursor:pointer;
+        border-radius: 200px;
+    }
 }

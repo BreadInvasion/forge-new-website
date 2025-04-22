@@ -1,5 +1,5 @@
 import React from 'react';
-import Table from '../components/Table';
+import Table, { DeleteItem } from '../components/Table';
 import { TableHead } from '../components/Table';
 import { Machine } from 'src/interfaces';
 
@@ -12,7 +12,7 @@ const Machines: React.FC = () => {
     const columns: (keyof Machine)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => !key.includes('_id') && key !== 'id') : [];
 
     React.useEffect(() => {
-        fetch('http://localhost:3000/api/machines', {
+        fetch('http://localhost:3000/api/machines?limit=100', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -38,16 +38,20 @@ const Machines: React.FC = () => {
             });
     }, []);
 
+    const onDelete = (index_local: number, index_real: number) => {
+        DeleteItem("machines", data[index_real], index_local, setData);
+    };
+
     return (
         <div className='tab-column-cover align-center'>
             <TableHead
                 heading="Machines"
-                addPath='/myforge/machines/add'
             />
             <Table<Machine>
                 columns={columns}
                 data={data}
-                editPath='/myforge/machines/edit'
+                onDelete={onDelete}
+                canEdit
             />
         </div>
     );

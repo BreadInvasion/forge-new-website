@@ -1,5 +1,5 @@
 import React from 'react';
-import Table from '../components/Table';
+import Table, {DeleteItem} from '../components/Table';
 import { TableHead } from '../components/Table';
 import { User } from 'src/interfaces';
 
@@ -14,7 +14,7 @@ const Users: React.FC = () => {
     const columns: (keyof User)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => !key.includes('_id') && key !== 'id') : [];
 
     React.useEffect(() => {
-        fetch('http://localhost:3000/api/users', {
+        fetch('http://localhost:3000/api/users?limit=100', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -44,12 +44,10 @@ const Users: React.FC = () => {
         <div className='tab-column-cover align-center'>
             <TableHead
                 heading="Users"
-                addPath='/myforge/users/add'
             />
             <Table<User>
                 columns={columns}
                 data={data}
-                editPath='/myforge/users/edit'
             />
         </div>
     );

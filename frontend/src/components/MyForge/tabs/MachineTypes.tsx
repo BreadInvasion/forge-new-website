@@ -1,9 +1,9 @@
 import React from 'react';
-import Table from '../components/Table';
+import Table, { DeleteItem } from '../components/Table';
 import { TableHead } from '../components/Table';
 
 import '../styles/TabStyles.scss';
-import { MachineType } from 'src/interfaces';
+import { emptyMachine, MachineType } from 'src/interfaces';
 
 
 const MachineTypes: React.FC = () => {
@@ -12,7 +12,7 @@ const MachineTypes: React.FC = () => {
     const columns: (keyof MachineType)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => !key.includes('_id') && key !== 'id') : [];
 
     React.useEffect(() => {
-        fetch('http://localhost:3000/api/machinetypes', {
+        fetch('http://localhost:3000/api/machinetypes?limit=100', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -27,27 +27,32 @@ const MachineTypes: React.FC = () => {
             })
             .then(data => {
                 if (Array.isArray(data) && data.every(item => 'id' in item && 'name' in item)) {
-                    console.log('Machines:', data);
+                    console.log('MachineTypes:', data);
                     setData(data);
                 } else {
-                    throw new Error('Data is not of type Machine');
+                    throw new Error('Data is not of type MachineType');
                 }
             })
             .catch(error => {
-                console.error('Error fetching machines:', error);
+                console.error('Error fetching machine types:', error);
             });
     }, []);
+
+    const onDelete = (index_local: number, index_real: number) => {
+        DeleteItem("machinetypes", data[index_real], index_local, setData);
+    };
 
     return (
         <div className='tab-column-cover align-center'>
             <TableHead
                 heading="Machine Types"
-                addPath='/myforge/machinetypes/add'
+                // type="machinetypes"
             />
             <Table<MachineType>
                 columns={columns}
                 data={data}
-                editPath='/myforge/machines/edit'
+                onDelete={onDelete}
+                canEdit
             />
         </div>
     );

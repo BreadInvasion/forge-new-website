@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Dialog } from 'radix-ui'
 
 import '../styles/Table.scss';
 import { Pencil2Icon, TrashIcon, ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons';
 
-interface TableProps<T extends Record<string, any>> {
+interface TableProps<T> {
     columns: (keyof T)[];
     data: T[];
-    editPath?: string;
-    onDelete?: (index: number) => void;
+    canEdit?: boolean;
+    onDelete?: (index_local: number, index_real:number) => void;
 }
 
 const ITEMS_PER_PAGE = 8;
@@ -44,22 +45,62 @@ function toTitle(snakeStr: string): string {
 }
 
 interface TableHeadProps {
-    heading?: string;
-    addPath?: string;
+    heading: string; 
+    type?: string;
+    updateExisting?: boolean;
+    aemenu?: JSX.Element;
 }
 
-export function TableHead(props: TableHeadProps) {
-    const {heading, addPath} = props;
+// calls the api to delete an item from the database. type parameter is the backend type not frontend
+export function DeleteItem(type: string, obj: any, index: number, setData: (dat: any) => void) {
+    if (!confirm(`Really delete ${obj.name}?`)) return;
+    fetch(`http://localhost:3000/api/${type}/${obj.id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+    })
+    .then(res => {
+            if (res.status !== 200) {
+                res.text().then((json) => {
+                alert(JSON.parse(json)['detail']);
+            });
+            }
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log(`${type} deleted:`, data);
+            const newData = [...data];
+            newData.splice(index, 1);
+            setData(newData);
+            document.location.reload(); // make this reload only table later
+        })
+        .catch(error => {
+            console.error(`Error deleting ${type}:`, error);
+        });
+}
+
+export function TableHead<T>(props: TableHeadProps) {
+    const { heading, type, aemenu } = props;
     return(
         <div className="table-head">
             <h2>{heading}</h2>
-            <a href={addPath}>+</a>
+            {type == null ?"":
+                aemenu
+                // <AddOrEditMenu
+                //     heading={heading}
+                //     type={type} />
+            }
         </div>
     );
 }
 
-function Table<T extends Record<string, any>>(props: TableProps<T>) {
-    const { columns, data, editPath, onDelete } = props;
+function Table<T>(props: TableProps<T>) {
+    const { columns, data, onDelete, canEdit } = props;
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -113,12 +154,13 @@ function Table<T extends Record<string, any>>(props: TableProps<T>) {
                                     </td>
                                 ))}
                                 <td className="icon">
-                                    <a href={editPath} className='edit'>
-                                        <Pencil2Icon />
-                                    </a>
-                                    <TrashIcon className='trash'
-                                        onClick={() => onDelete && onDelete(rowIndex)}
-                                    />
+                                    &#8203;
+                                    {!canEdit?'': <Pencil2Icon className='edit' />}
+                                    {onDelete == null ?"":
+                                        <TrashIcon
+                                            className='trash'
+                                            onClick={() => onDelete && onDelete(rowIndex, rowIndex + (currentPage - 1) * (MAX_PAGE_BUTTONS + 3))}
+                                    />}
                                 </td>
                             </tr>
                         ))}

@@ -1,5 +1,5 @@
 import React from 'react';
-import Table from '../components/Table';
+import Table, { DeleteItem } from '../components/Table';
 import { TableHead } from '../components/Table';
 import { MachineGroup } from 'src/interfaces';
 
@@ -43,7 +43,7 @@ const MachineGroups: React.FC = () => {
     }
 
     React.useEffect(() => {
-        fetch('http://localhost:3000/api/machinegroups', {
+        fetch('http://localhost:3000/api/machinegroups?limit=100', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -78,43 +78,45 @@ const MachineGroups: React.FC = () => {
             });
     }, []);
 
-    const onDelete = (index: number) => {
-        const id = data[index].id;
-        fetch(`http://localhost:3000/api/machinegroups/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-        })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(data => {
-                console.log('Machine group deleted:', data);
-                const newData = [...data];
-                newData.splice(index, 1);
-                setData(newData);
-            })
-            .catch(error => {
-                console.error('Error deleting machine group:', error);
-            });
+    // const onDelete = (index: number) => {
+    //     const id = data[index].id;
+    //     fetch(`http://localhost:3000/api/machinegroups/${id}`, {
+    //         method: 'DELETE',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+    //         },
+    //     })
+    //         .then(res => {
+    //             if (!res.ok) {
+    //                 throw new Error(`HTTP error! status: ${res.status}`);
+    //             }
+    //             return res.json();
+    //         })
+    //         .then(data => {
+    //             console.log('Machine group deleted:', data);
+    //             const newData = [...data];
+    //             newData.splice(index, 1);
+    //             setData(newData);
+    //         })
+    //         .catch(error => {
+    //             console.error('Error deleting machine group:', error);
+    //         });
+    // };
+    const onDelete = (index_local: number, index_real: number) => {
+        DeleteItem("machinegroups", data[index_real], index_local, setData);
     };
 
     return (
         <div className='tab-column-cover align-center'>
             <TableHead
                 heading="Machine Groups"
-                addPath='/myforge/machinegroups/add'
             />
             <Table<MachineGroup>
                 columns={columns}
                 data={data}
-                editPath='/myforge/machinegroups/edit'
                 onDelete={onDelete}
+                canEdit
             />
         </div>
     );

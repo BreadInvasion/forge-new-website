@@ -75,3 +75,11 @@ export interface Resource extends Record<string, any> {
     units: string;
     cost: string;
 };
+
+export interface ResourceSlot extends Record<string, any> {
+    db_name: string;
+    display_name: string;
+    resource_ids: string[];
+    allow_own_material: boolean;
+    allow_empty: boolean;
+};
