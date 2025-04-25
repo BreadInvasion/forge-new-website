@@ -95,7 +95,7 @@ const aemenu = (updateExisting:boolean) => {
 const Resources: React.FC = () => {
 
     const [data, setData] = React.useState<Resource[]>([]);
-    const columns: (keyof Resource)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => !key.includes('_id') && key !== 'id') : [];
+    const columns: (keyof Resource)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof Resource)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
 
     React.useEffect(() => {
         fetch('http://localhost:3000/api/resources?limit=100', {

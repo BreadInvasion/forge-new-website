@@ -9,7 +9,7 @@ import '../styles/TabStyles.scss';
 const Machines: React.FC = () => {
 
     const [data, setData] = React.useState<Machine[]>([]);
-    const columns: (keyof Machine)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => !key.includes('_id') && key !== 'id') : [];
+    const columns: (keyof Machine)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof Machine)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
 
     React.useEffect(() => {
         fetch('http://localhost:3000/api/machines?limit=100', {

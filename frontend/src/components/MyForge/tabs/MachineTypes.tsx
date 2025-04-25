@@ -9,7 +9,7 @@ import { emptyMachine, MachineType } from 'src/interfaces';
 const MachineTypes: React.FC = () => {
 
     const [data, setData] = React.useState<MachineType[]>([]);
-    const columns: (keyof MachineType)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => !key.includes('_id') && key !== 'id') : [];
+    const columns: (keyof MachineType)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineType)[]).filter( (key) => !key.includes('_id') && key !== 'id' ) : [];
 
     React.useEffect(() => {
         fetch('http://localhost:3000/api/machinetypes?limit=100', {

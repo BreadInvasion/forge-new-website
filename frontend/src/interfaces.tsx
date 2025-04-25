@@ -1,5 +1,5 @@
 // src/interfaces.ts
-import { UserPermission } from "enums";
+import { UserPermission } from "./enums";
 
 export interface User {
     id: string;
@@ -112,7 +112,7 @@ export interface AllMachinesStatusResponse{
 }
 
 
-export interface ResourceSlot extends Record<string, any> {
+export interface ResourceSlot {
     db_name: string;
     display_name: string;
     resource_ids: string[];

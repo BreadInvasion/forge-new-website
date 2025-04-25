@@ -9,7 +9,7 @@ import '../styles/TabStyles.scss';
 const MachineGroups: React.FC = () => {
 
     const [data, setData] = React.useState<MachineGroup[]>([]);
-    const columns: (keyof MachineGroup)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => key !== 'id') : [];
+    const columns: (keyof MachineGroup)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineGroup)[]).filter((key) => key !== 'id') : [];
 
     const fetchMachines = (machineIds: string[]) => {
         const machines: string[] = [];

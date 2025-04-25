@@ -147,7 +147,7 @@ const aemenu = (updateExisting:boolean) => {
 const ResourceSlots: React.FC = () => {
 
     const [data, setData] = React.useState<ResourceSlot[]>([]);
-    const columns: (keyof ResourceSlot)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => !key.includes('_id') && key !== 'id') : [];
+    const columns: (keyof ResourceSlot)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof ResourceSlot)[]).filter((key) => !key.includes('_db_name') && key !== 'db_name') : [];
 
     React.useEffect(() => {
         fetch('http://localhost:3000/api/resourceslots?limit=100', {

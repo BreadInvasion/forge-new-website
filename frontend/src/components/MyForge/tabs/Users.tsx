@@ -11,7 +11,7 @@ const Users: React.FC = () => {
     const [data, setData] = React.useState<User[]>([]);
 
     //change this to fix gender id
-    const columns: (keyof User)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => !key.includes('_id') && key !== 'id') : [];
+    const columns: (keyof User)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof User)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
 
     React.useEffect(() => {
         fetch('http://localhost:3000/api/users?limit=100', {
