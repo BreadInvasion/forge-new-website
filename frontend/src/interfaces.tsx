@@ -1,6 +1,7 @@
 // src/interfaces.ts
+import { UserPermission } from "enums";
 
-export interface User extends Record<string, any> {
+export interface User {
     id: string;
     is_rpi_staff: boolean;
     RCSID: string;
@@ -10,7 +11,8 @@ export interface User extends Record<string, any> {
     major?: string;
     gender_identity: string;
     pronouns: string;
-    role_ids: string[];
+    permissions: UserPermission[];
+    display_role: string;
     is_graduating: boolean;
     semester_balance: string;
 };
@@ -25,12 +27,13 @@ export const defaultUser: User = {
     major: '',
     gender_identity: "notdisclosed",
     pronouns: '',
-    role_ids: [],
+    permissions: [],
+    display_role: '',
     is_graduating: false,
     semester_balance: '',
 };
 
-export interface Machine extends Record<string, any> {
+export interface Machine {
     id: string;
     name: string;
     group: string;
@@ -52,7 +55,7 @@ export const emptyMachine: Machine = {
     disabled: false,
 };
 
-export interface MachineType extends Record<string, any> {
+export interface MachineType {
     id: string;
     name: string;
     resource_slots: number;
@@ -61,13 +64,21 @@ export interface MachineType extends Record<string, any> {
     resource_types: string[];
 };
 
-export interface MachineGroup extends Record<string, any> {
+export interface MachineGroup {
     id: number;
     name: string;
     machines: string[];
 };
 
-export interface Resource extends Record<string, any> {
+export interface MachineUsage {
+    semester: string
+    time_started: Date
+    duration: number
+    machine_name: string
+    cost: number
+};
+
+export interface Resource {
     id: string;
     name: string;
     brand?: string;
@@ -75,6 +86,31 @@ export interface Resource extends Record<string, any> {
     units: string;
     cost: string;
 };
+
+// MachineStatus block
+export interface MachineStatus{
+    id: string;
+    name: string;
+    in_use: boolean;
+    usage_start: Date;
+    usage_duration: number;
+    user_id: string;
+    maintenance_mode: boolean;
+    disabled: boolean;
+    failed: boolean;
+    failed_at: Date;
+}
+
+export interface MachineStatusGroup{
+    name: string;
+    machines: MachineStatus[];
+}
+
+export interface AllMachinesStatusResponse{
+    groups: MachineStatusGroup[];
+    loners: MachineStatus[];
+}
+
 
 export interface ResourceSlot extends Record<string, any> {
     db_name: string;
