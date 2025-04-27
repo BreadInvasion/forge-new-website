@@ -113,6 +113,7 @@ export interface AllMachinesStatusResponse{
 
 
 export interface ResourceSlot {
+    id: string;
     db_name: string;
     display_name: string;
     resource_ids: string[];

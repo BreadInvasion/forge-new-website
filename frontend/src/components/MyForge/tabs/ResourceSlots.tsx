@@ -110,7 +110,6 @@ const aemenu = (updateExisting:boolean) => {
                             <input className="Input" id="name" value={recname} onChange={e => setRecname(e.target.value)}/>
 
                             <label className="Label" htmlFor="resources">Resources</label>
-                            {/* <input className="Input" id="resources" value={resources} onChange={e => setResources(e.target.value)}/> */}
                             {resources.map((resource: Resource) => (
                                 <div className="checkbox-labels">
                                     <input
@@ -125,7 +124,6 @@ const aemenu = (updateExisting:boolean) => {
                                     </label>
                                 </div>
                             ))}
-                            
 
                             <label className="Label" htmlFor="useown"><div>Allow using own material?</div></label>
                             <input className="Input" id="useown" type='checkbox' value={String(useown)} onChange={e => setUseown(Boolean(e.target.value))}/>
@@ -147,7 +145,7 @@ const aemenu = (updateExisting:boolean) => {
 const ResourceSlots: React.FC = () => {
 
     const [data, setData] = React.useState<ResourceSlot[]>([]);
-    const columns: (keyof ResourceSlot)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof ResourceSlot)[]).filter((key) => !key.includes('_db_name') && key !== 'db_name') : [];
+    const columns: (keyof ResourceSlot)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof ResourceSlot)[]).filter((key) => !key.includes('db_name') && !key.includes('id') && !key.includes('valid_resource_ids')) : [];
 
     React.useEffect(() => {
         fetch('http://localhost:3000/api/resourceslots?limit=100', {
