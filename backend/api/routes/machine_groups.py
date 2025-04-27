@@ -43,8 +43,18 @@ async def create_machine_group(
             status_code=status.HTTP_409_CONFLICT,
             detail="A machine group with that name already exists",
         )
+    machines = (
+        await session.scalars(
+            select(Machine).where(Machine.id.in_(request.machine_ids))
+        )
+    ).all()
+    if len(machines) != len(request.machine_ids):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="One or more of the provided machine IDs is invalid",
+        )
 
-    new_machine_group = MachineGroup(name=request.name, machines=[])
+    new_machine_group = MachineGroup(name=request.name, machines=machines)
     session.add(new_machine_group)
     await session.commit()
     await session.refresh(new_machine_group)
