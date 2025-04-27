@@ -134,7 +134,6 @@ const aemenu = (updateExisting: boolean) => {
                             {machines.map((machine: Machine) => (
                                 <div className="checkbox-labels">
                                     <input
-                                        id='checkbox-layer-shift'
                                         className='styled-checkbox'
                                         type="checkbox"
                                         checked={machineIDS.includes(machine.id)}

@@ -113,23 +113,22 @@ const aemenu = (updateExisting:boolean) => {
                             {resources.map((resource: Resource) => (
                                 <div className="checkbox-labels">
                                     <input
-                                        id='checkbox-layer-shift'
                                         className='styled-checkbox'
                                         type="checkbox"
                                         checked={resourceIDS.includes(resource.id)}
                                         onChange={() => handleCheckboxChange(resource.id)}
                                     />
-                                    <label htmlFor='checkbox-layer-shift' className='checkbox-label'>
+                                    <label className='checkbox-label'>
                                         {resource.name}
                                     </label>
                                 </div>
                             ))}
 
                             <label className="Label" htmlFor="useown"><div>Allow using own material?</div></label>
-                            <input className="Input" id="useown" type='checkbox' value={String(useown)} onChange={e => setUseown(Boolean(e.target.value))}/>
+                            <input className="styled-checkbox" id="useown" type='checkbox' value={String(useown)} onChange={e => setUseown(Boolean(e.target.value))}/>
 
                             <label className="Label" htmlFor="canempty"><div>Allow empty?</div></label>
-                            <input className="Input" id="canempty" type='checkbox' value={String(canempty)} onChange={e => setCanempty(Boolean(e.target.value))}/>
+                            <input className="styled-checkbox" id="canempty" type='checkbox' value={String(canempty)} onChange={e => setCanempty(Boolean(e.target.value))}/>
                         </fieldset>
                         
                         <Dialog.Close asChild>

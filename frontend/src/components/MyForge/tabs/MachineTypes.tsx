@@ -105,7 +105,6 @@ const aemenu = (updateExisting: boolean) => {
                             {resourceSlots.map((resourceSlot: ResourceSlot) => (
                                 <div className="checkbox-labels">
                                     <input
-                                        id='checkbox-layer-shift'
                                         className='styled-checkbox'
                                         type="checkbox"
                                         checked={resourceSlotIDS.includes(resourceSlot.id)}
