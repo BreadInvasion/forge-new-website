@@ -63,6 +63,18 @@ export const OmniAPI = {
 
         return response.data;
     },
+    clear: async (id: string) => {
+        const response = await api.request({
+            url: `/clear/${id}`,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        });
+
+        return response.data;
+    },
     use: async (machine_id: string, data: Record<string, any>) => {
         const response = await api.request({
             url: `/use/${machine_id}`,

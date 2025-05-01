@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { OmniAPI } from "src/apis/OmniAPI";
 import { Card, MachineName, StatusText } from './StatusComponents';
 import { useSelectedMachine } from './SelectedMachineContext';
 
@@ -68,29 +69,29 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
 
     const handleClearClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
-        if (failed) {
+        if (failed || in_use) {
             try {
-                const response = await fetch(`http://localhost:3000/api/clear/${machine.id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+                const response = await OmniAPI.clear(`${machine.id}`);
     
-                if (!response.ok) {
+                console.log(response);
+                if (response != null) {
                     if (response.status === 404) {
                         alert('Machine not found. Please check the machine ID.');
                     } else {
                         throw new Error(`Failed to clear machine: ${response.statusText}`);
                     }
                 }
-                machine.failed = false; 
-                machine.in_use = false;
-                machine.maintenance_mode = false;
-                machine.disabled = false;
-                machine.failed_at = undefined;
+                const updatedMachine = {
+                    ...machine,
+                    failed: false,
+                    in_use: false,
+                    maintenance_mode: false,
+                    disabled: false,
+                    failed_at: undefined,
+                };
     
                 setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material });
+
             } catch (error) {
                 console.error('Error clearing machine:', error);
                 alert('Failed to clear the machine. Please try again.');
