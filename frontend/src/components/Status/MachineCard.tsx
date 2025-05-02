@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { OmniAPI } from "src/apis/OmniAPI";
 import { Card, MachineName, StatusText } from './StatusComponents';
@@ -58,7 +58,8 @@ const StyledButton = styled.button`
 `;
 
 
-const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlightFailed}) => {
+const MachineCard: React.FC<MachineCardProps> = ({ machine: machineInput, $minimized, $highlightFailed}) => {
+    const [machine, setMachine] = useState(machineInput);
     const {id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material} = machine;
 
     const {setSelectedMachine } = useSelectedMachine();
@@ -90,6 +91,7 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
                     failed_at: undefined,
                 };
     
+                setMachine(updatedMachine);
                 setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material });
 
             } catch (error) {
@@ -137,7 +139,7 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
                     </>
                 )}
                 <StatusText $area="date" $minimized={$minimized}>Est. Completion<br /> {usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</StatusText>
-                {$highlightFailed && failed && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
+                {$highlightFailed && (failed || in_use) && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
        </Card>
     );
 }

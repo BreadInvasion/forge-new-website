@@ -138,26 +138,16 @@ export const Status : React.FC = () => {
                 />
                 <StatusWrapper>
                     <GridContainer>
-                    {filteredMachines.map((machine, index) => (
+                    {filteredMachines.map((machine, index) => {
+                        return (
                             <MachineCard
                                 key={`${machine.name}-${index}`}  
-                                id={machine.id}
-                                name={machine.name}
-                                in_use={machine.in_use}
-                                usage_start={machine.usage_start} 
-                                usage_duration={machine.usage_duration} 
-                                user={machine.user}
-                                maintenance_mode={machine.maintenance_mode} 
-                                disabled={machine.disabled}
-                                failed={machine.failed}
-                                failed_at={machine.failed_at}
-                                material={machine.material} 
-                                weight={machine.weight}
                                 machine={machine} 
                                 $highlightFailed={highlightFailed}
                                 $minimized={true}
-                                />
-                        ))} 
+                            />
+                        );
+                    })}
                         </GridContainer>
                     </StatusWrapper>
                     <Sidebar>
