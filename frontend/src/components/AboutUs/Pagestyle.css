@@ -142,6 +142,17 @@
   font-size: 18px;
 }
 
+.hours-section button{
+  background-color: #AF0909;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background-color 0.3s ease;
+}
+
 /* Instagram section styling */
 .instagram-section {
   margin-bottom: 60px;
