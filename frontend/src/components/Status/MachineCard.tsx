@@ -72,13 +72,22 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine: machineInput, $minim
         event.stopPropagation();
         if (failed || in_use) {
             try {
+                const authToken = localStorage.getItem("authToken");
+                if (!authToken) {
+                    alert('Error, not authenticated. Must be logged in to clear machines.');
+                    return;
+                }
+
                 const response = await OmniAPI.clear(`${machine.id}`);
-    
-                console.log(response);
                 if (response != null) {
                     if (response.status === 404) {
                         alert('Machine not found. Please check the machine ID.');
-                    } else {
+                    }
+                    if (response.status === 403) {
+                        alert('Error, not authenticated. Must be logged in to clear machines.');
+                        return;
+                    } 
+                    else {
                         throw new Error(`Failed to clear machine: ${response.statusText}`);
                     }
                 }
