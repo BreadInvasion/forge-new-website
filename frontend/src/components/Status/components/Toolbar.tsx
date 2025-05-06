@@ -5,6 +5,8 @@ import styled from "styled-components";
 import Filter from "./Filter";
 import { ToolButton, FilterItem, FilterX } from "./FilterComponents";
 import { Toggle } from "@radix-ui/react-toggle";
+import { UserPermission } from "../../../enums";
+import useAuth from "../../Auth/useAuth";
 
 const ToolbarContainer = styled.div`
     grid-area: tools;
@@ -50,6 +52,10 @@ const ActiveFilters = styled.div`
 
 const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, activeFilters, setActiveFilters}) => {
 
+    const { user } = useAuth();
+    const hasPermission = (permission: UserPermission) => 
+        user?.permissions?.includes(permission) || user?.permissions?.includes(UserPermission.IS_SUPERUSER);
+   
     const navigate = useNavigate();
 
     const handleEditClick = () => {
@@ -106,21 +112,18 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
 
     return (
         <ToolbarContainer>
+            {hasPermission(UserPermission.CAN_EDIT_MACHINES) && (
             <ToolButton aria-label="Edit" onClick={handleEditClick}>
-                {/* Edit is for Room Managers and Admin/Super users only and will
-                 bring the user to a form where they can edit the details of the 
-                 usage */}
                 <Pencil1Icon />
             </ToolButton>
+            )}
+            {hasPermission(UserPermission.CAN_FAIL_MACHINES) && (
             <ToolButton aria-label="Fail" onClick={handleFailClick}>
-                { /*Fail will also be available to Volunteer level users,
-                 and when selected any machine they click on will redirect 
-                 to a Failure Form. */ }
-                <ExclamationTriangleIcon />
+               <ExclamationTriangleIcon />
             </ToolButton>
+            )}
+             {hasPermission(UserPermission.CAN_CLEAR_MACHINES) && (
             <ToolButton aria-label="Clear"> 
-                {/*only available to Admin/Super users and will clear the
-                 failure status of a machine */}
                 <Toggle
                     pressed={highlightFailed}
                     onPressedChange={setHighlightFailed}
@@ -131,6 +134,7 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
                 </div>
                 </Toggle>    
             </ToolButton>
+            )}
             <Filter 
                 filters={filters} 
                 activeFilters={activeFilters} 
