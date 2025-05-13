@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Card, MachineName, StatusText } from './StatusComponents';
+import { Card, MachineName, StatusText, BigCardAttribute, BigCardText, BigCardInfo} from './StatusComponents';
 import { useSelectedMachine } from './SelectedMachineContext';
 
 export const getEndTime = (usage_start: Date, usage_duration: number) => {
@@ -117,25 +117,35 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
             onClick={handleClick}
         >
                 <MachineName $minimized={$minimized}>{name}</MachineName>
-                <StatusText $minimized={$minimized}>User: {user ? user : 'N/A'}</StatusText>
+                <BigCardText $minimized={$minimized}>USER <br/ >{user ? user : 'N/A'} </BigCardText>
                 {!$minimized && (
                     <>
-                        <StatusText>Material: {material ? material : 'N/A'}</StatusText>
-                        <StatusText>Weight: {weight ? weight + 'g' : 'N/A'}</StatusText>
+                        <BigCardAttribute>
+                            <BigCardText>MATERIAL: </BigCardText><BigCardInfo>{material ? material : 'N/A'}</BigCardInfo>
+                        </BigCardAttribute>
+                        <BigCardAttribute>
+                            <BigCardText>WEIGHT: </BigCardText><BigCardInfo>{weight ? weight + 'g' : 'N/A'}</BigCardInfo>
+                        </BigCardAttribute>
                         {in_use && (
                             <>
-                            <StatusText>Start Time<br /> {usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })} </StatusText>
-                            <StatusText>Total Time: {usage_duration} </StatusText>
-                            <StatusText>Progress: {getProgress(usage_start, usage_duration).toFixed(2)} % </StatusText>
+                            <BigCardText>START TIME</BigCardText><BigCardInfo>{usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}</BigCardInfo>
+                            <BigCardAttribute>
+                                <BigCardText>TOTAL TIME: </BigCardText><BigCardInfo>{usage_duration}</BigCardInfo>
+                            </BigCardAttribute>
+                            <BigCardAttribute>
+                                <BigCardText>PROGRESS: </BigCardText><BigCardInfo>{getProgress(usage_start, usage_duration).toFixed(2)}%</BigCardInfo>
+                            </BigCardAttribute>
                             </>
                         )}
-                        <StatusText>Status: {getStatusText(in_use, failed, maintenance_mode, disabled)}</StatusText>
+                        <BigCardText>Status</BigCardText><BigCardInfo>{getStatusText(in_use, failed, maintenance_mode, disabled)}</BigCardInfo>
                         {failed &&(
-                            <StatusText>Failed at: {failed_at?.toDateString()}</StatusText>
+                            <BigCardAttribute>
+                                <BigCardText>Failed at: </BigCardText><BigCardInfo>{failed_at?.toDateString()}</BigCardInfo>
+                            </BigCardAttribute>
                         )}
                     </>
                 )}
-                <StatusText $area="date" $minimized={$minimized}>Est. Completion<br /> {usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</StatusText>
+                <BigCardText $minimized={$minimized}>Est. Completion <br/ >{usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</BigCardText>
                 {$highlightFailed && failed && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
        </Card>
     );

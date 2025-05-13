@@ -40,9 +40,11 @@ const Sidebar = styled.div`
     grid-area: highlight;
     display: flex;
     flex-direction: column; 
+    padding-top: 1rem;
     padding-right: 2rem;
     gap: 0;
     min-width: 250px;
+    overflow: visible;
     @media screen and (max-width: 850px) {
         padding: 0.5rem;
         padding-top: 1rem;

@@ -12,6 +12,8 @@ const HighlightCard = styled.div`
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    font-family: Montserrat;
+    font-size: 2.0vh;
     h2 { 
         margin-bottom: 1rem;
         color: white; 
@@ -29,7 +31,7 @@ const Highlight: React.FC = () => {
     if (!selectedMachine) {
         return (
             <HighlightCard>
-                <h2>Selected Machine: </h2>
+                <h2>SELECTED MACHINE: </h2>
                 <p>No machine selected</p>
             </HighlightCard>
         );
@@ -37,7 +39,7 @@ const Highlight: React.FC = () => {
 
     return (
         <HighlightCard>
-            <h2>Selected Machine: </h2>
+            <h2>SELECTED MACHINE: </h2>
             <MachineCard
                 id={selectedMachine.id}
                 name={selectedMachine.name}

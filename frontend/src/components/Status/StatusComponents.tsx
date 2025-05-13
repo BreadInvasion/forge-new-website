@@ -10,6 +10,7 @@ export const StatusWrapper = styled.div`
     display: flex;
     width: 100%;
     height: 100%;
+    overflow: visible;
 `;
 
 export const GridContainer = styled.div`
@@ -20,12 +21,17 @@ export const GridContainer = styled.div`
     justify-content: center;
     align-items: flex-start;
     column-gap: 10px;
+    overflow: visible;
     @media screen and (max-width: 850px) {
-        overflow-y: auto;
-    }
+    overflow-y: auto;}
 `;
 
-export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highlightFailed?: boolean; progress: number }>`
+export const Card = styled.div<{ 
+    $symbol?: string; 
+    $minimized?: boolean; 
+    $highlightFailed?: boolean; 
+    progress: number;
+}>`
     background-color: #f5f5f5;
     border-radius: 5px;
     padding: 5px;
@@ -74,6 +80,30 @@ export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highli
         height: ${({ $minimized }) => ($minimized? '12vh' : 'auto')};
         aspect-ratio: auto;
         border-radius: 10px; 
+    }
+`;
+
+export const BigCardAttribute = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.25rem;
+`;
+
+export const BigCardText = styled.p<{ $minimized?: boolean }>`
+    font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "2.0vh")};
+    font-weight: 600;
+    text-align: center;
+    width: auto;
+`;
+export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean }>`
+    font-weight: ${({ $minimized }) => ($minimized ? "600" : "400")};
+    font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "2.0vh")};
+    text-align: center;
+    width: auto;
+    @media screen and (max-width: 850px) {
+        font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "1.7vh")};
     }
 `;
 
