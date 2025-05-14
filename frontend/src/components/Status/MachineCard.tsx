@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Card, MachineName, StatusText, BigCardAttribute, BigCardText, BigCardInfo} from './StatusComponents';
+import { Card, MachineName, BigCardAttribute, BigCardText, BigCardInfo} from './StatusComponents';
 import { useSelectedMachine } from './SelectedMachineContext';
 
 export const getEndTime = (usage_start: Date, usage_duration: number) => {
@@ -96,17 +96,23 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
                 alert('Failed to clear the machine. Please try again.');
             }
         }
-    };
+};
 
-    const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: boolean, disabled?: boolean) => {
-        const statuses = [];
+const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: boolean, disabled?: boolean) => {
+    const statuses = [];
+    const progress = getProgress(usage_start, usage_duration); // Calculate progress once
+
+    if (progress === 100) {statuses.push("Completed");
+    } else {
         if (in_use) statuses.push("In Use");
         if (failed) statuses.push("Failed");
         if (maintenance_mode) statuses.push("Under Maintenance");
         if (disabled) statuses.push("Disabled");
         if (!in_use && !failed && !maintenance_mode && !disabled) statuses.push("Available");
-        return statuses.length > 0 ? statuses.join(", ") : "Operational";
-    };
+    }
+
+    return statuses.length > 0 ? statuses.join(", ") : "Operational";
+};
 
     return (
         <Card 
@@ -117,35 +123,25 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
             onClick={handleClick}
         >
                 <MachineName $minimized={$minimized}>{name}</MachineName>
-                <BigCardText $minimized={$minimized}>USER <br/ >{user ? user : 'N/A'} </BigCardText>
+                <BigCardText $minimized={$minimized}>USER </BigCardText><BigCardInfo>{user ? user : 'N/A'}</BigCardInfo> 
+                <BigCardText $minimized={$minimized}>EST. COMPLETION</BigCardText><BigCardInfo $minimized={$minimized}>{usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</BigCardInfo>
                 {!$minimized && (
                     <>
-                        <BigCardAttribute>
-                            <BigCardText>MATERIAL: </BigCardText><BigCardInfo>{material ? material : 'N/A'}</BigCardInfo>
-                        </BigCardAttribute>
-                        <BigCardAttribute>
-                            <BigCardText>WEIGHT: </BigCardText><BigCardInfo>{weight ? weight + 'g' : 'N/A'}</BigCardInfo>
-                        </BigCardAttribute>
+                        <BigCardAttribute><BigCardText>MATERIAL </BigCardText><BigCardInfo>{material ? material : 'N/A'}</BigCardInfo></BigCardAttribute>
+                        <BigCardAttribute><BigCardText>WEIGHT </BigCardText><BigCardInfo>{weight ? weight + 'g' : 'N/A'}</BigCardInfo></BigCardAttribute>
                         {in_use && (
                             <>
-                            <BigCardText>START TIME</BigCardText><BigCardInfo>{usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}</BigCardInfo>
-                            <BigCardAttribute>
-                                <BigCardText>TOTAL TIME: </BigCardText><BigCardInfo>{usage_duration}</BigCardInfo>
-                            </BigCardAttribute>
-                            <BigCardAttribute>
-                                <BigCardText>PROGRESS: </BigCardText><BigCardInfo>{getProgress(usage_start, usage_duration).toFixed(2)}%</BigCardInfo>
-                            </BigCardAttribute>
+                            <BigCardAttribute><BigCardText>START TIME</BigCardText><BigCardInfo>{usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}</BigCardInfo></BigCardAttribute>
+                            <BigCardAttribute><BigCardText>TOTAL TIME </BigCardText><BigCardInfo>{usage_duration}</BigCardInfo></BigCardAttribute>
+                            <BigCardAttribute><BigCardText>PROGRESS </BigCardText><BigCardInfo>{getProgress(usage_start, usage_duration).toFixed(2)}%</BigCardInfo></BigCardAttribute>
                             </>
                         )}
-                        <BigCardText>Status</BigCardText><BigCardInfo>{getStatusText(in_use, failed, maintenance_mode, disabled)}</BigCardInfo>
-                        {failed &&(
-                            <BigCardAttribute>
-                                <BigCardText>Failed at: </BigCardText><BigCardInfo>{failed_at?.toDateString()}</BigCardInfo>
-                            </BigCardAttribute>
+                        <BigCardAttribute><BigCardText>STATUS(ES)</BigCardText><BigCardInfo>{getStatusText(in_use, failed, maintenance_mode, disabled)}</BigCardInfo></BigCardAttribute>
+                       {failed &&(
+                            <BigCardAttribute><BigCardText>FAILED AT </BigCardText><BigCardInfo>{failed_at?.toDateString()}</BigCardInfo></BigCardAttribute>
                         )}
                     </>
                 )}
-                <BigCardText $minimized={$minimized}>Est. Completion <br/ >{usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</BigCardText>
                 {$highlightFailed && failed && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
        </Card>
     );

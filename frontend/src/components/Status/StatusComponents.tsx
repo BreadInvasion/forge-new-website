@@ -34,7 +34,7 @@ export const Card = styled.div<{
 }>`
     background-color: #f5f5f5;
     border-radius: 5px;
-    padding: 5px;
+    padding:10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -87,7 +87,7 @@ export const BigCardAttribute = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    align-items: center;
+    align-items: left;
     gap: 0.25rem;
 `;
 
@@ -99,7 +99,7 @@ export const BigCardText = styled.p<{ $minimized?: boolean }>`
 `;
 export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean }>`
     font-weight: ${({ $minimized }) => ($minimized ? "600" : "400")};
-    font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "2.0vh")};
+    font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "1.8vh")};
     text-align: center;
     width: auto;
     @media screen and (max-width: 850px) {
@@ -109,7 +109,7 @@ export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean }>`
 
 export const MachineName = styled.h3<{ $minimized?: boolean }>`
     font-size: ${({ $minimized }) => ($minimized ? "2.5vh" : "3.0vh")};
-    font-weight: 600;
+    font-weight: 650;
     color: #000;
     text-transform: uppercase;
     font-family: Montserrat;
