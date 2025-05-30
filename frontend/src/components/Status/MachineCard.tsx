@@ -98,10 +98,13 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine: machineInput, $minim
                     maintenance_mode: false,
                     disabled: false,
                     failed_at: undefined,
+                    progress: 0
                 };
     
                 setMachine(updatedMachine);
                 setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material });
+
+                window.location.reload();
 
             } catch (error) {
                 console.error('Error clearing machine:', error);

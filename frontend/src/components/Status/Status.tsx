@@ -63,48 +63,45 @@ export const Status : React.FC = () => {
     const [highlightFailed, setHighlightFailed] = useState(false);
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     
-    useEffect(() => {
-            const fetchMachines = async () => {
-                try {
-                    const response = await OmniAPI.getPublic("machinestatus");
-                    console.log(response);
-    
-                    const data: AllMachinesStatusResponse = response;
-                    setAllMachinesResponse(data);
-                    
-                    const flattenedMachines = [
-                        ...data.loners,
-                        ...data.groups.flatMap((group) => group.machines),
-                    ];
-    
-                    const transformedMachines = flattenedMachines.map((machine) => ({
-                        ...machine,
-                        group: machine.group || null,
-                        group_id: machine.group_id || null,
-                        type: machine.type || null,
-                        type_id: machine.type_id || null,
-                        id: machine.id,
-                        name: machine.name,
-                        in_use: machine.in_use,
-                        usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined, 
-                        usage_duration: machine.usage_duration,
-                        user: machine.user_name,
-                        maintenance_mode: machine.maintenance_mode,
-                        disabled: machine.disabled,
-                        failed: machine.failed,
-                        failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined,
-                    }));
-    
-                    console.log("Machines:", transformedMachines);
-                    setMachines(transformedMachines);
-                } catch (error) {
-                    console.error("Error fetching machines:", error);
-                }
-            };
-    
-            fetchMachines();
-        }, []);
+    const fetchMachines = async () => {
+        try {
+            const response = await OmniAPI.getPublic("machinestatus");
 
+            const data: AllMachinesStatusResponse = response;
+            setAllMachinesResponse(data);
+
+            const flattenedMachines = [
+                ...data.loners,
+                ...data.groups.flatMap((group) => group.machines),
+            ];
+
+            const transformedMachines = flattenedMachines.map((machine) => ({
+                ...machine,
+                group: machine.group || null,
+                group_id: machine.group_id || null,
+                type: machine.type || null,
+                type_id: machine.type_id || null,
+                id: machine.id,
+                name: machine.name,
+                in_use: machine.in_use,
+                usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined,
+                usage_duration: machine.usage_duration,
+                user: machine.user_name,
+                maintenance_mode: machine.maintenance_mode,
+                disabled: machine.disabled,
+                failed: machine.failed,
+                failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined,
+            }));
+
+            setMachines(transformedMachines);
+        } catch (error) {
+            console.error("Error fetching machines:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchMachines();
+    }, []);
 
     const filteredMachines = machines.filter((machine) => {
         if (activeFilters.length === 0) return true;
