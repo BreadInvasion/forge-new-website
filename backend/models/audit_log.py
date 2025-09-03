@@ -4,9 +4,8 @@ from .base import Base
 
 from schemas.enums import LogType
 
-from sqlalchemy import UUID as DB_UUID, DateTime, Enum, func
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import UUID as DB_UUID, DateTime, func
+from sqlalchemy.orm import Mapped, mapped_column
 
 from uuid import uuid4, UUID
 
@@ -19,7 +18,7 @@ class AuditLog(Base):
 
     time_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    type: Mapped[LogType] = mapped_column(Enum(LogType))
+    type: Mapped[LogType]
 
     # Maps to JSONB
     content: Mapped[dict[str, Any]]
