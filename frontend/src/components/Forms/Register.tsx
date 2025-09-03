@@ -73,6 +73,18 @@ export default function Register() {
             return;
         }
 
+        //Check RIN starts with 662
+        if (!/^662\d{6}$/.test(formValues["rin"])) {
+            alert("RIN must start with 662");
+            return;
+        }
+
+        //Check if there is any special characters in RCSID
+        if (/[^a-zA-Z0-9]/.test(formValues["rcsid"])) {
+            alert("RCSID must not contain special characters");
+            return;
+        }
+
         //Check first/last name not empty 
         if (formValues["first-name"] === "" || formValues["last-name"] === "") {
             alert("First and last name cannot be empty");

@@ -47,7 +47,9 @@ class UserNoHash(BaseModel):
 
     pronouns: PronounType
 
-    role_ids: list[UUID4]
+    permissions: list[str]
+
+    display_role: str | None
 
     is_graduating: bool
 
@@ -168,6 +170,7 @@ class MachineUsageSchema(BaseResponse):
 class UsageResponse(BaseResponse):
     semester: str | None
     time_started: datetime
+    duration: int
     machine_name: str
     cost: Decimal
 

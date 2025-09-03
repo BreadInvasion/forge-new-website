@@ -91,7 +91,7 @@ async def get_resource(
             select(AuditLog)
             .where(
                 and_(
-                    AuditLog.content.op("?")("resource_id"),
+                    AuditLog.content.has_key("resource_id"),
                     AuditLog.content["resource_id"].astext == str(resource_id),
                 )
             )
