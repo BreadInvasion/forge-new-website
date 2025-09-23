@@ -14,7 +14,7 @@ class State(Base):
     __tablename__ = "state"
 
     # Primary key that forces there to be only one row in this table
-    unique_id: Mapped[Literal["UNIQUE"]] = mapped_column(primary_key=True)
+    unique_id: Mapped[Literal["UNIQUE"]] = mapped_column(primary_key=True, default="UNIQUE")
 
     # Current active semester.
     # If None, only staff with CAN_USE_MACHINES_BETWEEN_SEMESTERS will be able to log usages.

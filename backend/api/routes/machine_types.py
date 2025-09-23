@@ -110,8 +110,8 @@ async def get_machine_type(
             select(AuditLog)
             .where(
                 and_(
-                    AuditLog.content.op("?")("machine_type_id"),
-                    AuditLog.content["machine_type_id"] == type_id,
+                    AuditLog.content.has_key("machine_type_id"),
+                    AuditLog.content["machine_type_id"].astext == str(type_id),
                 )
             )
             .order_by(AuditLog.time_created.desc())

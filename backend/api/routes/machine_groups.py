@@ -99,8 +99,8 @@ async def get_machine_group(
             select(AuditLog)
             .where(
                 and_(
-                    AuditLog.content.op("?")("machine_group_id"),
-                    AuditLog.content["machine_group_id"] == group_id,
+                    AuditLog.content.has_key("machine_group_id"),
+                    AuditLog.content["machine_group_id"].astext == str(group_id),
                 )
             )
             .order_by(AuditLog.time_created.desc())
