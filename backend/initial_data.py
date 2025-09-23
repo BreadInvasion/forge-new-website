@@ -15,6 +15,7 @@ from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixe
 from core import security
 from core.session import async_session
 from models.role import Role
+from models.state import State
 from models.user import User
 from schemas.enums import GenderStatsType, PronounType, Permissions
 
@@ -90,6 +91,12 @@ async def main() -> None:
             print("Thomas Superuser was created")
         else:
             print("Thomas Superuser already exists in database")
+
+        state = await session.scalar(select(State))
+        if not state:
+            new_state = State()
+            session.add(new_state)
+            await session.commit()
 
         print("Initial data created")
 
