@@ -70,7 +70,7 @@ const AccordionDemo: React.FC = () => {
   const sections: AccordionSectionProps[] = [
     {
       title: "General Questions",
-      defaultValue: "item-1",
+      defaultValue: "section-1",
       items: [
         {
           value: "item-1",
@@ -111,7 +111,7 @@ const AccordionDemo: React.FC = () => {
     },
     {
       title: "Sticker Printer",
-      defaultValue: "item-2",
+      defaultValue: "section-2",
       items: [
         {
           value: "item-1",
@@ -137,7 +137,7 @@ const AccordionDemo: React.FC = () => {
     },
     {
       title: "3D Printers",
-      defaultValue: "item-3",
+      defaultValue: "section-3",
       items: [
         {
           value: "item-1",
@@ -183,7 +183,7 @@ const AccordionDemo: React.FC = () => {
     },
     {
       title: "Laser Cutter",
-      defaultValue: "item-4",
+      defaultValue: "section-4",
       items: [
         {
           value: "item-1",
@@ -209,7 +209,7 @@ const AccordionDemo: React.FC = () => {
     },
     {
       title: "Resin Printer",
-      defaultValue: "item-5",
+      defaultValue: "section-5",
       items: [
         {
           value: "item-1",
@@ -235,7 +235,7 @@ const AccordionDemo: React.FC = () => {
     },
     {
       title: "Sewing machine",
-      defaultValue: "item-6",
+      defaultValue: "section-6",
       items: [
         {
           value: "item-1",
@@ -251,7 +251,7 @@ const AccordionDemo: React.FC = () => {
     },
     {
       title: "Button Maker",
-      defaultValue: "item-7",
+      defaultValue: "section-7",
       items: [
         {
           value: "item-1",
@@ -267,7 +267,7 @@ const AccordionDemo: React.FC = () => {
     },
     {
       title: "Drawing Tablet",
-      defaultValue: "item-8",
+      defaultValue: "itsectionem-8",
       items: [
         {
           value: "item-1",
