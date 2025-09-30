@@ -11,6 +11,7 @@ import useAuth from "../../Auth/useAuth";
 const ToolbarContainer = styled.div`
     grid-area: tools;
     display: flex;
+    padding: 0.5rem;
     padding-bottom: 1rem;
     gap: 10px;
 `;

@@ -43,7 +43,7 @@ export const Card = styled.div<{
     width: ${({ $minimized }) => ($minimized ? 'clamp(120px, 9vw, 200px)' : 'clamp(200px, 25vw, 400px)')};
     min-width: ${({ $minimized }) => ($minimized ? '100px' : '200px')};
     max-width: 100%;
-    height: ${({ $minimized }) => ($minimized ? 'clamp(15vh, 15vh, 17vh)' : 'auto')};
+    height: ${({ $minimized }) => ($minimized ? 'clamp(15vh, 18vh, 21vh)' : 'auto')};
     aspect-ratio: auto;
     flex-shrink: 0;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
