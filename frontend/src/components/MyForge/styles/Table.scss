@@ -275,6 +275,9 @@
             padding: .2rem;
             margin: .2rem;
         }
+        overflow-y: scroll;
+        min-height: min-content;
+        max-height: 30rem;
     }
 
     .DialogTitle {
