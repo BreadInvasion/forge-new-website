@@ -96,11 +96,9 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
                 const [machinestatus] = await Promise.all([
                     OmniAPI.getPublic('machinestatus'),
                 ]);
-                console.log("Fortnite Balls:", machinestatus.groups);
 
                 if (machinestatus.groups) {
                     const groupNames = machinestatus.groups.map((g: { machines: { group_id: any; }[]; name: any; }) => ({ id: g.machines[0].group_id, name: g.name }))
-                    console.log(groupNames);
                     setGroups(groupNames);
                 }
             } catch (err) {console.error('Error fetching filter data:', err);}
@@ -125,14 +123,12 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
     const handleFilterClick = (value: string) => {
         if(!activeFilters.includes(value)) {
             setActiveFilters((prevFilters) => [...prevFilters, value]);
-            console.log(activeFilters);
         }
     };
 
     const handleDeleteFilter = (e: any, value: string) => {
         e.stopPropagation();
         setActiveFilters((prevFilters) =>prevFilters.filter((filter) => filter !== value));
-        console.log(activeFilters);
     };
 
     return (

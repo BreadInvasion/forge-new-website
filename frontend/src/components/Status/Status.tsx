@@ -69,7 +69,7 @@ export const Status : React.FC = () => {
             const fetchMachines = async () => {
                 try {
                     const response = await OmniAPI.getPublic("machinestatus");
-                    console.log(response);
+                    // console.log(response);
     
                     const data: AllMachinesStatusResponse = response;
                     setAllMachinesResponse(data);
@@ -82,7 +82,7 @@ export const Status : React.FC = () => {
                         ...data.groups.flatMap((group) => group.machines),
                     ];
 
-                    console.log("Flattened Machines:", flattenedMachines);
+                    // console.log("Flattened Machines:", flattenedMachines);
     
                     const transformedMachines = flattenedMachines.map((machine) => ({
                         ...machine,
@@ -102,7 +102,7 @@ export const Status : React.FC = () => {
                         failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined,
                     }));
     
-                    console.log("Machines:", transformedMachines);
+                    // console.log("Machines:", transformedMachines);
                     setMachines(transformedMachines);
                 } catch (error) {
                     console.error("Error fetching machines:", error);
