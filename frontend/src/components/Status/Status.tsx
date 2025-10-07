@@ -73,24 +73,29 @@ export const Status : React.FC = () => {
     
                     const data: AllMachinesStatusResponse = response;
                     setAllMachinesResponse(data);
+
+                    const groups = [...data.groups.map(g => ({ id: g.machines[0].group_id, name: g.name }))];
+                    const types = [0]; // yeah this is fucked for now
                     
                     const flattenedMachines = [
                         ...data.loners,
                         ...data.groups.flatMap((group) => group.machines),
                     ];
+
+                    console.log("Flattened Machines:", flattenedMachines);
     
                     const transformedMachines = flattenedMachines.map((machine) => ({
                         ...machine,
-                        group: machine.group || null,
-                        group_id: machine.group_id || null,
-                        type: machine.type || null,
-                        type_id: machine.type_id || null,
+                        group_id: machine.group_id,
+                        group: machine.group_id ? (groups.find(g => g.id === String(machine.group_id))?.name ?? 'Unknown Group') : 'No Group',
+                        type_id: machine.type_id,
+                        type: "Unknown Type",
                         id: machine.id,
                         name: machine.name,
                         in_use: machine.in_use,
                         usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined, 
                         usage_duration: machine.usage_duration,
-                        user: machine.user_name,
+                        user: machine.user_id,
                         maintenance_mode: machine.maintenance_mode,
                         disabled: machine.disabled,
                         failed: machine.failed,
@@ -108,25 +113,41 @@ export const Status : React.FC = () => {
         }, []);
 
 
+    const STATUS_FILTERS = ["In Progress", "Completed", "Available", "Failed", "Maintenance"];
+
     const filteredMachines = machines.filter((machine) => {
         if (activeFilters.length === 0) return true;
-        return activeFilters.some((filter) => {
+
+        const statusFilters = activeFilters.filter((f) => STATUS_FILTERS.includes(f));
+        const otherFilters = activeFilters.filter((f) => !STATUS_FILTERS.includes(f));
+
+        let statusOk = true;
+        if (statusFilters.length > 0) {
             const progress = getProgress(machine.usage_start, machine.usage_duration);
-            switch (filter) {
-                case "In Progress":
-                    return progress < 100 && progress > 0;
-                case "Completed":
-                    return progress === 100;
-                case "Available":
-                    return !machine.in_use && !machine.failed && !machine.maintenance_mode;
-                case "Failed":
-                    return machine.failed;
-                case "Maintenance":
-                    return machine.maintenance_mode;
-                default:
-                    return filter === machine.type; 
-            }
-        });
+            statusOk = statusFilters.some((filter) => {
+                switch (filter) {
+                    case "In Progress":
+                        return progress < 100 && progress > 0;
+                    case "Completed":
+                        return progress === 100;
+                    case "Available":
+                        return !machine.in_use && !machine.failed && !machine.maintenance_mode;
+                    case "Failed":
+                        return machine.failed;
+                    case "Maintenance":
+                        return machine.maintenance_mode;
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        let otherOk = true;
+        if (otherFilters.length > 0) {
+            otherOk = otherFilters.every((filter) => filter === machine.type || filter === machine.group);
+        }
+
+        return statusOk && otherOk;
     });
 
     return (
@@ -153,9 +174,9 @@ export const Status : React.FC = () => {
                                 disabled={machine.disabled}
                                 failed={machine.failed}
                                 failed_at={machine.failed_at}
-                                material={machine.material} 
-                                weight={machine.weight}
-                                machine={machine} 
+                                material={(machine as any).material} 
+                                weight={(machine as any).weight}
+                                machine={(machine as any)} 
                                 $highlightFailed={highlightFailed}
                                 $minimized={true}
                                 />

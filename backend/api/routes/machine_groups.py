@@ -90,13 +90,12 @@ async def get_machine_group(
             .where(
                 and_(
                     AuditLog.content.op("?")("machine_group_id"),
-                    AuditLog.content["machine_group_id"] == group_id,
+                    AuditLog.content["machine_group_id"].astext == str(group_id),
                 )
             )
             .order_by(AuditLog.time_created.desc())
         )
     ).all()
-
     return MachineInfoGroupDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         machine_ids=[machine.id for machine in machine_group.machines],
