@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Card, MachineName, BigCardAttribute, BigCardText, BigCardInfo} from './StatusComponents';
+import { Card, MachineName, BigCardAttribute, BigCardText, BigCardInfo, StatusText} from './StatusComponents';
+import { OmniAPI } from "src/apis/OmniAPI";
 import { useSelectedMachine } from './SelectedMachineContext';
 
 export const getEndTime = (usage_start: Date, usage_duration: number) => {
@@ -57,7 +58,8 @@ const StyledButton = styled.button`
 `;
 
 
-const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlightFailed}) => {
+const MachineCard: React.FC<MachineCardProps> = ({ machine: machineInput, $minimized, $highlightFailed}) => {
+    const [machine, setMachine] = useState(machineInput);
     const {id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material} = machine;
 
     const {setSelectedMachine } = useSelectedMachine();
@@ -68,29 +70,42 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, $minimized, $highlig
 
     const handleClearClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
-        if (failed) {
+        if (failed || in_use) {
             try {
-                const response = await fetch(`http://localhost:3000/api/clear/${machine.id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-    
-                if (!response.ok) {
+                const authToken = localStorage.getItem("authToken");
+                if (!authToken) {
+                    alert('Error, not authenticated. Must be logged in to clear machines.');
+                    return;
+                }
+
+                const response = await OmniAPI.clear(`${machine.id}`);
+                if (response != null) {
                     if (response.status === 404) {
                         alert('Machine not found. Please check the machine ID.');
-                    } else {
+                    }
+                    if (response.status === 403) {
+                        alert('Error, not authenticated. Must be logged in to clear machines.');
+                        return;
+                    } 
+                    else {
                         throw new Error(`Failed to clear machine: ${response.statusText}`);
                     }
                 }
-                machine.failed = false; 
-                machine.in_use = false;
-                machine.maintenance_mode = false;
-                machine.disabled = false;
-                machine.failed_at = undefined;
+                const updatedMachine = {
+                    ...machine,
+                    failed: false,
+                    in_use: false,
+                    maintenance_mode: false,
+                    disabled: false,
+                    failed_at: undefined,
+                    progress: 0
+                };
     
+                setMachine(updatedMachine);
                 setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material });
+
+                window.location.reload();
+
             } catch (error) {
                 console.error('Error clearing machine:', error);
                 alert('Failed to clear the machine. Please try again.');
@@ -142,7 +157,8 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
                         )}
                     </>
                 )}
-                {$highlightFailed && failed && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
+                <StatusText $area="date" $minimized={$minimized}>Est. Completion<br /> {usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</StatusText>
+                {$highlightFailed && (failed || in_use) && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
        </Card>
     );
 }

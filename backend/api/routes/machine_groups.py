@@ -89,7 +89,7 @@ async def get_machine_group(
             select(AuditLog)
             .where(
                 and_(
-                    AuditLog.content.op("?")("machine_group_id"),
+                    AuditLog.content.has_key("machine_group_id"),
                     AuditLog.content["machine_group_id"].astext == str(group_id),
                 )
             )

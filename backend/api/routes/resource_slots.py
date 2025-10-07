@@ -106,8 +106,8 @@ async def get_resource_slot(
             select(AuditLog)
             .where(
                 and_(
-                    AuditLog.content.op("?")("resource_slot_id"),
-                    AuditLog.content["resource_slot_id"] == resource_slot_id,
+                    AuditLog.content.has_key("resource_slot_id"),
+                    AuditLog.content["resource_slot_id"].astext == str(resource_slot_id),
                 )
             )
             .order_by(AuditLog.time_created.desc())

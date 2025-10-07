@@ -92,8 +92,8 @@ async def get_semester(
             select(AuditLog)
             .where(
                 and_(
-                    AuditLog.content.op("?")("semester_id"),
-                    AuditLog.content["semester_id"] == semester_id,
+                    AuditLog.content.has_key("semester_id"),
+                    AuditLog.content["semester_id"].astext == str(semester_id),
                 )
             )
             .order_by(AuditLog.time_created.desc())
@@ -119,14 +119,12 @@ async def get_all_semesters(
 ):
     """Fetch all semesters."""
 
-    season_sorting: Mapping[SemesterType, int] = {
-        SemesterType.SPRING: 0,
-        SemesterType.SUMMER: 1,
-        SemesterType.FALL: 2,
-    }
-
     attr_key_map: dict[str, InstrumentedAttribute | Case] = {
-        "season": case(season_sorting, value=Semester.semester_type),
+        "season": case(
+            (Semester.semester_type == SemesterType.SPRING, 0),
+            (Semester.semester_type == SemesterType.SUMMER, 1),
+            (Semester.semester_type == SemesterType.FALL,   2),
+        ),
         "year": Semester.calendar_year,
     }
     order_determinant = attr_key_map[order_by]

@@ -112,7 +112,6 @@ export const Status : React.FC = () => {
             fetchMachines();
         }, []);
 
-
     const STATUS_FILTERS = ["In Progress", "Completed", "Available", "Failed", "Maintenance"];
 
     const filteredMachines = machines.filter((machine) => {
@@ -161,7 +160,8 @@ export const Status : React.FC = () => {
                 />
                 <StatusWrapper>
                     <GridContainer>
-                    {filteredMachines.map((machine, index) => (
+                    {filteredMachines.map((machine, index) => {
+                        return (
                             <MachineCard
                                 key={`${machine.name}-${index}`}  
                                 id={machine.id}
@@ -176,11 +176,12 @@ export const Status : React.FC = () => {
                                 failed_at={machine.failed_at}
                                 material={(machine as any).material} 
                                 weight={(machine as any).weight}
-                                machine={(machine as any)} 
+                                machine={(machine as any)}
                                 $highlightFailed={highlightFailed}
                                 $minimized={true}
-                                />
-                        ))} 
+                            />
+                        );
+                    })}
                         </GridContainer>
                     </StatusWrapper>
                     <Sidebar>
