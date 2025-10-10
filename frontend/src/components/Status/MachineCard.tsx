@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Card, MachineName, BigCardAttribute, BigCardText, BigCardInfo, StatusText} from './StatusComponents';
 import { OmniAPI } from "src/apis/OmniAPI";
@@ -60,6 +60,8 @@ const StyledButton = styled.button`
 
 const MachineCard: React.FC<MachineCardProps> = ({ machine: machineInput, $minimized, $highlightFailed}) => {
     const [machine, setMachine] = useState(machineInput);
+
+    useEffect(() => {console.log(machineInput); setMachine(machineInput);}, [machineInput]);
     const {id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material} = machine;
 
     const {setSelectedMachine } = useSelectedMachine();
@@ -113,6 +115,12 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine: machineInput, $minim
         }
 };
 
+function convHM(seconds: number): string {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    return `${hrs}h ${mins}m`;
+}
+
 const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: boolean, disabled?: boolean) => {
     const statuses = [];
     const progress = getProgress(usage_start, usage_duration); // Calculate progress once
@@ -139,7 +147,6 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
         >
                 <MachineName $minimized={$minimized}>{name}</MachineName>
                 <BigCardText $minimized={$minimized}>USER </BigCardText><BigCardInfo>{user ? user : 'N/A'}</BigCardInfo> 
-                <BigCardText $minimized={$minimized}>EST. COMPLETION</BigCardText><BigCardInfo $minimized={$minimized}>{usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</BigCardInfo>
                 {!$minimized && (
                     <>
                         <BigCardAttribute><BigCardText>MATERIAL </BigCardText><BigCardInfo>{material ? material : 'N/A'}</BigCardInfo></BigCardAttribute>
@@ -147,7 +154,7 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
                         {in_use && (
                             <>
                             <BigCardAttribute><BigCardText>START TIME</BigCardText><BigCardInfo>{usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}</BigCardInfo></BigCardAttribute>
-                            <BigCardAttribute><BigCardText>TOTAL TIME </BigCardText><BigCardInfo>{usage_duration}</BigCardInfo></BigCardAttribute>
+                            <BigCardAttribute><BigCardText>TOTAL TIME </BigCardText><BigCardInfo>{convHM(usage_duration ?? 0)}</BigCardInfo></BigCardAttribute>
                             <BigCardAttribute><BigCardText>PROGRESS </BigCardText><BigCardInfo>{getProgress(usage_start, usage_duration).toFixed(2)}%</BigCardInfo></BigCardAttribute>
                             </>
                         )}
@@ -157,7 +164,7 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
                         )}
                     </>
                 )}
-                <StatusText $area="date" $minimized={$minimized}>Est. Completion<br /> {usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</StatusText>
+                <StatusText $area="date" $minimized={$minimized}>EST. COMPLETION<br /> {usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</StatusText>
                 {$highlightFailed && (failed || in_use) && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
        </Card>
     );

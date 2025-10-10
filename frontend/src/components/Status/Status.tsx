@@ -95,7 +95,7 @@ export const Status : React.FC = () => {
                         in_use: machine.in_use,
                         usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined, 
                         usage_duration: machine.usage_duration,
-                        user: machine.user_id,
+                        user: (machine as any).user_name ?? machine.user_id,
                         maintenance_mode: machine.maintenance_mode,
                         disabled: machine.disabled,
                         failed: machine.failed,

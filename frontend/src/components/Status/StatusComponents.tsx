@@ -40,10 +40,11 @@ export const Card = styled.div<{
     justify-content: space-between;
     align-items: center;
     gap: 0rem;
-    width: ${({ $minimized }) => ($minimized ? 'clamp(120px, 9vw, 200px)' : 'clamp(200px, 25vw, 400px)')};
-    min-width: ${({ $minimized }) => ($minimized ? '100px' : '200px')};
+    /* increased clamps to give more room for longer names/text */
+    width: ${({ $minimized }) => ($minimized ? 'clamp(140px, 10vw, 260px)' : 'clamp(260px, 30vw, 520px)')};
+    min-width: ${({ $minimized }) => ($minimized ? '130px' : '240px')};
     max-width: 100%;
-    height: ${({ $minimized }) => ($minimized ? 'clamp(15vh, 18vh, 21vh)' : 'auto')};
+    height: ${({ $minimized }) => ($minimized ? 'clamp(16vh, 18vh, 24vh)' : 'auto')};
     aspect-ratio: auto;
     flex-shrink: 0;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
@@ -76,8 +77,9 @@ export const Card = styled.div<{
         }
     `}
     @media screen and (max-width: 850px) {
-        width: ${({ $minimized }) => ($minimized ? '15vh' : 'auto')};
-        height: ${({ $minimized }) => ($minimized? '12vh' : 'auto')};
+        /* on narrow screens, keep minimized cards reasonably sized */
+        width: ${({ $minimized }) => ($minimized ? '18vh' : 'auto')};
+        height: ${({ $minimized }) => ($minimized? '14vh' : 'auto')};
         aspect-ratio: auto;
         border-radius: 10px; 
     }

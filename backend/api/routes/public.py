@@ -65,6 +65,9 @@ async def get_machines_status(
                         if machine.active_usage
                         else None
                     ),
+                            "user_id": (
+                                machine.active_usage.user.id if machine.active_usage and machine.active_usage.user else None
+                            ),
                     "user_name": (
                         f"{machine.active_usage.user.first_name} {machine.active_usage.user.last_name[0]}."
                         if machine.active_usage and machine.active_usage.user
