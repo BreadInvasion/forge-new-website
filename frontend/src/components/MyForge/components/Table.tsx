@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Dialog } from 'radix-ui'
 
 import '../styles/Table.scss';
@@ -8,6 +8,7 @@ interface TableProps<T> {
     columns: (keyof T)[];
     data: T[];
     canEdit?: boolean;
+    onEdit?: (activeItem: T) => void;
     onDelete?: (index_local: number, index_real:number) => void;
 }
 
@@ -44,11 +45,12 @@ function toTitle(snakeStr: string): string {
         .join(' ');
 }
 
-interface TableHeadProps {
+interface TableHeadProps<T> {
     heading: string; 
     type?: string;
     updateExisting?: boolean;
-    aemenu?: JSX.Element;
+    activeItem?: T;
+    aemenu?: ReactNode;
 }
 
 // calls the api to delete an item from the database. type parameter is the backend type not frontend
@@ -84,24 +86,20 @@ export function DeleteItem(type: string, obj: any, index: number, setData: (dat:
         });
 }
 
-export function TableHead<T>(props: TableHeadProps) {
+export function TableHead<T>(props: TableHeadProps<T>) {
     const { heading, type, aemenu } = props;
     return(
         <div className="table-head">
             <h2>{heading}</h2>
-            {type == null ?"":
-                aemenu
-                // <AddOrEditMenu
-                //     heading={heading}
-                //     type={type} />
-            }
+            { type == null ? "" : aemenu }
         </div>
     );
 }
 
 function Table<T>(props: TableProps<T>) {
-    const { columns, data, onDelete, canEdit } = props;
+    const { columns, data, onDelete, onEdit, canEdit } = props;
 
+    const [activeItem, setActiveItem] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
 
     // 2. Calculate total pages
@@ -155,7 +153,10 @@ function Table<T>(props: TableProps<T>) {
                                 ))}
                                 <td className="icon">
                                     &#8203;
-                                    {!canEdit?'': <Pencil2Icon className='edit' />}
+                                    {!canEdit?'': <Pencil2Icon 
+                                        className='edit'
+                                        onClick={() => onEdit && onEdit(row)}
+                                    />}
                                     {onDelete == null ?"":
                                         <TrashIcon
                                             className='trash'
