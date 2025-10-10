@@ -15,6 +15,13 @@ const ToolbarContainer = styled.div`
     padding: 0.5rem;
     padding-bottom: 1rem;
     gap: 10px;
+    @media screen and (max-width: 850px) {
+        /* fixed toolbar height on mobile to avoid being pushed offscreen */
+        height: 4rem;
+        flex: 0 0 4rem;
+        align-items: center;
+        padding-bottom: 0.5rem;
+    }
 `;
 
 interface ToolbarProps {

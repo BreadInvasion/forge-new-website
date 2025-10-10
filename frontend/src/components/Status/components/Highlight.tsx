@@ -19,7 +19,7 @@ const HighlightCard = styled.div`
         color: white; 
         flex-shrink: 0;
     }
-    @media screen and (max-width: 768px) {
+    @media screen and (max-width: 850px) {
         max-height: 300px;
         overflow-y: auto;
     }

@@ -21,7 +21,7 @@ const Page = styled.div`
         "status up-next"
         "status up-next";
     padding: 0.5rem 1rem;
-    gap: 0.5 rem;
+    gap: 0.5rem;
     overflow-y: auto;
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent; 
     @media screen and (max-width: 850px) {
@@ -33,6 +33,7 @@ const Page = styled.div`
             "tools"
             "sidebar"
             "status";
+        padding: 0.5rem 1rem;
     }
 `;
 
@@ -55,6 +56,9 @@ const Sidebar = styled.div`
         gap: 1rem;
         grid-template-areas:
             "highlight up-next";
+        height: 40vh;
+        box-sizing: border-box;
+        overflow-y: auto;
     }
 `;
 

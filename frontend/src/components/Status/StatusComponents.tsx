@@ -11,6 +11,10 @@ export const StatusWrapper = styled.div`
     width: 100%;
     height: 100%;
     overflow: visible;
+    @media screen and (max-width: 850px) {
+        /* don't force full viewport height on mobile: let toolbar and sidebar size naturally */
+        height: auto;
+    }
 `;
 
 export const GridContainer = styled.div`
@@ -23,7 +27,13 @@ export const GridContainer = styled.div`
     column-gap: 10px;
     overflow: visible;
     @media screen and (max-width: 850px) {
-    overflow-y: auto;}
+    overflow-y: auto;
+    /* ensure padding remains visible on narrow viewports even if global rules exist */
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+    }
 `;
 
 export const Card = styled.div<{ 
@@ -40,7 +50,6 @@ export const Card = styled.div<{
     justify-content: space-between;
     align-items: center;
     gap: 0rem;
-    /* increased clamps to give more room for longer names/text */
     width: ${({ $minimized }) => ($minimized ? 'clamp(140px, 10vw, 260px)' : 'clamp(260px, 30vw, 520px)')};
     min-width: ${({ $minimized }) => ($minimized ? '130px' : '240px')};
     max-width: 100%;
@@ -79,7 +88,7 @@ export const Card = styled.div<{
     @media screen and (max-width: 850px) {
         /* on narrow screens, keep minimized cards reasonably sized */
         width: ${({ $minimized }) => ($minimized ? '18vh' : 'auto')};
-        height: ${({ $minimized }) => ($minimized? '14vh' : 'auto')};
+        height: ${({ $minimized }) => ($minimized? '18vh' : 'auto')};
         aspect-ratio: auto;
         border-radius: 10px; 
     }
