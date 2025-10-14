@@ -60,6 +60,7 @@ export interface MachineType {
     name: string;
     resource_slots: number;
     count: number;
+    cost: number;
     resource_slot_ids: string[];
     resource_types: string[];
 };
