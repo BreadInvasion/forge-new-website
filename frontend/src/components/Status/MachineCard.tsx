@@ -145,12 +145,10 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
             progress={$minimized ? getProgress(usage_start, usage_duration) : 0}
             onClick={handleClick}
         >
-                <MachineName $minimized={$minimized}>{name}</MachineName>
-                <BigCardText $minimized={$minimized}>USER </BigCardText><BigCardInfo>{user ? user : 'N/A'}</BigCardInfo> 
+                <MachineName $minimized={$minimized} $clearable={$highlightFailed && (failed || in_use)}>{name}</MachineName>
+                <BigCardText $minimized={$minimized} $clearable={$highlightFailed && (failed || in_use)}>USER </BigCardText><BigCardInfo $clearable={$highlightFailed && (failed || in_use)}>{user ? user : 'N/A'}</BigCardInfo> 
                 {!$minimized && (
                     <>
-                        <BigCardAttribute><BigCardText>MATERIAL </BigCardText><BigCardInfo>{material ? material : 'N/A'}</BigCardInfo></BigCardAttribute>
-                        <BigCardAttribute><BigCardText>WEIGHT </BigCardText><BigCardInfo>{weight ? weight + 'g' : 'N/A'}</BigCardInfo></BigCardAttribute>
                         {in_use && (
                             <>
                             <BigCardAttribute><BigCardText>START TIME</BigCardText><BigCardInfo>{usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}</BigCardInfo></BigCardAttribute>
@@ -164,7 +162,7 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
                         )}
                     </>
                 )}
-                <StatusText $area="date" $minimized={$minimized}>EST. COMPLETION<br /> {usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</StatusText>
+                <StatusText $area="date" $minimized={$minimized} $clearable={$highlightFailed && (failed || in_use)}>EST. COMPLETION<br /> {usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</StatusText>
                 {$highlightFailed && (failed || in_use) && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
        </Card>
     );

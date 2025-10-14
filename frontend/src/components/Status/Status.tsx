@@ -178,8 +178,6 @@ export const Status : React.FC = () => {
                                 disabled={machine.disabled}
                                 failed={machine.failed}
                                 failed_at={machine.failed_at}
-                                material={(machine as any).material} 
-                                weight={(machine as any).weight}
                                 machine={(machine as any)}
                                 $highlightFailed={highlightFailed}
                                 $minimized={true}

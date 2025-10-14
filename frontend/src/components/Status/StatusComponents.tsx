@@ -102,15 +102,15 @@ export const BigCardAttribute = styled.div`
     gap: 0.25rem;
 `;
 
-export const BigCardText = styled.p<{ $minimized?: boolean }>`
-    font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "2.0vh")};
+export const BigCardText = styled.p<{ $minimized?: boolean, $clearable?: boolean }>`
+    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.3vh" : "1.5vh") : "2.0vh")};
     font-weight: 600;
     text-align: center;
     width: auto;
 `;
-export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean }>`
+export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
     font-weight: ${({ $minimized }) => ($minimized ? "600" : "400")};
-    font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "1.8vh")};
+    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.0vh" : "1.5vh") : "1.8vh")};
     text-align: center;
     width: auto;
     @media screen and (max-width: 850px) {
@@ -118,8 +118,8 @@ export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean }>`
     }
 `;
 
-export const MachineName = styled.h3<{ $minimized?: boolean }>`
-    font-size: ${({ $minimized }) => ($minimized ? "2.5vh" : "3.0vh")};
+export const MachineName = styled.h3<{ $minimized?: boolean, $clearable?: boolean }>`
+    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "2.0vh" : "2.5vh") : "3.0vh")};
     font-weight: 650;
     color: #000;
     text-transform: uppercase;
@@ -127,15 +127,15 @@ export const MachineName = styled.h3<{ $minimized?: boolean }>`
     text-align: center;
 `;
 
-export const StatusText = styled.p<{ $area?: string, $minimized?: boolean }>`
-    font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "2.0vh")};
+export const StatusText = styled.p<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
+    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.2vh" : "1.5vh") : "2.0vh")};
     color: #000;
     text-align: center;
-    text-jusitfy: center;
+    text-justify: center;
     font-family: Montserrat;
     font-weight: 600;
     @media screen and (max-width: 850px) {
-        font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "1.7vh")};
+        font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.2vh" : "1.5vh") : "1.7vh")};
     }
 `;
 
