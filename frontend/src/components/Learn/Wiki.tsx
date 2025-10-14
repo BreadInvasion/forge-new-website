@@ -267,7 +267,7 @@ const AccordionDemo: React.FC = () => {
     },
     {
       title: "Drawing Tablet",
-      defaultValue: "itsectionem-8",
+      defaultValue: "section-8",
       items: [
         {
           value: "item-1",
