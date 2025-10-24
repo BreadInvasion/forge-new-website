@@ -40,6 +40,12 @@ export interface Machine {
     group_id: string;
     type: string;
     type_id: string;
+    in_use: boolean;
+    usage_start?: Date;
+    usage_duration?: number;
+    user?: string;
+    failed?: boolean;
+    failed_at?: Date;
     maintenance_mode: boolean;
     disabled: boolean;
 };
@@ -47,10 +53,14 @@ export interface Machine {
 export const emptyMachine: Machine = {
     id: '_',
     name: '',
-    group: '',
     group_id: '',
-    type: '',
     type_id: '',
+    in_use: false,
+    usage_start: undefined,
+    usage_duration: undefined,
+    user: undefined,
+    failed: false,
+    failed_at: undefined,
     maintenance_mode: false,
     disabled: false,
 };
@@ -90,6 +100,8 @@ export interface Resource {
 // MachineStatus block
 export interface MachineStatus{
     id: string;
+    group_id: string;
+    type_id: string;
     name: string;
     in_use: boolean;
     usage_start: Date;
