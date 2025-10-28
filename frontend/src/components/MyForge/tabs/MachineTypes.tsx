@@ -26,7 +26,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
     const [name, setName] = useState("");
     const [resourceSlots, setResourceSlots] = useState<ResourceSlot[]>(initialResSlots);
     const [resourceSlotIDS, setResourceSlotIDS] = useState<string[]>([]);
-    const [cost, setCost] = useState<Number>(Number());
+    const [cost, setCost] = useState<number>(0.0);
     const handleCheckboxChange = (value: string) => {
         setResourceSlotIDS(prev =>
             prev.includes(value)
@@ -41,7 +41,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
                 console.log("machine not null");
                 setName(mach.name);
                 setResourceSlotIDS(mach.resource_slot_ids);
-                setCost(mach.cost);
+                setCost(mach.cost_per_hour);
             } else {
                 console.log("machine is null");
                 setName("");
@@ -109,7 +109,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
                             ))}
 
                             <label className="Label" htmlFor="cost">Cost</label>
-                            <input className="Input" placeholder="0" id="cost" type="number" value={cost + ""} pattern="[0-9]*" onChange={e => setCost(Number(e.target.valueAsNumber))} />
+                            <input className="Input" placeholder={cost + ""} id="cost" type="number" value={cost} pattern="[0-9]*" onChange={e => setCost(e.target.valueAsNumber)} />
                         </fieldset>
                         <Dialog.Close asChild>
                             <button className="Button SaveBtn" onClick={machineType == null ? create : edit}>Save</button>

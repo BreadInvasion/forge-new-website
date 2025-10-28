@@ -4,6 +4,7 @@ from typing import Annotated, Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import and_, func, ScalarSelect, select
+from decimal import Decimal
 from sqlalchemy.orm import InstrumentedAttribute, joinedload, selectinload
 
 from models.audit_log import AuditLog
@@ -249,19 +250,20 @@ async def edit_machine_type(
     differences = {
         "name": request.name if machine_type.name != request.name else None,
         "resource_slots": (
-            request.resource_slot_ids
+            [str(x) for x in request.resource_slot_ids]
             if set(machine_type.resource_slots) != set(resource_slots)
             else None
         ),
         "cost_per_hour": (
-            request.cost_per_hour
-            if machine_type.cost_per_hour != request.cost_per_hour
+            float(request.cost_per_hour)
+            if float(machine_type.cost_per_hour) != float(request.cost_per_hour)
             else None
         ),
     }
 
     machine_type.name = request.name
     machine_type.resource_slots = list(resource_slots)
+    machine_type.cost_per_hour = Decimal(request.cost_per_hour)
 
     audit_log = AuditLog(
         type=LogType.MACHINE_TYPE_EDITED,
