@@ -12,6 +12,7 @@ const Footer = lazy(() => import('./components/Footer/Footer'));
 const Status = lazy(() => import('./components/Status/Status'));
 const Login = lazy(() => import('./components/Forms/Login'));
 const Register = lazy(() => import('./components/Forms/Register'));
+const ForgotPassword = lazy(() => import('./components/Forms/ForgotPassword'));
 const ComingSoon = lazy(() => import('./components/Home/ComingSoon'));
 const NewStatus = lazy(() => import('./components/Status/Status'));
 const MyForge = lazy(() => import('./components/MyForge/MyForge'));
@@ -38,6 +39,7 @@ export default function App() {
                     <Route path="/status" Component={NewStatus} />
                     <Route path="/login" Component={Login} />
                     <Route path="/register" Component={Register} />
+                    <Route path="/reset-password" Component={ForgotPassword} />
                     <Route path="/learn" Component={Wiki} />
                     <Route path="/learn/about" Component={AboutUs} />
                     <Route path="/learn/3d-printing-guide" Component={ComingSoon} />
