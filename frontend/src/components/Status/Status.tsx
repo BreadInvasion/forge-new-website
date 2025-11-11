@@ -21,7 +21,7 @@ const Page = styled.div`
         "status up-next"
         "status up-next";
     padding: 0.5rem 1rem;
-    gap: 0.5 rem;
+    gap: 0.5rem;
     overflow-y: auto;
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent; 
     @media screen and (max-width: 850px) {
@@ -33,6 +33,7 @@ const Page = styled.div`
             "tools"
             "sidebar"
             "status";
+        padding: 0.5rem 1rem;
     }
 `;
 
@@ -40,9 +41,11 @@ const Sidebar = styled.div`
     grid-area: highlight;
     display: flex;
     flex-direction: column; 
+    padding-top: 1rem;
     padding-right: 2rem;
     gap: 0;
     min-width: 250px;
+    overflow: visible;
     @media screen and (max-width: 850px) {
         padding: 0.5rem;
         padding-top: 1rem;
@@ -53,6 +56,9 @@ const Sidebar = styled.div`
         gap: 1rem;
         grid-template-areas:
             "highlight up-next";
+        height: 40vh;
+        box-sizing: border-box;
+        overflow-y: auto;
     }
 `;
 
@@ -63,65 +69,88 @@ export const Status : React.FC = () => {
     const [highlightFailed, setHighlightFailed] = useState(false);
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     
-    const fetchMachines = async () => {
-        try {
-            const response = await OmniAPI.getPublic("machinestatus");
-
-            const data: AllMachinesStatusResponse = response;
-            setAllMachinesResponse(data);
-
-            const flattenedMachines = [
-                ...data.loners,
-                ...data.groups.flatMap((group) => group.machines),
-            ];
-
-            const transformedMachines = flattenedMachines.map((machine) => ({
-                ...machine,
-                group: machine.group || null,
-                group_id: machine.group_id || null,
-                type: machine.type || null,
-                type_id: machine.type_id || null,
-                id: machine.id,
-                name: machine.name,
-                in_use: machine.in_use,
-                usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined,
-                usage_duration: machine.usage_duration,
-                user: machine.user_name,
-                maintenance_mode: machine.maintenance_mode,
-                disabled: machine.disabled,
-                failed: machine.failed,
-                failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined,
-            }));
-
-            setMachines(transformedMachines);
-        } catch (error) {
-            console.error("Error fetching machines:", error);
-        }
-    };
-
     useEffect(() => {
-        fetchMachines();
-    }, []);
+            const fetchMachines = async () => {
+                try {
+                    const response = await OmniAPI.getPublic("machinestatus");
+                    // console.log(response);
+    
+                    const data: AllMachinesStatusResponse = response;
+                    setAllMachinesResponse(data);
+
+                    const groups = [...data.groups.map(g => ({ id: g.machines[0].group_id, name: g.name }))];
+                    const types = [0]; // yeah this is fucked for now
+                    
+                    const flattenedMachines = [
+                        ...data.loners,
+                        ...data.groups.flatMap((group) => group.machines),
+                    ];
+
+                    // console.log("Flattened Machines:", flattenedMachines);
+    
+                    const transformedMachines = flattenedMachines.map((machine) => ({
+                        ...machine,
+                        group_id: machine.group_id,
+                        group: machine.group_id ? (groups.find(g => g.id === String(machine.group_id))?.name ?? 'Unknown Group') : 'No Group',
+                        type_id: machine.type_id,
+                        type: "Unknown Type",
+                        id: machine.id,
+                        name: machine.name,
+                        in_use: machine.in_use,
+                        usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined, 
+                        usage_duration: machine.usage_duration,
+                        user: (machine as any).user_name ?? machine.user_id,
+                        maintenance_mode: machine.maintenance_mode,
+                        disabled: machine.disabled,
+                        failed: machine.failed,
+                        failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined,
+                    }));
+    
+                    // console.log("Machines:", transformedMachines);
+                    setMachines(transformedMachines);
+                } catch (error) {
+                    console.error("Error fetching machines:", error);
+                }
+            };
+    
+            fetchMachines();
+        }, []);
+
+    const STATUS_FILTERS = ["In Progress", "Completed", "Available", "Failed", "Maintenance"];
 
     const filteredMachines = machines.filter((machine) => {
         if (activeFilters.length === 0) return true;
-        return activeFilters.some((filter) => {
+
+        const statusFilters = activeFilters.filter((f) => STATUS_FILTERS.includes(f));
+        const otherFilters = activeFilters.filter((f) => !STATUS_FILTERS.includes(f));
+
+        let statusOk = true;
+        if (statusFilters.length > 0) {
             const progress = getProgress(machine.usage_start, machine.usage_duration);
-            switch (filter) {
-                case "In Progress":
-                    return progress < 100 && progress > 0;
-                case "Completed":
-                    return progress === 100;
-                case "Available":
-                    return !machine.in_use && !machine.failed && !machine.maintenance_mode;
-                case "Failed":
-                    return machine.failed;
-                case "Maintenance":
-                    return machine.maintenance_mode;
-                default:
-                    return filter === machine.type; 
-            }
-        });
+            statusOk = statusFilters.some((filter) => {
+                switch (filter) {
+                    case "In Progress":
+                        return progress < 100 && progress > 0;
+                    case "Completed":
+                        return progress === 100;
+                    case "Available":
+                        return !machine.in_use && !machine.failed && !machine.maintenance_mode;
+                    case "Failed":
+                        return machine.failed;
+                    case "Maintenance":
+                        return machine.maintenance_mode;
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        let otherOk = true;
+        if (otherFilters.length > 0) {
+            otherOk = otherFilters.every((filter) => filter === machine.type || filter === machine.group);
+        }
+
+        return statusOk && otherOk;
     });
 
     return (
@@ -139,7 +168,17 @@ export const Status : React.FC = () => {
                         return (
                             <MachineCard
                                 key={`${machine.name}-${index}`}  
-                                machine={machine} 
+                                id={machine.id}
+                                name={machine.name}
+                                in_use={machine.in_use}
+                                usage_start={machine.usage_start} 
+                                usage_duration={machine.usage_duration} 
+                                user={machine.user}
+                                maintenance_mode={machine.maintenance_mode} 
+                                disabled={machine.disabled}
+                                failed={machine.failed}
+                                failed_at={machine.failed_at}
+                                machine={(machine as any)}
                                 $highlightFailed={highlightFailed}
                                 $minimized={true}
                             />

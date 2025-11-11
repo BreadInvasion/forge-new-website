@@ -96,7 +96,6 @@ async def get_machine_group(
             .order_by(AuditLog.time_created.desc())
         )
     ).all()
-
     return MachineInfoGroupDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         machine_ids=[machine.id for machine in machine_group.machines],
