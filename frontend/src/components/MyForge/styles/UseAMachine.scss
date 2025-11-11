@@ -153,6 +153,18 @@
     margin-top: 1rem;
 }
 
+#error-text {
+    font-size: 1.5vh;
+}
+
+#error-text.success {
+    color: green;
+}
+
+#error-text.error {
+    color: red;
+}
+
 .pagination-buttons {
     display: flex;
     flex-direction: row;
