@@ -66,7 +66,7 @@ export interface MachineType {
 };
 
 export interface MachineGroup {
-    id: number;
+    id: string;
     name: string;
     machines: string[];
 };

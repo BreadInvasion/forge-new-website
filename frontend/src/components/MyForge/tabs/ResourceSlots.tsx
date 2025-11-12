@@ -175,7 +175,7 @@ const ResourceSlots: React.FC = () => {
     }, []);
 
     const onDelete = (index_local: number, index_real: number) => {
-        DeleteItem("resourceslots", data[index_real], index_local, setData);
+        DeleteItem("resourceslots", data[index_real], index_local, data, setData);
     };
 
     return (

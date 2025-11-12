@@ -1,8 +1,9 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import { Dialog } from 'radix-ui'
+import { v1, v4 } from 'uuid'; // For version 4 (random) UUIDs
 
 import '../styles/Table.scss';
 import { Pencil2Icon, TrashIcon, ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons';
+import { OmniAPI } from 'src/apis/OmniAPI';
 
 interface TableProps<T> {
     columns: (keyof T)[];
@@ -54,36 +55,18 @@ interface TableHeadProps<T> {
 }
 
 // calls the api to delete an item from the database. type parameter is the backend type not frontend
-export function DeleteItem(type: string, obj: any, index: number, setData: (dat: any) => void) {
+export function DeleteItem(type: string, obj: any, index: number, data: any, setData: (dat: any) => void) {
     if (!confirm(`Really delete ${obj.name}?`)) return;
-    fetch(`http://localhost:3000/api/${type}/${obj.id}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        },
-    })
-    .then(res => {
-            if (res.status !== 200) {
-                res.text().then((json) => {
-                alert(JSON.parse(json)['detail']);
-            });
-            }
-            if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
-            }
-            return res.json();
-        })
-        .then(data => {
-            console.log(`${type} deleted:`, data);
-            const newData = [...data];
-            newData.splice(index, 1);
-            setData(newData);
-            document.location.reload(); // make this reload only table later
-        })
-        .catch(error => {
-            console.error(`Error deleting ${type}:`, error);
-        });
+    OmniAPI.delete(type, obj.id).then((r) => {
+        if (r != null) {
+            console.log("Error when deleting item.");
+            return;
+        }
+        console.log(`${type} deleted:`, data);
+        const newData = [...data];
+        newData.splice(index, 1);
+        setData(newData);
+    } );
 }
 
 export function TableHead<T>(props: TableHeadProps<T>) {
@@ -99,7 +82,6 @@ export function TableHead<T>(props: TableHeadProps<T>) {
 function Table<T>(props: TableProps<T>) {
     const { columns, data, onDelete, onEdit, canEdit } = props;
 
-    const [activeItem, setActiveItem] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
 
     // 2. Calculate total pages
@@ -145,7 +127,7 @@ function Table<T>(props: TableProps<T>) {
                         {currentData.map((row: T, rowIndex) => (
                             <tr key={rowIndex}>
                                 {columns.map((column, index) => (
-                                    <td key={String(column) + index + rowIndex}>
+                                    <td key={v4()}>
                                         {Array.isArray(row[column])
                                             ? row[column].join(', ')
                                             : String(row[column])}

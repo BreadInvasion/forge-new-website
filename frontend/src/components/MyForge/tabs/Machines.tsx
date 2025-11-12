@@ -152,7 +152,7 @@ const Machines: React.FC = () => {
     React.useEffect(() => { OmniAPI.getAll("machines").then(res => {setData(res);} ); }, []);        
 
     const onDelete = (index_local: number, index_real: number) => {
-        DeleteItem("machines", data[index_real], index_local, setData);
+        DeleteItem("machines", data[index_real], index_local, data, setData);
     };
 
     let [machine, setMachine]:[Machine | null, (machine: any) => void] = useState(null);

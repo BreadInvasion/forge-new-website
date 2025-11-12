@@ -3,7 +3,7 @@ import { api, publicApi } from "./configs/axiosConfigs";
 export const OmniAPI = {
     getAll: async (type: string) => {
         const response = await api.request({
-            url: `/${type}`,
+            url: `/${type}?limit=200`,
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -15,7 +15,7 @@ export const OmniAPI = {
     },
     get: async (type: string, id: string) => {
         const response = await api.request({
-            url: `/${type}/${id}`,
+            url: `/${type}/${id}?limit=200`,
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -40,7 +40,7 @@ export const OmniAPI = {
     },
     edit: async (type: string, id: string, data: Record<string, any>) => {
         const response = await api.request({
-            url: `/${type}/${id}`,
+            url: `/${type}/${id}?limit=200`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export const OmniAPI = {
     },
     delete: async (type: string, id: string) => {
         const response = await api.request({
-            url: `/${type}/${id}`,
+            url: `/${type}/${id}?limit=200`,
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export const OmniAPI = {
     },
     clear: async (id: string) => {
         const response = await api.request({
-            url: `/clear/${id}`,
+            url: `/clear/${id}?limit=200`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -77,7 +77,7 @@ export const OmniAPI = {
     },
     use: async (machine_id: string, data: Record<string, any>) => {
         const response = await api.request({
-            url: `/use/${machine_id}`,
+            url: `/use/${machine_id}?limit=200`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export const OmniAPI = {
     },
     getPublic: async (type: string) => {
         const response = await publicApi.request({
-            url: `/${type}`,
+            url: `/${type}?limit=200`,
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

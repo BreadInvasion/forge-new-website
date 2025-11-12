@@ -129,7 +129,7 @@ const MachineTypes: React.FC = () => {
     const columns: (keyof MachineType)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineType)[]).filter( (key) => !key.includes('_id') && key !== 'id' ) : [];
 
     const onDelete = (index_local: number, index_real: number) => {
-        DeleteItem("machinetypes", data[index_real], index_local, setData);
+        DeleteItem("machinetypes", data[index_real], index_local, data, setData);
     };
     let [machineType, setMachineType]:[MachineType | null, (machineType: any) => void] = useState(null);
     let [isDialogOpen, setIsDialogOpen] = useState(false);
