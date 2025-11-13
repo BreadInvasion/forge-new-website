@@ -56,8 +56,7 @@ export const DynamicMachineForm: React.FC = () => {
     }]);
     const [resourceUsageForm, setResourceUsageForm] = useState<ReactNode>(null);
     const [page, setPage] = useState<number>(1);
-    const [errorText, setErrorText] = useState<string>("");
-    const [errorType, setErrorType] = useState<"error" | "success" | "">("");
+    const [status, setStatus] = useState<{ text: string; type: "error" | "success" | "warning" | "" }>({ text: "", type: "" });
     const navigate = useNavigate();
 
     /**
@@ -138,17 +137,11 @@ export const DynamicMachineForm: React.FC = () => {
         setResourceUsageForm(newResourceUsageForm);
     }, [schema]);
 
-    function updateErrorText(message: string) {
-        setErrorText(message);
-        setErrorType("error");
-        try { document.getElementById('error-text')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {}
+    function updateStatus(message: string, type: string) {
+        setStatus({ text: message, type: type as "error" | "success" | "warning" | ""});
+        try { document.getElementById('status-text')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {console.log('Failed to display status text')}
     }
-
-    function updateSuccessText(message: string) {
-        setErrorText(message);
-        setErrorType("success");
-        try { document.getElementById('error-text')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {}
-    }
+    function clearStatus() {updateStatus("", "");}
 
     /**
      * Handle Form Submission
@@ -157,7 +150,7 @@ export const DynamicMachineForm: React.FC = () => {
         event.preventDefault();
 
         if (!formData.policy) {
-            updateErrorText("Please accept the usage policy.");
+            updateStatus("Please accept the usage policy.", "error");
             return;
         }
 
@@ -188,7 +181,7 @@ export const DynamicMachineForm: React.FC = () => {
             const response = await OmniAPI.use(selectedMachineId, usageData);
             console.log("Usage Response:", response);
             if (response == null) {
-                updateSuccessText("Usage submitted successfully.");
+                updateStatus("Usage submitted successfully.", "success");
                 window.setTimeout(() => navigate('../../status'), 1000);
             } else {
                 throw new Error("An error occurred. Please try again.");
@@ -196,13 +189,13 @@ export const DynamicMachineForm: React.FC = () => {
 
         } catch (error: any) {
             if (error.status == 409) {
-                updateErrorText("This machine is already in use. Please clear it before submitting a new usage.");
+                updateStatus("This machine is already in use. Please clear it before submitting a new usage.", "error");
             } else if (error.status == 404) {
-                updateErrorText("The selected machine does not exist.");
+                updateStatus("The selected machine does not exist.", "error");
             } else if (error.status == 403) {
-                updateErrorText("You are not permitted to use this machine.");
+                updateStatus("You are not permitted to use this machine.", "error");
             } else {
-                updateErrorText("An error occurred. Please try again.");
+                updateStatus("An error occurred. Please try again.", "error");
             }
         }
     };
@@ -224,7 +217,7 @@ export const DynamicMachineForm: React.FC = () => {
     const handlePageChange = (page: number) => {
         //Check if machine is selected
         if (page == 2 && selectedMachineId == "0") {
-            updateErrorText("Please select a machine first.");
+            updateStatus("Please select a machine first.", "error");
             return;
         }
 
@@ -232,26 +225,26 @@ export const DynamicMachineForm: React.FC = () => {
         if (page == 3) {
             const invalidSlot = slotValues.find((slot) => validateResourceUsage(slot));
             if (invalidSlot) {
-                updateErrorText(validateResourceUsage(invalidSlot) ?? "You should never see this message! Please contact the site administrators.");
+                updateStatus(validateResourceUsage(invalidSlot) ?? "You should never see this message! Please contact the site administrators.", "error");
                 return;
             }
 
             slotValues.forEach((slot) => {
                 if (slot.amount > 1000 && !slot.own) {
-                    updateErrorText(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please alert a volunteer or room manager after you start the print, so they are aware.`);
+                    updateStatus(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please alert a volunteer or room manager after you start the print, so they are aware.`, "warning");
                 } else if (slot.amount > 1000 && slot.own) {
-                    updateErrorText(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please make sure you have enough material to complete the print - you will not able to use Forge resources to complete the print.`);
+                    updateStatus(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please make sure you have enough material to complete the print - you will not able to use Forge resources to complete the print.`, "warning");
                 }
             });
         }
 
         //Check if duration is valid
         if (page == 4 && (formData.hours == 0 && formData.minutes == 0)) {
-            updateErrorText("Please enter a valid duration.");
+            updateStatus("Please enter a valid duration.", "error");
             return;
         }
 
-        setErrorText("");
+        clearStatus();
         setPage(page);
     };
 
@@ -354,9 +347,9 @@ export const DynamicMachineForm: React.FC = () => {
                     </div>
                 }
 
-                <div id="error-text" className={`error-text ${errorType === "success" ? "success" : errorType === "error" ? "error" : ""}`}>{errorText}</div>
+                <div id="status-text" className={`status-text ${status.type === "success" ? "success" : status.type === "error" ? "error" : ""}`}>{status.text}</div>
                 <div className="pagination-buttons">
-                    <button type="button" onClick={() => {setErrorText(""),setPage(page - 1)}} disabled={page === 1}>Back</button>
+                    <button type="button" onClick={() => {clearStatus(); setPage(page - 1)}} disabled={page === 1}>Back</button>
                     {page !== 4 && <button type="button" onClick={() => handlePageChange(page + 1)} disabled={page === 4}>Next</button>}
                     {page == 4 && <button type="submit">Submit</button>}
                 </div>

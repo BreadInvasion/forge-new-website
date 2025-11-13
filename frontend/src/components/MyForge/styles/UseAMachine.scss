@@ -153,16 +153,20 @@
     margin-top: 1rem;
 }
 
-#error-text {
-    font-size: 1.5vh;
+#status-text {
+    font-size: 0.8em;
 }
 
-#error-text.success {
+#status-text.success {
     color: green;
 }
 
-#error-text.error {
+#status-text.error {
     color: red;
+}
+
+#status-text.warning {
+    color: orange;
 }
 
 .pagination-buttons {
