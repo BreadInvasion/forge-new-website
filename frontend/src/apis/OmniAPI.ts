@@ -10,6 +10,7 @@ export const OmniAPI = {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
@@ -22,6 +23,7 @@ export const OmniAPI = {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
@@ -35,12 +37,13 @@ export const OmniAPI = {
             },
             data: data,
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
     edit: async (type: string, id: string, data: Record<string, any>) => {
         const response = await api.request({
-            url: `/${type}/${id}?limit=200`,
+            url: `/${type}/${id}`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -48,36 +51,39 @@ export const OmniAPI = {
             },
             data: data,
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
     delete: async (type: string, id: string) => {
         const response = await api.request({
-            url: `/${type}/${id}?limit=200`,
+            url: `/${type}/${id}`,
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
     clear: async (id: string) => {
         const response = await api.request({
-            url: `/clear/${id}?limit=200`,
+            url: `/clear/${id}`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
     use: async (machine_id: string, data: Record<string, any>) => {
         const response = await api.request({
-            url: `/use/${machine_id}?limit=200`,
+            url: `/use/${machine_id}`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -85,6 +91,7 @@ export const OmniAPI = {
             },
             data: data,
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
@@ -97,6 +104,7 @@ export const OmniAPI = {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
@@ -108,6 +116,7 @@ export const OmniAPI = {
                 "Content-Type": "application/json",
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     }

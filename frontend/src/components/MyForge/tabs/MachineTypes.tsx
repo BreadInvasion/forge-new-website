@@ -36,20 +36,20 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
     };
 
     const setOpenExtra = (state: boolean, mach: MachineType | null) => {
-            setMachineType(mach);
-            if (mach != null) {
-                console.log("machine not null");
-                setName(mach.name);
-                setResourceSlotIDS(mach.resource_slot_ids);
-                setCost(mach.cost_per_hour);
-            } else {
-                console.log("machine is null");
-                setName("");
-                setResourceSlotIDS([]);
-                setCost(Number());
-            }
-            if (isDialogOpen != state) setIsDialogOpen(state);
-        };
+        setMachineType(mach);
+        if (mach != null) {
+            console.log("machineTYPE not null");
+            setName(mach.name);
+            setResourceSlotIDS(mach.resource_slot_ids);
+            setCost(mach.cost_per_hour);
+        } else {
+            console.log("machineTYPE is null");
+            setName("");
+            setResourceSlotIDS([]);
+            setCost(Number());
+        }
+        if (isDialogOpen != state) setIsDialogOpen(state);
+    };
 
     function create() {
         if (name == "" || resourceSlots == null || cost == null) {

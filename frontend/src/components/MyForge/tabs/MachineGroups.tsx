@@ -83,12 +83,13 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
     }, []);
     const [machineIDS, setMachineIDS] = useState<string[]>([]);
     const handleCheckboxChange = (value: string) => {
-        // console.log("new: " + );
-        setMachineIDS(prev =>
-            prev.includes(value)
-            ? prev.filter(item => item !== value) // remove
-            : [...prev, value] // add
-        );
+        // handle potential null previous state by defaulting to an empty array
+        setMachineIDS(prev => {
+            const p = prev ?? [];
+            return p.includes(value)
+                ? p.filter(item => item !== value) // remove
+                : [...p, value]; // add
+        });
     };
 
     // function req() {
@@ -127,17 +128,17 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
         function setOpenExtra (state: boolean, mach: MachineGroup | null) {
             setMachineGroup(mach);
             if (mach != null) {
-                console.log("machine not null");
+                // console.log("machineGROUP not null");
                 setName(mach.name);
                 OmniAPI.get("machinegroups", mach.id).then((m) => {
-                    setMachineIDS(m.machines);
+                    setMachineIDS(m.machine_ids);
+                    setIsDialogOpen(state);
                 });
-                if (isDialogOpen != state) setIsDialogOpen(state);
             } else {
-                console.log("machine is null");
+                // console.log("machineGROUP is null");
                 setName("");
                 setMachineIDS([]);
-                if (isDialogOpen != state) setIsDialogOpen(state);
+                setIsDialogOpen(state);
             }
         }
     
@@ -147,7 +148,31 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
                 return;
             }
             OmniAPI.create("machinegroups", {name: name, machine_ids: machines.filter(r => machineIDS.includes(r.id)).map(m => m.id)}).then( () => {
-                OmniAPI.getAll("machinegroups").then(res => {dataSetter(res)});
+                let mappings: {[key: string]: string} = {};
+                OmniAPI.getAll("machines").then(m => {
+                    m.map((m2: Machine) => mappings[m2.id] = m2.name);
+                    // console.log(m);
+                }).then(() => {
+                OmniAPI.getAll("machinegroups").then(d => {
+                        // console.log('Machine groups:', d);
+                        if (Array.isArray(d) && d.every(item => 'id' in item && 'name' in item)) {
+                            let newData: MachineGroup[] = [];
+                            for (const item of d) {
+                                newData.push({
+                                    id: item.id,
+                                    name: item.name,
+                                    machines: item.machine_ids.map((m:string) => mappings[m]),
+                                });
+                            }
+                            dataSetter(newData);
+                        } else {
+                            throw new Error('Data is not of type MachineGroup');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching machine groups:', error);
+                    });
+                });
                 setOpenExtra(false, null);
             });
             return;
@@ -159,18 +184,40 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
                 alert("All fields must be populated!");
                 return;
             }
-            OmniAPI.edit("machinetypes", machineGroup.id, {name: name, machines: machineIDS}).then( () => {
-                OmniAPI.getAll("machinetypes").then(res => {dataSetter(res)});
+            OmniAPI.edit("machinegroups", machineGroup.id, {name: name, machine_ids: machineIDS}).then( () => {
+                let mappings: {[key: string]: string} = {};
+                OmniAPI.getAll("machines").then(m => {
+                    m.map((m2: Machine) => mappings[m2.id] = m2.name);
+                    // console.log(m);
+                }).then(() => {
+                OmniAPI.getAll("machinegroups").then(d => {
+                        // console.log('Machine groups:', d);
+                        if (Array.isArray(d) && d.every(item => 'id' in item && 'name' in item)) {
+                            let newData: MachineGroup[] = [];
+                            for (const item of d) {
+                                newData.push({
+                                    id: item.id,
+                                    name: item.name,
+                                    machines: item.machine_ids.map((m:string) => mappings[m]),
+                                });
+                            }
+                            dataSetter(newData);
+                        } else {
+                            throw new Error('Data is not of type MachineGroup');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching machine groups:', error);
+                    });
+                });
                 setOpenExtra(false, null);
             });
             return;
         }
 
     return [(
-        <Dialog.Root>
-            <Dialog.Trigger asChild>
-                <button className="addbtn"><PlusIcon /></button>
-            </Dialog.Trigger>
+        <Dialog.Root open={isDialogOpen} onOpenChange={(e: boolean) => { setOpenExtra(e, machineGroup); }}>
+            <button className="addbtn" onClick={() => { setOpenExtra(true, null); }}><PlusIcon /></button>
             <Dialog.Portal>
                 <div className='AEdiv'>
                     <Dialog.Overlay className="DialogOverlay" />
@@ -224,10 +271,10 @@ const MachineGroups: React.FC = () => {
         let mappings: {[key: string]: string} = {};
         OmniAPI.getAll("machines").then(m => {
             m.map((m2: Machine) => mappings[m2.id] = m2.name);
-            console.log(m);
+            // console.log(m);
         }).then(() => {
         OmniAPI.getAll("machinegroups").then(d => {
-                console.log('Machine groups:', d);
+                // console.log('Machine groups:', d);
                 if (Array.isArray(d) && d.every(item => 'id' in item && 'name' in item)) {
                     let newData: MachineGroup[] = [];
                     for (const item of d) {

@@ -182,7 +182,7 @@ async def edit_machine_group(
     differences = {
         "name": request.name if machine_group.name != request.name else None,
         "machine_ids": (
-            request.machine_ids
+            [str(x) for x in request.machine_ids]
             if set(machine_group.machines) != set(machines)
             else None
         ),
@@ -192,7 +192,7 @@ async def edit_machine_group(
     machine_group.machines = list(machines)
 
     audit_log = AuditLog(
-        type=LogType.MACHINE_GROUP_DELETED,
+        type=LogType.MACHINE_GROUP_EDITED,
         content={
             "machine_group_id": str(machine_group.id),
             "user_rcsid": current_user.RCSID,

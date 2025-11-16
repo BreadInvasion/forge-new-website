@@ -57,16 +57,13 @@ interface TableHeadProps<T> {
 // calls the api to delete an item from the database. type parameter is the backend type not frontend
 export function DeleteItem(type: string, obj: any, index: number, data: any, setData: (dat: any) => void) {
     if (!confirm(`Really delete ${obj.name}?`)) return;
-    OmniAPI.delete(type, obj.id).then((r) => {
-        if (r != null) {
-            console.log("Error when deleting item.");
-            return;
-        }
-        console.log(`${type} deleted:`, data);
-        const newData = [...data];
-        newData.splice(index, 1);
-        setData(newData);
-    } );
+    OmniAPI.delete(type, obj.id).then(r => {
+        location.reload(); // fix this eventually, commented out code below is broken
+    
+        // const newData = [...data];
+        // newData.splice(index, 1);
+        // setData(newData);
+    } ).catch(e => alert("Failed to delete machine: " + e.response.data.detail));
 }
 
 export function TableHead<T>(props: TableHeadProps<T>) {
