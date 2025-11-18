@@ -3,7 +3,7 @@ import { OmniAPI } from "src/apis/OmniAPI";
 import { CheckboxInput, CustomForm, CustomFormField, DropdownInput, FormIcon, TextInput } from "src/components/Forms/Form";
 import { emptyMachine, Machine, Resource } from "src/interfaces";
 import { v4 as uuidv4 } from "uuid";
-
+import { useNavigate } from "react-router-dom"
 import '../../Forms/styles/Form.scss';
 import '../styles/UseAMachine.scss';
 import { AxiosError } from "axios";
@@ -56,6 +56,8 @@ export const DynamicMachineForm: React.FC = () => {
     }]);
     const [resourceUsageForm, setResourceUsageForm] = useState<ReactNode>(null);
     const [page, setPage] = useState<number>(1);
+    const [status, setStatus] = useState<{ text: string; type: "error" | "success" | "warning" | "" }>({ text: "", type: "" });
+    const navigate = useNavigate();
 
     /**
      * Initial Step on Load
@@ -135,6 +137,11 @@ export const DynamicMachineForm: React.FC = () => {
         setResourceUsageForm(newResourceUsageForm);
     }, [schema]);
 
+    function updateStatus(message: string, type: string) {
+        setStatus({ text: message, type: type as "error" | "success" | "warning" | ""});
+        try { document.getElementById('status-text')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {console.log('Failed to display status text')}
+    }
+    function clearStatus() {updateStatus("", "");}
 
     /**
      * Handle Form Submission
@@ -143,7 +150,7 @@ export const DynamicMachineForm: React.FC = () => {
         event.preventDefault();
 
         if (!formData.policy) {
-            alert("Please accept the usage policy.");
+            updateStatus("Please accept the usage policy.", "error");
             return;
         }
 
@@ -174,25 +181,21 @@ export const DynamicMachineForm: React.FC = () => {
             const response = await OmniAPI.use(selectedMachineId, usageData);
             console.log("Usage Response:", response);
             if (response == null) {
-                alert("Usage submitted successfully.");
-                window.location.reload();
+                updateStatus("Usage submitted successfully.", "success");
+                window.setTimeout(() => navigate('../../status'), 1000);
             } else {
                 throw new Error("An error occurred. Please try again.");
             }
 
         } catch (error: any) {
             if (error.status == 409) {
-                alert("This machine is already in use. Please clear it before submitting a new usage.");
-                window.location.reload();
+                updateStatus("This machine is already in use. Please clear it before submitting a new usage.", "error");
             } else if (error.status == 404) {
-                alert("The selected machine does not exist.");
-                window.location.reload();
+                updateStatus("The selected machine does not exist.", "error");
             } else if (error.status == 403) {
-                alert("You are not permitted to use this machine.");
-                window.location.reload();
+                updateStatus("You are not permitted to use this machine.", "error");
             } else {
-                alert("An error occurred. Please try again.");
-                window.location.reload();
+                updateStatus("An error occurred. Please try again.", "error");
             }
         }
     };
@@ -214,7 +217,7 @@ export const DynamicMachineForm: React.FC = () => {
     const handlePageChange = (page: number) => {
         //Check if machine is selected
         if (page == 2 && selectedMachineId == "0") {
-            alert("Please select a machine first.");
+            updateStatus("Please select a machine first.", "error");
             return;
         }
 
@@ -222,25 +225,26 @@ export const DynamicMachineForm: React.FC = () => {
         if (page == 3) {
             const invalidSlot = slotValues.find((slot) => validateResourceUsage(slot));
             if (invalidSlot) {
-                alert(validateResourceUsage(invalidSlot));
+                updateStatus(validateResourceUsage(invalidSlot) ?? "You should never see this message! Please contact the site administrators.", "error");
                 return;
             }
 
             slotValues.forEach((slot) => {
                 if (slot.amount > 1000 && !slot.own) {
-                    alert(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please alert a volunteer or room manager after you start the print, so they are aware.`);
+                    updateStatus(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please alert a volunteer or room manager after you start the print, so they are aware.`, "warning");
                 } else if (slot.amount > 1000 && slot.own) {
-                    alert(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please make sure you have enough material to complete the print - you will not able to use Forge resources to complete the print.`);
+                    updateStatus(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please make sure you have enough material to complete the print - you will not able to use Forge resources to complete the print.`, "warning");
                 }
             });
         }
 
         //Check if duration is valid
         if (page == 4 && (formData.hours == 0 && formData.minutes == 0)) {
-            alert("Please enter a valid duration.");
+            updateStatus("Please enter a valid duration.", "error");
             return;
         }
 
+        clearStatus();
         setPage(page);
     };
 
@@ -274,6 +278,7 @@ export const DynamicMachineForm: React.FC = () => {
                     <div className="usage-duration">
                         <label>3. Usage Duration</label>
                         <input
+                            id="hours"
                             type="number"
                             inputMode="numeric"
                             pattern="[0-9]*"
@@ -283,7 +288,9 @@ export const DynamicMachineForm: React.FC = () => {
                             onChange={(e) => setFormData((prev) => ({ ...prev, 'hours': e.target.valueAsNumber }))}
                             value={formData.hours}
                         />
+                        <label htmlFor="hours">hr</label>
                         <input
+                            id="minutes"
                             type="number"
                             inputMode="numeric"
                             pattern="[0-9]*"
@@ -293,6 +300,7 @@ export const DynamicMachineForm: React.FC = () => {
                             onChange={(e) => setFormData((prev) => ({ ...prev, 'minutes': e.target.valueAsNumber }))}
                             value={formData.minutes}
                         />
+                        <label htmlFor="minutes">min</label>
                     </div>
                 }
 
@@ -339,8 +347,9 @@ export const DynamicMachineForm: React.FC = () => {
                     </div>
                 }
 
+                <div id="status-text" className={`status-text ${status.type === "success" ? "success" : status.type === "error" ? "error" : ""}`}>{status.text}</div>
                 <div className="pagination-buttons">
-                    <button type="button" onClick={() => setPage(page - 1)} disabled={page === 1}>Back</button>
+                    <button type="button" onClick={() => {clearStatus(); setPage(page - 1)}} disabled={page === 1}>Back</button>
                     {page !== 4 && <button type="button" onClick={() => handlePageChange(page + 1)} disabled={page === 4}>Next</button>}
                     {page == 4 && <button type="submit">Submit</button>}
                 </div>
