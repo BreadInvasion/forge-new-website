@@ -67,8 +67,8 @@ function Table<T extends Record<string, any>>(props: TableProps<T>) {
                         {columns.map((column, index) => (
                             <th key={String(column) + index}>{String(column)}</th>
                         ))}
-                        <th id="edit-col">Edit</th>
-                        <th id="delete-col">Delete</th>
+                        {editPath && <th id="edit-col">Edit</th>}
+                        {editPath && <th id="delete-col">Delete</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -81,18 +81,22 @@ function Table<T extends Record<string, any>>(props: TableProps<T>) {
                                         : String(row[column])}
                                 </td>
                             ))}
-                            <td className="icon">
-                                <a href={editPath}>
-                                    <Pencil2Icon width={20} height={20} />
-                                </a>
-                            </td>
-                            <td className="icon">
-                                <TrashIcon
-                                    width={20}
-                                    height={20}
-                                    onClick={() => onDelete && onDelete(rowIndex)}
-                                />
-                            </td>
+                            {editPath && (
+                                <td className="icon">
+                                    <a href={editPath}>
+                                        <Pencil2Icon width={20} height={20} />
+                                    </a>
+                                </td>
+                            )}
+                            {editPath && (
+                                <td className="icon">
+                                    <TrashIcon
+                                        width={20}
+                                        height={20}
+                                        onClick={() => onDelete && onDelete(rowIndex)}
+                                    />
+                                </td>
+                            )}
                         </tr>
                     ))}
                 </tbody>
