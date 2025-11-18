@@ -81,7 +81,8 @@ div.divider {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: auto;
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
     padding: 3%;
     direction: rtl;
@@ -108,20 +109,26 @@ div.divider {
 .user-options {
     display: flex;
     flex-direction: column;
-    height: auto;
-    overflow: visible;
-    gap: 1rem;
+    gap: 0.75rem;
     direction: ltr;
+    width: 100%;
+    min-width: 0;
 }
 
 .user-options li {
     list-style: none;
     margin: 0;
-    // padding: 0.25rem;
     border-radius: 5px;
     color: um.$black;
-    font-weight: 500;
     cursor: pointer;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    height: auto;
+    font-size: 1rem;
+    line-height: 1.2;
+    position: relative;
 }
 
 .member li {
@@ -153,10 +160,14 @@ div.divider {
 }
 
 .btn {
-    display: flex;
+    display: inline-flex;
     text-decoration: none;
     color: inherit;
-    height: 100%;
+    height: auto;
     width: 100%;
-    padding: 0.25rem;
+    padding: 0.3rem 0.25rem;
+    align-items: center;
+    justify-content: flex-start;
+    line-height: 1.2;
+    font-size: 1rem;
 }

@@ -13,7 +13,7 @@ const UserMenu: React.FC = () => {
     const hasPermission = (permission: UserPermission) => user.permissions.includes(permission) || user.permissions.includes(UserPermission.IS_SUPERUSER);
 
     return (
-        <div className="sidebar">
+    <div className="sidebar">
             {/* Avatar should be able to be outlined based on user type 
                 - if user is a volunteer, avatar should have a green border
                 - is user is a room manager, avatar should have a gold border
