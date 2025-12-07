@@ -115,9 +115,10 @@ export interface AllMachinesStatusResponse{
 
 export interface ResourceSlot {
     id: string;
-    db_name: string;
+    name: string;
+    db_name: string; // this NEEDS to be changed
     display_name: string;
-    resource_ids: string[];
+    valid_resource_ids: string[];
     allow_own_material: boolean;
     allow_empty: boolean;
 };
