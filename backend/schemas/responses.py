@@ -58,6 +58,8 @@ class UserNoHash(BaseModel):
 
 class MachineStatus(BaseResponse):
     id: UUID4
+    group_id: UUID4
+    type_id: UUID4
     name: str
     in_use: bool
     usage_start: Optional[datetime] = None

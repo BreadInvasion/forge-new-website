@@ -1,14 +1,18 @@
 import { Pencil1Icon, ExclamationTriangleIcon, Cross2Icon, EraserIcon } from "@radix-ui/react-icons";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Filter from "./Filter";
 import { ToolButton, FilterItem, FilterX } from "./FilterComponents";
 import { Toggle } from "@radix-ui/react-toggle";
+import { UserPermission } from "../../../enums";
+import { OmniAPI } from "src/apis/OmniAPI";
+import useAuth from "../../Auth/useAuth";
 
 const ToolbarContainer = styled.div`
     grid-area: tools;
     display: flex;
+    padding: 0.5rem;
     padding-bottom: 1rem;
     gap: 10px;
 `;
@@ -50,6 +54,10 @@ const ActiveFilters = styled.div`
 
 const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, activeFilters, setActiveFilters}) => {
 
+    const { user } = useAuth();
+    const hasPermission = (permission: UserPermission) => 
+        user?.permissions?.includes(permission) || user?.permissions?.includes(UserPermission.IS_SUPERUSER);
+   
     const navigate = useNavigate();
 
     const handleEditClick = () => {
@@ -62,29 +70,7 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
         navigate("/myforge/fail");
     };  
 
-    const filters = [
-        {
-            name: "Machine Type",
-            value: ["Mk3", "Mk4", "Mini", "XL", "Formlabs", "Markforged", "Other"]
-        },
-        {
-            name: "Status",
-            value: ["In Progress", "Completed", "Available", "Failed", "Maintenance"]
-        }
-    ]
-    
-    const handleFilterClick = (value: string) => {
-        if(!activeFilters.includes(value)) {
-            setActiveFilters((prevFilters) => [...prevFilters, value]);
-        }
-    };
-
-    const handleDeleteFilter = (e: any, value: string) => {
-        e.stopPropagation();
-        setActiveFilters((prevFilters) =>
-            prevFilters.filter((filter) => filter !== value)
-        );
-    };
+    const [groups, setGroups] = React.useState<{ id: string; name: string }[]>([]);
 
     useEffect(() => {
         const container = document.getElementById('active-filters') as HTMLElement; // .MAIN is a class since I think It could be more useful
@@ -104,23 +90,61 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
         }
     }, []);
 
+    useEffect(() => {
+        const fetchFilterData = async () => {
+            try {
+                const [machinestatus] = await Promise.all([
+                    OmniAPI.getPublic('machinestatus'),
+                ]);
+
+                if (machinestatus.groups) {
+                    const groupNames = machinestatus.groups.map((g: { machines: { group_id: any; }[]; name: any; }) => ({ id: g.machines[0].group_id, name: g.name }))
+                    setGroups(groupNames);
+                }
+            } catch (err) {console.error('Error fetching filter data:', err);}
+        };
+
+        fetchFilterData();
+
+        return () => {};
+    }, []);
+
+    const filters: { name: string; value: string[] }[] = [
+        {
+            name: "Machine Group",
+            value: groups.map(g => g.name) || []
+        },
+        {
+            name: "Status",
+            value: ["In Progress", "Completed", "Available", "Failed", "Maintenance"]
+        }
+    ];
+    
+    const handleFilterClick = (value: string) => {
+        if(!activeFilters.includes(value)) {
+            setActiveFilters((prevFilters) => [...prevFilters, value]);
+        }
+    };
+
+    const handleDeleteFilter = (e: any, value: string) => {
+        e.stopPropagation();
+        setActiveFilters((prevFilters) =>prevFilters.filter((filter) => filter !== value));
+    };
+
     return (
         <ToolbarContainer>
+            {hasPermission(UserPermission.CAN_EDIT_MACHINES) && (
             <ToolButton aria-label="Edit" onClick={handleEditClick}>
-                {/* Edit is for Room Managers and Admin/Super users only and will
-                 bring the user to a form where they can edit the details of the 
-                 usage */}
                 <Pencil1Icon />
             </ToolButton>
+            )}
+            {hasPermission(UserPermission.CAN_FAIL_MACHINES) && (
             <ToolButton aria-label="Fail" onClick={handleFailClick}>
-                { /*Fail will also be available to Volunteer level users,
-                 and when selected any machine they click on will redirect 
-                 to a Failure Form. */ }
-                <ExclamationTriangleIcon />
+               <ExclamationTriangleIcon />
             </ToolButton>
+            )}
+             {hasPermission(UserPermission.CAN_CLEAR_MACHINES) && (
             <ToolButton aria-label="Clear"> 
-                {/*only available to Admin/Super users and will clear the
-                 failure status of a machine */}
                 <Toggle
                     pressed={highlightFailed}
                     onPressedChange={setHighlightFailed}
@@ -131,6 +155,7 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
                 </div>
                 </Toggle>    
             </ToolButton>
+            )}
             <Filter 
                 filters={filters} 
                 activeFilters={activeFilters} 

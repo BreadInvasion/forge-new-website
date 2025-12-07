@@ -47,6 +47,8 @@ async def get_machines_status(
             MachineStatus.model_validate(
                 {
                     "in_use": machine.active_usage is not None,
+                    "group_id": machine.group_id,
+                    "type_id": machine.type_id,
                     "failed": (
                         machine.active_usage.failed if machine.active_usage else False
                     ),
@@ -62,6 +64,9 @@ async def get_machines_status(
                         machine.active_usage.duration_seconds
                         if machine.active_usage
                         else None
+                    ),
+                    "user_id": (
+                        machine.active_usage.user.id if machine.active_usage and machine.active_usage.user else None
                     ),
                     "user_name": (
                         f"{machine.active_usage.user.first_name} {machine.active_usage.user.last_name[0]}."

@@ -153,6 +153,22 @@
     margin-top: 1rem;
 }
 
+#status-text {
+    font-size: 0.8em;
+}
+
+#status-text.success {
+    color: green;
+}
+
+#status-text.error {
+    color: red;
+}
+
+#status-text.warning {
+    color: orange;
+}
+
 .pagination-buttons {
     display: flex;
     flex-direction: row;

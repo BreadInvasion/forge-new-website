@@ -10,6 +10,11 @@ export const StatusWrapper = styled.div`
     display: flex;
     width: 100%;
     height: 100%;
+    overflow: visible;
+    @media screen and (max-width: 850px) {
+        /* don't force full viewport height on mobile: let toolbar and sidebar size naturally */
+        height: auto;
+    }
 `;
 
 export const GridContainer = styled.div`
@@ -20,24 +25,35 @@ export const GridContainer = styled.div`
     justify-content: center;
     align-items: flex-start;
     column-gap: 10px;
+    overflow: visible;
     @media screen and (max-width: 850px) {
-        overflow-y: auto;
+    overflow-y: auto;
+    /* ensure padding remains visible on narrow viewports even if global rules exist */
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
     }
 `;
 
-export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highlightFailed?: boolean; progress: number }>`
+export const Card = styled.div<{ 
+    $symbol?: string; 
+    $minimized?: boolean; 
+    $highlightFailed?: boolean; 
+    progress: number;
+}>`
     background-color: #f5f5f5;
     border-radius: 5px;
-    padding: 5px;
+    padding:10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
     gap: 0rem;
-    width: ${({ $minimized }) => ($minimized ? 'clamp(120px, 9vw, 200px)' : 'clamp(200px, 25vw, 400px)')};
-    min-width: ${({ $minimized }) => ($minimized ? '100px' : '200px')};
+    width: ${({ $minimized }) => ($minimized ? 'clamp(140px, 10vw, 260px)' : 'clamp(260px, 30vw, 520px)')};
+    min-width: ${({ $minimized }) => ($minimized ? '130px' : '240px')};
     max-width: 100%;
-    height: ${({ $minimized }) => ($minimized ? 'clamp(15vh, 15vh, 17vh)' : 'auto')};
+    height: ${({ $minimized }) => ($minimized ? 'clamp(16vh, 18vh, 24vh)' : 'auto')};
     aspect-ratio: auto;
     flex-shrink: 0;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
@@ -70,31 +86,56 @@ export const Card = styled.div<{ $symbol?: string; $minimized?: boolean; $highli
         }
     `}
     @media screen and (max-width: 850px) {
-        width: ${({ $minimized }) => ($minimized ? '15vh' : 'auto')};
-        height: ${({ $minimized }) => ($minimized? '12vh' : 'auto')};
+        /* on narrow screens, keep minimized cards reasonably sized */
+        width: ${({ $minimized }) => ($minimized ? '18vh' : 'auto')};
+        height: ${({ $minimized }) => ($minimized? '18vh' : 'auto')};
         aspect-ratio: auto;
         border-radius: 10px; 
     }
 `;
 
-export const MachineName = styled.h3<{ $minimized?: boolean }>`
-    font-size: ${({ $minimized }) => ($minimized ? "2.5vh" : "3.0vh")};
+export const BigCardAttribute = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: left;
+    gap: 0.25rem;
+`;
+
+export const BigCardText = styled.p<{ $minimized?: boolean, $clearable?: boolean }>`
+    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.3vh" : "1.5vh") : "2.0vh")};
     font-weight: 600;
+    text-align: center;
+    width: auto;
+`;
+export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
+    font-weight: ${({ $minimized }) => ($minimized ? "600" : "400")};
+    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.0vh" : "1.5vh") : "1.8vh")};
+    text-align: center;
+    width: auto;
+    @media screen and (max-width: 850px) {
+        font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "1.7vh")};
+    }
+`;
+
+export const MachineName = styled.h3<{ $minimized?: boolean, $clearable?: boolean }>`
+    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "2.0vh" : "2.5vh") : "3.0vh")};
+    font-weight: 650;
     color: #000;
     text-transform: uppercase;
     font-family: Montserrat;
     text-align: center;
 `;
 
-export const StatusText = styled.p<{ $area?: string, $minimized?: boolean }>`
-    font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "2.0vh")};
+export const StatusText = styled.p<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
+    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.2vh" : "1.5vh") : "2.0vh")};
     color: #000;
     text-align: center;
-    text-jusitfy: center;
+    text-justify: center;
     font-family: Montserrat;
     font-weight: 600;
     @media screen and (max-width: 850px) {
-        font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "1.7vh")};
+        font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.2vh" : "1.5vh") : "1.7vh")};
     }
 `;
 
