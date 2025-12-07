@@ -15,7 +15,7 @@ const aemenu = (updateExisting:boolean) => {
     const [recname, setRecname] = useState("");
     const [resources, setResources] = useState<Resource[]>([]);
     React.useEffect(() => {
-            fetch('http://localhost:3000/api/resources?limit=100', {
+            fetch('http://localhost:3000/api/resources?limit=100', { // TODO: Switch this to OmniAPI
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

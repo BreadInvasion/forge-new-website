@@ -13,8 +13,8 @@ const Users: React.FC = () => {
     //change this to fix gender id
     const columns: (keyof User)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof User)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
 
-    React.useEffect(() => {
-        fetch('http://localhost:3000/api/users?limit=100', {
+    React.useEffect(() => { // TODO: switch this to omniapi
+        fetch('http://localhost:3000/api/users?limit=1000', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

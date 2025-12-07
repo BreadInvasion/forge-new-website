@@ -10,37 +10,6 @@ import { Dialog } from 'radix-ui';
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { OmniAPI } from 'src/apis/OmniAPI';
 
-const fetchMachines = (machineIds: string[]) => {
-    const machines: string[] = [];
-    for (const machineId of machineIds) {
-        fetch(`http://localhost:3000/api/machines/${machineId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-        })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(data => {
-                if ('id' in data && 'name' in data) {
-                    // console.log('Machine:', data);
-                    machines.push(data.name);
-                } else {
-                    throw new Error('Data is not of type Machine');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching machine:', error);
-            });
-    }
-    return machines;
-}
-
 interface aemenuprops {
     isDialogOpen: boolean;
     setIsDialogOpen: (open: boolean) => void;

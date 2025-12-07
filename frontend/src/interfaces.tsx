@@ -85,7 +85,7 @@ export interface Resource {
     brand?: string;
     color?: string;
     units: string;
-    cost: string;
+    cost: number;
 };
 
 // MachineStatus block

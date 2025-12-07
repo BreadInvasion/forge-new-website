@@ -63,7 +63,7 @@ export function DeleteItem(type: string, obj: any, index: number, data: any, set
         // const newData = [...data];
         // newData.splice(index, 1);
         // setData(newData);
-    } ).catch(e => alert("Failed to delete machine: " + e.response.data.detail));
+    } ).catch(e => alert("Failed to delete " + type + ": " + e.response.data.detail));
 }
 
 export function TableHead<T>(props: TableHeadProps<T>) {
