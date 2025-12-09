@@ -25,6 +25,13 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
 
     const [name, setName] = useState("");
     const [resourceSlots, setResourceSlots] = useState<ResourceSlot[]>(initialResSlots);
+
+    React.useEffect(() => {
+        OmniAPI.getAll("resourceslots").then(rs =>{
+            setResourceSlots(rs);
+        });
+    }, []);
+
     const [resourceSlotIDS, setResourceSlotIDS] = useState<string[]>([]);
     const [cost, setCost] = useState<number>(0.0);
     const handleCheckboxChange = (value: string) => {
@@ -124,9 +131,14 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
 let initialMachTypes: MachineType[] = await OmniAPI.getAll("machinetypes");
 
 const MachineTypes: React.FC = () => {
-
     const [data, setData] = React.useState<MachineType[]>(initialMachTypes);
     const columns: (keyof MachineType)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineType)[]).filter( (key) => !key.includes('_id') && key !== 'id' ) : [];
+
+    React.useEffect(() => {
+        OmniAPI.getAll("machinetypes").then( (mt) => {
+            setData(mt);
+        });
+    }, []);
 
     const onDelete = (index_local: number, index_real: number) => {
         DeleteItem("machinetypes", data[index_real], index_local, data, setData);
