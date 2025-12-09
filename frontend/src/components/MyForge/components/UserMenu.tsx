@@ -60,6 +60,9 @@ const UserMenu: React.FC = () => {
                     { hasPermission(UserPermission.CAN_SEE_RESOURCES) && (
                         <li><Link to='/myforge/resources' className='btn'>Resources</Link></li>
                     )}
+                    { hasPermission(UserPermission.CAN_SEE_RESOURCE_SLOTS) && (
+                        <li><Link to='/myforge/resource_slots' className='btn'>Resource Slots</Link></li>
+                    )}
                     { hasPermission(UserPermission.CAN_SEE_USERS) && (
                         <li><Link to='/myforge/users' className='btn'>Users</Link></li>
                     )}

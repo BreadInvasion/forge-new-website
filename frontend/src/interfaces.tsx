@@ -1,5 +1,5 @@
 // src/interfaces.ts
-import { UserPermission } from "enums";
+import { UserPermission } from "./enums";
 
 export interface User {
     id: string;
@@ -70,12 +70,13 @@ export interface MachineType {
     name: string;
     resource_slots: number;
     count: number;
+    cost_per_hour: number;
     resource_slot_ids: string[];
     resource_types: string[];
 };
 
 export interface MachineGroup {
-    id: number;
+    id: string;
     name: string;
     machines: string[];
 };
@@ -94,7 +95,7 @@ export interface Resource {
     brand?: string;
     color?: string;
     units: string;
-    cost: string;
+    cost: number;
 };
 
 // MachineStatus block
@@ -122,3 +123,14 @@ export interface AllMachinesStatusResponse{
     groups: MachineStatusGroup[];
     loners: MachineStatus[];
 }
+
+
+export interface ResourceSlot {
+    id: string;
+    name: string;
+    db_name: string; // this NEEDS to be changed
+    display_name: string;
+    valid_resource_ids: string[];
+    allow_own_material: boolean;
+    allow_empty: boolean;
+};

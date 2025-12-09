@@ -3,25 +3,27 @@ import { api, publicApi } from "./configs/axiosConfigs";
 export const OmniAPI = {
     getAll: async (type: string) => {
         const response = await api.request({
-            url: `/${type}`,
+            url: `/${type}?limit=200`,
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
     get: async (type: string, id: string) => {
         const response = await api.request({
-            url: `/${type}/${id}`,
+            url: `/${type}/${id}?limit=200`,
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
@@ -35,6 +37,7 @@ export const OmniAPI = {
             },
             data: data,
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
@@ -48,6 +51,7 @@ export const OmniAPI = {
             },
             data: data,
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
@@ -60,6 +64,7 @@ export const OmniAPI = {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
@@ -72,6 +77,7 @@ export const OmniAPI = {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
@@ -85,6 +91,7 @@ export const OmniAPI = {
             },
             data: data,
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
@@ -97,17 +104,19 @@ export const OmniAPI = {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     },
     getPublic: async (type: string) => {
         const response = await publicApi.request({
-            url: `/${type}`,
+            url: `/${type}?limit=200`,
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
         });
+        if (response.status != 200) throw response.data;
 
         return response.data;
     }

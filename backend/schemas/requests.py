@@ -178,6 +178,7 @@ class UserChangeRCSIDRequest(BaseRequest):
 
 class MachineGroupCreateRequest(BaseRequest):
     name: str
+    machine_ids: list[UUID4]
 
 
 class MachineGroupEditRequest(BaseRequest):

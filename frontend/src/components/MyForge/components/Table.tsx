@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
+import { v1, v4 } from 'uuid'; // For version 4 (random) UUIDs
 
 import '../styles/Table.scss';
-import { Pencil2Icon, TrashIcon } from '@radix-ui/react-icons';
+import { Pencil2Icon, TrashIcon, ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons';
+import { OmniAPI } from 'src/apis/OmniAPI';
 
-interface TableProps<T extends Record<string, any>> {
+interface TableProps<T> {
     columns: (keyof T)[];
     data: T[];
-    editPath?: string;
-    onDelete?: (index: number) => void;
+    canEdit?: boolean;
+    onEdit?: (activeItem: T) => void;
+    onDelete?: (index_local: number, index_real:number) => void;
 }
 
 const ITEMS_PER_PAGE = 8;
@@ -34,8 +37,47 @@ function createPageRange(
     return pages;
 }
 
-function Table<T extends Record<string, any>>(props: TableProps<T>) {
-    const { columns, data, editPath, onDelete } = props;
+function toTitle(snakeStr: string): string {
+    return snakeStr
+        .replace("_rpi", "_RPI") // Fixed like a true CS major 😎
+        .replace("rpi_", "RPI") // Same here 💅💅
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+        .join(' ');
+}
+
+interface TableHeadProps<T> {
+    heading: string; 
+    type?: string;
+    updateExisting?: boolean;
+    activeItem?: T;
+    aemenu?: ReactNode;
+}
+
+// calls the api to delete an item from the database. type parameter is the backend type not frontend
+export function DeleteItem(type: string, obj: any, index: number, data: any, setData: (dat: any) => void) {
+    if (!confirm(`Really delete ${obj.name}?`)) return;
+    OmniAPI.delete(type, obj.id).then(r => {
+        location.reload(); // fix this eventually, commented out code below is broken
+    
+        // const newData = [...data];
+        // newData.splice(index, 1);
+        // setData(newData);
+    } ).catch(e => alert("Failed to delete " + type + ": " + e.response.data.detail));
+}
+
+export function TableHead<T>(props: TableHeadProps<T>) {
+    const { heading, type, aemenu } = props;
+    return(
+        <div className="table-head">
+            <h2>{heading}</h2>
+            { type == null ? "" : aemenu }
+        </div>
+    );
+}
+
+function Table<T>(props: TableProps<T>) {
+    const { columns, data, onDelete, onEdit, canEdit } = props;
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -59,77 +101,81 @@ function Table<T extends Record<string, any>>(props: TableProps<T>) {
     // Generate an array of pages to display (limited by MAX_PAGE_BUTTONS)
     const pagesToShow = createPageRange(currentPage, totalPages, MAX_PAGE_BUTTONS);
 
-    return (
-        <div className="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        {columns.map((column, index) => (
-                            <th key={String(column) + index}>{String(column)}</th>
-                        ))}
-                        {editPath && <th id="edit-col">Edit</th>}
-                        {editPath && <th id="delete-col">Delete</th>}
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentData.map((row: T, rowIndex) => (
-                        <tr key={rowIndex}>
+    if (data.length == 0) {
+        return(
+            <div>
+                <br />
+                <i>No items are present.</i>
+            </div>
+        );
+    } else {
+        return (
+            <div className="table-container">
+                <table>
+                    <thead>
+                        <tr>
                             {columns.map((column, index) => (
-                                <td key={String(column) + index + rowIndex}>
-                                    {Array.isArray(row[column])
-                                        ? row[column].join(', ')
-                                        : String(row[column])}
-                                </td>
+                                <th key={String(column) + index}>{toTitle(String(column))}</th>
                             ))}
-                            {editPath && (
-                                <td className="icon">
-                                    <a href={editPath}>
-                                        <Pencil2Icon width={20} height={20} />
-                                    </a>
-                                </td>
-                            )}
-                            {editPath && (
-                                <td className="icon">
-                                    <TrashIcon
-                                        width={20}
-                                        height={20}
-                                        onClick={() => onDelete && onDelete(rowIndex)}
-                                    />
-                                </td>
-                            )}
+                            <th id="edit-col"></th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {currentData.map((row: T, rowIndex) => (
+                            <tr key={rowIndex}>
+                                {columns.map((column, index) => (
+                                    <td key={v4()}>
+                                        {Array.isArray(row[column])
+                                            ? row[column].join(', ')
+                                            : String(row[column])}
+                                    </td>
+                                ))}
+                                <td className="icon">
+                                    &#8203;
+                                    {!canEdit?'': <Pencil2Icon 
+                                        className='edit'
+                                        onClick={() => onEdit && onEdit(row)}
+                                    />}
+                                    {onDelete == null ?"":
+                                        <TrashIcon
+                                            className='trash'
+                                            onClick={() => onDelete && onDelete(rowIndex, rowIndex + (currentPage - 1) * (MAX_PAGE_BUTTONS + 3))}
+                                    />}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
 
-            <div className='pagination-container'>
-                <div className='page-info'>
-                    Page {currentPage} of {totalPages}
-                </div>
+                <div className='pagination-container'>
+                    <div className='page-info'>
+                        Page {currentPage} of {totalPages}
+                    </div>
 
-                <div className='pagination'>
-                    <button onClick={handlePrevious} disabled={currentPage === 1}>
-                        Previous
-                    </button>
-
-                    {/* Render each page button */}
-                    {pagesToShow.map((page) => (
-                        <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={page === currentPage ? 'active' : ''}
-                        >
-                            {page}
+                    <div className='pagination'>
+                        <button onClick={handlePrevious} disabled={currentPage === 1}>
+                            <ArrowLeftIcon />
                         </button>
-                    ))}
 
-                    <button onClick={handleNext} disabled={currentPage === totalPages}>
-                        Next
-                    </button>
+                        {/* Render each page button */}
+                        {pagesToShow.map((page) => (
+                            <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={page === currentPage ? 'active' : ''}
+                            >
+                                {page}
+                            </button>
+                        ))}
+
+                        <button onClick={handleNext} disabled={currentPage === totalPages}>
+                            <ArrowRightIcon />
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    }
 };
 
 export default Table;

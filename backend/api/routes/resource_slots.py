@@ -9,6 +9,7 @@ from sqlalchemy.orm import InstrumentedAttribute, selectinload
 from models.audit_log import AuditLog
 from models.resource import Resource
 from models.resource_slot import ResourceSlot
+from models.machine_type import MachineType, MachineTypeSlotAssociation
 from models.resource_usage_quantity import ResourceUsageQuantity
 from schemas.requests import ResourceSlotCreateRequest, ResourceSlotEditRequest
 from schemas.responses import (
@@ -207,8 +208,8 @@ async def edit_resource_slot(
             if resource_slot.display_name != request.display_name
             else None
         ),
-        "valid_resource_ids": (
-            request.resource_ids
+        "resource_ids": (
+            [str(r) for r in request.resource_ids]
             if set(resource_slot.valid_resources) != set(valid_resources)
             else None
         ),
@@ -260,6 +261,14 @@ async def delete_resource_slot(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resource Slot with provided ID not found",
+        )
+
+    slotAcc: MachineTypeSlotAssociation = await session.scalar(select(MachineTypeSlotAssociation).where(MachineTypeSlotAssociation.resource_slot_id == resource_slot_id))
+    if slotAcc:
+        mtypeWith: MachineType = await session.get(MachineType, slotAcc.machine_type_id)
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail=f"One or more machine types is using this resource slot: {mtypeWith.name})"
         )
 
     await session.delete(resource_slot)

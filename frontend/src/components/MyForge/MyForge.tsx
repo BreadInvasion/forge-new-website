@@ -42,10 +42,13 @@ const MyForge: React.FC = () => {
                         <Route path="machines" element={<Machines />} />
                         <Route path="machine_types" element={<MachineTypes />} />
                         <Route path="machine_groups" element={<MachineGroups />} />
+                        <Route path="machines" element={<Machines />} />
                         <Route path="resources" element={<Resources />} />
                         <Route path="resource_slots" element={<ResourceSlots />} />
                         <Route path="users" element={<Users />} />
-                        <Route path="usages" element={<Usages />} />
+                        <Route path="semesters" element={<ComingSoon />} />
+                        <Route path="charge_sheets" element={<ComingSoon />} />
+                        <Route path="change_config" element={<ComingSoon />} />
                     </Routes>
                 </Suspense>
             </div>

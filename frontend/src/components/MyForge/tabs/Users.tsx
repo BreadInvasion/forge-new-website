@@ -1,5 +1,6 @@
 import React from 'react';
-import Table from '../components/Table';
+import Table, {DeleteItem} from '../components/Table';
+import { TableHead } from '../components/Table';
 import { User } from 'src/interfaces';
 
 import '../styles/TabStyles.scss';
@@ -10,10 +11,10 @@ const Users: React.FC = () => {
     const [data, setData] = React.useState<User[]>([]);
 
     //change this to fix gender id
-    const columns: (keyof User)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => !key.includes('_id') && key !== 'id') : [];
+    const columns: (keyof User)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof User)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
 
-    React.useEffect(() => {
-        fetch('http://localhost:3000/api/users', {
+    React.useEffect(() => { // TODO: switch this to omniapi
+        fetch('http://localhost:3000/api/users?limit=1000', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -41,14 +42,12 @@ const Users: React.FC = () => {
 
     return (
         <div className='tab-column-cover align-center'>
-            <h2>Users</h2>
-            <button className='add-button'>
-                <a href='/myforge/users/add'>Add User</a>
-            </button>
+            <TableHead
+                heading="Users"
+            />
             <Table<User>
                 columns={columns}
                 data={data}
-                editPath='/myforge/users/edit'
             />
         </div>
     );
