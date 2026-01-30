@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 
 import '../styles/TabStyles.scss';
 
-import { Dialog } from 'radix-ui';
+import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { OmniAPI } from 'src/apis/OmniAPI';
 
