@@ -212,7 +212,7 @@ async def delete_resource(
     if slotAcc:
         slotWith: ResourceSlot = await session.get(ResourceSlot, slotAcc.resource_slot_id)
         raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            status_code=status.HTTP_409_CONFLICT,
             detail=f"One or more resource slots is using this resource: {slotWith.display_name})"
         )
 

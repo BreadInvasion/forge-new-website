@@ -267,7 +267,7 @@ async def delete_resource_slot(
     if slotAcc:
         mtypeWith: MachineType = await session.get(MachineType, slotAcc.machine_type_id)
         raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            status_code=status.HTTP_409_CONFLICT,
             detail=f"One or more machine types is using this resource slot: {mtypeWith.name})"
         )
 
