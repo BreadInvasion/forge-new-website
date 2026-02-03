@@ -188,40 +188,38 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
         <Dialog.Root open={isDialogOpen} onOpenChange={(e: boolean) => { setOpenExtra(e, machineGroup); }}>
             <button className="addbtn" onClick={() => { setOpenExtra(true, null); }}><PlusIcon /></button>
             <Dialog.Portal>
-                <div className='AEdiv'>
-                    <Dialog.Overlay className="DialogOverlay" />
-                    <Dialog.Content className="DialogContent">
-                        <Dialog.Close asChild>
-                            <button className="IconButton" aria-label="Close">
-                                <Cross2Icon />
-                            </button>
-                        </Dialog.Close>
-                        <Dialog.Title className="DialogTitle">{machineGroup == null ? "Adding" : "Editing"} Machine Group</Dialog.Title>
-                        <fieldset className="Fieldset">
-                            <label className="Label" htmlFor="name">Name</label>
-                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} />
+                <Dialog.Overlay className="DialogOverlay" />
+                <Dialog.Content className="DialogContent">
+                    <Dialog.Close asChild>
+                        <button className="IconButton" aria-label="Close">
+                            <Cross2Icon />
+                        </button>
+                    </Dialog.Close>
+                    <Dialog.Title className="DialogTitle">{machineGroup == null ? "Adding" : "Editing"} Machine Group</Dialog.Title>
+                    <fieldset className="Fieldset">
+                        <label className="Label" htmlFor="name">Name</label>
+                        <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} />
 
-                            <label className="Label" htmlFor="machines">Machines</label>
-                            {machines.map((machine: Machine) => (
-                                <div className="checkbox-labels">
-                                    <input
-                                        className='styled-checkbox'
-                                        type="checkbox"
-                                        id={machine.id}
-                                        checked={machineIDS == null ? false : machineIDS.includes(machine.id)}
-                                        onChange={() => handleCheckboxChange(machine.id)}
-                                    />
-                                    <label htmlFor={machine.id} className='checkbox-label'>
-                                        {machine.name}
-                                    </label>
-                                </div>
-                            ))}
-                        </fieldset>
-                        <Dialog.Close asChild>
-                            <button className="Button SaveBtn" onClick={machineGroup == null ? create : edit}>Save</button>
-                        </Dialog.Close>
-                    </Dialog.Content>
-                </div>
+                        <label className="Label" htmlFor="machines">Machines</label>
+                        {machines.map((machine: Machine) => (
+                            <div className="checkbox-labels" key={machine.id}>
+                                <input
+                                    className='styled-checkbox'
+                                    type="checkbox"
+                                    id={machine.id}
+                                    checked={machineIDS == null ? false : machineIDS.includes(machine.id)}
+                                    onChange={() => handleCheckboxChange(machine.id)}
+                                />
+                                <label htmlFor={machine.id} className='checkbox-label'>
+                                    {machine.name}
+                                </label>
+                            </div>
+                        ))}
+                    </fieldset>
+                    <Dialog.Close asChild>
+                        <button className="Button SaveBtn" onClick={machineGroup == null ? create : edit}>Save</button>
+                    </Dialog.Close>
+                </Dialog.Content>
             </Dialog.Portal>
         </Dialog.Root>
     ), setOpenExtra];
