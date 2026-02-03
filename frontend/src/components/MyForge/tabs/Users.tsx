@@ -1,4 +1,5 @@
 import React from 'react';
+import { OmniAPI } from 'src/apis/OmniAPI';
 import Table, {DeleteItem} from '../components/Table';
 import { TableHead } from '../components/Table';
 import { User } from 'src/interfaces';
@@ -13,21 +14,9 @@ const Users: React.FC = () => {
     //change this to fix gender id
     const columns: (keyof User)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof User)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
 
-    React.useEffect(() => { // TODO: switch this to omniapi
-        fetch('http://localhost:3000/api/users?limit=1000', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-        })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(data => {
+    React.useEffect(() => {
+        OmniAPI.getAll("users")
+            .then((data) => {
                 console.log('Users:', data);
                 if (Array.isArray(data)) {
                     setData(data);
@@ -35,7 +24,7 @@ const Users: React.FC = () => {
                     throw new Error('Data is not of type User');
                 }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error fetching users:', error);
             });
     }, []);

@@ -26,29 +26,15 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: Resourc
     const [name, setName] = useState("");
     const [resources, setResources] = useState<Resource[]>([]);
     React.useEffect(() => {
-            fetch('http://localhost:3000/api/resources?limit=100', { // TODO: Switch this to OmniAPI
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                },
-            })
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
-                    }
-                    return res.json();
-                })
-                .then(data => {
-                    // console.log('Resources:', data);
+            OmniAPI.getAll("resources")
+                .then((data) => {
                     if (Array.isArray(data) && data.every(item => 'id' in item && 'name' in item)) {
-                        // console.log('Resources:', data);
                         setResources(data);
                     } else {
                         throw new Error('Data is not of type Resource');
                     }
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Error fetching resources:', error);
                 });
         }, []);
@@ -253,30 +239,17 @@ const ResourceSlots: React.FC = () => {
     const columns: (keyof ResourceSlot)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof ResourceSlot)[]).filter((key) => !key.includes('db_name') && !(key == 'name') && !key.includes('id') && !key.includes('valid_resource_ids')) : [];
 
     React.useEffect(() => {
-        fetch('http://localhost:3000/api/resourceslots?limit=100', { // TODO: change this to use onmiapi
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-        })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(data => {
-                data.map((x:ResourceSlot) => x.name = x.display_name);
+        OmniAPI.getAll("resourceslots")
+            .then((data) => {
+                data.map((x: ResourceSlot) => x.name = x.display_name);
                 console.log('Resource Slots:', data);
                 if (Array.isArray(data) && data.every(item => 'id' in item && 'valid_resource_ids' in item)) {
-                    console.log('Resource Slots:', data);
                     setData(data);
                 } else {
                     throw new Error('Data is not of type ResourceSlot');
                 }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error fetching resource slots:', error);
             });
     }, []);

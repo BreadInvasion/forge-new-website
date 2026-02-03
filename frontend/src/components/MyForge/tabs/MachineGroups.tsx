@@ -24,29 +24,15 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
     const [name, setName] = useState("");
     const [machines, setMachines] = useState<Machine[]>([]);
     React.useEffect(() => {
-        fetch('http://localhost:3000/api/machines?limit=100', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-        })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(data => {
-                // console.log('Machines:', data);
+        OmniAPI.getAll("machines")
+            .then((data) => {
                 if (Array.isArray(data) && data.every(item => 'id' in item && 'name' in item)) {
-                    // console.log('Machines:', data);
                     setMachines(data);
                 } else {
                     throw new Error('Data is not of type Machine');
                 }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error fetching machines:', error);
             });
     }, []);

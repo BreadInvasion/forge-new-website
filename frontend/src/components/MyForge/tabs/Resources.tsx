@@ -114,30 +114,17 @@ const Resources: React.FC = () => {
     const [data, setData] = React.useState<Resource[]>([]);
     const columns: (keyof Resource)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof Resource)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
 
-    React.useEffect(() => { // TODO : Switch to OmniAPI
-        fetch('http://localhost:3000/api/resources?limit=100', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-        })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(data => {
+    React.useEffect(() => {
+        OmniAPI.getAll("resources")
+            .then((data) => {
                 console.log('Resources:', data);
                 if (Array.isArray(data) && data.every(item => 'id' in item && 'name' in item)) {
-                    console.log('Resources:', data);
                     setData(data);
                 } else {
                     throw new Error('Data is not of type Resource');
                 }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error fetching resources:', error);
             });
     }, []);

@@ -16,7 +16,7 @@ export const OmniAPI = {
     },
     get: async (type: string, id: string) => {
         const response = await api.request({
-            url: `/${type}/${id}?limit=200`,
+            url: `/${type}/${id}`,
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
