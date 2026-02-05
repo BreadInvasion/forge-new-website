@@ -125,7 +125,7 @@
 .pagination-container {
     display: flex;
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-end;
     margin-top: 20px;
     padding-right: 30px;
 }
@@ -157,7 +157,9 @@
 }
 
 .pagination button:disabled {
-    display:none;
+    opacity: 0.45;
+    cursor: default;
+    pointer-events: none;
 }
 
 .pagination button.active {
@@ -175,6 +177,14 @@
 .pagination button:last-of-type {
     background-color: #ffffff;
     margin-right: 0;
+}
+
+.pagination button[aria-current='page'] {
+    background-color: #ffffff;
+    color: #111827;
+    cursor: default;
+    pointer-events: none;
+    box-shadow: none;
 }
 .pagination button:first-of-type:hover {
     background-color: #c9c9c9;

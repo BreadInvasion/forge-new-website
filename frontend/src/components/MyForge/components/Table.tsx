@@ -11,31 +11,13 @@ interface TableProps<T> {
     canEdit?: boolean;
     onEdit?: (activeItem: T) => void;
     onDelete?: (index_local: number, index_real:number) => void;
+    itemsPerPage?: number;
+    currentPage?: number;
+    onPageChange?: (page: number) => void;
+    resourceType?: string;
 }
 
 const ITEMS_PER_PAGE = 8;
-const MAX_PAGE_BUTTONS = 5;
-
-function createPageRange(
-    currentPage: number,
-    totalPages: number,
-    maxPages: number
-) {
-    // Start near the current page:
-    let start = Math.max(1, currentPage - Math.floor(maxPages / 2));
-    let end = start + maxPages - 1;
-    if (end > totalPages) {
-        end = totalPages;
-        // If we’re at the last pages, shift the start so we still show maxPages
-        start = Math.max(1, end - maxPages + 1);
-    }
-
-    const pages = [];
-    for (let i = start; i <= end; i++) {
-        pages.push(i);
-    }
-    return pages;
-}
 
 function toTitle(snakeStr: string): string {
     return snakeStr
@@ -55,15 +37,12 @@ interface TableHeadProps<T> {
 }
 
 // calls the api to delete an item from the database. type parameter is the backend type not frontend
-export function DeleteItem(type: string, obj: any, index: number, data: any, setData: (dat: any) => void) {
+export function DeleteItem(type: string, obj: any, onSuccess: () => void) {
     if (!confirm(`Really delete ${obj.name}?`)) return;
-    OmniAPI.delete(type, obj.id).then(r => {
-        location.reload(); // fix this eventually, commented out code below is broken
-    
-        // const newData = [...data];
-        // newData.splice(index, 1);
-        // setData(newData);
-    } ).catch(e => alert("Failed to delete " + type + ": " + e.response.data.detail));
+    OmniAPI.delete(type, obj.id)
+        .then(() => {
+            onSuccess();
+        }).catch(e => alert("Failed to delete " + type + ": " + e.response?.data?.detail));
 }
 
 export function TableHead<T>(props: TableHeadProps<T>) {
@@ -78,31 +57,68 @@ export function TableHead<T>(props: TableHeadProps<T>) {
 
 function Table<T>(props: TableProps<T>) {
     const { columns, data, onDelete, onEdit, canEdit } = props;
+    const {
+        itemsPerPage: itemsPerPageProp,
+        currentPage: currentPageProp,
+        onPageChange,
+        resourceType
+    } = props;
 
-    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = itemsPerPageProp ?? ITEMS_PER_PAGE;
+    const currentPage = currentPageProp ?? 1;
+    const [hasNext, setHasNext] = useState(false);
 
-    // 2. Calculate total pages
-    const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+    // check for next page by pulling next item 
+    const checkHasNext = React.useCallback(() => {
+        if (!resourceType) {
+            setHasNext(false);
+            return;
+        }
+        const nextOffset = currentPage * itemsPerPage;
 
-    // 3. Slice the data for currentPage
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentData = data.slice(startIndex, endIndex);
+        OmniAPI.getAll(resourceType, {limit: 1, offset: nextOffset}).then(res => {
+                setHasNext(Array.isArray(res) && res.length > 0);
+        }).catch(() => setHasNext(false));
+    }, [resourceType, currentPage, itemsPerPage]);
 
-    // 4. Pagination controls
+    useEffect(() => {
+        checkHasNext();
+    }, [checkHasNext, data]);
+
+    useEffect(() => {
+        if (currentPage > 1 && data.length === 0) {
+            onPageChange?.(currentPage - 1);
+        }
+    }, [data.length, currentPage]);
+
+
     const handlePrevious = () => {
-        setCurrentPage((prev) => Math.max(prev - 1, 1));
+        if (currentPage === 1) return;
+        onPageChange?.(currentPage - 1);
     };
 
     const handleNext = () => {
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+        if (!hasNext) return;
+        onPageChange?.(currentPage + 1);
     };
 
-    // Generate an array of pages to display (limited by MAX_PAGE_BUTTONS)
-    const pagesToShow = createPageRange(currentPage, totalPages, MAX_PAGE_BUTTONS);
+    // arrow keys work like the buttons
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            const active = document.activeElement as HTMLElement | null;
+            const tag = active?.tagName?.toLowerCase();
+            if (tag === 'input' || tag === 'textarea' || active?.isContentEditable) return;
 
-    if (data.length == 0) {
-        return(
+            if (e.key === 'ArrowLeft') handlePrevious();
+            if (e.key === 'ArrowRight') handleNext();
+        };
+
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [currentPage, hasNext]);
+
+    if (data.length === 0) {
+        return (
             <div>
                 <br />
                 <i>No items are present.</i>
@@ -121,26 +137,28 @@ function Table<T>(props: TableProps<T>) {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentData.map((row: T, rowIndex) => (
+                        {data.map((row, rowIndex) => (
                             <tr key={rowIndex}>
-                                {columns.map((column, index) => (
-                                    <td key={v4()}>
+                                {columns.map(column => (
+                                    <td key={String(column)}>
                                         {Array.isArray(row[column])
                                             ? row[column].join(', ')
                                             : String(row[column])}
                                     </td>
                                 ))}
                                 <td className="icon">
-                                    &#8203;
-                                    {!canEdit?'': <Pencil2Icon 
-                                        className='edit'
-                                        onClick={() => onEdit && onEdit(row)}
-                                    />}
-                                    {onDelete == null ?"":
+                                    {!canEdit ? null : (
+                                        <Pencil2Icon
+                                            className="edit"
+                                            onClick={() => onEdit?.(row)}
+                                        />
+                                    )}
+                                    {!onDelete ? null : (
                                         <TrashIcon
-                                            className='trash'
-                                            onClick={() => onDelete && onDelete(rowIndex, rowIndex + (currentPage - 1) * (MAX_PAGE_BUTTONS + 3))}
-                                    />}
+                                            className="trash"
+                                            onClick={() => onDelete( rowIndex, rowIndex )}
+                                        />
+                                    )}
                                 </td>
                             </tr>
                         ))}
@@ -148,27 +166,16 @@ function Table<T>(props: TableProps<T>) {
                 </table>
 
                 <div className='pagination-container'>
-                    <div className='page-info'>
-                        Page {currentPage} of {totalPages}
-                    </div>
-
                     <div className='pagination'>
-                        <button onClick={handlePrevious} disabled={currentPage === 1}>
+                        <button onClick={handlePrevious} disabled={currentPage === 1} aria-label="Previous page">
                             <ArrowLeftIcon />
                         </button>
 
-                        {/* Render each page button */}
-                        {pagesToShow.map((page) => (
-                            <button
-                                key={page}
-                                onClick={() => setCurrentPage(page)}
-                                className={page === currentPage ? 'active' : ''}
-                            >
-                                {page}
-                            </button>
-                        ))}
+                        <button className="active" aria-current="page">
+                            {currentPage}
+                        </button>
 
-                        <button onClick={handleNext} disabled={currentPage === totalPages}>
+                        <button onClick={handleNext} disabled={!hasNext} aria-label="Next page" >
                             <ArrowRightIcon />
                         </button>
                     </div>

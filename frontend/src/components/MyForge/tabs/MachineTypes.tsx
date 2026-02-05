@@ -6,7 +6,7 @@ import '../styles/TabStyles.scss';
 import { emptyMachine, MachineType, ResourceSlot } from 'src/interfaces';
 
 import { Cross2Icon, PlusIcon } from "@radix-ui/react-icons";
-import { Dialog } from 'radix-ui';
+import * as Dialog from '@radix-ui/react-dialog';
 import ResourceSlots from './ResourceSlots';
 import { OmniAPI } from 'src/apis/OmniAPI';
 
@@ -15,16 +15,14 @@ interface aemenuprops {
     setIsDialogOpen: (open: boolean) => void;
     machineType: MachineType | null;
     setMachineType: (machine: MachineType | null) => void;
-    dataSetter: (data: MachineType[]) => void;
+    refresh: () => void;
 }
 
-let initialResSlots: ResourceSlot[] = await OmniAPI.getAll("resourceslots");
-
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineType | null) => void] => {
-    let { isDialogOpen, setIsDialogOpen, machineType, setMachineType, dataSetter} = props;
+    let { isDialogOpen, setIsDialogOpen, machineType, setMachineType, refresh} = props;
 
     const [name, setName] = useState("");
-    const [resourceSlots, setResourceSlots] = useState<ResourceSlot[]>(initialResSlots);
+    const [resourceSlots, setResourceSlots] = useState<ResourceSlot[]>([]);
 
     React.useEffect(() => {
         OmniAPI.getAll("resourceslots").then(rs =>{
@@ -42,49 +40,61 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
         );
     };
 
+    const handleOpenChange = (open: boolean) => {
+        if (!open) setOpenExtra(false, null);
+    };
+
     const setOpenExtra = (state: boolean, mach: MachineType | null) => {
         setMachineType(mach);
         if (mach != null) {
-            console.log("machineTYPE not null");
             setName(mach.name);
             setResourceSlotIDS(mach.resource_slot_ids);
             setCost(mach.cost_per_hour);
         } else {
-            console.log("machineTYPE is null");
             setName("");
             setResourceSlotIDS([]);
-            setCost(Number());
+            setCost(0);
         }
         if (isDialogOpen != state) setIsDialogOpen(state);
     };
 
     function create() {
-        if (name == "" || resourceSlots == null || cost == null) {
+        if (!name || cost == null) {
             alert("All fields must be populated!");
             return;
         }
-        OmniAPI.create("machinetypes", {name: name, resource_slot_ids: resourceSlots.filter(r => resourceSlotIDS.includes(r.id)).map(m => m.id), cost_per_hour: cost.toString(),}).then( () => {
-            OmniAPI.getAll("machinetypes").then(res => {dataSetter(res)});
-            setOpenExtra(false, null);
-        });
-        return;
+
+        OmniAPI.create("machinetypes", {
+            name,
+            resource_slot_ids: resourceSlots
+                .filter(r => resourceSlotIDS.includes(r.id))
+                .map(r => r.id),
+            cost_per_hour: cost.toString(),}).then(() => {
+                refresh();
+                setOpenExtra(false, null);
+            });
     }
 
     function edit() {
-        if (machineType == null) return;
-        if (name == "" || resourceSlots == null || cost == null) {
+        if (!machineType) return;
+        if (!name || cost == null) {
             alert("All fields must be populated!");
             return;
         }
-        OmniAPI.edit("machinetypes", machineType.id, {name: name, resource_slot_ids: resourceSlots.filter(r => resourceSlotIDS.includes(r.id)).map(m => m.id), cost_per_hour: cost.toString(),}).then( () => {
-            OmniAPI.getAll("machinetypes").then(res => {dataSetter(res)});
-            setOpenExtra(false, null);
-        });
-        return;
+
+        OmniAPI.edit("machinetypes", machineType.id, {
+            name,
+            resource_slot_ids: resourceSlots
+                .filter(r => resourceSlotIDS.includes(r.id))
+                .map(r => r.id),
+            cost_per_hour: cost.toString(),}).then(() => {
+                refresh();
+                setOpenExtra(false, null);
+            });
     }
 
     return [(
-        <Dialog.Root open={isDialogOpen} onOpenChange={(e: boolean) => { setOpenExtra(e, machineType); }}>
+        <Dialog.Root open={isDialogOpen} onOpenChange={handleOpenChange}>
             <button className="addbtn" onClick={() => { setOpenExtra(true, null); }}><PlusIcon /></button>
             <Dialog.Portal>
                 <div className='AEdiv'>
@@ -101,8 +111,8 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
                             <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} />
 
                             <label className="Label" htmlFor="resourceSlots">Resource Slots</label>
-                            {resourceSlots.map((resourceSlot: ResourceSlot) => (
-                                <div className="checkbox-labels">
+                            {resourceSlots.map(resourceSlot => (
+                                <div className="checkbox-labels" key={resourceSlot.id}>
                                     <input
                                         className='styled-checkbox'
                                         type="checkbox"
@@ -128,24 +138,38 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
     ), setOpenExtra];
 };
 
-let initialMachTypes: MachineType[] = await OmniAPI.getAll("machinetypes");
-
 const MachineTypes: React.FC = () => {
-    const [data, setData] = React.useState<MachineType[]>(initialMachTypes);
+    const [data, setData] = React.useState<MachineType[]>([]);
+    const [currentPage, setCurrentPage] = React.useState<number>(1);
+
+    const LIMIT = 10;
+
     const columns: (keyof MachineType)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineType)[]).filter( (key) => !key.includes('_id') && key !== 'id' ) : [];
 
-    React.useEffect(() => {
-        OmniAPI.getAll("machinetypes").then( (mt) => {
+    const fetchPage = (page: number) => {
+        const offset = (page - 1) * LIMIT;
+        OmniAPI.getAll("machinetypes", { limit: LIMIT, offset }).then( (mt) => {
             setData(mt);
+            setCurrentPage(page);
         });
+    };
+
+    const refreshPage = () => {
+        const offset = (currentPage - 1) * LIMIT;
+        OmniAPI.getAll("machinetypes", { limit: LIMIT, offset }).then(setData);
+    };
+
+    React.useEffect(() => {
+        fetchPage(1);
     }, []);
 
-    const onDelete = (index_local: number, index_real: number) => {
-        DeleteItem("machinetypes", data[index_real], index_local, data, setData);
+    const onDelete = (index_local: number) => {
+        DeleteItem("machinetypes", data[index_local], refreshPage);
     };
-    let [machineType, setMachineType]:[MachineType | null, (machineType: any) => void] = useState(null);
+
+   const [machineType, setMachineType] = useState<MachineType | null>(null);
     let [isDialogOpen, setIsDialogOpen] = useState(false);
-    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, machineType, setMachineType, dataSetter: setData});
+    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, machineType, setMachineType, refresh: refreshPage});
 
     return (
         <div className='tab-column-cover align-center'>
@@ -160,6 +184,10 @@ const MachineTypes: React.FC = () => {
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit
+                itemsPerPage={LIMIT}
+                currentPage={currentPage}
+                onPageChange={(p) => fetchPage(p)}
+                resourceType={"machinetypes"}
             />
         </div>
     );

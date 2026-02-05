@@ -9,7 +9,7 @@ import '../styles/TabStyles.scss';
 
 
 import {Cross2Icon, PlusIcon} from "@radix-ui/react-icons";
-import { Dialog } from 'radix-ui';
+import * as Dialog from '@radix-ui/react-dialog';
 
 interface aemenuprops {
     isDialogOpen: boolean;
