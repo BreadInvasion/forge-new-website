@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from 'react';
-import Table, { DeleteItem } from '../components/Table';
+import Table, { DeleteItem, ITEMS_PER_PAGE } from '../components/Table';
 import { TableHead } from '../components/Table';
 
 import '../styles/TabStyles.scss';
@@ -69,10 +69,11 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
             resource_slot_ids: resourceSlots
                 .filter(r => resourceSlotIDS.includes(r.id))
                 .map(r => r.id),
-            cost_per_hour: cost.toString(),}).then(() => {
-                refresh();
-                setOpenExtra(false, null);
-            });
+            cost_per_hour: cost.toString(),
+        }).then(() => {
+            refresh();
+            setOpenExtra(false, null);
+        });
     }
 
     function edit() {
@@ -87,10 +88,11 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
             resource_slot_ids: resourceSlots
                 .filter(r => resourceSlotIDS.includes(r.id))
                 .map(r => r.id),
-            cost_per_hour: cost.toString(),}).then(() => {
-                refresh();
-                setOpenExtra(false, null);
-            });
+            cost_per_hour: cost.toString(),
+        }).then(() => {
+            refresh();
+            setOpenExtra(false, null);
+        });
     }
 
     return [(
@@ -139,35 +141,30 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
 };
 
 const MachineTypes: React.FC = () => {
+
     const [data, setData] = React.useState<MachineType[]>([]);
-    const [currentPage, setCurrentPage] = React.useState<number>(1);
-
-    const LIMIT = 10;
-
     const columns: (keyof MachineType)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineType)[]).filter( (key) => !key.includes('_id') && key !== 'id' ) : [];
-
+    const [currentPage, setCurrentPage] = React.useState<number>(1);
+    
     const fetchPage = (page: number) => {
-        const offset = (page - 1) * LIMIT;
-        OmniAPI.getAll("machinetypes", { limit: LIMIT, offset }).then( (mt) => {
+        const offset = (page - 1) * ITEMS_PER_PAGE;
+        OmniAPI.getAll("machinetypes", { limit: ITEMS_PER_PAGE, offset }).then( (mt) => {
             setData(mt);
             setCurrentPage(page);
         });
-    };
-
-    const refreshPage = () => {
-        const offset = (currentPage - 1) * LIMIT;
-        OmniAPI.getAll("machinetypes", { limit: LIMIT, offset }).then(setData);
     };
 
     React.useEffect(() => {
         fetchPage(1);
     }, []);
 
+    const refreshPage = () => fetchPage(currentPage);
+
     const onDelete = (index_local: number) => {
         DeleteItem("machinetypes", data[index_local], refreshPage);
     };
 
-   const [machineType, setMachineType] = useState<MachineType | null>(null);
+    const [machineType, setMachineType] = useState<MachineType | null>(null);
     let [isDialogOpen, setIsDialogOpen] = useState(false);
     let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, machineType, setMachineType, refresh: refreshPage});
 
@@ -184,7 +181,6 @@ const MachineTypes: React.FC = () => {
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit
-                itemsPerPage={LIMIT}
                 currentPage={currentPage}
                 onPageChange={(p) => fetchPage(p)}
                 resourceType={"machinetypes"}

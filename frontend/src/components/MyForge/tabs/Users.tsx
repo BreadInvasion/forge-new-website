@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { OmniAPI } from 'src/apis/OmniAPI';
-import Table, {DeleteItem} from '../components/Table';
-import { TableHead } from '../components/Table';
+import Table, { DeleteItem, ITEMS_PER_PAGE, TableHead } from '../components/Table';
 import { User } from 'src/interfaces';
 
 import '../styles/TabStyles.scss';
@@ -10,24 +9,27 @@ import '../styles/TabStyles.scss';
 const Users: React.FC = () => {
 
     const [data, setData] = React.useState<User[]>([]);
-
     //change this to fix gender id
     const columns: (keyof User)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof User)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const fetchPage = (page: number) => {
+        const offset = (page - 1) * ITEMS_PER_PAGE;
+        OmniAPI.getAll('users', { limit: ITEMS_PER_PAGE, offset }).then((res) => {
+            setData(Array.isArray(res) ? res : []);
+            setCurrentPage(page);
+        });
+    };
 
     React.useEffect(() => {
-        OmniAPI.getAll("users")
-            .then((data) => {
-                console.log('Users:', data);
-                if (Array.isArray(data)) {
-                    setData(data);
-                } else {
-                    throw new Error('Data is not of type User');
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching users:', error);
-            });
+        fetchPage(1);
     }, []);
+
+    const refreshPage = () => fetchPage(currentPage);
+
+    const onDelete = (index_local: number, index_real: number) => {
+        DeleteItem('users', data[index_real], refreshPage);
+    };
 
     return (
         <div className='tab-column-cover align-center'>
@@ -37,6 +39,10 @@ const Users: React.FC = () => {
             <Table<User>
                 columns={columns}
                 data={data}
+                onDelete={onDelete}
+                currentPage={currentPage}
+                onPageChange={fetchPage}
+                resourceType="users"
             />
         </div>
     );

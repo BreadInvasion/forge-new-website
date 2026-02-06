@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import Table, { DeleteItem } from '../components/Table';
+import Table, { DeleteItem, ITEMS_PER_PAGE } from '../components/Table';
 import { TableHead } from '../components/Table';
 import { Machine, MachineGroup, MachineType } from 'src/interfaces';
 import { v4 } from 'uuid';
@@ -15,28 +15,22 @@ interface aemenuprops {
     setIsDialogOpen: (open: boolean) => void;
     machineGroup: MachineGroup | null;
     setMachineGroup: (machine: MachineGroup | null) => void;
-    dataSetter: (data: MachineGroup[]) => void;
+    refresh: () => void;
 }
 
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineGroup | null) => void] => {
-    let { isDialogOpen, setIsDialogOpen, machineGroup, setMachineGroup, dataSetter} = props;
+    let { isDialogOpen, setIsDialogOpen, machineGroup, setMachineGroup, refresh} = props;
 
     const [name, setName] = useState("");
     const [machines, setMachines] = useState<Machine[]>([]);
-    React.useEffect(() => {
-        OmniAPI.getAll("machines")
-            .then((data) => {
-                if (Array.isArray(data) && data.every(item => 'id' in item && 'name' in item)) {
-                    setMachines(data);
-                } else {
-                    throw new Error('Data is not of type Machine');
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching machines:', error);
-            });
-    }, []);
     const [machineIDS, setMachineIDS] = useState<string[]>([]);
+
+    useEffect(() => {
+        OmniAPI.getAll("machines")
+            .then((data: Machine[]) => setMachines(data))
+            .catch(err => console.error("Error fetching machines:", err));
+    }, []);
+    
     const handleCheckboxChange = (value: string) => {
         // handle potential null previous state by defaulting to an empty array
         setMachineIDS(prev => {
@@ -46,129 +40,57 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
                 : [...p, value]; // add
         });
     };
-
-    // function req() {
-    //     fetch(`http://localhost:3000/api/machinegroups/new`, {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-    //         },
-    //         body: JSON.stringify({
-    //             name: name,
-    //             machine_ids: machines.filter(r => machineIDS.includes(r.id)).map(m => m.id),
-    //         })
-    //     })
-    //     .then(res => {
-    //         if (res.status !== 200) {
-    //             res.text().then((json) => {
-    //                 alert(JSON.parse(json)['detail']);
-    //             });
-    //         }
-    //         if (!res.ok) {
-    //             throw new Error(`HTTP error! status: ${res.status}`);
-    //         }
-    //         return res.json();
-    //     })
-    //     .then(data => {
-    //         // setData(prev => [...prev, data]);
-    //         document.location.reload(); // Optionally, reload only the table
-    //     })
-    //     .catch(error => {
-    //         console.error(`Error adding machine type:`, error);
-    //     });
-    // }
-
     
-        function setOpenExtra (state: boolean, mach: MachineGroup | null) {
-            setMachineGroup(mach);
-            if (mach != null) {
-                // console.log("machineGROUP not null");
-                setName(mach.name);
-                OmniAPI.get("machinegroups", mach.id).then((m) => {
-                    setMachineIDS(m.machine_ids);
-                    setIsDialogOpen(state);
-                });
-            } else {
-                // console.log("machineGROUP is null");
-                setName("");
-                setMachineIDS([]);
+    function setOpenExtra (state: boolean, mach: MachineGroup | null) {
+        setMachineGroup(mach);
+        if (mach != null) {
+            setName(mach.name);
+            OmniAPI.get("machinegroups", mach.id).then((m) => {
+                setMachineIDS(m.machine_ids);
                 setIsDialogOpen(state);
-            }
-        }
-    
-        function create() {
-            if (name == "" || machines == null) {
-                alert("All fields must be populated!");
-                return;
-            }
-            OmniAPI.create("machinegroups", {name: name, machine_ids: machines.filter(r => machineIDS.includes(r.id)).map(m => m.id)}).then( () => {
-                let mappings: {[key: string]: string} = {};
-                OmniAPI.getAll("machines").then(m => {
-                    m.map((m2: Machine) => mappings[m2.id] = m2.name);
-                    // console.log(m);
-                }).then(() => {
-                OmniAPI.getAll("machinegroups").then(d => {
-                        // console.log('Machine groups:', d);
-                        if (Array.isArray(d) && d.every(item => 'id' in item && 'name' in item)) {
-                            let newData: MachineGroup[] = [];
-                            for (const item of d) {
-                                newData.push({
-                                    id: item.id,
-                                    name: item.name,
-                                    machines: item.machine_ids.map((m:string) => mappings[m]),
-                                });
-                            }
-                            dataSetter(newData);
-                        } else {
-                            throw new Error('Data is not of type MachineGroup');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching machine groups:', error);
-                    });
-                });
-                setOpenExtra(false, null);
             });
+        } else {
+            setName("");
+            setMachineIDS([]);
+            setIsDialogOpen(state);
+        }
+    }
+
+    function create() {
+        if (!name) {
+            alert("Name must be populated!");
             return;
         }
-    
-        function edit() {
-            if (machineGroup == null) return;
-            if (name == "" || machines == null) {
-                alert("All fields must be populated!");
-                return;
-            }
-            OmniAPI.edit("machinegroups", machineGroup.id, {name: name, machine_ids: machineIDS}).then( () => {
-                let mappings: {[key: string]: string} = {};
-                OmniAPI.getAll("machines").then(m => {
-                    m.map((m2: Machine) => mappings[m2.id] = m2.name);
-                    // console.log(m);
-                }).then(() => {
-                OmniAPI.getAll("machinegroups").then(d => {
-                        // console.log('Machine groups:', d);
-                        if (Array.isArray(d) && d.every(item => 'id' in item && 'name' in item)) {
-                            let newData: MachineGroup[] = [];
-                            for (const item of d) {
-                                newData.push({
-                                    id: item.id,
-                                    name: item.name,
-                                    machines: item.machine_ids.map((m:string) => mappings[m]),
-                                });
-                            }
-                            dataSetter(newData);
-                        } else {
-                            throw new Error('Data is not of type MachineGroup');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching machine groups:', error);
-                    });
-                });
-                setOpenExtra(false, null);
-            });
+
+        // Send API request
+        OmniAPI.create("machinegroups", {
+            name,
+            machine_ids: machines.filter(m => machineIDS.includes(m.id)).map(m => m.id)
+        }).then(() => {
+            refresh();
+            setOpenExtra(false, null);
+        }).catch(err => {
+            alert("Failed to create machine group: " + err.response?.data?.detail);
+        });
+    }
+
+    function edit() {
+        if (!machineGroup) return;
+        if (!name) {
+            alert("Name must be populated!");
             return;
         }
+
+        OmniAPI.edit("machinegroups", machineGroup.id, {
+            name,
+            machine_ids: machineIDS
+        }).then(() => {
+            refresh();
+            setOpenExtra(false, null);
+        }).catch(err => {
+            alert("Failed to edit machine group: " + err.response?.data?.detail);
+        });
+    }
 
     return [(
         <Dialog.Root open={isDialogOpen} onOpenChange={(e: boolean) => { setOpenExtra(e, machineGroup); }}>
@@ -211,50 +133,45 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
     ), setOpenExtra];
 };
 
-// let initialMachGroups: MachineGroup[] = await OmniAPI.getAll("machinegroups");
-
-
-
 const MachineGroups: React.FC = () => {
 
     const [data, setData] = React.useState<MachineGroup[]>([]);
     const columns: (keyof MachineGroup)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineGroup)[]).filter((key) => key !== 'id') : [];
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const fetchPage = (page: number) => {
+        const offset = (page - 1) * ITEMS_PER_PAGE;
+        let mappings: Record<string, string> = {};
+        OmniAPI.getAll("machines")
+            .then((machines: Machine[]) => {
+                machines.forEach(m => mappings[m.id] = m.name);
+                return OmniAPI.getAll("machinegroups", { limit: ITEMS_PER_PAGE, offset });
+            })
+            .then(groups => {
+                const newData: MachineGroup[] = groups.map((g: any) => ({
+                    id: g.id,
+                    name: g.name,
+                    machines: g.machine_ids.map((id: string) => mappings[id])
+                }));
+                setData(newData);
+                setCurrentPage(page);
+            })
+            .catch(err => console.error("Error fetching machine groups:", err));
+    };
 
     React.useEffect(() => {
-        let mappings: {[key: string]: string} = {};
-        OmniAPI.getAll("machines").then(m => {
-            m.map((m2: Machine) => mappings[m2.id] = m2.name);
-            // console.log(m);
-        }).then(() => {
-        OmniAPI.getAll("machinegroups").then(d => {
-                // console.log('Machine groups:', d);
-                if (Array.isArray(d) && d.every(item => 'id' in item && 'name' in item)) {
-                    let newData: MachineGroup[] = [];
-                    for (const item of d) {
-                        newData.push({
-                            id: item.id,
-                            name: item.name,
-                            machines: item.machine_ids.map((m:string) => mappings[m]),
-                        });
-                    }
-                    setData(newData);
-                } else {
-                    throw new Error('Data is not of type MachineGroup');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching machine groups:', error);
-            });
-        });
+        fetchPage(1);
     }, []);
 
+    const refreshPage = () => fetchPage(currentPage);
+
     const onDelete = (index_local: number, index_real: number) => {
-        DeleteItem("machinegroups", data[index_real], index_local, data, setData);
+        DeleteItem("machinegroups", data[index_real],  refreshPage);
     };
 
     let [machineGroup, setMachineGroup]:[MachineGroup | null, (machineGroup: any) => void] = useState(null);
     let [isDialogOpen, setIsDialogOpen] = useState(false);
-    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, machineGroup, setMachineGroup, dataSetter: setData});
+    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, machineGroup, setMachineGroup, refresh: refreshPage});
 
     return (
         <div className='tab-column-cover align-center'>
@@ -264,12 +181,15 @@ const MachineGroups: React.FC = () => {
                 aemenu={ae}
             />
             <Table<MachineGroup>
-                key={data.map((mg: MachineGroup) => mg.machines.join(" ")).join(" ")}
+                key={`mg-${currentPage}-${data.length}`}
                 columns={columns}
                 data={data}
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit
+                currentPage={currentPage}
+                onPageChange={fetchPage}
+                resourceType="machinegroups"
             />
         </div>
     );

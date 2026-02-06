@@ -1,5 +1,4 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import { v1, v4 } from 'uuid'; // For version 4 (random) UUIDs
 
 import '../styles/Table.scss';
 import { Pencil2Icon, TrashIcon, ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons';
@@ -11,13 +10,12 @@ interface TableProps<T> {
     canEdit?: boolean;
     onEdit?: (activeItem: T) => void;
     onDelete?: (index_local: number, index_real:number) => void;
-    itemsPerPage?: number;
     currentPage?: number;
     onPageChange?: (page: number) => void;
     resourceType?: string;
 }
 
-const ITEMS_PER_PAGE = 8;
+export const ITEMS_PER_PAGE = 10;
 
 function toTitle(snakeStr: string): string {
     return snakeStr
@@ -58,13 +56,11 @@ export function TableHead<T>(props: TableHeadProps<T>) {
 function Table<T>(props: TableProps<T>) {
     const { columns, data, onDelete, onEdit, canEdit } = props;
     const {
-        itemsPerPage: itemsPerPageProp,
         currentPage: currentPageProp,
         onPageChange,
         resourceType
     } = props;
 
-    const itemsPerPage = itemsPerPageProp ?? ITEMS_PER_PAGE;
     const currentPage = currentPageProp ?? 1;
     const [hasNext, setHasNext] = useState(false);
 
@@ -74,12 +70,12 @@ function Table<T>(props: TableProps<T>) {
             setHasNext(false);
             return;
         }
-        const nextOffset = currentPage * itemsPerPage;
+        const nextOffset = currentPage * ITEMS_PER_PAGE;
 
         OmniAPI.getAll(resourceType, {limit: 1, offset: nextOffset}).then(res => {
                 setHasNext(Array.isArray(res) && res.length > 0);
         }).catch(() => setHasNext(false));
-    }, [resourceType, currentPage, itemsPerPage]);
+    }, [resourceType, currentPage]);
 
     useEffect(() => {
         checkHasNext();

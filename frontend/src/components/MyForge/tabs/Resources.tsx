@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { useState } from 'react';
-import Table, { DeleteItem } from '../components/Table';
+import Table, { DeleteItem, ITEMS_PER_PAGE } from '../components/Table';
 import { TableHead } from '../components/Table';
 import { Resource } from 'src/interfaces';
 import { OmniAPI } from 'src/apis/OmniAPI';
@@ -16,11 +16,11 @@ interface aemenuprops {
     setIsDialogOpen: (open: boolean) => void;
     resource: Resource | null;
     setResource: (resource: Resource | null) => void;
-    dataSetter: (data: Resource[]) => void;
+    refresh: () => void;
 }
 
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource | null) => void] =>  {
-    let { isDialogOpen, setIsDialogOpen, resource, setResource, dataSetter} = props;
+    let { isDialogOpen, setIsDialogOpen, resource, setResource, refresh} = props;
     const [name, setName] = useState("");
     const [brand, setBrand] = useState("");
     const [color, setColor] = useState("");
@@ -48,24 +48,25 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource 
         };
 
     function create() {
-            if (name == "" || brand == "" || color == "" || units == "") {
-                alert("All fields must be populated!");
-                return;
-            }
-            OmniAPI.create("resources", {name: name, brand: brand, color: color, units: units, cost: cost}).then( () => {
-                OmniAPI.getAll("resources").then(res => {dataSetter(res)});
-                setOpenExtra(false, null);
-            });
-        };
-    
-        function edit() {
-            if (resource == null) {return}
-            OmniAPI.edit("resources", resource.id, {name: name, brand: brand, color: color, units: units, cost: cost}).then( () => {
-                OmniAPI.getAll("resources").then(res => {dataSetter(res)});
-                setOpenExtra(false, null);
-            });
-            console.log("edit req sent");
+        if (name == "" || brand == "" || color == "" || units == "") {
+            alert("All fields must be populated!");
+            return;
         }
+        OmniAPI.create("resources", {name: name, brand: brand, color: color, units: units, cost: cost})
+        .then( () => {
+            refresh();
+            setOpenExtra(false, null);
+        });
+    };
+    
+    function edit() {
+        if (resource == null) {return}
+        OmniAPI.edit("resources", resource.id, {name: name, brand: brand, color: color, units: units, cost: cost})
+        .then( () => {
+            refresh();
+            setOpenExtra(false, null);
+        });
+    }
             
     return [(
         <Dialog.Root open={isDialogOpen} onOpenChange={(e: boolean) => { setOpenExtra(e, resource); }}>
@@ -95,7 +96,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource 
                             <input className="Input" id="units" value={units} onChange={e => setUnits(e.target.value)}/>
 
                             <label className="Label" htmlFor="cost">Cost</label>
-                            <input className="Input" id="cost" type='number' value={cost} onChange={e => setCost(parseFloat(e.target.value))}/>
+                            <input className="Input" id="cost" type='number' value={cost} onChange={e => setCost(Number(e.target.value) || 0)}/>
                         </fieldset>
                         
                         <Dialog.Close asChild>
@@ -113,29 +114,29 @@ const Resources: React.FC = () => {
 
     const [data, setData] = React.useState<Resource[]>([]);
     const columns: (keyof Resource)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof Resource)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const fetchPage = (page: number) => {
+        const offset = (page - 1) * ITEMS_PER_PAGE;
+        OmniAPI.getAll("resources", { limit: ITEMS_PER_PAGE, offset }).then( (data) => {
+            setData(data);
+            setCurrentPage(page);
+        });
+    };
 
     React.useEffect(() => {
-        OmniAPI.getAll("resources")
-            .then((data) => {
-                console.log('Resources:', data);
-                if (Array.isArray(data) && data.every(item => 'id' in item && 'name' in item)) {
-                    setData(data);
-                } else {
-                    throw new Error('Data is not of type Resource');
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching resources:', error);
-            });
+        fetchPage(1);
     }, []);
 
+    const refreshPage = () => fetchPage(currentPage);
+
     const onDelete = (index_local: number, index_real: number) => {
-        DeleteItem("resources", data[index_real], index_local, data, setData);
+        DeleteItem("resources", data[index_real], refreshPage);
     };
 
     let [resource, setResource]:[Resource | null, (resource: any) => void] = useState(null);
     let [isDialogOpen, setIsDialogOpen] = useState(false);
-    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, resource, setResource, dataSetter: setData});
+    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, resource, setResource, refresh: refreshPage});
 
     return (
         <div className='tab-column-cover align-center'>
@@ -150,6 +151,9 @@ const Resources: React.FC = () => {
                 onDelete={onDelete}
                 onEdit={(e) => { setOpen(true, e);}}
                 canEdit
+                currentPage={currentPage}
+                onPageChange={fetchPage}
+                resourceType="resources"
             />
         </div>
     );

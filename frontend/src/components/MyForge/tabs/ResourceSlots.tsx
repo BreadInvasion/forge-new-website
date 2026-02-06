@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import Table, { DeleteItem } from '../components/Table';
+import Table, { DeleteItem, ITEMS_PER_PAGE } from '../components/Table';
 import { TableHead } from '../components/Table';
 import { OmniAPI } from "src/apis/OmniAPI";
 import { Resource, ResourceSlot } from 'src/interfaces';
@@ -17,11 +17,11 @@ interface aemenuprops {
     setIsDialogOpen: (open: boolean) => void;
     resourceSlot: ResourceSlot | null;
     setResourceSlot: (resourceSlot: ResourceSlot | null) => void;
-    dataSetter: (data: ResourceSlot[]) => void;
+    refresh: () => void;
 }
 
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: ResourceSlot | null) => void] => {
-    let { isDialogOpen, setIsDialogOpen, resourceSlot, setResourceSlot, dataSetter} = props;
+    let { isDialogOpen, setIsDialogOpen, resourceSlot, setResourceSlot, refresh} = props;
     
     const [name, setName] = useState("");
     const [resources, setResources] = useState<Resource[]>([]);
@@ -50,43 +50,6 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: Resourc
         );
     };
 
-//     function req(){
-//         fetch(`http://localhost:3000/api/resourceslots/new`, {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-//             },
-//             body: `{
-//   "db_name": "${recname}",
-//   "display_name": "${recname}",
-//   "resource_ids": [${resources.filter(r => resourceIDS.includes(r.id)).map(r => '"' + r.id + '"')}],
-//   "allow_own_material": ${useown},
-//   "allow_empty": ${canempty}}`
-//         })
-//         .then(res => {
-//                 if (res.status !== 200) {
-//                     res.text().then((json) => {
-//                     alert(JSON.parse(json)['detail']);
-//                 });
-//                 }
-//                 if (!res.ok) {
-//                     throw new Error(`HTTP error! status: ${res.status}`);
-//                 }
-//                 return res.json();
-//             })
-//             .then(data => {
-//                 document.location.reload(); // make this reload only table later
-//                 // console.log(`${type} deleted:`, data);
-//                 // const newData = [...data];
-//                 // newData.splice(index, 1);
-//                 // setData(newData);
-//             })
-//             .catch(error => {
-//                 console.error(`Error adding resourceslot:`, error);
-//             });
-//     }
-
     function setOpenExtra (state: boolean, rslot: ResourceSlot | null) {
         setResourceSlot(rslot);
         if (rslot != null) {
@@ -107,80 +70,42 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: Resourc
     }
 
     function create() {
-        if (name == "" || resourceIDS == null) {
+        if (!name || !resourceIDS) {
             alert("All fields must be populated!");
             return;
         }
-        OmniAPI.create("resourceslots", {db_name: name, display_name: name, allow_empty: canempty, allow_own_material: useown, resource_ids: resources.filter(r => resourceIDS.includes(r.id)).map(m => m.id)} ).then( () => {
-            let mappings: {[key: string]: string} = {};
-            OmniAPI.getAll("resources").then(m => {
-                m.map((m2: Resource) => mappings[m2.id] = m2.name);
-            }).then(() => {
-            OmniAPI.getAll("resourceslots").then(d => {
-                    if (Array.isArray(d) && d.every(item => 'id' in item && 'valid_resource_ids' in item)) {
-                        let newData: ResourceSlot[] = [];
-                        for (const item of d) {
-                            newData.push({
-                                id: item.id,
-                                name: item.name,
-                                display_name: item.display_name,
-                                db_name: item.db_name,
-                                valid_resource_ids : item.valid_resource_ids.map((m:string) => mappings[m]),
-                                allow_own_material: item.allow_own_material,
-                                allow_empty: item.allow_empty,
-                            });
-                        }
-                        dataSetter(newData);
-                    } else {
-                        throw new Error('Data is not of type ResourceSlot');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching resource slots:', error);
-                });
-            });
+
+        OmniAPI.create("resourceslots", {
+            db_name: name,
+            display_name: name,
+            allow_empty: canempty,
+            allow_own_material: useown,
+            resource_ids: resources
+                .filter(r => resourceIDS.includes(r.id))
+                .map(r => r.id)
+        }).then(() => {
+            refresh();
             setOpenExtra(false, null);
         });
-        return;
     }
 
     function edit() {
-        if (resourceSlot == null) return;
-        if (name == "" || resourceIDS == null) {
+        if (!resourceSlot) return;
+        if (!name || !resourceIDS) {
             alert("All fields must be populated!");
             return;
         }
-        OmniAPI.edit("resourceslots", resourceSlot? resourceSlot.id : "", {db_name: name, display_name: name, resource_ids: resourceIDS, allow_empty: canempty, allow_own_material: useown}).then( () => {
-            let mappings: {[key: string]: string} = {};
-            OmniAPI.getAll("resources").then(m => {
-                m.map((m2: Resource) => mappings[m2.id] = m2.name);
-            }).then(() => {
-            OmniAPI.getAll("resourceslots").then(d => {
-                    if (Array.isArray(d) && d.every(item => 'id' in item && 'db_name' in item && 'valid_resource_ids' in item)) {
-                        let newData: ResourceSlot[] = [];
-                        for (const item of d) {
-                            newData.push({
-                                id: item.id,
-                                name: item.name,
-                                db_name: item.db_name,
-                                display_name: item.display_name,
-                                valid_resource_ids: item.valid_resource_ids.map((m:string) => mappings[m]),
-                                allow_own_material: item.allow_own_material,
-                                allow_empty: item.allow_empty,
-                            });
-                        }
-                        dataSetter(newData);
-                    } else {
-                        throw new Error('Data is not of type ResourceSlot');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching resource slots:', error);
-                });
-            });
+
+        OmniAPI.edit("resourceslots", resourceSlot.id, {
+            db_name: name,
+            display_name: name,
+            resource_ids: resourceIDS,
+            allow_empty: canempty,
+            allow_own_material: useown
+        }).then(() => {
+            refresh();
             setOpenExtra(false, null);
         });
-        return;
     }
     
     return [(
@@ -217,10 +142,22 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: Resourc
                             ))}
 
                             <label className="Label" htmlFor="useown"><div>Allow using own material?</div></label>
-                            <input className="styled-checkbox" id="useown" type='checkbox' checked={useown} onChange={e => setUseown(Boolean(e.target.value))}/>
+                            <input
+                                className="styled-checkbox"
+                                id="useown"
+                                type="checkbox"
+                                checked={useown}
+                                onChange={e => setUseown(e.target.checked)}
+                            />
 
                             <label className="Label" htmlFor="canempty"><div>Allow empty?</div></label>
-                            <input className="styled-checkbox" id="canempty" type='checkbox' checked={canempty} onChange={e => setCanempty(Boolean(e.target.value))}/>
+                            <input
+                                className="styled-checkbox"
+                                id="canempty"
+                                type="checkbox"
+                                checked={canempty}
+                                onChange={e => setCanempty(e.target.checked)}
+                            />
                         </fieldset>
                         
                         <Dialog.Close asChild>
@@ -237,31 +174,29 @@ const ResourceSlots: React.FC = () => {
 
     const [data, setData] = React.useState<ResourceSlot[]>([]);
     const columns: (keyof ResourceSlot)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof ResourceSlot)[]).filter((key) => !key.includes('db_name') && !(key == 'name') && !key.includes('id') && !key.includes('valid_resource_ids')) : [];
+    const [currentPage, setCurrentPage] = useState(1);
 
-    React.useEffect(() => {
-        OmniAPI.getAll("resourceslots")
-            .then((data) => {
-                data.map((x: ResourceSlot) => x.name = x.display_name);
-                console.log('Resource Slots:', data);
-                if (Array.isArray(data) && data.every(item => 'id' in item && 'valid_resource_ids' in item)) {
-                    setData(data);
-                } else {
-                    throw new Error('Data is not of type ResourceSlot');
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching resource slots:', error);
-            });
-    }, []);
-
-    const onDelete = (index_local: number, index_real: number) => {
-        DeleteItem("resourceslots", data[index_real], index_local, data, setData);
+    const fetchPage = (page: number) => {
+        const offset = (page - 1) * ITEMS_PER_PAGE;
+        OmniAPI.getAll("resourceslots", { limit: ITEMS_PER_PAGE, offset }).then( (data) => {
+            setData(data);
+            setCurrentPage(page);
+        });
     };
 
+    React.useEffect(() => {
+        fetchPage(1);
+    }, []);
+
+    const refreshPage = () => fetchPage(currentPage);
+
+    const onDelete = (index_local: number) => {
+        DeleteItem("resourceslots", data[index_local], refreshPage);
+    };
     
     let [resourceSlot, setResourceSlot]:[ResourceSlot | null, (resourceSlot: any) => void] = useState(null);
     let [isDialogOpen, setIsDialogOpen] = useState(false);
-    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, resourceSlot, setResourceSlot, dataSetter: setData});
+    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, resourceSlot, setResourceSlot, refresh: refreshPage});
 
     return (
         <div className='tab-column-cover align-center'>
@@ -276,6 +211,9 @@ const ResourceSlots: React.FC = () => {
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit
+                currentPage={currentPage}
+                onPageChange={fetchPage}
+                resourceType="resourceslots"
             />
         </div>
     );
