@@ -61,6 +61,8 @@ function Table<T>(props: TableProps<T>) {
         resourceType
     } = props;
 
+    const hasEditOrDelete = !!(canEdit || onDelete);
+
     const currentPage = currentPageProp ?? 1;
     const [hasNext, setHasNext] = useState(false);
 
@@ -129,7 +131,7 @@ function Table<T>(props: TableProps<T>) {
                             {columns.map((column, index) => (
                                 <th key={String(column) + index}>{toTitle(String(column))}</th>
                             ))}
-                            <th id="edit-col"></th>
+                            {hasEditOrDelete && <th id="edit-col"></th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -142,20 +144,22 @@ function Table<T>(props: TableProps<T>) {
                                             : String(row[column])}
                                     </td>
                                 ))}
-                                <td className="icon">
-                                    {!canEdit ? null : (
-                                        <Pencil2Icon
-                                            className="edit"
-                                            onClick={() => onEdit?.(row)}
-                                        />
-                                    )}
-                                    {!onDelete ? null : (
-                                        <TrashIcon
-                                            className="trash"
-                                            onClick={() => onDelete( rowIndex, rowIndex )}
-                                        />
-                                    )}
-                                </td>
+                                {hasEditOrDelete && (
+                                    <td className="icon">
+                                        {canEdit && (
+                                            <Pencil2Icon
+                                                className="edit"
+                                                onClick={() => onEdit?.(row)}
+                                            />
+                                        )}
+                                        {onDelete && (
+                                            <TrashIcon
+                                                className="trash"
+                                                onClick={() => onDelete(rowIndex, rowIndex)}
+                                            />
+                                        )}
+                                    </td>
+                                )}
                             </tr>
                         ))}
                     </tbody>

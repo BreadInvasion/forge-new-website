@@ -39,6 +39,7 @@ const MyForge: React.FC = () => {
                         <Route path="summary" element={<Summary />} />
                         <Route path="create" element={<DynamicMachineForm />} />
                         <Route path="fail" element={<FailAMachineForm />} />
+                        <Route path="usages" element={<Usages />} />
                         <Route path="machines" element={<Machines />} />
                         <Route path="machine_types" element={<MachineTypes />} />
                         <Route path="machine_groups" element={<MachineGroups />} />

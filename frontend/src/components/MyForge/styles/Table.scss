@@ -51,7 +51,7 @@
         border-right: 1px solid #a0a0a0;
     }
 
-    th:nth-last-child(2) {border-right:none;}
+    th:has(+ #edit-col) {border-right:none;}
     
     th:last-of-type {
         border-right: none;
@@ -60,7 +60,7 @@
     }
 
     
-    td:nth-last-child(2) {border-right:none;}
+    td:has(+ .icon) {border-right:none;}
 
     td {
         color: #333333;
