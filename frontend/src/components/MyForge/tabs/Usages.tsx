@@ -41,7 +41,6 @@ const Usages: React.FC = () => {
         fetchPage(1);
     }, []);
 
-
     return (
         <div className='tab-column-cover align-center'>
             <TableHead heading="My Usages" />

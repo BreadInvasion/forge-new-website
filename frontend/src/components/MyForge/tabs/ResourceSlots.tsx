@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react';
-import Table, { DeleteItem, ITEMS_PER_PAGE } from '../components/Table';
-import { TableHead } from '../components/Table';
+import Table, { DeleteItem, TableHead, ITEMS_PER_PAGE } from '../components/Table';
 import { OmniAPI } from "src/apis/OmniAPI";
 import { Resource, ResourceSlot } from 'src/interfaces';
 

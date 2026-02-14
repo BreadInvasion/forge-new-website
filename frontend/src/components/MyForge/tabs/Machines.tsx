@@ -1,10 +1,9 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import Table, { DeleteItem } from '../components/Table';
-import { TableHead } from '../components/Table';
+import Table, { DeleteItem, TableHead, ITEMS_PER_PAGE } from '../components/Table';
 import { Machine, MachineGroup, MachineType } from 'src/interfaces';
 
 import '../styles/TabStyles.scss';
-import { Dialog } from 'radix-ui';
+import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { OmniAPI } from 'src/apis/OmniAPI';
 
@@ -13,11 +12,10 @@ interface aemenuprops {
     setIsDialogOpen: (open: boolean) => void;
     machine: Machine | null;
     setMachine: (machine: Machine | null) => void;
-    dataSetter: (data: Machine[]) => void;
+    refresh: () => void;
 }
 
-const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: Machine | null) => void] =>  {
-    let { isDialogOpen, setIsDialogOpen, machine, setMachine, dataSetter} = props;
+const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine, setMachine, refresh,}) => {
     const [name, setName] = useState("");
 
     const [selectedMachineGroupId, setSelectedMachineGroupId] = useState<string>("_");
@@ -31,25 +29,21 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: Machine 
     const [disabled, setDisabled] = useState<boolean>(false);
     const [maintenanceMode, setMaintenanceMode] = useState<boolean>(false);
 
-    const setOpenExtra = (state: boolean, mach: Machine | null) => {
-        setMachine(mach);
-        if (mach != null) {
-            console.log("machine not null");
-            setName(mach.name);
-            setSelectedMachineGroupId(mach.group_id);
-            setSelectedMachineTypeId(mach.type_id);
-            setDisabled(mach.disabled);
-            setMaintenanceMode(mach.maintenance_mode);
+    useEffect(() => {
+        if (machine) {
+            setName(machine.name);
+            setSelectedMachineGroupId(machine.group_id);
+            setSelectedMachineTypeId(machine.type_id);
+            setDisabled(machine.disabled);
+            setMaintenanceMode(machine.maintenance_mode);
         } else {
-            console.log("machine is null");
             setName("");
             setSelectedMachineGroupId("_");
             setSelectedMachineTypeId("_");
             setDisabled(false);
             setMaintenanceMode(false);
         }
-        if (isDialogOpen != state) setIsDialogOpen(state);
-    };
+    }, [machine]);
 
     function create() {
         if (name == "" || selectedMachineGroupId == "_" || selectedMachineTypeId == "_") {
@@ -57,16 +51,19 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: Machine 
             return;
         }
         OmniAPI.create("machines", {name: name, group_id: selectedMachineGroupId, type_id: selectedMachineTypeId,}).then( () => {
-            OmniAPI.getAll("machines").then(res => {dataSetter(res)});
-            setOpenExtra(false, null);
+            refresh();
+            setIsDialogOpen(false);
         });
     };
 
     function edit() {
-        if (machine == null) {return}
+        if (!machine || selectedMachineGroupId === "_" || selectedMachineTypeId === "_" ){
+            alert("Invalid machine state");
+            return;
+        }
         OmniAPI.edit("machines", machine.id, {name: name, group_id: selectedMachineGroupId, type_id: selectedMachineTypeId, maintenance_mode: maintenanceMode, disabled: disabled,}).then( () => {
-            OmniAPI.getAll("machines").then(res => {dataSetter(res)});
-            setOpenExtra(false, null);
+            refresh();
+            setIsDialogOpen(false);
         });
     }
     
@@ -83,9 +80,11 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: Machine 
         setSelectedMachineTypeId(id);
     };
 
-    return [(
-        <Dialog.Root open={isDialogOpen} onOpenChange={(e: boolean) => { setOpenExtra(e, machine); }}>
-            <button className="addbtn" onClick={() => { setOpenExtra(true, null); }}><PlusIcon /></button>
+    return (
+        <Dialog.Root open={isDialogOpen} onOpenChange={(open) => { if (!open) setMachine(null); setIsDialogOpen(open); }}>
+            <button className="addbtn" onClick={() => { setMachine(null); setIsDialogOpen(true); }}>
+                <PlusIcon />
+            </button>
             <Dialog.Portal>
                 <div className='AEdiv'>
                     <Dialog.Overlay className="DialogOverlay" />
@@ -141,37 +140,65 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: Machine 
                 </div>
             </Dialog.Portal>
         </Dialog.Root>
-    ), setOpenExtra];
+    );
 };
 
 const Machines: React.FC = () => {
 
     const [data, setData] = React.useState<Machine[]>([]);
     const columns: (keyof Machine)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof Machine)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
+    const [currentPage, setCurrentPage] = useState(1);
 
-    React.useEffect(() => { OmniAPI.getAll("machines").then(res => {setData(res);} ); }, []);        
+    const fetchPage = (page: number) => {
+        const offset = (page - 1) * ITEMS_PER_PAGE;
+        OmniAPI.getAll("machines", { limit: ITEMS_PER_PAGE, offset }).then( (data) => {
+            setData(data);
+            setCurrentPage(page);
+        });
+    };
+
+    React.useEffect(() => {
+        fetchPage(1);
+    }, []);
+
+    const refreshPage = () => fetchPage(currentPage);
 
     const onDelete = (index_local: number, index_real: number) => {
-        DeleteItem("machines", data[index_real], index_local, data, setData);
+        DeleteItem("machines", data[index_real], refreshPage);
     };
 
     let [machine, setMachine]:[Machine | null, (machine: any) => void] = useState(null);
     let [isDialogOpen, setIsDialogOpen] = useState(false);
-    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, machine, setMachine, dataSetter: setData});
+
+    const onEdit = (mach: Machine) => {
+        setMachine(mach);
+        setIsDialogOpen(true);
+    };
 
     return (
         <div className='tab-column-cover align-center'>
             <TableHead
                 heading="Machines"
                 type="machines"
-                aemenu={ae}
+                aemenu={
+                    <AEMenu
+                        isDialogOpen={isDialogOpen}
+                        setIsDialogOpen={setIsDialogOpen}
+                        machine={machine}
+                        setMachine={setMachine}
+                        refresh={refreshPage}
+                    />
+                }
             />
             <Table<Machine>
                 columns={columns}
                 data={data}
                 onDelete={onDelete}
-                onEdit={(e) => { setOpen(true, e);}}
+                onEdit={onEdit}
                 canEdit
+                currentPage={currentPage}
+                onPageChange={fetchPage}
+                resourceType="machines"
             />
         </div>
     );

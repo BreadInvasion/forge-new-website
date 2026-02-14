@@ -1,8 +1,6 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import Table, { DeleteItem, ITEMS_PER_PAGE } from '../components/Table';
-import { TableHead } from '../components/Table';
+import Table, { DeleteItem, TableHead, ITEMS_PER_PAGE } from '../components/Table';
 import { Machine, MachineGroup, MachineType } from 'src/interfaces';
-import { v4 } from 'uuid';
 
 import '../styles/TabStyles.scss';
 
