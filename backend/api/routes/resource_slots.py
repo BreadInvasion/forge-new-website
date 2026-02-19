@@ -165,6 +165,9 @@ async def get_all_resource_slots(
             valid_resource_ids=[
                 resource.id for resource in resource_slot.valid_resources
             ],
+            resource_names={
+                resource.name for resource in resource_slot.valid_resources
+            },
             **resource_slot.__dict__,
         )
         for resource_slot in resource_slots

@@ -41,7 +41,6 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: Resourc
     const [useown, setUseown] = useState(false);
     const [canempty, setCanempty] = useState(false);
     const handleCheckboxChange = (value: string) => {
-        // console.log("new: " + );
         setResourceIDS(prev =>
             prev.includes(value)
             ? prev.filter(item => item !== value) // remove
@@ -127,7 +126,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: Resourc
 
                             <label className="Label" htmlFor="resources">Resources</label>
                             {resources.map((resource: Resource) => (
-                                <div className="checkbox-labels">
+                                <div className="checkbox-labels" key={resource.id}>
                                     <input
                                         className='styled-checkbox'
                                         type="checkbox"

@@ -132,6 +132,9 @@ async def get_machine_type(
         resource_slot_ids=[
             resource_slot.id for resource_slot in machine_type.resource_slots
         ],
+        resource_slot_names={
+            resource_slot.display_name for resource_slot in machine_type.resource_slots
+        },
         resource_names={
             resource.name
             for slot in machine_type.resource_slots
@@ -198,6 +201,9 @@ async def get_all_machine_types(
             resource_slot_ids=[
                 resource_slot.id for resource_slot in machine_type.resource_slots
             ],
+            resource_slot_names={
+                resource_slot.display_name for resource_slot in machine_type.resource_slots
+            },
             resource_names={
                 resource.name
                 for slot in machine_type.resource_slots
