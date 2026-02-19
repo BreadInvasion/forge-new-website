@@ -118,6 +118,7 @@ async def get_resource_slot(
     return ResourceSlotDetails(
         audit_logs=[AuditLogModel.model_validate(log) for log in audit_logs],
         valid_resource_ids=[resource.id for resource in resource_slot.valid_resources],
+        resource_names={resource.name for resource in resource_slot.valid_resources},
         **resource_slot.__dict__,
     )
 
