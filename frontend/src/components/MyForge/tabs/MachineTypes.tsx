@@ -110,7 +110,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
                         <Dialog.Title className="DialogTitle">{machineType == null ? "Adding" : "Editing"}  Machine Type</Dialog.Title>
                         <fieldset className="Fieldset">
                             <label className="Label" htmlFor="name">Name</label>
-                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} />
+                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100} />
 
                             <label className="Label" htmlFor="resourceSlots">Resource Slots</label>
                             {resourceSlots.map(resourceSlot => (
@@ -128,7 +128,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
                             ))}
 
                             <label className="Label" htmlFor="cost">Cost</label>
-                            <input className="Input" placeholder={cost + ""} id="cost" type="number" value={cost} pattern="[0-9]*" onChange={e => setCost(e.target.valueAsNumber)} />
+                            <input className="Input" placeholder={cost + ""} id="cost" type="number" value={cost} min={0} pattern="[0-9]*" onChange={e => setCost(Math.max(0, e.target.valueAsNumber))} />
                         </fieldset>
                         <Dialog.Close asChild>
                             <button className="Button SaveBtn" onClick={machineType == null ? create : edit}>Save</button>

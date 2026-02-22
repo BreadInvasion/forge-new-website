@@ -97,7 +97,7 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
                         <Dialog.Title className="DialogTitle">{machine == null ? "Adding" : "Editing"} Machine</Dialog.Title>
                         <fieldset className="Fieldset">
                             <label className="Label" htmlFor="name">Name</label>
-                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} />
+                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100} />
 
                             <label className="Label" htmlFor="machineGroup">Machine Group</label>
                             <select

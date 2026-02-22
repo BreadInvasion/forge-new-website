@@ -122,7 +122,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: Resourc
 
                         <fieldset className="Fieldset">
                             <label className="Label" htmlFor="name"><div>Name</div></label>
-                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)}/>
+                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100}/>
 
                             <label className="Label" htmlFor="resources">Resources</label>
                             {resources.map((resource: Resource) => (

@@ -104,7 +104,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
                     <Dialog.Title className="DialogTitle">{machineGroup == null ? "Adding" : "Editing"} Machine Group</Dialog.Title>
                     <fieldset className="Fieldset">
                         <label className="Label" htmlFor="name">Name</label>
-                        <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} />
+                        <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100} />
 
                         <label className="Label" htmlFor="machines">Machines</label>
                         {machines.map((machine: Machine) => (

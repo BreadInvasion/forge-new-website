@@ -83,19 +83,19 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource 
 
                         <fieldset className="Fieldset">
                             <label className="Label" htmlFor="name">Name</label>
-                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)}/>
+                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100}/>
 
                             <label className="Label" htmlFor="brand">Brand</label>
-                            <input className="Input" id="brand" value={brand} onChange={e => setBrand(e.target.value)}/>
+                            <input className="Input" id="brand" value={brand} onChange={e => setBrand(e.target.value)} maxLength={100}/>
 
                             <label className="Label" htmlFor="color">Color</label>
-                            <input className="Input" id="color" value={color} onChange={e => setColor(e.target.value)}/>
+                            <input className="Input" id="color" value={color} onChange={e => setColor(e.target.value)} maxLength={100}/>
 
                             <label className="Label" htmlFor="units">Units</label>
-                            <input className="Input" id="units" value={units} onChange={e => setUnits(e.target.value)}/>
+                            <input className="Input" id="units" value={units} onChange={e => setUnits(e.target.value)} maxLength={16}/>
 
                             <label className="Label" htmlFor="cost">Cost</label>
-                            <input className="Input" id="cost" type='number' value={cost} onChange={e => setCost(Number(e.target.value) || 0)}/>
+                            <input className="Input" id="cost" type='number' value={cost} min={0} onChange={e => setCost(Math.max(0, Number(e.target.value) || 0))}/>
                         </fieldset>
                         
                         <Dialog.Close asChild>
