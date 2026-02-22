@@ -39,7 +39,6 @@ const Users: React.FC = () => {
             <Table<User>
                 columns={columns}
                 data={data}
-                onDelete={onDelete}
                 currentPage={currentPage}
                 onPageChange={fetchPage}
                 resourceType="users"
