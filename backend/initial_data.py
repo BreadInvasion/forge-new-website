@@ -44,18 +44,18 @@ async def main() -> None:
         else:
             print("Superuser role already exists in database")
 
-        user = await session.scalar(select(User).where(User.RCSID == "haddlm"))
+        user = await session.scalar(select(User).where(User.RCSID == "haddlg"))
 
         if not user:
 
             new_superuser = User(
-                RCSID="haddlm",
+                RCSID="haddlg",
                 RIN="662012578",
-                first_name="Mark",
+                first_name="Gwen",
                 last_name="Haddleton",
                 major="Computer Science",
-                gender_identity=GenderStatsType.MALE,
-                pronouns=PronounType.HE_HIM,
+                gender_identity=GenderStatsType.FEMALE,
+                pronouns=PronounType.SHE_HER,
                 hashed_password=security.get_password_hash(SecretStr("12345")),
                 roles=[superuser_role],
                 is_rpi_staff=False,
@@ -91,6 +91,30 @@ async def main() -> None:
             print("Thomas Superuser was created")
         else:
             print("Thomas Superuser already exists in database")
+
+        user = await session.scalar(select(User).where(User.RCSID == "khusix"))
+
+        if not user:
+
+            new_superuser = User(
+                RCSID="khusix",
+                RIN="662000000",
+                first_name="Xenia",
+                last_name="Khusid",
+                major="Computer Science",
+                gender_identity=GenderStatsType.FEMALE,
+                pronouns=PronounType.SHE_HER,
+                hashed_password=security.get_password_hash(SecretStr("abcde")),
+                roles=[superuser_role],
+                is_rpi_staff=False,
+                is_graduating=False,
+            )
+
+            session.add(new_superuser)
+            await session.commit()
+            print("Xenia Superuser was created")
+        else:
+            print("Xenia Superuser already exists in database")
 
         state = await session.scalar(select(State))
         if not state:
