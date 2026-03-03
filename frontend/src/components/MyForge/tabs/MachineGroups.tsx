@@ -7,6 +7,8 @@ import '../styles/TabStyles.scss';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { OmniAPI } from 'src/apis/OmniAPI';
+import { UserPermission } from 'src/enums';
+import useAuth from '../../Auth/useAuth';
 
 interface aemenuprops {
     isDialogOpen: boolean;
@@ -17,6 +19,10 @@ interface aemenuprops {
 }
 
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineGroup | null) => void] => {
+    const { user } = useAuth();
+    const canCreate = user.permissions.includes(UserPermission.CAN_CREATE_MACHINE_GROUPS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_MACHINE_GROUPS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+
     let { isDialogOpen, setIsDialogOpen, machineGroup, setMachineGroup, refresh} = props;
 
     const [name, setName] = useState("");
@@ -55,6 +61,10 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
     }
 
     function create() {
+        if (!canCreate) {
+            alert("You do not have the permissions to create machine groups");
+            return;
+        }
         if (!name) {
             alert("Name must be populated!");
             return;
@@ -74,6 +84,10 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
 
     function edit() {
         if (!machineGroup) return;
+        if (!canEdit) {
+            alert("You do not have the permissions to edit machine groups");
+            return;
+        }
         if (!name) {
             alert("Name must be populated!");
             return;
@@ -90,48 +104,56 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
         });
     }
 
+    if (!canCreate && !canEdit) return [null, setOpenExtra];
     return [(
         <Dialog.Root open={isDialogOpen} onOpenChange={(e: boolean) => { setOpenExtra(e, machineGroup); }}>
-            <button className="addbtn" onClick={() => { setOpenExtra(true, null); }}><PlusIcon /></button>
-            <Dialog.Portal>
-                <Dialog.Overlay className="DialogOverlay" />
-                <Dialog.Content className="DialogContent">
-                    <Dialog.Close asChild>
-                        <button className="IconButton" aria-label="Close">
-                            <Cross2Icon />
-                        </button>
-                    </Dialog.Close>
-                    <Dialog.Title className="DialogTitle">{machineGroup == null ? "Adding" : "Editing"} Machine Group</Dialog.Title>
-                    <fieldset className="Fieldset">
-                        <label className="Label" htmlFor="name">Name</label>
-                        <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100} />
+            {canCreate && (
+                <button className="addbtn" onClick={() => { setOpenExtra(true, null); }}><PlusIcon /></button>
+            )}
+            {(canCreate || canEdit) ? (
+                <Dialog.Portal>
+                    <Dialog.Overlay className="DialogOverlay" />
+                    <Dialog.Content className="DialogContent">
+                        <Dialog.Close asChild>
+                            <button className="IconButton" aria-label="Close">
+                                <Cross2Icon />
+                            </button>
+                        </Dialog.Close>
+                        <Dialog.Title className="DialogTitle">{machineGroup == null ? "Adding" : "Editing"} Machine Group</Dialog.Title>
+                        <fieldset className="Fieldset">
+                            <label className="Label" htmlFor="name">Name</label>
+                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100} />
 
-                        <label className="Label" htmlFor="machines">Machines</label>
-                        {machines.map((machine: Machine) => (
-                            <div className="checkbox-labels" key={machine.id}>
-                                <input
-                                    className='styled-checkbox'
-                                    type="checkbox"
-                                    id={machine.id}
-                                    checked={machineIDS == null ? false : machineIDS.includes(machine.id)}
-                                    onChange={() => handleCheckboxChange(machine.id)}
-                                />
-                                <label htmlFor={machine.id} className='checkbox-label'>
-                                    {machine.name}
-                                </label>
-                            </div>
-                        ))}
-                    </fieldset>
-                    <Dialog.Close asChild>
-                        <button className="Button SaveBtn" onClick={machineGroup == null ? create : edit}>Save</button>
-                    </Dialog.Close>
-                </Dialog.Content>
-            </Dialog.Portal>
+                            <label className="Label" htmlFor="machines">Machines</label>
+                            {machines.map((machine: Machine) => (
+                                <div className="checkbox-labels" key={machine.id}>
+                                    <input
+                                        className='styled-checkbox'
+                                        type="checkbox"
+                                        id={machine.id}
+                                        checked={machineIDS == null ? false : machineIDS.includes(machine.id)}
+                                        onChange={() => handleCheckboxChange(machine.id)}
+                                    />
+                                    <label htmlFor={machine.id} className='checkbox-label'>
+                                        {machine.name}
+                                    </label>
+                                </div>
+                            ))}
+                        </fieldset>
+                        <Dialog.Close asChild>
+                            <button className="Button SaveBtn" onClick={machineGroup == null ? create : edit}>Save</button>
+                        </Dialog.Close>
+                    </Dialog.Content>
+                </Dialog.Portal>
+            ) : null}
         </Dialog.Root>
     ), setOpenExtra];
 };
 
 const MachineGroups: React.FC = () => {
+    const { user } = useAuth();
+    const canDelete = user.permissions.includes(UserPermission.CAN_DELETE_MACHINE_GROUPS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_MACHINE_GROUPS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
 
     const [data, setData] = React.useState<MachineGroup[]>([]);
     const columns: (keyof MachineGroup)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineGroup)[]).filter((key) => key !== 'id') : [];
@@ -164,6 +186,10 @@ const MachineGroups: React.FC = () => {
     const refreshPage = () => fetchPage(currentPage);
 
     const onDelete = (index_local: number, index_real: number) => {
+        if (!canDelete) {
+            alert("You do not have the permissions to delete machine groups");
+            return;
+        }
         DeleteItem("machinegroups", data[index_real],  refreshPage);
     };
 
@@ -184,7 +210,7 @@ const MachineGroups: React.FC = () => {
                 data={data}
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
-                canEdit
+                canEdit={canEdit}
                 currentPage={currentPage}
                 onPageChange={fetchPage}
                 resourceType="machinegroups"

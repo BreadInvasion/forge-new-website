@@ -6,6 +6,8 @@ import '../styles/TabStyles.scss';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { OmniAPI } from 'src/apis/OmniAPI';
+import { UserPermission } from 'src/enums';
+import useAuth from '../../Auth/useAuth';
 
 interface aemenuprops {
     isDialogOpen: boolean;
@@ -16,6 +18,10 @@ interface aemenuprops {
 }
 
 const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine, setMachine, refresh,}) => {
+    const { user } = useAuth();
+    const canCreate = user.permissions.includes(UserPermission.CAN_CREATE_MACHINES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_MACHINES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    
     const [name, setName] = useState("");
 
     const [selectedMachineGroupId, setSelectedMachineGroupId] = useState<string>("_");
@@ -80,70 +86,78 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
         setSelectedMachineTypeId(id);
     };
 
+    if (!canCreate && !canEdit) return null;
     return (
         <Dialog.Root open={isDialogOpen} onOpenChange={(open) => { if (!open) setMachine(null); setIsDialogOpen(open); }}>
-            <button className="addbtn" onClick={() => { setMachine(null); setIsDialogOpen(true); }}>
-                <PlusIcon />
-            </button>
-            <Dialog.Portal>
-                <div className='AEdiv'>
-                    <Dialog.Overlay className="DialogOverlay" />
-                    <Dialog.Content className="DialogContent" aria-describedby={undefined}>
-                        <Dialog.Close asChild>
-                            <button className="IconButton" aria-label="Close">
-                                <Cross2Icon />
-                            </button>
-                        </Dialog.Close>
-                        <Dialog.Title className="DialogTitle">{machine == null ? "Adding" : "Editing"} Machine</Dialog.Title>
-                        <fieldset className="Fieldset">
-                            <label className="Label" htmlFor="name">Name</label>
-                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100} />
+            {canCreate && (
+                <button className="addbtn" onClick={() => { setMachine(null); setIsDialogOpen(true); }}>
+                    <PlusIcon />
+                </button>
+            )}
+            {(canCreate || canEdit) ? (
+                <Dialog.Portal>
+                    <div className='AEdiv'>
+                        <Dialog.Overlay className="DialogOverlay" />
+                        <Dialog.Content className="DialogContent" aria-describedby={undefined}>
+                            <Dialog.Close asChild>
+                                <button className="IconButton" aria-label="Close">
+                                    <Cross2Icon />
+                                </button>
+                            </Dialog.Close>
+                            <Dialog.Title className="DialogTitle">{machine == null ? "Adding" : "Editing"} Machine</Dialog.Title>
+                            <fieldset className="Fieldset">
+                                <label className="Label" htmlFor="name">Name</label>
+                                <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100} />
 
-                            <label className="Label" htmlFor="machineGroup">Machine Group</label>
-                            <select
-                                className='styled-dropdown'
-                                value={selectedMachineGroupId}
-                                onChange={(e) => handleSelectMachineGroup(e.target.value)}
-                                required
-                            >
-                                <option className='styled-dropdown-placeholder' hidden>Select Machine Group</option>
-                                {machineGroups.map((machineGroup: MachineGroup) => (
-                                    <option className='styled-dropdown-option' key={machineGroup.id} value={machineGroup.id}>{machineGroup.name}</option>
-                                ))}
-                            </select>
+                                <label className="Label" htmlFor="machineGroup">Machine Group</label>
+                                <select
+                                    className='styled-dropdown'
+                                    value={selectedMachineGroupId}
+                                    onChange={(e) => handleSelectMachineGroup(e.target.value)}
+                                    required
+                                >
+                                    <option className='styled-dropdown-placeholder' hidden>Select Machine Group</option>
+                                    {machineGroups.map((machineGroup: MachineGroup) => (
+                                        <option className='styled-dropdown-option' key={machineGroup.id} value={machineGroup.id}>{machineGroup.name}</option>
+                                    ))}
+                                </select>
 
-                            <label className="Label" htmlFor="machineType">Machine Type</label>
-                            <select
-                                className='styled-dropdown'
-                                value={selectedMachineTypeId}
-                                onChange={(e) => handleSelectMachineType(e.target.value)}
-                                required
-                            >
-                                <option className='styled-dropdown-placeholder' value="_" hidden>Select Machine Type</option>
-                                {machineTypes.map((machineType: MachineType) => (
-                                    <option className='styled-dropdown-option' key={machineType.id} value={machineType.id}>{machineType.name}</option>
-                                ))}
-                            </select>
+                                <label className="Label" htmlFor="machineType">Machine Type</label>
+                                <select
+                                    className='styled-dropdown'
+                                    value={selectedMachineTypeId}
+                                    onChange={(e) => handleSelectMachineType(e.target.value)}
+                                    required
+                                >
+                                    <option className='styled-dropdown-placeholder' value="_" hidden>Select Machine Type</option>
+                                    {machineTypes.map((machineType: MachineType) => (
+                                        <option className='styled-dropdown-option' key={machineType.id} value={machineType.id}>{machineType.name}</option>
+                                    ))}
+                                </select>
 
-                            {machine != null ? <>
-                            <input className="Input" type="checkbox" id="disabled" checked={disabled} onChange={(e) => setDisabled(e.target.checked)} />
-                            <label className="Label" htmlFor="machineType">Disabled</label>
-                            <br />
-                            <input className="Input" type="checkbox" id="maintenance" checked={maintenanceMode} onChange={(e) => setMaintenanceMode(e.target.checked)} />
-                            <label className="Label" htmlFor="machineType">Maintenance Mode</label>
-                            
-                            </> : null}
+                                {machine != null ? <>
+                                <input className="Input" type="checkbox" id="disabled" checked={disabled} onChange={(e) => setDisabled(e.target.checked)} />
+                                <label className="Label" htmlFor="machineType">Disabled</label>
+                                <br />
+                                <input className="Input" type="checkbox" id="maintenance" checked={maintenanceMode} onChange={(e) => setMaintenanceMode(e.target.checked)} />
+                                <label className="Label" htmlFor="machineType">Maintenance Mode</label>
+                                </> : null}
 
-                        </fieldset>
-                        <button className="Button SaveBtn" onClick={machine == null ? create : edit}>Save</button>
-                    </Dialog.Content>
-                </div>
-            </Dialog.Portal>
+                            </fieldset>
+                            <button className="Button SaveBtn" onClick={machine == null ? create : edit}>Save</button>
+                        </Dialog.Content>
+                    </div>
+                </Dialog.Portal>
+            ) : null}
         </Dialog.Root>
     );
 };
 
+
 const Machines: React.FC = () => {
+    const { user } = useAuth();
+    const canDelete = user.permissions.includes(UserPermission.CAN_DELETE_MACHINES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_MACHINES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
 
     const [data, setData] = React.useState<Machine[]>([]);
     const columns: (keyof Machine)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof Machine)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
@@ -164,6 +178,10 @@ const Machines: React.FC = () => {
     const refreshPage = () => fetchPage(currentPage);
 
     const onDelete = (index_local: number, index_real: number) => {
+        if (!canDelete) {
+            alert("You do not have the permissions to delete machines");
+            return;
+        }
         DeleteItem("machines", data[index_real], refreshPage);
     };
 
@@ -171,6 +189,10 @@ const Machines: React.FC = () => {
     let [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const onEdit = (mach: Machine) => {
+        if (!canEdit) {
+            alert("You do not have the permissions to edit machines");
+            return;
+        }
         setMachine(mach);
         setIsDialogOpen(true);
     };
@@ -195,7 +217,7 @@ const Machines: React.FC = () => {
                 data={data}
                 onDelete={onDelete}
                 onEdit={onEdit}
-                canEdit
+                canEdit={canEdit}
                 currentPage={currentPage}
                 onPageChange={fetchPage}
                 resourceType="machines"

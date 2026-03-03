@@ -5,10 +5,11 @@ import { Resource, ResourceSlot } from 'src/interfaces';
 
 import '../styles/TabStyles.scss';
 
-
 import {Cross2Icon, PlusIcon} from "@radix-ui/react-icons";
 import * as Dialog from '@radix-ui/react-dialog';
 import { useState } from 'react';
+import { UserPermission } from 'src/enums';
+import useAuth from '../../Auth/useAuth';
 
 
 interface aemenuprops {
@@ -22,6 +23,10 @@ interface aemenuprops {
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: ResourceSlot | null) => void] => {
     let { isDialogOpen, setIsDialogOpen, resourceSlot, setResourceSlot, refresh} = props;
     
+    const { user } = useAuth();
+    const canCreate = user.permissions.includes(UserPermission.CAN_CREATE_RESOURCE_SLOTS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_RESOURCE_SLOTS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+
     const [name, setName] = useState("");
     const [resources, setResources] = useState<Resource[]>([]);
     React.useEffect(() => {
@@ -68,6 +73,10 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: Resourc
     }
 
     function create() {
+        if (!canCreate) {
+            alert("You do not have the permissions to create resource slots");
+            return;
+        }
         if (!name || !resourceIDS) {
             alert("All fields must be populated!");
             return;
@@ -88,6 +97,10 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: Resourc
     }
 
     function edit() {
+        if (!canEdit) {
+            alert("You do not have the permissions to edit resource slots");
+            return;
+        }
         if (!resourceSlot) return;
         if (!name || !resourceIDS) {
             alert("All fields must be populated!");
@@ -106,69 +119,77 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: Resourc
         });
     }
     
+    if (!canCreate && !canEdit) return [<></>, () => {}];
     return [(
         <Dialog.Root open={isDialogOpen} onOpenChange={(e: boolean) => { setOpenExtra(e, resourceSlot); }}>
-            <button className="addbtn" onClick={() => { setOpenExtra(true, null); }}><PlusIcon /></button>
-            <Dialog.Portal>
-                <div className='AEdiv'>
-                    <Dialog.Overlay className="DialogOverlay" />
-                    <Dialog.Content className="DialogContent">
-                        <Dialog.Close asChild>
-                            <button className="IconButton" aria-label="Close">
-                                <Cross2Icon />
-                            </button>
-                        </Dialog.Close>
-                        <Dialog.Title className="DialogTitle">{resourceSlot == null ? "Adding" : "Editing"} Resource Slot</Dialog.Title>
+            {canCreate && (
+                <button className="addbtn" onClick={() => { setOpenExtra(true, null); }}><PlusIcon /></button>
+            )}
+            {(canCreate || canEdit) && (
+                <Dialog.Portal>
+                    <div className='AEdiv'>
+                        <Dialog.Overlay className="DialogOverlay" />
+                        <Dialog.Content className="DialogContent">
+                            <Dialog.Close asChild>
+                                <button className="IconButton" aria-label="Close">
+                                    <Cross2Icon />
+                                </button>
+                            </Dialog.Close>
+                            <Dialog.Title className="DialogTitle">{resourceSlot == null ? "Adding" : "Editing"} Resource Slot</Dialog.Title>
 
-                        <fieldset className="Fieldset">
-                            <label className="Label" htmlFor="name"><div>Name</div></label>
-                            <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100}/>
+                            <fieldset className="Fieldset">
+                                <label className="Label" htmlFor="name"><div>Name</div></label>
+                                <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100}/>
 
-                            <label className="Label" htmlFor="resources">Resources</label>
-                            {resources.map((resource: Resource) => (
-                                <div className="checkbox-labels" key={resource.id}>
-                                    <input
-                                        className='styled-checkbox'
-                                        type="checkbox"
-                                        checked={resourceIDS ? resourceIDS.includes(resource.id) : false}
-                                        onChange={() => handleCheckboxChange(resource.id)}
-                                    />
-                                    <label className='checkbox-label'>
-                                        {resource.name}
-                                    </label>
-                                </div>
-                            ))}
+                                <label className="Label" htmlFor="resources">Resources</label>
+                                {resources.map((resource: Resource) => (
+                                    <div className="checkbox-labels" key={resource.id}>
+                                        <input
+                                            className='styled-checkbox'
+                                            type="checkbox"
+                                            checked={resourceIDS ? resourceIDS.includes(resource.id) : false}
+                                            onChange={() => handleCheckboxChange(resource.id)}
+                                        />
+                                        <label className='checkbox-label'>
+                                            {resource.name}
+                                        </label>
+                                    </div>
+                                ))}
 
-                            <label className="Label" htmlFor="useown"><div>Allow using own material?</div></label>
-                            <input
-                                className="styled-checkbox"
-                                id="useown"
-                                type="checkbox"
-                                checked={useown}
-                                onChange={e => setUseown(e.target.checked)}
-                            />
+                                <label className="Label" htmlFor="useown"><div>Allow using own material?</div></label>
+                                <input
+                                    className="styled-checkbox"
+                                    id="useown"
+                                    type="checkbox"
+                                    checked={useown}
+                                    onChange={e => setUseown(e.target.checked)}
+                                />
 
-                            <label className="Label" htmlFor="canempty"><div>Allow empty?</div></label>
-                            <input
-                                className="styled-checkbox"
-                                id="canempty"
-                                type="checkbox"
-                                checked={canempty}
-                                onChange={e => setCanempty(e.target.checked)}
-                            />
-                        </fieldset>
-                        
-                        <Dialog.Close asChild>
-                            <button className="Button SaveBtn" onClick={resourceSlot == null ? create : edit}>Save</button>
-                        </Dialog.Close>
-                    </Dialog.Content>
-                </div>
-            </Dialog.Portal>
+                                <label className="Label" htmlFor="canempty"><div>Allow empty?</div></label>
+                                <input
+                                    className="styled-checkbox"
+                                    id="canempty"
+                                    type="checkbox"
+                                    checked={canempty}
+                                    onChange={e => setCanempty(e.target.checked)}
+                                />
+                            </fieldset>
+                            
+                            <Dialog.Close asChild>
+                                <button className="Button SaveBtn" onClick={resourceSlot == null ? create : edit}>Save</button>
+                            </Dialog.Close>
+                        </Dialog.Content>
+                    </div>
+                </Dialog.Portal>
+            )}
         </Dialog.Root>
     ), setOpenExtra];
 }
 
 const ResourceSlots: React.FC = () => {
+    const { user } = useAuth();
+    const canDelete = user.permissions.includes(UserPermission.CAN_DELETE_RESOURCE_SLOTS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_RESOURCE_SLOTS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
 
     const [data, setData] = React.useState<ResourceSlot[]>([]);
     const columns: (keyof ResourceSlot)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof ResourceSlot)[]).filter((key) => !key.includes('db_name') && !(key == 'name') && !key.includes('id') && !key.includes('valid_resource_ids')) : [];
@@ -189,6 +210,10 @@ const ResourceSlots: React.FC = () => {
     const refreshPage = () => fetchPage(currentPage);
 
     const onDelete = (index_local: number) => {
+        if (!canDelete) {
+            alert("You do not have the permissions to delete resource slots");
+            return;
+        }
         DeleteItem("resourceslots", data[index_local], refreshPage);
     };
     
@@ -208,7 +233,7 @@ const ResourceSlots: React.FC = () => {
                 data={data}
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
-                canEdit
+                canEdit={canEdit}
                 currentPage={currentPage}
                 onPageChange={fetchPage}
                 resourceType="resourceslots"
