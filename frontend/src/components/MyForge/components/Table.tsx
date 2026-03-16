@@ -1,135 +1,188 @@
-import React, { useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
 import '../styles/Table.scss';
-import { Pencil2Icon, TrashIcon } from '@radix-ui/react-icons';
+import { Pencil2Icon, TrashIcon, ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons';
+import { OmniAPI } from 'src/apis/OmniAPI';
 
-interface TableProps<T extends Record<string, any>> {
+interface TableProps<T> {
     columns: (keyof T)[];
     data: T[];
-    editPath?: string;
-    onDelete?: (index: number) => void;
+    canEdit?: boolean;
+    onEdit?: (activeItem: T) => void;
+    onDelete?: (index_local: number, index_real:number) => void;
+    currentPage?: number;
+    onPageChange?: (page: number) => void;
+    resourceType?: string;
 }
 
-const ITEMS_PER_PAGE = 8;
-const MAX_PAGE_BUTTONS = 5;
+export const ITEMS_PER_PAGE = 10;
 
-function createPageRange(
-    currentPage: number,
-    totalPages: number,
-    maxPages: number
-) {
-    // Start near the current page:
-    let start = Math.max(1, currentPage - Math.floor(maxPages / 2));
-    let end = start + maxPages - 1;
-    if (end > totalPages) {
-        end = totalPages;
-        // If we’re at the last pages, shift the start so we still show maxPages
-        start = Math.max(1, end - maxPages + 1);
-    }
-
-    const pages = [];
-    for (let i = start; i <= end; i++) {
-        pages.push(i);
-    }
-    return pages;
+function toTitle(snakeStr: string): string {
+    return snakeStr
+        .replace("_rpi", "_RPI") // Fixed like a true CS major 😎
+        .replace("rpi_", "RPI") // Same here 💅💅
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+        .join(' ');
 }
 
-function Table<T extends Record<string, any>>(props: TableProps<T>) {
-    const { columns, data, editPath, onDelete } = props;
+interface TableHeadProps<T> {
+    heading: string; 
+    type?: string;
+    updateExisting?: boolean;
+    activeItem?: T;
+    aemenu?: ReactNode;
+}
 
-    const [currentPage, setCurrentPage] = useState(1);
+// calls the api to delete an item from the database. type parameter is the backend type not frontend
+export function DeleteItem(type: string, obj: any, onSuccess: () => void) {
+    if (!confirm(`Really delete ${obj.name}?`)) return;
+    OmniAPI.delete(type, obj.id)
+        .then(() => {
+            onSuccess();
+        }).catch(e => alert("Failed to delete " + type + ": " + e.response?.data?.detail));
+}
 
-    // 2. Calculate total pages
-    const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+export function TableHead<T>(props: TableHeadProps<T>) {
+    const { heading, type, aemenu } = props;
+    return(
+        <div className="table-head">
+            <h2>{heading}</h2>
+            { type == null ? "" : aemenu }
+        </div>
+    );
+}
 
-    // 3. Slice the data for currentPage
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentData = data.slice(startIndex, endIndex);
+function Table<T>(props: TableProps<T>) {
+    const { columns, data, onDelete, onEdit, canEdit } = props;
+    const {
+        currentPage: currentPageProp,
+        onPageChange,
+        resourceType
+    } = props;
 
-    // 4. Pagination controls
+    const hasEditOrDelete = !!(canEdit || onDelete);
+
+    const currentPage = currentPageProp ?? 1;
+    const [hasNext, setHasNext] = useState(false);
+
+    // check for next page by pulling next item 
+    const checkHasNext = React.useCallback(() => {
+        if (!resourceType) {
+            setHasNext(false);
+            return;
+        }
+        const nextOffset = currentPage * ITEMS_PER_PAGE;
+
+        OmniAPI.getAll(resourceType, {limit: 1, offset: nextOffset}).then(res => {
+                setHasNext(Array.isArray(res) && res.length > 0);
+        }).catch(() => setHasNext(false));
+    }, [resourceType, currentPage]);
+
+    useEffect(() => {
+        checkHasNext();
+    }, [checkHasNext, data]);
+
+    useEffect(() => {
+        if (currentPage > 1 && data.length === 0) {
+            onPageChange?.(currentPage - 1);
+        }
+    }, [data.length, currentPage]);
+
+
     const handlePrevious = () => {
-        setCurrentPage((prev) => Math.max(prev - 1, 1));
+        if (currentPage === 1) return;
+        onPageChange?.(currentPage - 1);
     };
 
     const handleNext = () => {
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+        if (!hasNext) return;
+        onPageChange?.(currentPage + 1);
     };
 
-    // Generate an array of pages to display (limited by MAX_PAGE_BUTTONS)
-    const pagesToShow = createPageRange(currentPage, totalPages, MAX_PAGE_BUTTONS);
+    // arrow keys work like the buttons
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            const active = document.activeElement as HTMLElement | null;
+            const tag = active?.tagName?.toLowerCase();
+            if (tag === 'input' || tag === 'textarea' || active?.isContentEditable) return;
 
-    return (
-        <div className="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        {columns.map((column, index) => (
-                            <th key={String(column) + index}>{String(column)}</th>
-                        ))}
-                        {editPath && <th id="edit-col">Edit</th>}
-                        {editPath && <th id="delete-col">Delete</th>}
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentData.map((row: T, rowIndex) => (
-                        <tr key={rowIndex}>
+            if (e.key === 'ArrowLeft') handlePrevious();
+            if (e.key === 'ArrowRight') handleNext();
+        };
+
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [currentPage, hasNext]);
+
+    if (data.length === 0) {
+        return (
+            <div>
+                <br />
+                <i>No items are present.</i>
+            </div>
+        );
+    } else {
+        return (
+            <div className="table-container">
+                <table>
+                    <thead>
+                        <tr>
                             {columns.map((column, index) => (
-                                <td key={String(column) + index + rowIndex}>
-                                    {Array.isArray(row[column])
-                                        ? row[column].join(', ')
-                                        : String(row[column])}
-                                </td>
+                                <th key={String(column) + index}>{toTitle(String(column))}</th>
                             ))}
-                            {editPath && (
-                                <td className="icon">
-                                    <a href={editPath}>
-                                        <Pencil2Icon width={20} height={20} />
-                                    </a>
-                                </td>
-                            )}
-                            {editPath && (
-                                <td className="icon">
-                                    <TrashIcon
-                                        width={20}
-                                        height={20}
-                                        onClick={() => onDelete && onDelete(rowIndex)}
-                                    />
-                                </td>
-                            )}
+                            {hasEditOrDelete && <th id="edit-col"></th>}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {data.map((row, rowIndex) => (
+                            <tr key={rowIndex}>
+                                {columns.map(column => (
+                                    <td key={String(column)}>
+                                        {Array.isArray(row[column])
+                                            ? row[column].join(', ')
+                                            : String(row[column])}
+                                    </td>
+                                ))}
+                                {hasEditOrDelete && (
+                                    <td className="icon">
+                                        {canEdit && (
+                                            <Pencil2Icon
+                                                className="edit"
+                                                onClick={() => onEdit?.(row)}
+                                            />
+                                        )}
+                                        {onDelete && (
+                                            <TrashIcon
+                                                className="trash"
+                                                onClick={() => onDelete(rowIndex, rowIndex)}
+                                            />
+                                        )}
+                                    </td>
+                                )}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
 
-            <div className='pagination-container'>
-                <div className='page-info'>
-                    Page {currentPage} of {totalPages}
-                </div>
-
-                <div className='pagination'>
-                    <button onClick={handlePrevious} disabled={currentPage === 1}>
-                        Previous
-                    </button>
-
-                    {/* Render each page button */}
-                    {pagesToShow.map((page) => (
-                        <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={page === currentPage ? 'active' : ''}
-                        >
-                            {page}
+                <div className='pagination-container'>
+                    <div className='pagination'>
+                        <button onClick={handlePrevious} disabled={currentPage === 1} aria-label="Previous page">
+                            <ArrowLeftIcon />
                         </button>
-                    ))}
 
-                    <button onClick={handleNext} disabled={currentPage === totalPages}>
-                        Next
-                    </button>
+                        <button className="active" aria-current="page">
+                            {currentPage}
+                        </button>
+
+                        <button onClick={handleNext} disabled={!hasNext} aria-label="Next page" >
+                            <ArrowRightIcon />
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    }
 };
 
 export default Table;

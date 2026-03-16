@@ -119,6 +119,7 @@ class ResourceSlotInfo(BaseModel):
     id: UUID4
     db_name: str
     display_name: str
+    resource_names: set[str]
     valid_resource_ids: list[UUID4]
     allow_own_material: bool
     allow_empty: bool
@@ -133,6 +134,7 @@ class MachineTypeInfo(BaseModel):
     name: str
     num_machines: int
     resource_names: set[str]
+    resource_slot_names: set[str]
     resource_slot_ids: list[UUID4]
     cost_per_hour: Decimal
 

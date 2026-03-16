@@ -8,6 +8,7 @@ from sqlalchemy.orm import InstrumentedAttribute
 
 from models.audit_log import AuditLog
 from models.resource import Resource
+from models.resource_slot import ResourceSlot, ResourceSlotAssociation
 from schemas.requests import ResourceCreateRequest, ResourceEditRequest
 from schemas.responses import (
     AuditLogModel,
@@ -50,7 +51,7 @@ async def create_resource(
         )
 
     new_resource = Resource(
-        name=request.name, brand=request.brand, units=request.units, cost=request.cost
+        name=request.name, color=request.color, brand=request.brand, units=request.units, cost=request.cost
     )
     session.add(new_resource)
     await session.commit()
@@ -166,12 +167,14 @@ async def edit_resource(
     differences = {
         "name": request.name if resource.name != request.name else None,
         "brand": request.brand if resource.brand != request.brand else None,
+        "color": request.color if resource.color != request.color else None,
         "units": request.units if resource.units != request.units else None,
         "cost": request.cost if resource.cost != request.cost else None,
     }
 
     resource.name = request.name
     resource.brand = request.brand
+    resource.color = request.color
     resource.units = request.units
     resource.cost = request.cost
 
@@ -203,6 +206,14 @@ async def delete_resource(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resource with provided ID not found",
+        )
+    
+    slotAcc: ResourceSlotAssociation = await session.scalar(select(ResourceSlotAssociation).where(ResourceSlotAssociation.resource_id == resource_id))
+    if slotAcc:
+        slotWith: ResourceSlot = await session.get(ResourceSlot, slotAcc.resource_slot_id)
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"One or more resource slots is using this resource: {slotWith.display_name})"
         )
 
     await session.delete(resource)

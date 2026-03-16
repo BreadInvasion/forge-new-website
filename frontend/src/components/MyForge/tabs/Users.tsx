@@ -1,5 +1,6 @@
-import React from 'react';
-import Table from '../components/Table';
+import React, { useState, useEffect } from 'react';
+import { OmniAPI } from 'src/apis/OmniAPI';
+import Table, { DeleteItem, ITEMS_PER_PAGE, TableHead } from '../components/Table';
 import { User } from 'src/interfaces';
 
 import '../styles/TabStyles.scss';
@@ -8,47 +9,39 @@ import '../styles/TabStyles.scss';
 const Users: React.FC = () => {
 
     const [data, setData] = React.useState<User[]>([]);
-
     //change this to fix gender id
-    const columns: (keyof User)[] = data.length > 0 ? Object.keys(data[0]).filter((key) => !key.includes('_id') && key !== 'id') : [];
+    const columns: (keyof User)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof User)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const fetchPage = (page: number) => {
+        const offset = (page - 1) * ITEMS_PER_PAGE;
+        OmniAPI.getAll('users', { limit: ITEMS_PER_PAGE, offset }).then((res) => {
+            setData(Array.isArray(res) ? res : []);
+            setCurrentPage(page);
+        });
+    };
 
     React.useEffect(() => {
-        fetch('http://localhost:3000/api/users', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-        })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(data => {
-                console.log('Users:', data);
-                if (Array.isArray(data)) {
-                    setData(data);
-                } else {
-                    throw new Error('Data is not of type User');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching users:', error);
-            });
+        fetchPage(1);
     }, []);
+
+    const refreshPage = () => fetchPage(currentPage);
+
+    const onDelete = (index_local: number, index_real: number) => {
+        DeleteItem('users', data[index_real], refreshPage);
+    };
 
     return (
         <div className='tab-column-cover align-center'>
-            <h2>Users</h2>
-            <button className='add-button'>
-                <a href='/myforge/users/add'>Add User</a>
-            </button>
+            <TableHead
+                heading="Users"
+            />
             <Table<User>
                 columns={columns}
                 data={data}
-                editPath='/myforge/users/edit'
+                currentPage={currentPage}
+                onPageChange={fetchPage}
+                resourceType="users"
             />
         </div>
     );

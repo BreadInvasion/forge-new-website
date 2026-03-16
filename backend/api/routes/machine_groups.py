@@ -43,8 +43,18 @@ async def create_machine_group(
             status_code=status.HTTP_409_CONFLICT,
             detail="A machine group with that name already exists",
         )
+    machines = (
+        await session.scalars(
+            select(Machine).where(Machine.id.in_(request.machine_ids))
+        )
+    ).all()
+    if len(machines) != len(request.machine_ids):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="One or more of the provided machine IDs is invalid",
+        )
 
-    new_machine_group = MachineGroup(name=request.name, machines=[])
+    new_machine_group = MachineGroup(name=request.name, machines=machines)
     session.add(new_machine_group)
     await session.commit()
     await session.refresh(new_machine_group)
@@ -171,7 +181,7 @@ async def edit_machine_group(
     differences = {
         "name": request.name if machine_group.name != request.name else None,
         "machine_ids": (
-            request.machine_ids
+            [str(x) for x in request.machine_ids]
             if set(machine_group.machines) != set(machines)
             else None
         ),
@@ -181,7 +191,7 @@ async def edit_machine_group(
     machine_group.machines = list(machines)
 
     audit_log = AuditLog(
-        type=LogType.MACHINE_GROUP_DELETED,
+        type=LogType.MACHINE_GROUP_EDITED,
         content={
             "machine_group_id": str(machine_group.id),
             "user_rcsid": current_user.RCSID,
