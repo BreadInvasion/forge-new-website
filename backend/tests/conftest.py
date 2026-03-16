@@ -18,13 +18,13 @@ from schemas.enums import GenderStatsType, Permissions, PronounType
 
 default_user_password = "welcometothefroge"
 default_user_object = User(
-    RCSID="haddlm",
+    RCSID="haddlg",
     RIN="999999999",
-    first_name="Mark",
+    first_name="Gwen",
     last_name="Haddleton",
     major="Computer Science",
-    gender_identity=GenderStatsType.MALE,
-    pronouns=PronounType.HE_HIM,
+    gender_identity=GenderStatsType.FEMALE,
+    pronouns=PronounType.SHE_HER,
     hashed_password=security.get_password_hash(SecretStr(default_user_password)),
 )
 default_user_access_token = security.create_jwt_token(
