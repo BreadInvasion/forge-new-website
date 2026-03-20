@@ -121,5 +121,19 @@ export const OmniAPI = {
         if (response.status != 200) throw response.data;
 
         return response.data;
-    }
+    },
+    exec: async (action: string, data?: Record<string, any>) => {
+        const response = await api.request({
+            url: `/exec/${action}`,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+            data: data,
+        });
+        if (response.status != 200) throw response.data;
+
+        return response.data;
+    },
 };
