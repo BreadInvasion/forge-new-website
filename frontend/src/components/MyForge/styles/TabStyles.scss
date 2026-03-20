@@ -20,3 +20,38 @@
 .justify-center {
   justify-content: center;
 }
+
+.current-semester-label {
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.semester-actions-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+.advance-warning {
+  margin: 1rem 0;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.set-semester-select {
+  margin: 1rem 0;
+}
+
+.set-semester-select select {
+  width: 100%;
+}
+
+.set-semester-error {
+  color: red;
+  margin-top: 0.5rem;
+}

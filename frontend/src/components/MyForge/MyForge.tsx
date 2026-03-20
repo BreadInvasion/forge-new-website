@@ -16,7 +16,7 @@ const ResourceSlots = lazy(() => import('./tabs/ResourceSlots'));
 const Users = lazy(() => import('./tabs/Users'));
 const Usages = lazy(() => import('./tabs/Usages'));
 const ComingSoon = lazy(() => import( '../Home/ComingSoon'));
-
+const Semesters = lazy(() => import('./tabs/Semesters'));
 
 
 interface MyForgeProps {
@@ -47,7 +47,7 @@ const MyForge: React.FC = () => {
                         <Route path="resources" element={<Resources />} />
                         <Route path="resource_slots" element={<ResourceSlots />} />
                         <Route path="users" element={<Users />} />
-                        <Route path="semesters" element={<ComingSoon />} />
+                        <Route path="semesters" element={<Semesters />} />
                         <Route path="charge_sheets" element={<ComingSoon />} />
                         <Route path="change_config" element={<ComingSoon />} />
                     </Routes>
