@@ -9,6 +9,7 @@ from sqlalchemy.orm import InstrumentedAttribute
 from models.audit_log import AuditLog
 from models.machine_usage import MachineUsage
 from models.semester import Semester
+from models.state import State
 from schemas.requests import SemesterCreateRequest, SemesterEditRequest
 from schemas.responses import (
     AuditLogModel,
@@ -248,3 +249,29 @@ async def delete_semester(
     session.add(audit_log)
 
     await session.commit()
+
+@router.get("/current_semester")
+async def get_current_semester(
+    session: DBSession
+):
+    """Fetch current semester."""
+
+    state = await session.scalar(select(State))
+    if not state or not state.active_semester_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No active semester set in state."
+        )
+    
+    semester = await session.scalar(select(Semester).where(Semester.id == state.active_semester_id))
+    if not semester:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Active semester not found."
+        )
+    
+    return SemesterInfo.model_validate({
+        "id": semester.id,
+        "semester_type": semester.semester_type,
+        "calendar_year": semester.calendar_year,
+    })
