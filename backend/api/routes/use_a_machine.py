@@ -123,10 +123,11 @@ async def use_a_machine(
             detail="Machine is in use",
         )
 
-    current_semester = await session.scalar(
-        select(State.active_semester).options(selectinload(State.active_semester))
+    state = await session.scalar(
+        select(State).options(selectinload(State.active_semester))
     )
-    
+    current_semester = state.active_semester
+
     between_semesters_permission = await has_permissions_any(
         session=session,
         user_id=current_user.id,
