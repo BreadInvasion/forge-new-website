@@ -181,7 +181,7 @@ async def edit_semester(
 
     differences = {
         "semester_type": (
-            request.semester_type
+            request.semester_type.value
             if semester.semester_type != request.semester_type
             else None
         ),
