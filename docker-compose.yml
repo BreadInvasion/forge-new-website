@@ -1,16 +1,21 @@
-version: "3.7"
-
 # Database + Webserver (under http, for testing setup on localhost:80)
 #
 # docker-compose -f docker-compose.dev.yml up -d
 #
 
 services:
+  # For Postgres <18, use the default PGDATA and volume path
   postgres:
     restart: unless-stopped
     image: postgres:latest
+    environment:
+      # Uncomment the next line for Postgres 18+
+      # PGDATA: /var/lib/postgresql/18/docker
     volumes:
+      # For Postgres <18:
       - postgres_data:/var/lib/postgresql/data
+      # For Postgres 18+, comment the above and uncomment below:
+      # - postgres_data:/var/lib/postgresql/18/docker
     env_file:
       - ./database/.env.dev
   backend:
@@ -41,3 +46,5 @@ services:
 
 volumes:
   postgres_data:
+  default_database_data:
+  test_database_data:
