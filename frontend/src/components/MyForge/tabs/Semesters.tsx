@@ -11,14 +11,14 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Semester } from 'src/interfaces';
 
 const SEMESTER_TYPE_MAP: { [key: number]: string } = {
-    0: 'Spring',
-    1: 'Summer',
-    2: 'Fall',
+    0: 'Fall',
+    1: 'Spring',
+    2: 'Summer',
 };
 const SEMESTER_TYPE_REVERSE: { [key: string]: number } = {
-    'Spring': 0,
-    'Summer': 1,
-    'Fall': 2,
+    'Fall': 0,
+    'Spring': 1,
+    'Summer': 2,
 };
 
 interface aemenuprops {
