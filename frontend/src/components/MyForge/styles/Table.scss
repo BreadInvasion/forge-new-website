@@ -221,6 +221,7 @@
     pointer-events: auto;
     border-radius: 1rem;
     margin: 0;
+    will-change: transform, opacity;
 }
 
 .Fieldset {
