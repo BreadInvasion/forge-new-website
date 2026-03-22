@@ -279,9 +279,10 @@ async def get_all_users(
             is_graduating=user.is_graduating,
             semester_balance=Decimal(
                 next(
-                    balance.tuple()[1]
-                    for balance in semester_balances
-                    if balance.tuple()[0] == user.id
+                    (balance.tuple()[1]
+                     for balance in semester_balances
+                     if balance.tuple()[0] == user.id),
+                    0.0
                 )
                 if semester_balances and len(semester_balances) > 0
                 else 0.0
