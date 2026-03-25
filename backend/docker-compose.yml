@@ -1,11 +1,16 @@
-version: "1"
-
 services:
+  # For Postgres <18, use the default PGDATA and volume path
   postgres:
       restart: unless-stopped
       image: postgres:latest
+      environment:
+        # Uncomment the next line for Postgres 18+
+        # PGDATA: /var/lib/postgresql/18/docker
       volumes:
+        # For Postgres <18:
         - default_database_data:/var/lib/postgresql/data
+        # For Postgres 18+, comment the above and uncomment below:
+        # - default_database_data:/var/lib/postgresql/18/docker
       env_file:
         - ../database/.env.dev
       ports:
@@ -13,8 +18,14 @@ services:
   test_database:
     restart: unless-stopped
     image: postgres:latest
+    environment:
+      # Uncomment the next line for Postgres 18+
+      # PGDATA: /var/lib/postgresql/18/docker
     volumes:
+      # For Postgres <18:
       - test_database_data:/var/lib/postgresql/data
+      # For Postgres 18+, comment the above and uncomment below:
+      # - test_database_data:/var/lib/postgresql/18/docker
     env_file:
       - ../database/.env.test
     ports:
