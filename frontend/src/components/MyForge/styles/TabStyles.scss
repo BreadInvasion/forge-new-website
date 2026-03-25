@@ -20,3 +20,68 @@
 .justify-center {
   justify-content: center;
 }
+
+.current-semester-label {
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.semester-actions-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.advance-warning {
+  margin: 1rem 0;
+}
+
+
+.dialog-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.dialog-actions button {
+  min-width: 100px;
+  flex: 0 1 auto;
+  display: inline-flex;
+  position: relative;
+  white-space: nowrap;
+  box-sizing: border-box;
+  z-index: 1;
+}
+
+/* safari is silly */
+@media not all and (min-resolution:.001dpcm) {
+  @supports (-webkit-appearance:none) {
+    .dialog-actions {
+      gap: 1.5rem;
+    }
+    .dialog-actions button {
+      flex-shrink: 0;
+    }
+  }
+}
+
+.set-semester-select {
+  margin: 1rem 0;
+}
+
+.set-semester-select select {
+  width: 100%;
+}
+
+.set-semester-error {
+  color: red;
+  margin-top: 0.5rem;
+}

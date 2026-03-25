@@ -124,6 +124,11 @@ export interface AllMachinesStatusResponse{
     loners: MachineStatus[];
 }
 
+export interface Semester {
+    id: string;
+    semester_type: number | string;
+    calendar_year: number;
+}
 
 export interface ResourceSlot {
     id: string;

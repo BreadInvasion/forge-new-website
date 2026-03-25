@@ -213,14 +213,15 @@
     max-height: 90vh;
     padding: 1.25rem 1.5rem 2rem 1.5rem;
     background-color: #eeeeee;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
     overflow: auto;
     box-sizing: border-box;
     pointer-events: auto;
     border-radius: 1rem;
     margin: 0;
+    will-change: transform, opacity;
 }
 
 .Fieldset {
