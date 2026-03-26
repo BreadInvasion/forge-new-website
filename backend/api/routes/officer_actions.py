@@ -136,10 +136,13 @@ async def get_charge_sheet(
     users = (
         await session.scalars(
             select(User)
+            .join(MachineUsage, MachineUsage.user_id == User.id)
+            .where(MachineUsage.semester_id == semester.id)
             .options(selectinload(User.roles))
+            .distinct()
         )
     ).all()
-    
+
     semester_balances = (
         (
             await session.execute(
@@ -170,4 +173,4 @@ async def get_charge_sheet(
         )
         for user in users
     ]
-    
+
