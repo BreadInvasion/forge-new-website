@@ -1,18 +1,19 @@
+from decimal import Decimal
 from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import UUID4
-from sqlalchemy import and_, select
+from sqlalchemy import and_, select, func
 from sqlalchemy.orm import selectinload
 
 from models.audit_log import AuditLog
-from models.machine import Machine
+from models.machine_usage import MachineUsage
 from models.semester import Semester
 from models.state import State
 from models.user import User
 from schemas.enums import LogType, Permissions, SemesterType
-from schemas.requests import ActivateSemesterRequest
-from schemas.responses import CreateResponse
+from schemas.requests import ActivateSemesterRequest, GetChargeSheetsRequest
+from schemas.responses import CreateResponse, UserChargeResponse
 
 from ..deps import DBSession, PermittedUserChecker
 
@@ -111,3 +112,62 @@ async def set_semester(
     )
     session.add(audit_log)
     await session.commit()
+
+
+@router.post("/exec/get_charges")
+async def get_charge_sheet(
+    request: GetChargeSheetsRequest,
+    session: DBSession,
+    current_user: Annotated[
+        User, Depends(PermittedUserChecker({Permissions.CAN_GET_CHARGES}))
+    ],
+):
+    """Create and return the charge sheet for the provided semester."""
+
+    semester = await session.scalar(
+        select(Semester).where(Semester.id == request.semester_id)
+    )
+    if not semester:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Could not find a semester with the provided ID",
+        )
+
+    users = (
+        await session.scalars(
+            select(User)
+            .options(selectinload(User.roles))
+        )
+    ).all()
+    
+    semester_balances = (
+        (
+            await session.execute(
+                select(User.id, func.sum(MachineUsage.cost))
+                .join(MachineUsage.user)
+                .where(MachineUsage.semester_id == semester.id)
+                .group_by(User.id)
+            )
+        ).all()
+    )
+
+    return [
+        UserChargeResponse(
+            RIN=user.RIN,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            is_graduating=user.is_graduating,
+            semester_balance=Decimal(
+                next(
+                    (balance.tuple()[1]
+                     for balance in semester_balances
+                     if balance.tuple()[0] == user.id),
+                    0.0
+                )
+                if semester_balances and len(semester_balances) > 0
+                else 0.0
+            ),
+        )
+        for user in users
+    ]
+    

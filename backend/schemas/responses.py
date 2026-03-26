@@ -30,6 +30,14 @@ class BasicUserResponse(BaseResponse):
     last_name: str
 
 
+class UserChargeResponse(BaseResponse):
+    RIN: str
+    first_name: str
+    last_name: str
+    semester_balance: Decimal = Field(max_digits=10, decimal_places=2)
+    is_graduating: bool
+
+
 class UserNoHash(BaseModel):
     id: UUID4
 
