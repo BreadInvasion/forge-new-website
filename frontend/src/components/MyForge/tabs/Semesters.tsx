@@ -10,7 +10,7 @@ import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Semester } from 'src/interfaces';
 
-const SEMESTER_TYPE_MAP: { [key: number]: string } = {
+export const SEMESTER_TYPE_MAP: { [key: number]: string } = {
     0: 'Fall',
     1: 'Spring',
     2: 'Summer',

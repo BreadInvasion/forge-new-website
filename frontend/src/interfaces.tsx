@@ -33,6 +33,14 @@ export const defaultUser: User = {
     semester_balance: '',
 };
 
+export interface UserCharge {
+    RIN: string;
+    first_name: string;
+    last_name: string;
+    semester_balance: string | number;
+    is_graduating: boolean;
+}
+
 export interface Machine {
     id: string;
     name: string;
