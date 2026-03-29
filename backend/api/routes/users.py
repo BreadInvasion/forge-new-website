@@ -1,5 +1,6 @@
 from decimal import Decimal
 from typing import Annotated, Literal
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import ScalarSelect, and_, func, or_, select
@@ -21,6 +22,35 @@ from core.security import get_password_hash
 
 router = APIRouter()
 
+async def get_semester_balance(
+    session: DBSession,
+    user_id: UUID,
+    semester_id: str
+) -> Decimal:
+    """Calculate the semester balance for a user and semester."""
+    
+    if not semester_id:
+        return Decimal(0)
+    
+    semester_balance = (
+        (
+            await session.scalar(
+                select(func.sum(MachineUsage.cost))
+                .select_from(MachineUsage)
+                .where(
+                    and_(
+                        MachineUsage.user_id == user_id,
+                        MachineUsage.semester_id == semester_id,
+                    )
+                )
+            )
+        )
+        or 0.0
+        if semester_id
+        else 0.0
+    )
+
+    return Decimal(semester_balance)
 
 @router.post("/signup")
 async def register_user(
@@ -75,27 +105,8 @@ async def get_user_by_rcsid(
         )
 
     current_semester_id = await session.scalar(select(State.active_semester_id))
-
     user_permissions = await get_user_permissions(session, user.id)
-
-    semester_balance = (
-        (
-            await session.scalar(
-                select(func.sum(MachineUsage.cost))
-                .select_from(MachineUsage)
-                .where(
-                    and_(
-                        MachineUsage.user_id == user.id,
-                        MachineUsage.semester_id == current_semester_id,
-                    )
-                )
-            )
-        )
-        or 0.0
-        if current_semester_id
-        else 0.0
-    )
-
+    semester_balance = await get_semester_balance(session, user.id, current_semester_id)
     return UserNoHash(
         id=user.id,
         is_rpi_staff=user.is_rpi_staff,
@@ -115,7 +126,7 @@ async def get_user_by_rcsid(
             ""
         ),
         is_graduating=user.is_graduating,
-        semester_balance=Decimal(semester_balance),
+        semester_balance=semester_balance,
     )
 
 
@@ -136,27 +147,8 @@ async def get_user_by_rin(
         raise HTTPException(status_code=404, detail="User with provided RIN not found")
 
     current_semester_id = await session.scalar(select(State.active_semester_id))
-
     user_permissions = await get_user_permissions(session, user.id)
-
-    semester_balance = (
-        (
-            await session.scalar(
-                select(func.sum(MachineUsage.cost))
-                .select_from(MachineUsage)
-                .where(
-                    and_(
-                        MachineUsage.user_id == user.id,
-                        MachineUsage.semester_id == current_semester_id,
-                    )
-                )
-            )
-        )
-        or 0.0
-        if current_semester_id
-        else 0.0
-    )
-
+    semester_balance = await get_semester_balance(session, user.id, current_semester_id)
     return UserNoHash(
         id=user.id,
         is_rpi_staff=user.is_rpi_staff,
@@ -176,7 +168,7 @@ async def get_user_by_rin(
             ""
         ),
         is_graduating=user.is_graduating,
-        semester_balance=Decimal(semester_balance),
+        semester_balance=semester_balance,
     )
 
 
