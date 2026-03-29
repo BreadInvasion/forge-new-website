@@ -30,7 +30,10 @@
     margin-top: 20px;
     width: 100%;
     overflow-x: auto;
-    padding: 0 2rem 0 2rem;
+    padding: 0 2rem 0 2rem;    
+    max-height: 60vh;
+    overflow-y: auto;
+    position: relative;
 
     table {
         width: 100%;
