@@ -25,6 +25,24 @@ const AboutUs = lazy(() => import('./components/AboutUs/AboutUs'));
 // import Register from './components/Forms/Register';
 // import ComingSoon from './components/Home/ComingSoon';
 
+let partyMode: boolean = false;
+const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a', 'Enter'];
+let pressedKeys: string[] = [];
+
+document.addEventListener('keydown', (event) => {
+    pressedKeys.push(event.key);
+    pressedKeys = pressedKeys.slice(-konamiCode.length);
+    if (JSON.stringify(pressedKeys) === JSON.stringify(konamiCode)) {
+        partyMode = !partyMode;
+        const all = document.querySelectorAll('*');
+        all.forEach(element => {
+            if (partyMode) {element.classList.add('party-mode');}
+            else {element.classList.remove('party-mode');}
+        })
+    }
+});
+
+
 export default function App() {
 
     const { isAuthenticated, user, setAuth } = useAuth();

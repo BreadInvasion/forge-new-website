@@ -2,7 +2,6 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    overflow: hidden;
 }
 
 html, body {
@@ -21,4 +20,21 @@ button {
     display: flex;
     flex-direction: column;
     position: relative;
+}
+
+.party-mode {
+  width: 100px;
+  height: 100px;
+  animation: spin 3.4s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+    filter: hue-rotate(360deg);
+  }
 }
