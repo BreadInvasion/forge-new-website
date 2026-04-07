@@ -12,6 +12,7 @@ from .routes import (
     public,
     resource_slots,
     resources,
+    roles,
     semesters,
     users,
     use_a_machine,
@@ -27,6 +28,7 @@ api_router.include_router(officer_actions.router, tags=["officer_actions"])
 api_router.include_router(public.router, tags=["public"])
 api_router.include_router(resource_slots.router, tags=["resource_slots"])
 api_router.include_router(resources.router, tags=["resources"])
+api_router.include_router(roles.router, tags=["roles"])
 api_router.include_router(semesters.router, tags=["semesters"])
 api_router.include_router(users.router, tags=["users"])
 api_router.include_router(use_a_machine.router, tags=["use_a_machine"])
