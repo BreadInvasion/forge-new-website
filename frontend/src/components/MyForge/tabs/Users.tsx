@@ -2,11 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { OmniAPI } from 'src/apis/OmniAPI';
 import Table, { DeleteItem, ITEMS_PER_PAGE, TableHead } from '../components/Table';
 import { User } from 'src/interfaces';
+import { UserPermission } from 'src/enums';
+import useAuth from '../../Auth/useAuth';
 
 import '../styles/TabStyles.scss';
 
 
 const Users: React.FC = () => {
+
+    const { user } = useAuth();
+    const canSeeUsers = user.permissions.includes(UserPermission.CAN_SEE_USERS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
 
     const [data, setData] = React.useState<User[]>([]);
     //change this to fix gender id
@@ -31,6 +36,7 @@ const Users: React.FC = () => {
         DeleteItem('users', data[index_real], refreshPage);
     };
 
+    if (!canSeeUsers) return null;
     return (
         <div className='tab-column-cover align-center'>
             <TableHead

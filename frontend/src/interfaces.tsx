@@ -138,6 +138,15 @@ export interface Semester {
     calendar_year: number;
 }
 
+export interface Role {
+    id: string;
+    name: string;
+    permissions: UserPermission[];
+    inverse_permissions: UserPermission[];
+    display_role: boolean;
+    priority: number;
+}
+
 export interface ResourceSlot {
     id: string;
     name: string;
