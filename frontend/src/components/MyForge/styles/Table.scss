@@ -23,12 +23,16 @@
         scale: 1.2;
         background-color: #e9ffe9;
     }
-    h2 { float: left;}
+    h2 { float: left; }
 }
 
 .table-container {
     margin-top: 20px;
+    align-self: stretch;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     overflow-x: auto;
     padding: 0 2rem 0 2rem;    
     max-height: 60vh;
@@ -37,6 +41,8 @@
 
     table {
         width: 100%;
+        min-width: 100%;
+        table-layout: fixed;
         border-collapse: separate;
         border-spacing: 0;
         border: 1px solid #a7a7a7;
@@ -52,7 +58,6 @@
         padding: 8px;
         border-bottom: 1px solid #a0a0a0;
         border-right: 1px solid #a0a0a0;
-        max-width: 20%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -74,8 +79,17 @@
         padding: 12px;
         border-bottom: 1px solid #a0a0a0;
         border-right: 1px solid #a0a0a0;
-        max-width: 20%;
         overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .cell-content {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
     }
 
