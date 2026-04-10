@@ -1,6 +1,7 @@
 .tab-container {
   display: flex;
   flex-grow: 1;
+  min-width: 0;
   height: 100%;
   overflow: hidden;
 }
@@ -10,6 +11,7 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
+  min-width: 0;
   padding: 0.25rem 0.5rem;
 }
 
