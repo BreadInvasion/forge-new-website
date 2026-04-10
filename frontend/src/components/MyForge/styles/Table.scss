@@ -29,8 +29,6 @@
 .table-container {
     margin-top: 20px;
     width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
     overflow-x: auto;
     padding: 0 2rem 0 2rem;    
     max-height: 60vh;
@@ -54,7 +52,7 @@
         padding: 8px;
         border-bottom: 1px solid #a0a0a0;
         border-right: 1px solid #a0a0a0;
-        max-width: 220px;
+        max-width: 20%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -76,16 +74,8 @@
         padding: 12px;
         border-bottom: 1px solid #a0a0a0;
         border-right: 1px solid #a0a0a0;
-        max-width: 220px;
+        max-width: 20%;
         overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .cell-content {
-        display: block;
-        overflow: hidden;
-        text-overflow: ellipsis;
         white-space: nowrap;
     }
 
