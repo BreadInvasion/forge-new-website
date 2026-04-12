@@ -125,7 +125,7 @@ function Table<T>(props: TableProps<T>) {
     } else {
         return (
             <div className="table-container">
-                <table>
+                <table className={hasEditOrDelete ? 'has-actions' : undefined}>
                     <thead>
                         <tr>
                             {columns.map((column, index) => (
