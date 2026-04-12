@@ -125,7 +125,7 @@ function Table<T>(props: TableProps<T>) {
     } else {
         return (
             <div className="table-container">
-                <table>
+                <table className={hasEditOrDelete ? 'has-actions' : undefined}>
                     <thead>
                         <tr>
                             {columns.map((column, index) => (
@@ -137,13 +137,17 @@ function Table<T>(props: TableProps<T>) {
                     <tbody>
                         {data.map((row, rowIndex) => (
                             <tr key={rowIndex}>
-                                {columns.map(column => (
-                                    <td key={String(column)}>
-                                        {Array.isArray(row[column])
-                                            ? row[column].join(', ')
-                                            : String(row[column])}
-                                    </td>
-                                ))}
+                                {columns.map(column => {
+                                    const value = Array.isArray(row[column])
+                                        ? row[column].join(', ')
+                                        : String(row[column]);
+
+                                    return (
+                                        <td key={String(column)}>
+                                            <span className="cell-content" title={value}>{value}</span>
+                                        </td>
+                                    );
+                                })}
                                 {hasEditOrDelete && (
                                     <td className="icon">
                                         {canEdit && (
