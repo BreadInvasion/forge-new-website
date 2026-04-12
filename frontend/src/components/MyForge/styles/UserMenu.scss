@@ -54,6 +54,9 @@
     display: flex;
     flex-direction: column;
     width: 18vw;
+    flex: 0 0 18vw;
+    min-width: 220px;
+    flex-shrink: 0;
     height: 100%;
     background-color: um.$white-background;
     color: um.$text-gray;
