@@ -31,7 +31,7 @@ export default function App() {
 
     return (
         <Router>
-            <NavBar user={user} setAuth={setAuth} isAuthed={isAuthenticated}/>
+            <NavBar user={user} setAuth={setAuth} isAuthed={isAuthenticated} />
             <Suspense fallback={<div>Loading...</div>}>
                 <Routes>
                     <Route path="/" Component={Home} />
@@ -49,7 +49,7 @@ export default function App() {
                         <ProtectedRoute>
                             <MyForge />
                         </ProtectedRoute>
-                    }/>
+                    } />
                     <Route path="/create/3dprint" element={
                         <ProtectedRoute>
                             <ComingSoon />
