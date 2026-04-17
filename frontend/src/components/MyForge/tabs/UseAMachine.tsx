@@ -1,43 +1,402 @@
-import React, { useEffect, useState, ChangeEvent, FormEvent, ReactNode, Suspense, useMemo, createContext, useContext } from "react";
+import React, { useEffect, useState, ChangeEvent, FormEvent, ReactNode, Suspense, useMemo } from "react";
+import styled from "styled-components";
 import { OmniAPI } from "src/apis/OmniAPI";
-import { CheckboxInput, CustomForm, CustomFormField, DropdownInput, FormIcon, TextInput } from "src/components/Forms/Form";
 import { emptyMachine, Machine, Resource } from "src/interfaces";
 import { v4 as uuidv4 } from "uuid";
-import { useNavigate } from "react-router-dom"
-import '../../Forms/styles/Form.scss';
-import '../styles/UseAMachine.scss';
+import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
+import bgPattern from '../../../assets/img/background.svg?url';
 
+// ── Design tokens ─────────────────────────────────────────────────────────────
+const C = {
+    navy:  '#111c36',
+    red:   '#a51c1c',
+    white: '#ffffff',
+    black: '#000000',
+};
 
-interface MachineSchemaResponse {
-    [key: string]: any;
-}
+// ── Page wrapper ──────────────────────────────────────────────────────────────
 
-/** Database IDs specific to UsageForm Testing
- * Resource IDs:
- *   "acc18d23-19db-4c6e-b3c8-fdf79e19b6e6"
- *   "0897f0dc-eb66-41f2-b179-e76ced9aad69"
- *   "23fb8bf6-7d0c-4029-8810-f19fe85bfb38"
- *   "da36be80-2dcb-43a7-88b2-885e3ce387f6"
- *   "c96423f3-fbea-4993-8455-e929f333a820"
- *   "5a7c609b-df2f-48b4-9028-a0222a13b7a9"
- *   "fec63512-f7d3-46c9-a89a-c0f4e0b5c8b7"
- *   "f0f83ef1-a4c5-4fc9-8ff8-821c7658f7ad"
- *
- * Reource Slot IDs:
- *   "6fad9ba9-2093-40cc-81d4-5443bc8d06f8"
- *   "af30b008-1f52-4e77-91ec-67dc8d61fa75"
- *   "73cd77a0-1a74-4047-9c2c-ce08d1062963"
- * 
- * Machine Type IDs:
- *   "2cc65063-23a9-41b5-ab5a-fb451f6ef547"
- *
- * Machine Group IDs:
- *   "9d18bb70-cf67-4903-a78d-073722bb9ff2"
- *
- * Machine IDs:
- *   "d8aa3861-a1f3-4c1d-a154-018936173dc4"
-*/
+const PageWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: calc(100vh - 74px);
+    padding: 40px 16px;
+    box-sizing: border-box;
+    background: #EEF2F8;
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url(${bgPattern});
+        background-repeat: repeat;
+        background-size: 122px 140px;
+        opacity: 0.09;
+        pointer-events: none;
+    }
+`;
+
+// ── Card ──────────────────────────────────────────────────────────────────────
+
+const Card = styled.div`
+    position: relative;
+    z-index: 1;
+    background: ${C.white};
+    border: 4px solid ${C.navy};
+    border-radius: 12px;
+    width: clamp(340px, 50vw, 600px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 12px 48px rgba(17,28,54,0.18), 0 2px 8px rgba(17,28,54,0.08);
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url(${bgPattern});
+        background-repeat: repeat;
+        background-size: 122px 140px;
+        opacity: 0.04;
+        pointer-events: none;
+        z-index: 0;
+    }
+`;
+
+const CardInner = styled.div`
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 28px 0;
+`;
+
+// ── Title & divider ───────────────────────────────────────────────────────────
+
+const TitleBand = styled.div`
+    width: 100%;
+    background: ${C.navy};
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+`;
+
+const Title = styled.h2`
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    font-size: clamp(20px, 2.5vw, 28px);
+    font-weight: 700;
+    color: ${C.white};
+    text-align: center;
+    margin: 0;
+`;
+
+const Divider = styled.div`
+    width: calc(100% - 40px);
+    height: 2px;
+    background: #e2e8f0;
+    flex-shrink: 0;
+`;
+
+// ── Fields ────────────────────────────────────────────────────────────────────
+
+const FieldsArea = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    width: calc(100% - 40px);
+    padding: 18px 0 12px 0;
+`;
+
+const FieldRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 6px 10px;
+    width: 100%;
+    justify-content: flex-end;
+`;
+
+const FieldLabel = styled.label`
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    font-size: clamp(14px, 1.5vw, 20px);
+    font-weight: 700;
+    color: ${C.black};
+    white-space: nowrap;
+    flex-shrink: 0;
+`;
+
+const FieldInput = styled.input`
+    height: 35px;
+    width: clamp(120px, 25vw, 300px);
+    border: 2px solid ${C.black};
+    border-radius: 5px;
+    background: ${C.white};
+    padding: 4px 8px;
+    font-size: 14px;
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    outline: none;
+    box-sizing: border-box;
+    flex-shrink: 0;
+
+    &:focus {
+        border-color: ${C.navy};
+        box-shadow: 0 0 0 2px rgba(17,28,54,0.15);
+    }
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+        opacity: 1;
+    }
+`;
+
+const FieldSelect = styled.select`
+    height: 35px;
+    width: clamp(120px, 25vw, 300px);
+    border: 2px solid ${C.black};
+    border-radius: 5px;
+    background: ${C.white};
+    padding: 4px 8px;
+    font-size: 14px;
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    outline: none;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    cursor: pointer;
+
+    &:focus {
+        border-color: ${C.navy};
+    }
+`;
+
+// ── Duration row ──────────────────────────────────────────────────────────────
+
+const DurationRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    justify-content: center;
+    width: 100%;
+`;
+
+const DurationInput = styled.input`
+    height: 35px;
+    width: clamp(60px, 10vw, 100px);
+    border: 2px solid ${C.black};
+    border-radius: 5px;
+    background: ${C.white};
+    padding: 4px 8px;
+    font-size: 14px;
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    text-align: right;
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus { border-color: ${C.navy}; }
+`;
+
+const DurationLabel = styled.span`
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    font-size: clamp(14px, 1.5vw, 20px);
+    font-weight: 700;
+    color: ${C.black};
+`;
+
+// ── Checkboxes ────────────────────────────────────────────────────────────────
+
+const CheckboxArea = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    width: calc(100% - 40px);
+    padding: 14px 10px;
+`;
+
+const CheckRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+    width: 100%;
+`;
+
+const StyledCheckbox = styled.input`
+    width: 22px;
+    height: 22px;
+    border: 2px solid ${C.black};
+    border-radius: 4px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: ${C.navy};
+`;
+
+const CheckLabel = styled.label`
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    font-size: clamp(12px, 1.2vw, 15px);
+    font-weight: 700;
+    color: ${C.black};
+    cursor: pointer;
+`;
+
+// ── Resource table ────────────────────────────────────────────────────────────
+
+const ResourceArea = styled.div`
+    width: calc(100% - 24px);
+    padding: 14px 0 8px 0;
+    overflow-x: auto;
+`;
+
+const ResourceTable = styled.table`
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    font-size: 13px;
+`;
+
+const TableHead = styled.thead`
+    color: ${C.navy};
+
+    th {
+        padding: 8px 6px;
+        border-bottom: 2px solid ${C.navy};
+        text-align: center;
+        font-weight: 700;
+        white-space: nowrap;
+        font-size: clamp(11px, 1.1vw, 13px);
+    }
+`;
+
+const TableBody = styled.tbody`
+    td {
+        padding: 6px;
+        text-align: center;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    select, input[type="number"] {
+        padding: 4px 6px;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        font-size: 12px;
+        width: 100%;
+        box-sizing: border-box;
+        font-family: var(--font-display, 'Funnel Display', sans-serif);
+        outline: none;
+        &:focus { border-color: ${C.navy}; }
+    }
+
+    input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: ${C.navy};
+        cursor: pointer;
+    }
+`;
+
+const ResourceSectionLabel = styled.p`
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    font-size: clamp(14px, 1.5vw, 18px);
+    font-weight: 700;
+    color: ${C.navy};
+    margin: 0 0 10px 0;
+    text-align: left;
+    padding: 0 10px;
+`;
+
+// ── Status text ───────────────────────────────────────────────────────────────
+
+const StatusText = styled.div<{ $type: string }>`
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    padding: 6px 20px;
+    min-height: 20px;
+    color: ${({ $type }) =>
+        $type === 'success' ? '#1d7a48' :
+        $type === 'error'   ? '#a51c1c' :
+        $type === 'warning' ? '#8a5c00' : 'transparent'};
+`;
+
+// ── Step indicator ────────────────────────────────────────────────────────────
+
+const StepRow = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 0 0 0;
+    width: 100%;
+`;
+
+const StepDot = styled.div<{ $active: boolean }>`
+    width: ${p => p.$active ? '28px' : '10px'};
+    height: 10px;
+    border-radius: 100px;
+    background: ${p => p.$active ? C.navy : '#c8d3e8'};
+    transition: width 0.2s ease, background 0.2s ease;
+`;
+
+// ── Nav buttons ───────────────────────────────────────────────────────────────
+
+const NavRow = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: calc(100% - 40px);
+    padding: 12px 0 4px 0;
+    box-sizing: border-box;
+`;
+
+const NavBtn = styled.button`
+    height: 44px;
+    min-width: 100px;
+    padding: 0 24px;
+    background: ${C.red};
+    border: 2px solid ${C.black};
+    border-radius: 6px;
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    font-size: clamp(16px, 1.8vw, 22px);
+    font-weight: 700;
+    color: ${C.white};
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
+
+    &:hover:not(:disabled) {
+        background: #8a1515;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(165,28,28,0.3);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+
+    &:disabled {
+        background: #c9a0a0;
+        border-color: #aaa;
+        cursor: not-allowed;
+        transform: none;
+    }
+`;
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Main component
+// ═════════════════════════════════════════════════════════════════════════════
 
 export const DynamicMachineForm: React.FC = () => {
 
@@ -59,51 +418,28 @@ export const DynamicMachineForm: React.FC = () => {
     const [status, setStatus] = useState<{ text: string; type: "error" | "success" | "warning" | "" }>({ text: "", type: "" });
     const navigate = useNavigate();
 
-    /**
-     * Initial Step on Load
-     */
     useEffect(() => {
         const fetchMachines = async () => {
             const allMachines: Machine[] = await OmniAPI.getAll("machines");
-            console.log("All machines:", allMachines);
             setMachines(allMachines);
         };
-
         fetchMachines();
     }, []);
 
-
-    /**
-     * Handle Machine Selection with placeholder protection
-     */
     const handleSelectMachine = (id: string) => {
-        if (id === "_") {
-            return;
-        }
+        if (id === "_") return;
         setSelectedMachineId(id);
     };
 
-
-    /**
-     * Fetch Machine Schema on Machine Selection
-     */
     useEffect(() => {
         if (selectedMachineId == "0") return;
-
         const fetchSchema = async () => {
             const schemaData: MachineSchemaResponse = await OmniAPI.get("use", `${selectedMachineId}/schema`);
-            console.log("Schema for machine:", schemaData);
             setSchema(schemaData);
         };
-
         fetchSchema();
-
     }, [selectedMachineId]);
 
-
-    /**
-     * Generate Resource Usage Form on Schema Load
-     */
     useEffect(() => {
         if (!schema.resource_slots) return;
 
@@ -133,19 +469,15 @@ export const DynamicMachineForm: React.FC = () => {
             }
         };
 
-        const newResourceUsageForm = <ResourceUsageForm key={fieldId} {...resourceUsageProps} />;
-        setResourceUsageForm(newResourceUsageForm);
+        setResourceUsageForm(<ResourceUsageForm key={fieldId} {...resourceUsageProps} />);
     }, [schema]);
 
     function updateStatus(message: string, type: string) {
-        setStatus({ text: message, type: type as "error" | "success" | "warning" | ""});
-        try { document.getElementById('status-text')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {console.log('Failed to display status text')}
+        setStatus({ text: message, type: type as "error" | "success" | "warning" | "" });
+        try { document.getElementById('status-text')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { console.log('Failed to display status text'); }
     }
-    function clearStatus() {updateStatus("", "");}
+    function clearStatus() { updateStatus("", ""); }
 
-    /**
-     * Handle Form Submission
-     */
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
 
@@ -153,8 +485,6 @@ export const DynamicMachineForm: React.FC = () => {
             updateStatus("Please accept the usage policy.", "error");
             return;
         }
-
-        console.log(slotValues);
 
         const resource_usages: { [key: string]: { resource_id: string, amount: number, is_own_material: boolean } } = {};
         slotValues.map((slot) => {
@@ -168,25 +498,20 @@ export const DynamicMachineForm: React.FC = () => {
         });
 
         const duration_seconds = Math.ceil((formData.hours * 3600) + (formData.minutes * 60));
-        console.log("Resource Usages:", resource_usages);
         const usageData = {
             as_org_id: formData.org ? formData.org : null,
             duration_seconds: duration_seconds,
             resource_usages: resource_usages,
         };
 
-        console.log("Usage Data:", usageData);
-
         try {
             const response = await OmniAPI.use(selectedMachineId, usageData);
-            console.log("Usage Response:", response);
             if (response == null) {
                 updateStatus("Usage submitted successfully.", "success");
                 window.setTimeout(() => navigate('../../status'), 1000);
             } else {
                 throw new Error("An error occurred. Please try again.");
             }
-
         } catch (error: any) {
             if (error.status == 409) {
                 updateStatus("This machine is already in use. Please clear it before submitting a new usage.", "error");
@@ -203,164 +528,177 @@ export const DynamicMachineForm: React.FC = () => {
     const validateResourceUsage = (slotValue: ResourceSlotElement) => {
         if (!schema.resource_slots.find((slot: ResourceSlotSchema) => slot.resource_slot_id === slotValue.slot_id)?.allow_own_material && slotValue.own) {
             const displayName = schema.resource_slots.find((slot: ResourceSlotSchema) => slot.resource_slot_id === slotValue.slot_id)?.display_name;
-            return `${displayName} does not allow personal material.`
+            return `${displayName} does not allow personal material.`;
         }
-
         if (!schema.resource_slots.find((slot: ResourceSlotSchema) => slot.resource_slot_id === slotValue.slot_id)?.allow_empty && slotValue.amount <= 0 && !slotValue.own) {
             const displayName = schema.resource_slots.find((slot: ResourceSlotSchema) => slot.resource_slot_id === slotValue.slot_id)?.display_name;
-            return `Please enter an amount greater than 0 for ${displayName}.`
+            return `Please enter an amount greater than 0 for ${displayName}.`;
         }
-
         return null;
-    }
+    };
 
-    const handlePageChange = (page: number) => {
-        //Check if machine is selected
-        if (page == 2 && selectedMachineId == "0") {
+    const handlePageChange = (nextPage: number) => {
+        if (nextPage == 2 && selectedMachineId == "0") {
             updateStatus("Please select a machine first.", "error");
             return;
         }
-
-        //Check if resource is selected
-        if (page == 3) {
+        if (nextPage == 3) {
             const invalidSlot = slotValues.find((slot) => validateResourceUsage(slot));
             if (invalidSlot) {
-                updateStatus(validateResourceUsage(invalidSlot) ?? "You should never see this message! Please contact the site administrators.", "error");
+                updateStatus(validateResourceUsage(invalidSlot) ?? "Please contact the site administrators.", "error");
                 return;
             }
-
             slotValues.forEach((slot) => {
                 if (slot.amount > 1000 && !slot.own) {
-                    updateStatus(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please alert a volunteer or room manager after you start the print, so they are aware.`, "warning");
+                    updateStatus(`WARNING: The amount for ${slot.name} exceeds one spool. Please alert a volunteer after starting.`, "warning");
                 } else if (slot.amount > 1000 && slot.own) {
-                    updateStatus(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please make sure you have enough material to complete the print - you will not able to use Forge resources to complete the print.`, "warning");
+                    updateStatus(`WARNING: The amount for ${slot.name} exceeds one spool. Ensure you have enough material.`, "warning");
                 }
             });
         }
-
-        //Check if duration is valid
-        if (page == 4 && (formData.hours == 0 && formData.minutes == 0)) {
+        if (nextPage == 4 && (formData.hours == 0 && formData.minutes == 0)) {
             updateStatus("Please enter a valid duration.", "error");
             return;
         }
-
         clearStatus();
-        setPage(page);
+        setPage(nextPage);
     };
 
-
     return (
-        <div className="use-a-machine">
-            <form className="usage-form" onSubmit={handleSubmit}>
-                <FormIcon />
-                <h2>Machine Usage Form</h2>
-                {page == 1 &&
-                    <div className="machine-selection">
-                        <label>1. Machine Selection</label>
-                        <select
-                            className='styled-dropdown'
-                            value={selectedMachineId}
-                            onChange={(e) => handleSelectMachine(e.target.value)}
-                        >
-                            <option className='styled-dropdown-placeholder' value="0" hidden>{"Please Select a Machine"}</option>
-                            {machines.map((machine: Machine) => (
-                                <option className='styled-dropdown-option' key={machine.id} value={machine.id}>{machine.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                }
+        <PageWrapper>
+            <Card>
+                <CardInner>
+                    <form onSubmit={handleSubmit} style={{ width: '100%', display: 'contents' }}>
+                        <TitleBand><Title>Machine Usage Form</Title></TitleBand>
 
+                        {/* ── Page 1: Choose a Machine ── */}
+                        {page === 1 && (
+                            <FieldsArea>
+                                <FieldRow>
+                                    <FieldLabel htmlFor="machine-select">Choose a Machine</FieldLabel>
+                                    <FieldSelect
+                                        id="machine-select"
+                                        value={selectedMachineId}
+                                        onChange={(e) => handleSelectMachine(e.target.value)}
+                                    >
+                                        <option value="0" disabled hidden>Please Select a Machine</option>
+                                        {machines.map((machine: Machine) => (
+                                            <option key={machine.id} value={machine.id}>{machine.name}</option>
+                                        ))}
+                                    </FieldSelect>
+                                </FieldRow>
+                            </FieldsArea>
+                        )}
 
-                {page == 2 && resourceUsageForm}
+                        {/* ── Page 2: Resource Selection ── */}
+                        {page === 2 && (
+                            <ResourceArea>
+                                <ResourceSectionLabel>Resource Selection</ResourceSectionLabel>
+                                {resourceUsageForm}
+                            </ResourceArea>
+                        )}
 
+                        {/* ── Page 3: Usage Duration ── */}
+                        {page === 3 && (
+                            <FieldsArea>
+                                <DurationRow>
+                                    <DurationLabel>Usage Duration</DurationLabel>
+                                    <DurationInput
+                                        id="hours"
+                                        type="number"
+                                        inputMode="numeric"
+                                        step="1"
+                                        min="0"
+                                        placeholder="0"
+                                        value={formData.hours}
+                                        onChange={(e) => setFormData((prev) => ({ ...prev, hours: e.target.valueAsNumber }))}
+                                    />
+                                    <DurationLabel>hr</DurationLabel>
+                                    <DurationInput
+                                        id="minutes"
+                                        type="number"
+                                        inputMode="numeric"
+                                        step="1"
+                                        min="0"
+                                        placeholder="0"
+                                        value={formData.minutes}
+                                        onChange={(e) => setFormData((prev) => ({ ...prev, minutes: e.target.valueAsNumber }))}
+                                    />
+                                    <DurationLabel>min</DurationLabel>
+                                </DurationRow>
+                            </FieldsArea>
+                        )}
 
-                {page == 3 &&
-                    <div className="usage-duration">
-                        <label>3. Usage Duration</label>
-                        <input
-                            id="hours"
-                            type="number"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            step="1"
-                            min="0"
-                            placeholder="Hours"
-                            onChange={(e) => setFormData((prev) => ({ ...prev, 'hours': e.target.valueAsNumber }))}
-                            value={formData.hours}
-                        />
-                        <label htmlFor="hours">hr</label>
-                        <input
-                            id="minutes"
-                            type="number"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            step="1"
-                            min="0"
-                            placeholder="Minutes"
-                            onChange={(e) => setFormData((prev) => ({ ...prev, 'minutes': e.target.valueAsNumber }))}
-                            value={formData.minutes}
-                        />
-                        <label htmlFor="minutes">min</label>
-                    </div>
-                }
+                        {/* ── Page 4: Policies ── */}
+                        {page === 4 && (
+                            <CheckboxArea>
+                                <CheckRow>
+                                    <StyledCheckbox
+                                        id="policy"
+                                        type="checkbox"
+                                        onChange={(e) => setFormData((prev) => ({ ...prev, policy: e.target.checked }))}
+                                    />
+                                    <CheckLabel htmlFor="policy">
+                                        <span style={{ color: C.red, marginRight: 4 }}>*</span>
+                                        Do you agree to the Machine Usage Policy?
+                                    </CheckLabel>
+                                </CheckRow>
+                                <CheckRow>
+                                    <StyledCheckbox
+                                        id="reprint"
+                                        type="checkbox"
+                                        onChange={(e) => setFormData((prev) => ({ ...prev, reprint: e.target.checked }))}
+                                    />
+                                    <CheckLabel htmlFor="reprint">Is this a reprint?</CheckLabel>
+                                </CheckRow>
+                                <CheckRow>
+                                    <StyledCheckbox
+                                        id="org"
+                                        type="checkbox"
+                                        onChange={(e) => setFormData((prev) => ({ ...prev, org: e.target.checked }))}
+                                    />
+                                    <CheckLabel htmlFor="org">Is this usage for an organization?</CheckLabel>
+                                </CheckRow>
+                            </CheckboxArea>
+                        )}
 
-                {page == 4 &&
-                    <div className="usage-policies">
-                        <input
-                            id='checkbox-usage-policy'
-                            className='styled-checkbox'
-                            type="checkbox"
-                            onChange={(e) => setFormData((prev) => ({ ...prev, 'policy': e.target.value }))}
-                        />
-                        <label
-                            htmlFor='checkbox-usage-policy'
-                            className='checkbox-label'
-                        >
-                            <span style={{ color: 'red' }}>*</span>
-                            Do you agree to the Machine Usage Policy? 
-                        </label>
-                        <input
-                            id='checkbox-org-usage'
-                            className='styled-checkbox'
-                            type="checkbox"
-                            onChange={(e) => setFormData((prev) => ({ ...prev, 'org': e.target.value }))}
-                        />
-                        <label
-                            htmlFor='checkbox-org-usage'
-                            className='checkbox-label'
-                        >
-                            Is this machine usage for an organization?
-                        </label>
+                        <StatusText id="status-text" $type={status.type}>{status.text || " "}</StatusText>
 
-                        <input
-                            id='checkbox-reprint'
-                            className='styled-checkbox'
-                            type="checkbox"
-                            onChange={(e) => setFormData((prev) => ({ ...prev, 'reprint': e.target.value }))}
-                        />
-                        <label
-                            htmlFor='checkbox-reprint'
-                            className='checkbox-label'
-                        >
-                            Is this a reprint?
-                        </label>
-                    </div>
-                }
+                        <StepRow>
+                            {[1,2,3,4].map(s => <StepDot key={s} $active={s === page} />)}
+                        </StepRow>
 
-                <div id="status-text" className={`status-text ${status.type === "success" ? "success" : status.type === "error" ? "error" : ""}`}>{status.text}</div>
-                <div className="pagination-buttons">
-                    <button type="button" onClick={() => {clearStatus(); setPage(page - 1)}} disabled={page === 1}>Back</button>
-                    {page !== 4 && <button type="button" onClick={() => handlePageChange(page + 1)} disabled={page === 4}>Next</button>}
-                    {page == 4 && <button type="submit">Submit</button>}
-                </div>
-
-            </form>
-        </div >
+                        <NavRow>
+                            <NavBtn
+                                type="button"
+                                onClick={() => { clearStatus(); setPage(page - 1); }}
+                                disabled={page === 1}
+                            >
+                                Back
+                            </NavBtn>
+                            {page !== 4 && (
+                                <NavBtn type="button" onClick={() => handlePageChange(page + 1)}>
+                                    Next
+                                </NavBtn>
+                            )}
+                            {page === 4 && (
+                                <NavBtn type="submit">Submit</NavBtn>
+                            )}
+                        </NavRow>
+                    </form>
+                </CardInner>
+            </Card>
+        </PageWrapper>
     );
 };
 
 
-/** This interface will serve as the master version of the schema - not the editable state version */
+// ═════════════════════════════════════════════════════════════════════════════
+// Supporting types & sub-components (logic unchanged)
+// ═════════════════════════════════════════════════════════════════════════════
+
+interface MachineSchemaResponse { [key: string]: any; }
+
 interface ResourceSlotSchema {
     resource_slot_id: string;
     display_name: string;
@@ -369,11 +707,6 @@ interface ResourceSlotSchema {
     allow_empty: boolean;
 }
 
-
-/** This is an interface to use as a template to populate the ResourceSlotElement into a state
- *  An instance should be created for each resource slot in the 
- *  machine schema, and then populated with the setSlots function
- */
 interface ResourceSlotElement {
     slot_id: string;
     resource_id?: string;
@@ -385,59 +718,43 @@ interface ResourceSlotElement {
     cost: number;
 }
 
-/** Passing along a state object wouldn't have worked, so when slotValues updated, initialValues will need to be updated concurrently */
 interface ResourceUsageFormProps {
     slots: ResourceSlotSchema[];
     initialValues: ResourceSlotElement[];
     setSlots: (updatedSlot: ResourceSlotElement) => void;
 }
 
-/* This is a CustomField for the CustomForm Component to use */
 const ResourceUsageForm: React.FC<ResourceUsageFormProps> = ({ slots, initialValues, setSlots }) => {
-
-    const [slotValues, setSlotValues] = useState<ResourceSlotElement[]>(initialValues);
-
-    const handleSlotChange = (slotValue: ResourceSlotElement) => {
-        const newSlotValues = [...slotValues];
-        const slotIndex = newSlotValues.findIndex((slot) => slot.slot_id === slotValue.slot_id);
-        newSlotValues[slotIndex] = slotValue;
-        setSlotValues(newSlotValues);
-    }
-
     const showBrand = slots.find((slot) => slot.valid_resources.find((resource) => resource.brand)) ? true : false;
-    const showColor = false; //slots.find((slot) => slot.valid_resources.find((resource) => resource.color) ? true : false);
+    const showColor = false;
 
     return (
         <Suspense fallback={<div>Loading...</div>}>
-            <div className="resource-usage-form">
-                <label>2. Resource Selection</label>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Slot Name</th>
-                            <th>Material</th>
-                            {showBrand && <th>Brand</th>}
-                            {showColor && <th>Color</th>}
-                            <th className="amount">Amount</th>
-                            <th className="own-material">Personal Material</th>
-                            <th>Cost</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {slots.map((slot, index) => (
-                            <ResourceSlot
-                                key={slot.resource_slot_id + index}
-                                slot={slot}
-                                slotValue={initialValues[index]}
-                                setSlotValue={setSlots}
-                                showBrand={showBrand}
-                                showColor={showColor}
-                            />
-                        ))}
-                    </tbody>
-
-                </table>
-            </div >
+            <ResourceTable>
+                <TableHead>
+                    <tr>
+                        <th>Slot</th>
+                        <th>Material</th>
+                        {showBrand && <th>Brand</th>}
+                        {showColor && <th>Color</th>}
+                        <th>Amount</th>
+                        <th>Own</th>
+                        <th>Cost</th>
+                    </tr>
+                </TableHead>
+                <TableBody>
+                    {slots.map((slot, index) => (
+                        <ResourceSlot
+                            key={slot.resource_slot_id + index}
+                            slot={slot}
+                            slotValue={initialValues[index]}
+                            setSlotValue={setSlots}
+                            showBrand={showBrand}
+                            showColor={showColor}
+                        />
+                    ))}
+                </TableBody>
+            </ResourceTable>
         </Suspense>
     );
 };
@@ -450,89 +767,48 @@ interface ResourceSlotProps {
     showColor?: boolean;
 }
 
-
 const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotValue, showBrand, showColor }) => {
     const [selectedDetails, setSelectedDetails] = useState<ResourceSlotElement>({
         slot_id: slot.resource_slot_id,
-        name: "_",
-        brand: "_",
-        color: "_",
-        amount: 0,
-        own: false,
-        cost: 0,
+        name: "_", brand: "_", color: "_", amount: 0, own: false, cost: 0,
     });
-
     const [cost, setCost] = useState(0);
-
     const validResources = slot.valid_resources;
 
-    // Get unique materials (always available)
-    const materialOptions = useMemo(() => [...new Set(validResources.map(resource => resource.name))], [validResources]);
-
-    // Get brands based on selected material
+    const materialOptions = useMemo(() => [...new Set(validResources.map(r => r.name))], [validResources]);
     const brandOptions = useMemo(() => [...new Set(validResources
-        .filter(resource => resource.name === selectedDetails.name || selectedDetails.name === "_")
-        .map(resource => resource.brand))],
-        [validResources, selectedDetails.name]);
-
-    // Get colors based on selected material and brand
+        .filter(r => r.name === selectedDetails.name || selectedDetails.name === "_")
+        .map(r => r.brand))], [validResources, selectedDetails.name]);
     const colorOptions = useMemo(() => [...new Set(validResources
-        .filter(resource => resource.name === selectedDetails.name && resource.brand === selectedDetails.brand || selectedDetails.name === "_")
-        .map(resource => resource.color))],
-        [validResources, selectedDetails.name, selectedDetails.brand]);
+        .filter(r => (r.name === selectedDetails.name && r.brand === selectedDetails.brand) || selectedDetails.name === "_")
+        .map(r => r.color))], [validResources, selectedDetails.name, selectedDetails.brand]);
 
-    // Find the best matching resource
-    const matchingResource = (name: string, brand: string, color: string) => {
-        return validResources.find(resource =>
-            resource.name === name &&
-            (brand === "_" || resource.brand === brand) &&
-            (color === "_" || resource.color === color)
-        ) ?? null;
-    };
+    const matchingResource = (name: string, brand: string, color: string) =>
+        validResources.find(r => r.name === name && (brand === "_" || r.brand === brand) && (color === "_" || r.color === color)) ?? null;
 
     const handleChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         const { name, value, type } = event.target;
         const newValue = type === "checkbox" ? (event.target as HTMLInputElement).checked : value;
 
         setSelectedDetails(prev => {
-            let updatedDetails = { ...prev, [name]: newValue };
-
-            // Get valid brands for the selected material
-            const validBrands = validResources
-                .filter(resource => resource.name === updatedDetails.name)
-                .map(resource => resource.brand);
-
-            // Get valid colors for the selected material & brand
-            const validColors = validResources
-                .filter(resource => resource.name === updatedDetails.name && resource.brand === updatedDetails.brand)
-                .map(resource => resource.color);
-
-            // If material changes, check if brand is still valid
-            if (name === "name" && !validBrands.includes(updatedDetails.brand)) {
-                updatedDetails.brand = "_"; // Reset brand if it's not a valid option anymore
-            }
-
-            // If brand changes, check if color is still valid
-            if ((name === "name" || name === "brand") && !validColors.includes(updatedDetails.color)) {
-                updatedDetails.color = "_"; // Reset color if it's not a valid option anymore
-            }
-
-            // Find best resource with the selected options
-            const resource = matchingResource(updatedDetails.name, updatedDetails.brand || "_", updatedDetails.color || "_");
+            let updated = { ...prev, [name]: newValue };
+            const validBrands = validResources.filter(r => r.name === updated.name).map(r => r.brand);
+            const validColors = validResources.filter(r => r.name === updated.name && r.brand === updated.brand).map(r => r.color);
+            if (name === "name" && !validBrands.includes(updated.brand)) updated.brand = "_";
+            if ((name === "name" || name === "brand") && !validColors.includes(updated.color)) updated.color = "_";
+            const resource = matchingResource(updated.name, updated.brand || "_", updated.color || "_");
             const unitCost = parseFloat(resource?.cost ?? "0");
-            updatedDetails.cost = updatedDetails.own ? 0 : (updatedDetails.amount * unitCost);
-
-            return updatedDetails;
+            updated.cost = updated.own ? 0 : (updated.amount * unitCost);
+            return updated;
         });
     };
 
     useEffect(() => {
-        const matchedResource = validResources.find(resource =>
-            resource.name === selectedDetails.name &&
-            (resource.brand === selectedDetails.brand || selectedDetails.brand === "_") &&
-            (resource.color === selectedDetails.color || selectedDetails.color === "_")
+        const matchedResource = validResources.find(r =>
+            r.name === selectedDetails.name &&
+            (r.brand === selectedDetails.brand || selectedDetails.brand === "_") &&
+            (r.color === selectedDetails.color || selectedDetails.color === "_")
         );
-
         setSlotValue({
             slot_id: selectedDetails.slot_id,
             resource_id: matchedResource?.id,
@@ -545,88 +821,40 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
         });
     }, [selectedDetails, setSlotValue]);
 
-    useEffect(() => {
-        setCost(selectedDetails.cost);
-    }, [selectedDetails.cost]);
+    useEffect(() => { setCost(selectedDetails.cost); }, [selectedDetails.cost]);
 
     return (
         <tr>
             <td>{slot.display_name}</td>
-            {/* Material Dropdown (Always available) */}
             <td>
-                <select
-                    name="name"
-                    value={selectedDetails.name}
-                    onChange={handleChange}
-                    required={!slot.allow_empty}
-                >
-                    <option value="_">--Material--</option>
-                    {materialOptions.map(name => (
-                        <option key={name} value={name}>{name}</option>
-                    ))}
+                <select name="name" value={selectedDetails.name} onChange={handleChange} required={!slot.allow_empty}>
+                    <option value="_">-- Material --</option>
+                    {materialOptions.map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
             </td>
-
-            {/* Brand Dropdown (Only available if material is selected) */}
             {showBrand && (
                 <td>
-                    <select
-                        name="brand"
-                        value={selectedDetails.brand}
-                        onChange={handleChange}
-                        disabled={selectedDetails.name === "_"}
-                    >
-                        <option value="_">--Brand--</option>
-                        {brandOptions.map(brand => (
-                            <option key={brand} value={brand}>{brand}</option>
-                        ))}
+                    <select name="brand" value={selectedDetails.brand} onChange={handleChange} disabled={selectedDetails.name === "_"}>
+                        <option value="_">-- Brand --</option>
+                        {brandOptions.map(b => <option key={b} value={b}>{b}</option>)}
                     </select>
                 </td>
             )}
-
-            {/* Color Dropdown (Only available if brand is selected) */}
             {showColor && (
                 <td>
-                    <select
-                        name="color"
-                        value={selectedDetails.color}
-                        onChange={handleChange}
-                        disabled={selectedDetails.name === "_" || selectedDetails.brand === "_"}
-                    >
-                        <option value="_">--Color--</option>
-                        {colorOptions.map(color => (
-                            <option key={color} value={color}>{color}</option>
-                        ))}
+                    <select name="color" value={selectedDetails.color} onChange={handleChange} disabled={selectedDetails.name === "_" || selectedDetails.brand === "_"}>
+                        <option value="_">-- Color --</option>
+                        {colorOptions.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                 </td>
             )}
-
-            {/* Amount Input */}
             <td>
-                <input
-                    type="number"
-                    name="amount"
-                    value={selectedDetails.amount}
-                    onChange={handleChange}
-                    required={!slot.allow_empty}
-                />
+                <input type="number" name="amount" value={selectedDetails.amount} onChange={handleChange} required={!slot.allow_empty} />
             </td>
-
-            {/* Own Checkbox */}
             <td>
-                <input
-                    type="checkbox"
-                    name="own"
-                    checked={selectedDetails.own}
-                    onChange={handleChange}
-                />
+                <input type="checkbox" name="own" checked={selectedDetails.own} onChange={handleChange} />
             </td>
-
-            {/* Cost Display */}
-            <td>
-                {"$" + cost.toFixed(2)}
-            </td>
+            <td>{"$" + cost.toFixed(2)}</td>
         </tr>
     );
 };
-

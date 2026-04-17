@@ -107,3 +107,181 @@
     --content-px-r:  24px;
   }
 }
+<<<<<<< Updated upstream
+=======
+
+// =============================================================================
+// Shared data card + table
+// =============================================================================
+// Used by any page that displays a tabular data view (Admin tabs, etc.).
+// These classes live in globals.scss so every table across the site shares
+// the same visual design.
+// =============================================================================
+
+.data-card {
+    position: relative;
+    background: var(--color-white);
+    border: 0.5px solid var(--color-navy-mid);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(17, 28, 54, 0.04);
+    min-height: 444px;
+}
+
+.data-card-title {
+    font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    color: var(--color-navy);
+    padding: 5px 36px;
+    line-height: 1.1;
+    margin: 0;
+
+    @media (max-width: 900px) {
+        font-size: 24px;
+        padding: 12px 20px;
+    }
+}
+
+.data-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0 36px 12px 36px;
+
+    @media (max-width: 900px) {
+        padding: 0 20px 12px 20px;
+    }
+}
+
+.data-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.data-table thead tr {
+    background-color: var(--color-navy);
+    height: 53px;
+}
+
+.data-table th {
+    font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    text-align: left;
+    color: #4a6080;
+    padding: 12px 20px;
+    white-space: nowrap;
+
+    &:first-child,
+    &.data-th--active {
+        color: var(--color-white);
+        padding-left: 62px;
+    }
+
+    @media (max-width: 900px) {
+        font-size: 14px;
+        padding: 10px 12px;
+
+        &:first-child,
+        &.data-th--active {
+            padding-left: 20px;
+        }
+    }
+}
+
+.data-table tbody tr {
+    border-bottom: 0.5px solid var(--color-divider);
+    height: 64px;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.data-table td {
+    font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #4a6080;
+    padding: 12px 20px;
+    vertical-align: middle;
+
+    &:first-child {
+        padding-left: 62px;
+    }
+
+    @media (max-width: 900px) {
+        font-size: 14px;
+        padding: 10px 12px;
+
+        &:first-child {
+            padding-left: 20px;
+        }
+    }
+}
+
+.data-table-empty {
+    padding: 40px 62px;
+    font-family: var(--font-body), 'Inter', sans-serif;
+    font-size: 16px;
+    color: var(--color-slate);
+}
+
+.data-table-error {
+    color: var(--color-red);
+}
+
+// =============================================================================
+// Shared action buttons (green = manager, purple = eboard)
+// =============================================================================
+// Mirrors the green / purple button colors from the MyForge UserMenu so the
+// Admin page can reuse them for tab-level actions (e.g. "Create Charge Sheet",
+// "Advance Semester").
+// =============================================================================
+
+.btn-action {
+    all: unset;
+    cursor: pointer;
+    font-family: var(--font-display), 'Funnel Display', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--color-white);
+    padding: 10px 18px;
+    border-radius: 8px;
+    line-height: 1;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        opacity: 0.55;
+        cursor: default;
+        pointer-events: none;
+    }
+}
+
+.btn-action--green {
+    background-color: #97bb63; // muted-green (manager)
+
+    &:hover {
+        background-color: #718d4a; // hover-muted-green
+    }
+}
+
+.btn-action--purple {
+    background-color: #8650a0; // muted-purple (eboard)
+
+    &:hover {
+        background-color: #643b77; // hover-muted-purple
+    }
+}
+>>>>>>> Stashed changes

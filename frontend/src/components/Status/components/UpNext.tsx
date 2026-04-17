@@ -6,71 +6,98 @@ import { MachineStatus } from 'src/interfaces';
 import { StatusText } from '../StatusComponents';
 
 const UpNextContainer = styled.div`
-    padding: 1rem;
-    background-color:rgb(138, 138, 138);
-    border-radius: 0.5rem;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-    max-height: 300px;
+    background: #ffffff;
+    border: 1px solid #2d4a80;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(17,28,54,0.10);
+    flex-shrink: 0;
+`;
+
+const UpNextHeader = styled.div`
+    background: #2d4a80;
+    padding: 10px 14px;
+
+    h2 {
+        font-family: var(--font-display, 'Funnel Display', sans-serif);
+        font-weight: 700;
+        font-size: 13px;
+        color: #ffffff;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin: 0;
+    }
+`;
+
+const UpNextBody = styled.div`
+    padding: 10px 12px;
+    max-height: 280px;
     overflow-y: auto;
-    font-family: Montserrat;
-    font-size: 2.0vh;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.15) transparent;
+
+    p {
+        font-family: var(--font-display, 'Funnel Display', sans-serif);
+        font-size: 12px;
+        color: #64748b;
+        margin: 0;
+        padding: 6px 0;
+    }
 `;
 
 const MachineItem = styled.div`
-    margin-bottom: 0.5rem;
-    margin-top: 0.5rem; 
-    padding: 0.5rem; 
-    border-bottom: 2px solid rgba(0, 0, 0, 0.1); 
-    background-color:rgba(255, 255, 255, 0.58);
-    border-radius: 0.5rem;
-    border-color: rgb(110, 110, 110);
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e8f0;
+    &:last-child { border-bottom: none; }
 `;
 
 const ItemHeader = styled.div`
-    display: flex; 
+    display: flex;
     justify-content: space-between;
     align-items: center;
-    @media screen and (max-width: 850px) {
-        flex-direction: column;
-        align-items: flex-start;
-        }
+    gap: 8px;
+    margin-bottom: 2px;
 `;
 
 const MachineName = styled.h3`
-    font-size: 2.5vh;
-    font-weight: 600;
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    font-size: 13px;
+    font-weight: 700;
+    color: #111c36;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
 `;
 
 const Countdown = styled.div`
     display: flex;
-    align-items: center; 
-    gap: 0.1rem;
-    padding: 0.2rem;
-    font-size: 1.5vh;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 6px;
+    font-size: 11px;
     font-weight: 700;
-    background-color: rgba(0, 0, 0, 0.17);
-    max-width: 100px;
-    text-align: center;
-    border-radius: 0.5rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    border-color: rgb(72, 72, 72);
-
+    color: #2d4a80;
+    background: rgba(45,74,128,0.08);
+    border: 1px solid rgba(45,74,128,0.2);
+    border-radius: 4px;
+    white-space: nowrap;
 `;
 
 const UserName = styled.p`
-    font-size: 2.0vh;
-    font-weight: 400;
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748b;
+    margin: 0 0 2px 0;
 `;
 
 const EstTime = styled(StatusText)`
-    font-size: 2.0vh;
-    font-weight: 500;
+    font-size: 11px;
     text-align: left;
 `;
 
 const UpNext: React.FC = () => {
-    const [machines, setMachines] = useState<{ name: string; in_use: Boolean, user: string | undefined; usage_start?: Date; usage_duration?: number }[]>([]);
+    const [machines, setMachines] = useState<{ name: string; in_use: Boolean; failed?: boolean; user: string | undefined; usage_start?: Date; usage_duration?: number }[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -90,7 +117,8 @@ const UpNext: React.FC = () => {
                 const transformedMachines = flattenedMachines.map((machine) => ({
                     name: machine.name,
                     in_use: machine.in_use,
-                    user: machine.user_name, 
+                    failed: machine.failed,
+                    user: machine.user_name,
                     usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined,
                     usage_duration: machine.usage_duration,
                 }));
@@ -105,10 +133,13 @@ const UpNext: React.FC = () => {
         };
 
         fetchMachines();
+        // Poll every 10 s to pick up failures and completions
+        const poll = setInterval(fetchMachines, 10000);
+        return () => clearInterval(poll);
     }, []);
 
     const inProgressMachines = machines
-    .filter((machine) => machine.in_use)
+    .filter((machine) => machine.in_use && !machine.failed)
     .sort((a, b) => {
             const endA = new Date(a.usage_start!).getTime() + a.usage_duration! * 1000;
             const endB = new Date(b.usage_start!).getTime() + b.usage_duration! * 1000;
@@ -126,15 +157,16 @@ const UpNext: React.FC = () => {
     if (upNextMachines.length === 0) {
         return (
             <UpNextContainer>
-                <h2>MACHINES UP NEXT:</h2>
-                <p>No machines to be completed in the next 30 minutes.</p>
+                <UpNextHeader><h2>Machines Up Next</h2></UpNextHeader>
+                <UpNextBody><p>Nothing finishing in the next 30 min.</p></UpNextBody>
             </UpNextContainer>
         );
     }
 
     return (
         <UpNextContainer>
-            <h2>MACHINES UP NEXT:</h2>
+            <UpNextHeader><h2>Machines Up Next</h2></UpNextHeader>
+            <UpNextBody>
             {upNextMachines.map((machine, index) => (
                 <MachineItem key={index}>
                     <ItemHeader>
@@ -150,6 +182,7 @@ const UpNext: React.FC = () => {
                     <EstTime $area="date">Est. Completion: {getEndTime(machine.usage_start!, machine.usage_duration!)}</EstTime>
                 </MachineItem>
             ))}
+            </UpNextBody>
         </UpNextContainer>
     );
 };

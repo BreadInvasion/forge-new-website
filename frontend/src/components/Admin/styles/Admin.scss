@@ -1,0 +1,202 @@
+// =============================================================================
+// THE FORGE | THE MILL — Admin Page Styles
+// =============================================================================
+// Mirrors the Figma design for the Admin / Machines / Machine Types /
+// Machine Groups pages.
+// =============================================================================
+
+.admin-page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex: 1 0 auto;
+    min-height: calc(100vh - var(--navbar-height) - 100px);
+    background: var(--color-white);
+    overflow: hidden;
+
+    // Red top accent line (between navbar and content)
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--color-red);
+        z-index: 2;
+        pointer-events: none;
+    }
+}
+
+// Background technical-drawing pattern (matches Status/Hours pages)
+.admin-bg-pattern {
+    position: absolute;
+    inset: 0;
+    background-repeat: repeat;
+    background-size: 122px 140px;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 0;
+}
+
+// Ruler strip down the left edge
+.admin-ruler {
+    position: absolute;
+    left: -1px;
+    top: 0;
+    bottom: 0;
+    width: 70px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+
+    &::after {
+        content: '';
+        position: absolute;
+        width: 5000px;
+        height: 70px;
+        left: calc(50% - 2500px);
+        top: -2535px;
+        transform: rotate(-90deg) scaleY(-1);
+        transform-origin: center center;
+        background-image: var(--ruler-url);
+        background-size: 750px 70px;
+        background-repeat: repeat-x;
+        background-position: 0 0;
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Tab bar at the top of the admin page
+// ──────────────────────────────────────────────────────────────────────────
+.admin-tabs {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    row-gap: 12px;
+    gap: 48px;
+    padding: 16px var(--content-px) 0 var(--content-px);
+    z-index: 1;
+
+    @media (max-width: 900px) {
+        gap: 20px;
+        padding: 16px 24px 0 24px;
+    }
+}
+
+.admin-tab-button {
+    all: unset;
+    cursor: pointer;
+    font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    color: var(--color-navy);
+    line-height: 1.1;
+    padding: 4px 0 8px 0;
+    position: relative;
+    transition: color 0.15s ease;
+    white-space: nowrap;
+
+    &:hover {
+        color: var(--color-navy-mid);
+    }
+
+    @media (max-width: 900px) {
+        font-size: 24px;
+    }
+}
+
+.admin-tab-button.active {
+    color: var(--color-navy);
+
+    // Red underline for the active tab (default)
+    &::after {
+        content: '';
+        position: absolute;
+        left: 4px;
+        right: 4px;
+        bottom: -3px;
+        height: 4px;
+        background: var(--color-red);
+        border-radius: 2px;
+    }
+}
+
+// Green underline for manager-level admin tabs (matches the green
+// buttons on the user page: Machines / Types / Groups / Resources /
+// Resource Slots / Users).
+.admin-tab-button--green.active::after {
+    background: #97bb63;
+}
+
+// Purple underline for eboard-level admin tabs (matches the purple
+// buttons on the user page: Semesters / Charge Sheets).
+.admin-tab-button--purple.active::after {
+    background: #8650a0;
+}
+
+.admin-tab-divider {
+    position: relative;
+    margin: 0 var(--content-px);
+    height: 4px;
+    background-image: linear-gradient(to right, var(--color-red) 0%, var(--color-red) 100%);
+    background-repeat: no-repeat;
+    background-size: 1124px 4px;
+    background-position: left top;
+    z-index: 0;
+
+    @media (max-width: 1280px) {
+        background-size: 100% 4px;
+    }
+
+    @media (max-width: 900px) {
+        margin: 0 24px;
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Table card — shared table / card styles live in src/styles/globals.scss
+// (.data-card, .data-table, etc.) so every tabular view across the site
+// uses the same design.
+// ──────────────────────────────────────────────────────────────────────────
+.admin-content {
+    position: relative;
+    z-index: 1;
+    padding: 30px var(--content-px) 60px var(--content-px);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+
+    @media (max-width: 900px) {
+        padding: 30px 24px 60px 24px;
+    }
+}
+
+// Forbidden fallback when a non-admin lands on /admin
+.admin-forbidden {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 24px;
+    gap: 16px;
+
+    h1 {
+        font-family: var(--font-display), 'Funnel Display', sans-serif;
+        font-weight: 700;
+        color: var(--color-navy);
+        font-size: 32px;
+        margin: 0;
+    }
+
+    p {
+        font-family: var(--font-body), 'Inter', sans-serif;
+        color: var(--color-slate);
+        font-size: 16px;
+        margin: 0;
+        max-width: 480px;
+    }
+}

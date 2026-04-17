@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import UserMenu from './components/UserMenu';
-import { Outlet, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import './styles/MyForge.scss';
 import './styles/TabStyles.scss';
@@ -8,16 +8,7 @@ import { DynamicMachineForm } from './tabs/UseAMachine';
 import { FailAMachineForm } from './tabs/FailAMachine';
 
 const Summary = lazy(() => import('./tabs/Summary'));
-const Machines = lazy(() => import('./tabs/Machines'));
-const MachineTypes = lazy(() => import('./tabs/MachineTypes'));
-const MachineGroups = lazy(() => import('./tabs/MachineGroups'));
-const Resources = lazy(() => import('./tabs/Resources'));
-const ResourceSlots = lazy(() => import('./tabs/ResourceSlots'));
-const Users = lazy(() => import('./tabs/Users'));
 const Usages = lazy(() => import('./tabs/Usages'));
-const ComingSoon = lazy(() => import( '../Home/ComingSoon'));
-const Semesters = lazy(() => import('./tabs/Semesters'));
-const ChargeSheets = lazy(() => import('./tabs/ChargeSheets'));
 
 
 interface MyForgeProps {
@@ -27,6 +18,9 @@ interface MyForgeProps {
 const MyForge: React.FC = () => {
     /** MyForge Component
      *  - Operates as a functional Router for the subpage types. Which are defined in the App.tsx file.
+     *  - Management-only tabs (Machines / Machine Types / Machine Groups / Resources /
+     *    Resource Slots / Users / Semesters / Charge Sheets / Change Configuration)
+     *    have been moved to the Admin page (/admin).
      *  - All children share the same prop API, defined above, which is passed through context.
     */
 
@@ -41,16 +35,6 @@ const MyForge: React.FC = () => {
                         <Route path="create" element={<DynamicMachineForm />} />
                         <Route path="fail" element={<FailAMachineForm />} />
                         <Route path="usages" element={<Usages />} />
-                        <Route path="machines" element={<Machines />} />
-                        <Route path="machine_types" element={<MachineTypes />} />
-                        <Route path="machine_groups" element={<MachineGroups />} />
-                        <Route path="machines" element={<Machines />} />
-                        <Route path="resources" element={<Resources />} />
-                        <Route path="resource_slots" element={<ResourceSlots />} />
-                        <Route path="users" element={<Users />} />
-                        <Route path="semesters" element={<Semesters />} />
-                        <Route path="charge_sheets" element={<ChargeSheets />} />
-                        <Route path="change_config" element={<ComingSoon />} />
                     </Routes>
                 </Suspense>
             </div>

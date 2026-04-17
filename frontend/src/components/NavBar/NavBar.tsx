@@ -6,6 +6,10 @@ import * as NavMenu from '@radix-ui/react-navigation-menu';
 import { CaretDownIcon } from '@radix-ui/react-icons';
 import * as Avatar from '../MyForge/components/Avatar';
 import * as Hamburger from './Hamburger';
+<<<<<<< Updated upstream
+=======
+import { isAdmin } from '../Auth/roleUtils';
+>>>>>>> Stashed changes
 import { ReactComponent as ForgeSVG } from 'src/assets/img/RPI_Lockup_Eng_Sm.svg'
 
 import './styles/UserMenu.scss';
@@ -120,6 +124,12 @@ export const NavBar: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
                         <NavMenu.Link className="link" href="/faq/about">About Us</NavMenu.Link>
                     </NavMenu.Content>
                 </NavMenu.Item>
+
+                {isAuthed && isAdmin(user) && (
+                    <NavMenu.Item className="list-item">
+                        <NavMenu.Link className="link" href="/admin">Admin</NavMenu.Link>
+                    </NavMenu.Item>
+                )}
 
                 <Hamburger.default />
 

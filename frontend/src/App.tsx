@@ -23,6 +23,10 @@ const AboutUs = lazy(() => import('./components/FAQ/AboutUs'));
 const FAQ = lazy(() => import('./components/FAQ/FAQ'));
 const Etiquette = lazy(() => import('./components/FAQ/Etiquette'));
 const Materials = lazy(() => import('./components/FAQ/Materials'));
+<<<<<<< Updated upstream
+=======
+const Admin = lazy(() => import('./components/Admin/Admin'));
+>>>>>>> Stashed changes
 
 const AppWrapper = styled.div`
     display: flex;
@@ -113,6 +117,17 @@ export default function App() {
                                 }
                             />
                             <Route
+<<<<<<< Updated upstream
+=======
+                                path="/admin"
+                                element={
+                                    <ProtectedRoute>
+                                        <Admin />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+>>>>>>> Stashed changes
                                 path="*"
                                 element={
                                     <div>

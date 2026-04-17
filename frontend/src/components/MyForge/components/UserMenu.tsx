@@ -42,45 +42,30 @@ const UserMenu: React.FC = () => {
                 { hasPermission(UserPermission.CAN_FAIL_MACHINES) && (
                     <ul className='user-options volunteer'>
                         <li><Link to='/myforge/fail' className='btn'>Failure Form</Link></li>
-                    </ul>   
+                    </ul>
                 )}
-                { (hasPermission(UserPermission.CAN_SEE_MACHINE_TYPES) || hasPermission(UserPermission.CAN_SEE_MACHINE_GROUPS) || hasPermission(UserPermission.CAN_SEE_MACHINES) || hasPermission(UserPermission.CAN_SEE_RESOURCES) || hasPermission(UserPermission.CAN_SEE_USERS)) && (
-                    <hr className='divider' />
+                {/*
+                 * Manager-level (green) and eboard-level (purple) sections have
+                 * been moved to the Admin page (/admin). The admin link below
+                 * is shown to anyone with an admin-ish permission so they can
+                 * jump over to manage machines, resources, users, semesters,
+                 * and charge sheets.
+                 */}
+                { (hasPermission(UserPermission.CAN_SEE_MACHINE_TYPES)
+                    || hasPermission(UserPermission.CAN_SEE_MACHINE_GROUPS)
+                    || hasPermission(UserPermission.CAN_SEE_MACHINES)
+                    || hasPermission(UserPermission.CAN_SEE_RESOURCES)
+                    || hasPermission(UserPermission.CAN_SEE_RESOURCE_SLOTS)
+                    || hasPermission(UserPermission.CAN_SEE_USERS)
+                    || hasPermission(UserPermission.CAN_SEE_SEMESTERS)
+                    || hasPermission(UserPermission.CAN_GET_CHARGES)) && (
+                    <>
+                        <hr className='divider' />
+                        <ul className='user-options manager'>
+                            <li><Link to='/admin' className='btn'>Admin</Link></li>
+                        </ul>
+                    </>
                 )}
-                <ul className='user-options manager'>
-                    { hasPermission(UserPermission.CAN_SEE_MACHINE_TYPES) && (
-                        <li><Link to='/myforge/machine_types' className='btn'>Machine Types</Link></li>
-                    )}
-                    { hasPermission(UserPermission.CAN_SEE_MACHINE_GROUPS) && (
-                        <li><Link to='/myforge/machine_groups' className='btn'>Machine Groups</Link></li>
-                    )}
-                    { hasPermission(UserPermission.CAN_SEE_MACHINES) && (
-                        <li><Link to='/myforge/machines' className='btn'>Machines</Link></li>
-                    )}
-                    { hasPermission(UserPermission.CAN_SEE_RESOURCES) && (
-                        <li><Link to='/myforge/resources' className='btn'>Resources</Link></li>
-                    )}
-                    { hasPermission(UserPermission.CAN_SEE_RESOURCE_SLOTS) && (
-                        <li><Link to='/myforge/resource_slots' className='btn'>Resource Slots</Link></li>
-                    )}
-                    { hasPermission(UserPermission.CAN_SEE_USERS) && (
-                        <li><Link to='/myforge/users' className='btn'>Users</Link></li>
-                    )}
-                </ul>
-                { (hasPermission(UserPermission.CAN_SEE_SEMESTERS) || hasPermission(UserPermission.CAN_GET_CHARGES)) && (
-                    <hr className='divider' />
-                )}
-                <ul className='user-options eboard'>
-                    { hasPermission(UserPermission.CAN_SEE_SEMESTERS) && (
-                        <li><Link to='/myforge/semesters' className='btn'>Semesters</Link></li>
-                    )}
-                    { hasPermission(UserPermission.CAN_GET_CHARGES) && (
-                        <li><Link to='/myforge/charge_sheets' className='btn'>Charge Sheets</Link></li>
-                    )}
-                    { hasPermission(UserPermission.IS_SUPERUSER) && (
-                        <li><Link to='/myforge/change_config' className='btn'>Change Configuration</Link></li>
-                    )}
-                </ul>
             </nav>
         </div>
     );

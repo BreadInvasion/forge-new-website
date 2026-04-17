@@ -116,10 +116,12 @@ export interface MachineStatus{
     usage_start: Date;
     usage_duration: number;
     user_id: string;
+    user_name?: string;
     maintenance_mode: boolean;
     disabled: boolean;
     failed: boolean;
     failed_at: Date;
+    percent_completed?: number;
 }
 
 export interface MachineStatusGroup{

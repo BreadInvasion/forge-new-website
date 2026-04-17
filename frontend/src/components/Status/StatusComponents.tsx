@@ -36,61 +36,55 @@ export const GridContainer = styled.div`
     }
 `;
 
-export const Card = styled.div<{ 
-    $symbol?: string; 
-    $minimized?: boolean; 
-    $highlightFailed?: boolean; 
+export const Card = styled.div<{
+    $symbol?: string;
+    $minimized?: boolean;
+    $highlightFailed?: boolean;
+    $failed?: boolean;
     progress: number;
 }>`
-    background-color: #f5f5f5;
+    /* ── Figma small card ── */
+    background: #ffffff;
     border-radius: 5px;
-    padding:10px;
+    border: 1px solid ${({ $highlightFailed, $failed }) => ($highlightFailed || $failed ? '#a51c1c' : '#2d4a80')};
+    box-shadow: ${({ $highlightFailed, $failed }) =>
+        $highlightFailed || $failed
+            ? '0 0 8px 2px rgba(165,28,28,0.5)'
+            : '0 1px 4px rgba(17,28,54,0.10)'};
+    padding: ${({ $minimized }) => ($minimized ? '10px 10px 18px 10px' : '18px 20px 20px 20px')};
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     align-items: center;
-    gap: 0rem;
-    width: ${({ $minimized }) => ($minimized ? 'clamp(140px, 10vw, 260px)' : 'clamp(260px, 30vw, 520px)')};
-    min-width: ${({ $minimized }) => ($minimized ? '130px' : '240px')};
-    max-width: 100%;
-    height: ${({ $minimized }) => ($minimized ? 'clamp(16vh, 18vh, 24vh)' : 'auto')};
-    aspect-ratio: auto;
-    flex-shrink: 0;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    border-radius: ${({ $minimized }) => ($minimized ? '5px' : '10px')}; 
-    box-shadow: ${({ $highlightFailed }) =>
-        $highlightFailed ? '0 0 10px 2px red' : '0 0 5px rgba(0, 0, 0, 0.5)'};
-    border: ${({ $minimized }) => ($minimized ? '1px solid #ccc' : '1px solid #999')};
-    font-size: ${({ $minimized }) => ($minimized ? "2.5vh" : "3.0vh")};
-    transition: all 0.3s ease-in-out;
-    ${props => props?.$symbol && `
-        background-image: url(src/assets/img/symbols/${props.$symbol}.svg);
-        background-size: auto 90%;
-        background-repeat: no-repeat;
-        background-position: center;
-    `}
+    gap: 4px;
+    width: ${({ $minimized }) => ($minimized ? '200px' : '100%')};
+    min-width: ${({ $minimized }) => ($minimized ? '180px' : '0')};
+    flex-shrink: ${({ $minimized }) => ($minimized ? '0' : '1')};
+    box-sizing: border-box;
     position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+    /* progress fill at bottom — minimized cards only */
     &::before {
         content: '';
         position: absolute;
         bottom: 0;
         left: 0;
-        width: 100%;
-        height: ${props => props.progress}%;
-        background-color: rgba(0, 255, 0, 0.2);
-        border-radius: 5px;
+        width: ${({ $failed, progress }) => $failed ? '100%' : `${progress}%`};
+        height: ${({ $minimized }) => ($minimized ? '10px' : '0')};
+        background: ${({ $failed }) => $failed ? '#a51c1c' : '#2d9c5c'};
+        border-radius: 0 6px 0 0;
+        transition: width 1s linear;
     }
-    ${({ $minimized }) =>$minimized && `&:hover {    
-        transform: scale(1.05); 
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
-        }
-    `}
+
+    &:hover {
+        box-shadow: 0 3px 12px rgba(17,28,54,0.18);
+        transform: translateY(-1px);
+    }
+
     @media screen and (max-width: 850px) {
-        /* on narrow screens, keep minimized cards reasonably sized */
-        width: ${({ $minimized }) => ($minimized ? '18vh' : 'auto')};
-        height: ${({ $minimized }) => ($minimized? '18vh' : 'auto')};
-        aspect-ratio: auto;
-        border-radius: 10px; 
+        width: ${({ $minimized }) => ($minimized ? '180px' : '100%')};
     }
 `;
 
@@ -103,40 +97,41 @@ export const BigCardAttribute = styled.div`
 `;
 
 export const BigCardText = styled.p<{ $minimized?: boolean, $clearable?: boolean }>`
-    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.3vh" : "1.5vh") : "2.0vh")};
-    font-weight: 600;
-    text-align: center;
-    width: auto;
+    font-size: ${({ $minimized }) => ($minimized ? '10px' : '12px')};
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.3;
 `;
 export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
-    font-weight: ${({ $minimized }) => ($minimized ? "600" : "400")};
-    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.0vh" : "1.5vh") : "1.8vh")};
-    text-align: center;
-    width: auto;
-    @media screen and (max-width: 850px) {
-        font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "1.7vh")};
-    }
+    font-size: ${({ $minimized }) => ($minimized ? '11px' : '14px')};
+    font-weight: 500;
+    color: #111c36;
+    margin: 0;
+    line-height: 1.3;
 `;
 
 export const MachineName = styled.h3<{ $minimized?: boolean, $clearable?: boolean }>`
-    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "2.0vh" : "2.5vh") : "3.0vh")};
-    font-weight: 650;
-    color: #000;
+    font-size: ${({ $minimized }) => ($minimized ? '15px' : '20px')};
+    font-weight: 700;
+    color: #111c36;
     text-transform: uppercase;
-    font-family: Montserrat;
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    letter-spacing: 0.6px;
+    line-height: 1.2;
+    margin: 0 0 6px 0;
     text-align: center;
+    width: 100%;
 `;
 
 export const StatusText = styled.p<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
-    font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.2vh" : "1.5vh") : "2.0vh")};
-    color: #000;
-    text-align: center;
-    text-justify: center;
-    font-family: Montserrat;
-    font-weight: 600;
-    @media screen and (max-width: 850px) {
-        font-size: ${({ $minimized, $clearable }) => ($minimized ? ($clearable ? "1.2vh" : "1.5vh") : "1.7vh")};
-    }
+    font-size: ${({ $minimized }) => ($minimized ? '10px' : '12px')};
+    color: #64748b;
+    font-weight: 500;
+    line-height: 1.3;
+    margin: 0;
 `;
 
 export const ProgressBar = styled.div<{$horizontal?: boolean}>`
