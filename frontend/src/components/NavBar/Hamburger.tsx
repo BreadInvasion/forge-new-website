@@ -13,7 +13,7 @@ const Hamburger: React.FC = () => {
                 <NavMenu.Link className='link' href="/status">Status</NavMenu.Link>
                 <NavMenu.Link className='link' href="/hours">Hours</NavMenu.Link>
                 <NavMenu.Link className='link' href="/learn">Wiki</NavMenu.Link>
-                <NavMenu.Link className='link' href="/learn/aboutus">About Us</NavMenu.Link>
+                <NavMenu.Link className='link' href="/faq/about">About Us</NavMenu.Link>
             </NavMenu.Content>
         </NavMenu.Item>
     );

@@ -6,11 +6,51 @@
     display: flex;
     justify-content: right;
     width: 100%;
-    min-height: 60px;
+    min-height: 63px;
+    max-height: 72px;
     overflow: visible;
-    height: 8%;
-    border-bottom: 2px solid nav.$border-color;
+    border-bottom: 1px solid nav.$border-color;
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.06);
     background-color: nav.$base-color;
+}
+
+/* ── Figma branding elements ──────────────────────────────────────── */
+.nav-rpi-lockup {
+    height: 30px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+    position: relative;
+    top: 5px;
+}
+
+.nav-forge-sticker {
+    height: 30px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+    position: relative;
+    top: 5px;
+}
+
+.nav-brand-separator {
+    width: 3px;
+    height: 40px;
+    background-color: nav.$text-color;
+    flex-shrink: 0;
+    border-radius: 1px;
+    position: relative;
+}
+
+.logo-text {
+    font-family: 'Funnel Display', 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: nav.$text-color;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    top: 5px;
+    position: relative;
 }
 
 .nav-menu-root > div {
@@ -64,10 +104,10 @@
 
 .link {
     text-decoration: none;
-    font-family: "Noto Sans";
+    font-family: 'Funnel Display', 'Noto Sans', sans-serif;
     font-weight: 700;
     border-radius: 4px;
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     padding: 0.25rem 0.5rem;
     color: inherit;
     width: auto;
@@ -93,17 +133,7 @@
     z-index: 1;
 }
 
-.logo-text {
-    transition-duration: nav.$layout-transition-speed;
-    color: nav.$text-color;
-    font-family: "Montserrat";
-    font-size: 1.875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    overflow: visible;
-    white-space: nowrap;
-    width: 100%;
-}
+/* .logo-text is defined above alongside the Figma branding block */
 
 .nav-menu-content {
     position: absolute;

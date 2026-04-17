@@ -1,0 +1,621 @@
+import React from 'react';
+import { styled } from 'styled-components';
+import bgPattern from '../../assets/img/background.svg?url';
+
+// ── Figma Assets ──────────────────────────────────────────────────────────
+const RULER_HERO    = 'https://www.figma.com/api/mcp/asset/b426b84f-2581-4ff9-a424-ceec5398c918';
+const RULER_SECTION = 'https://www.figma.com/api/mcp/asset/654fb1de-c65d-4527-b4d9-0ad91b65b34a';
+const HERO_DECO     = 'https://www.figma.com/api/mcp/asset/366c8e9b-0c94-4167-934e-fb6eff4d35f9';
+
+// ── Design tokens ─────────────────────────────────────────────────────────
+const C = {
+  navy:      '#111c36',
+  navyMid:   '#2d4a80',
+  navyLight: '#31519c',
+  red:       '#a51c1c',
+  redLight:  'rgba(165,28,28,0.15)',
+  blueLight: 'rgba(45,74,128,0.15)',
+  slate:     '#64748b',
+  lightBlue: '#bac8db',
+  divider:   '#e2e8f0',
+};
+
+// ── Data ──────────────────────────────────────────────────────────────────
+
+const PRICING = [
+  {
+    title: 'Filament',
+    rows: [
+      { mat: 'PLA',  price: '$0.06', unit: '/gram' },
+      { mat: 'PETG', price: '$0.09', unit: '/gram' },
+      { mat: 'TPU',  price: '$0.09', unit: '/gram' },
+    ],
+  },
+  {
+    title: 'Resin',
+    rows: [
+      { mat: 'Clear', price: '$0.18', unit: '/mL' },
+      { mat: 'Grey',  price: '$0.18', unit: '/mL' },
+    ],
+  },
+  {
+    title: 'Vinyl',
+    rows: [
+      { mat: 'Standard',    price: '$0.20', unit: '/in' },
+      { mat: 'Holographic', price: '$0.20', unit: '/in' },
+      { mat: 'Ink',         price: '$2.00', unit: '/cc' },
+    ],
+  },
+];
+
+const MACHINE_RULES = [
+  {
+    label:    'FDM 3D Printing',
+    title:    'Filament rules & recommendations',
+    subtitle: 'Make sure to check the banned filaments',
+    banned: [
+      { header: 'NOT ALLOWED', sub: 'Banned material types', items: ['Particulate filaments','Wood','Fiber Additives','Metal','Marble Silk','PLA Pro','Ultra & Super variants','etc.'] },
+      { header: 'NOT ALLOWED', sub: 'Banned brands',         items: ['Elegoo','Sunlu','GeeeTech','XYZPrinting','Ender','Amazon Basics','Generic + No Names','Unnamed + Blank Spools'] },
+    ],
+    allowed: [
+      { header: 'RECOMMENDED', sub: 'Filaments we trust', items: ['Prusament','Polar','Polymaker','InLand','Jessie','Printed Solid','Overture','Hatchbox'] },
+    ],
+  },
+  {
+    label:    'Laser Cutter',
+    title:    'Laser Cutter',
+    subtitle: "Materials you can and can't use",
+    banned: [
+      { header: 'NOT ALLOWED', sub: 'Banned materials', items: ['Pressure treated wood','Corrugated cardboard','PVC','Vinyl','ABS','Materials containing chlorine/halogen'] },
+    ],
+    allowed: [
+      { header: 'ALLOWED', sub: 'Approved materials', items: ['Wood','MDF','Taskboard','Cardboard','Acrylic','Polystyrene','Polyethylene','Polypropylene','Butyl rubber'] },
+    ],
+  },
+  {
+    label:    'Vinyl/Sticker Printer',
+    title:    'Vinyl/Sticker Printer',
+    subtitle: "Materials you can and can't use",
+    banned: [
+      { header: 'NOT ALLOWED', sub: 'Banned', items: ['Over 24 inches wide'] },
+    ],
+    allowed: [
+      { header: 'RECOMMENDED', sub: 'Allowed', items: ['Glossy Vinyl','Matte Vinyl','Clear Glossy','Clear Matte','Holographic','Heat Transfer','Banner Cloth','Oracle 3651'] },
+    ],
+  },
+];
+
+// =============================================================================
+// Styled components
+// =============================================================================
+
+const PageWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  overflow-x: hidden;
+`;
+
+// ── Hero ──────────────────────────────────────────────────────────────────
+
+const HeroSection = styled.section`
+  position: relative;
+  width: 100%;
+  min-height: 362px;
+  background: linear-gradient(to right, #2d0707, ${C.red});
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+`;
+
+const RulerStrip = styled.div<{ $url: string }>`
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 79px;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 5000px;
+    height: 79px;
+    left: calc(50% - 2500px);
+    top: calc(50% - 39.5px);
+    transform: rotate(-90deg) scaleY(-1);
+    transform-origin: center center;
+    background-image: url(${p => p.$url});
+    background-size: 750px 79px;
+    background-repeat: repeat-x;
+  }
+`;
+
+const HeroDecoWrap = styled.div`
+  position: absolute;
+  right: 100px;
+  top: 23px;
+  width: 550px;
+  height: 310px;
+  transform: rotate(180deg) scaleY(-1);
+  overflow: hidden;
+  pointer-events: none;
+
+  img {
+    position: absolute;
+    width: 122.18%;
+    height: 216.89%;
+    left: -3.51%;
+    top: -4.18%;
+    max-width: none;
+    object-fit: cover;
+  }
+`;
+
+const HeroInner = styled.div`
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 60px 174px 60px 127px;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: 1024px) { padding: 60px 80px; }
+  @media (max-width: 640px)  { padding: 48px 24px; }
+`;
+
+const HeroTitle = styled.h1`
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(48px, 6vw, 75px);
+  color: #fff;
+  line-height: 1.25;
+  margin: 0 0 16px 0;
+`;
+
+const HeroSubtitle = styled.p`
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(18px, 2.2vw, 32px);
+  color: ${C.lightBlue};
+  line-height: 1.25;
+  max-width: 680px;
+  margin: 0;
+`;
+
+// ── Content section ───────────────────────────────────────────────────────
+
+// SectionRuler reuses RulerStrip — defined above
+
+const ContentSection = styled.section`
+  position: relative;
+  width: 100%;
+  background: #fff;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url(${bgPattern});
+    background-repeat: repeat;
+    background-size: 122px 140px;
+    opacity: 0.05;
+    pointer-events: none;
+  }
+`;
+
+const SectionInner = styled.div`
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 64px 120px 80px 174px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+
+  @media (max-width: 1024px) { padding: 48px 60px 64px 80px; }
+  @media (max-width: 640px)  { padding: 40px 24px 56px 24px; }
+`;
+
+// ── Pricing ───────────────────────────────────────────────────────────────
+
+const PricingSectionTitle = styled.h2`
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(32px, 3vw, 48px);
+  color: ${C.red};
+  margin: 0 0 6px 0;
+`;
+
+const PricingSectionSub = styled.p`
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  color: ${C.slate};
+  letter-spacing: 1.12px;
+  margin: 0 0 28px 0;
+  max-width: 588px;
+`;
+
+const PricingGrid = styled.div`
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+`;
+
+const PricingCard = styled.div`
+  flex: 1 1 280px;
+  max-width: 352px;
+  border: 1px solid ${C.navyLight};
+  border-radius: 5px;
+  background: #fff;
+  overflow: hidden;
+`;
+
+const PricingCardHeader = styled.div`
+  padding: 14px 24px 10px;
+  border-bottom: 1px solid ${C.divider};
+`;
+
+const PricingCardTitle = styled.p`
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: ${C.navy};
+  letter-spacing: 1.68px;
+  margin: 0;
+`;
+
+const PricingRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  border-bottom: 1px solid ${C.divider};
+  &:last-child { border-bottom: none; }
+`;
+
+const PricingMat = styled.span`
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 19px;
+  color: ${C.slate};
+  letter-spacing: 1.4px;
+`;
+
+const PricingAmt = styled.span`
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  color: ${C.navyMid};
+`;
+
+const PricingUnit = styled.span`
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 14px;
+  color: ${C.slate};
+`;
+
+// ── Machine rules ─────────────────────────────────────────────────────────
+
+const MachineBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const MachineLabel = styled.p`
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: ${C.red};
+  letter-spacing: 1.12px;
+  margin: 0;
+`;
+
+const MachineTitle = styled.h3`
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(28px, 3vw, 48px);
+  color: ${C.navy};
+  letter-spacing: 2px;
+  margin: 0;
+`;
+
+const MachineSubtitle = styled.p`
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: ${C.slate};
+  letter-spacing: 1.4px;
+  margin: 0;
+`;
+
+const RulesPanelRow = styled.div`
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+`;
+
+const RulePanel = styled.div<{ variant: 'banned' | 'allowed' }>`
+  flex: 1 1 280px;
+  border-left: 2px solid ${p => p.variant === 'banned' ? C.red : C.navyMid};
+  background: ${p => p.variant === 'banned' ? C.redLight : C.blueLight};
+  border-radius: 0 5px 5px 0;
+  overflow: hidden;
+`;
+
+const RulePanelTop = styled.div`
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+const RuleBadge = styled.div<{ variant: 'banned' | 'allowed' }>`
+  background: ${p => p.variant === 'banned' ? C.red : C.navyMid};
+  padding: 6px 12px;
+  border-radius: 2px;
+
+  span {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 14px;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+`;
+
+const RuleBadgeSub = styled.p<{ variant: 'banned' | 'allowed' }>`
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  color: ${p => p.variant === 'banned' ? C.red : C.navyMid};
+  letter-spacing: 1px;
+  margin: 0;
+`;
+
+const RuleList = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 8px 16px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const RuleListItem = styled.li<{ variant: 'banned' | 'allowed' }>`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  color: ${C.navy};
+  letter-spacing: 1px;
+
+  &::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: ${p => p.variant === 'banned' ? C.red : C.navyMid};
+  }
+`;
+// ── Info Box (for special notes like Resin Printer) ──────────────────────
+
+const InfoBoxSection = styled.div`
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+  padding: 0;
+`;
+
+const InfoBoxLeft = styled.div`
+  flex: 0 0 auto;
+  max-width: 320px;
+`;
+
+const InfoBoxLeftTitle = styled.h3`
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(24px, 3vw, 42px);
+  color: ${C.navy};
+  letter-spacing: 1px;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+`;
+
+const InfoBoxLeftSubtitle = styled.p`
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 16px;
+  color: ${C.slate};
+  letter-spacing: 0.5px;
+  margin: 0;
+  line-height: 1.6;
+`;
+
+const InfoBox = styled.div`
+  flex: 1;
+  border-left: 4px solid ${C.red};
+  background: ${C.redLight};
+  border-radius: 0 6px 6px 0;
+  padding: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+`;
+
+const InfoBoxIcon = styled.div`
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: ${C.red};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 24px;
+`;
+
+const InfoBoxContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const InfoBoxTitle = styled.h4`
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: ${C.red};
+  letter-spacing: 1px;
+  margin: 0;
+`;
+
+const InfoBoxText = styled.p`
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 15px;
+  color: ${C.navy};
+  letter-spacing: 0.5px;
+  margin: 0;
+  line-height: 1.6;
+`;
+
+// Add this data object at the top with your other data
+const RESIN_INFO = {
+  title: 'Resin Printer',
+  subtitle: 'Please read the information regarding printing with resin',
+  boxTitle: 'Important Information on Resin',
+  boxText: 'You cannot bring your own resin to The Forge. All resin printing must use materials stocked and approved by staff. This ensures machine compatibility and keeps our printers in good condition for everyone.',
+};
+
+// ... rest of your styled components ...
+
+export default function Materials() {
+  return (
+    <PageWrapper>
+
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <HeroSection>
+        <RulerStrip $url={RULER_HERO} />
+        <HeroDecoWrap>
+          <img src={HERO_DECO} alt="" aria-hidden="true" />
+        </HeroDecoWrap>
+        <HeroInner>
+          <HeroTitle>Material Information</HeroTitle>
+          <HeroSubtitle>
+            Pricing, filament rules, laser cutter materials, and more.
+          </HeroSubtitle>
+        </HeroInner>
+      </HeroSection>
+
+      {/* ── Content ──────────────────────────────────────────────────────── */}
+      <ContentSection>
+        <RulerStrip $url={RULER_SECTION} />
+        <SectionInner>
+
+          {/* Pricing */}
+          <div>
+            <PricingSectionTitle>Material Pricing</PricingSectionTitle>
+            <PricingSectionSub>
+              We stock everything you need. Pay only for what you use — priced per gram, mL, or inch
+              depending on the material. Before you come to the space check out the{' '}
+              <strong style={{ fontWeight: 800, color: C.red }}>banned filaments section below.</strong>
+            </PricingSectionSub>
+            <PricingGrid>
+              {PRICING.map(card => (
+                <PricingCard key={card.title}>
+                  <PricingCardHeader>
+                    <PricingCardTitle>{card.title}</PricingCardTitle>
+                  </PricingCardHeader>
+                  {card.rows.map(row => (
+                    <PricingRow key={row.mat}>
+                      <PricingMat>{row.mat}</PricingMat>
+                      <span>
+                        <PricingAmt>{row.price}</PricingAmt>
+                        <PricingUnit>{row.unit}</PricingUnit>
+                      </span>
+                    </PricingRow>
+                  ))}
+                </PricingCard>
+              ))}
+            </PricingGrid>
+          </div>
+          
+          {/* Machine rules */}
+          {MACHINE_RULES.map((machine, index) => (
+            <React.Fragment key={machine.title}>
+              <MachineBlock>
+                <MachineLabel>{machine.label}</MachineLabel>
+                <MachineTitle>{machine.title}</MachineTitle>
+                <MachineSubtitle>{machine.subtitle}</MachineSubtitle>
+                
+                <RulesPanelRow>
+                  {machine.banned.map(panel => (
+                    <RulePanel key={panel.sub} variant="banned">
+                      <RulePanelTop>
+                        <RuleBadge variant="banned"><span>{panel.header}</span></RuleBadge>
+                        <RuleBadgeSub variant="banned">{panel.sub}</RuleBadgeSub>
+                      </RulePanelTop>
+                      <RuleList>
+                        {panel.items.map(item => (
+                          <RuleListItem key={item} variant="banned">{item}</RuleListItem>
+                        ))}
+                      </RuleList>
+                    </RulePanel>
+                  ))}
+                  
+                  {machine.allowed.map(panel => (
+                    <RulePanel key={panel.sub} variant="allowed">
+                      <RulePanelTop>
+                        <RuleBadge variant="allowed"><span>{panel.header}</span></RuleBadge>
+                        <RuleBadgeSub variant="allowed">{panel.sub}</RuleBadgeSub>
+                      </RulePanelTop>
+                      <RuleList>
+                        {panel.items.map(item => (
+                          <RuleListItem key={item} variant="allowed">{item}</RuleListItem>
+                        ))}
+                      </RuleList>
+                    </RulePanel>
+                  ))}
+                </RulesPanelRow>
+              </MachineBlock>
+
+              {/* Resin Printer Info Box - appears after Laser Cutter (index 1) */}
+              {index === 1 && (
+                <InfoBoxSection>
+                  <InfoBoxLeft>
+                    <InfoBoxLeftTitle>{RESIN_INFO.title}</InfoBoxLeftTitle>
+                    <InfoBoxLeftSubtitle>{RESIN_INFO.subtitle}</InfoBoxLeftSubtitle>
+                  </InfoBoxLeft>
+                  <InfoBox>
+                    <InfoBoxIcon>!</InfoBoxIcon>
+                    <InfoBoxContent>
+                      <InfoBoxTitle>{RESIN_INFO.boxTitle}</InfoBoxTitle>
+                      <InfoBoxText>{RESIN_INFO.boxText}</InfoBoxText>
+                    </InfoBoxContent>
+                  </InfoBox>
+                </InfoBoxSection>
+              )}
+            </React.Fragment>
+          ))}
+
+        </SectionInner>
+      </ContentSection>
+
+    </PageWrapper>
+  );
+}

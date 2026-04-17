@@ -1,14 +1,16 @@
+@use './styles/globals.scss';
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    overflow: hidden;
 }
 
 html, body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     min-height: 100vh;
     position: relative;
+    overflow-x: hidden;
 }
 
 button {
@@ -16,8 +18,8 @@ button {
 }
 
 #root {
-    height: 100vh;
-    width: 100vw;
+    min-height: 100vh;
+    width: 100%;
     display: flex;
     flex-direction: column;
     position: relative;

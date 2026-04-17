@@ -1,56 +1,91 @@
 import React from 'react';
 import { styled } from 'styled-components';
-import { InstagramLogoIcon, EnvelopeOpenIcon } from '@radix-ui/react-icons';
-import { ReactComponent as FacebookLogoIcon } from 'src/assets/img/nav-icon2.svg';
 
-const Container = styled.div`
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    padding-bottom: 15px;
-    padding-right: 50px;
+// ---------------------------------------------------------------------------
+// Styled components — matching the Figma "The Forge | The MILL" footer design
+// ---------------------------------------------------------------------------
+
+const FooterContainer = styled.footer`
+    position: relative;
+    width: 100%;
+    min-height: 100px;
+    background: #111c36;
     display: flex;
-    flex-direction: row;
-
-    @media (max-width: 450px) {
-        display: none;
-    }
-`;
-
-const IconContainer = styled.a`
-    margin: 0 0.25rem;
-    cursor: pointer;
-    color: #000;
-    background-color: transparent;
-    width: fit-content;
-    height: fit-content;
-    display: flex;
-    line-height: 0;
-    justify-content: center;
     align-items: center;
-
-    svg {
-        width: 30px;
-        height: 30px;
+    flex-shrink: 0;
+    /* Red top accent bar */
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: #a51c1c;
+        flex: 1;
     }
 `;
 
+const FooterLeft = styled.div`
+    display: flex;
+    flex-direction: column;
+    padding: 28px 0 24px 40px;
+`;
 
+const FooterTitle = styled.p`
+    font-family: 'Familjen Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #ffffff;
+    white-space: nowrap;
+    margin: 0 0 4px 0;
+`;
 
+const FooterAddress = styled.div`
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    color: #4a6080;
+    line-height: 1.7;
+
+    p { margin: 0; }
+`;
+
+const FooterRight = styled.div`
+    margin-left: auto;
+    padding-right: 40px;
+`;
+
+const FooterUrl = styled.a`
+    font-family: 'Familjen Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    color: #4a6080;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover { color: #a51c1c; }
+`;
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
 export default function Footer() {
-
     return (
-        <Container>
-            <IconContainer href="https://www.facebook.com/RPIMakerSpace/" target='_blank'>
-                <FacebookLogoIcon />
-            </IconContainer>
-            <IconContainer href="https://www.instagram.com/the_forge_rpi/" target='_blank'>
-                <InstagramLogoIcon />
-            </IconContainer>
-            <IconContainer href="mailto:theforge@rpi.edu" target='_blank'>
-                <EnvelopeOpenIcon />
-            </IconContainer>
-        </Container>
+        <FooterContainer>
+            <FooterLeft>
+                <FooterTitle>THE FORGE | The MILL</FooterTitle>
+                <FooterAddress>
+                    <p>Rensselaer Polytechnic Institute · School of Engineering</p>
+                    <p>110 8th St, Troy, NY 12180</p>
+                </FooterAddress>
+            </FooterLeft>
+
+            <FooterRight>
+                <FooterUrl href="https://rpiforge.dev" target="_blank" rel="noopener noreferrer">
+                    rpiforge.dev
+                </FooterUrl>
+            </FooterRight>
+        </FooterContainer>
     );
-    
 }
