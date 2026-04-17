@@ -1,11 +1,16 @@
 import styled from 'styled-components';
 import { grayDark, whiteA } from '@radix-ui/colors';
 
+// Figma design colors (node 97:2663)
+const NAVY = '#111c36';
+const GREEN = '#369c3d';
+
 // Works for 90% of phones (With the settings for background and all that) Has some trouble with tablets
 const mobileBreakpoint = "850px";
 
 /******************************* Prusa Shelf ******************************** */
 export const StatusWrapper = styled.div`
+    grid-area: status;
     flex-direction: column;
     display: flex;
     width: 100%;
@@ -18,21 +23,31 @@ export const StatusWrapper = styled.div`
 `;
 
 export const GridContainer = styled.div`
-    grid-area: status;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
     justify-content: center;
-    align-items: flex-start;
-    column-gap: 10px;
-    overflow: visible;
-    @media screen and (max-width: 850px) {
-    overflow-y: auto;
-    /* ensure padding remains visible on narrow viewports even if global rules exist */
-    padding: 0.5rem 1rem;
-    box-sizing: border-box;
+    align-items: start;
     width: 100%;
-    -webkit-overflow-scrolling: touch;
+    height: 100%;
+    overflow-y: auto;
+    padding: 4px 4px 4px 4px;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: rgba(17, 28, 54, 0.25);
+        border-radius: 4px;
+    }
+
+    @media screen and (max-width: 850px) {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        overflow-y: auto;
+        padding: 0.5rem 1rem;
+        box-sizing: border-box;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
     }
 `;
 
@@ -40,6 +55,7 @@ export const Card = styled.div<{
     $symbol?: string;
     $minimized?: boolean;
     $highlightFailed?: boolean;
+<<<<<<< Updated upstream
     $failed?: boolean;
     progress: number;
 }>`
@@ -85,18 +101,54 @@ export const Card = styled.div<{
 
     @media screen and (max-width: 850px) {
         width: ${({ $minimized }) => ($minimized ? '180px' : '100%')};
+=======
+    progress: number;
+}>`
+    position: relative;
+    background-color: #ffffff;
+    border: 1px solid ${NAVY};
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    min-height: 170px;
+    box-sizing: border-box;
+    box-shadow: ${({ $highlightFailed }) =>
+        $highlightFailed
+            ? '0 0 10px 2px rgba(255,0,0,0.55), 0px 4px 4px 0px rgba(0, 0, 0, 0.25)'
+            : '0px 4px 4px 0px rgba(0, 0, 0, 0.25)'};
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    @media screen and (max-width: 850px) {
+        min-height: 160px;
+>>>>>>> Stashed changes
     }
 `;
 
 export const BigCardAttribute = styled.div`
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
-    align-items: left;
-    gap: 0.25rem;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 5px;
+    width: 100%;
 `;
 
 export const BigCardText = styled.p<{ $minimized?: boolean, $clearable?: boolean }>`
+<<<<<<< Updated upstream
     font-size: ${({ $minimized }) => ($minimized ? '10px' : '12px')};
     font-weight: 700;
     color: #64748b;
@@ -104,8 +156,19 @@ export const BigCardText = styled.p<{ $minimized?: boolean, $clearable?: boolean
     text-transform: uppercase;
     margin: 0;
     line-height: 1.3;
+=======
+    font-family: 'Funnel Display', 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+    text-align: right;
+    margin: 0;
+    white-space: nowrap;
+>>>>>>> Stashed changes
 `;
+
 export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
+<<<<<<< Updated upstream
     font-size: ${({ $minimized }) => ($minimized ? '11px' : '14px')};
     font-weight: 500;
     color: #111c36;
@@ -131,37 +194,63 @@ export const StatusText = styled.p<{ $area?: string, $minimized?: boolean, $clea
     color: #64748b;
     font-weight: 500;
     line-height: 1.3;
+=======
+    font-family: 'Funnel Display', 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #000;
+    text-align: left;
+    flex: 0 0 80px;
+    min-width: 80px;
+    border-bottom: 1px solid #000;
+    padding: 0 4px 2px;
+    min-height: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+`;
+
+export const MachineName = styled.h3<{ $minimized?: boolean, $clearable?: boolean }>`
+    font-family: 'Funnel Display', 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: ${NAVY};
+    text-align: center;
+    margin: 0 0 4px 0;
+    text-transform: none;
+`;
+
+export const StatusText = styled.p<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
+    font-family: 'Funnel Display', 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #000;
+    text-align: center;
+>>>>>>> Stashed changes
     margin: 0;
 `;
 
 export const ProgressBar = styled.div<{$horizontal?: boolean}>`
-    width: 10%;
-    height: 100%;
-    background-color: ${whiteA.whiteA11};
-    border-radius: 1vw;
+    width: 150px;
+    max-width: 100%;
+    height: 15px;
+    background-color: #ffffff;
+    border-radius: 10px;
     border: 1px solid #000;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    align-items: stretch;
     justify-content: flex-start;
-    ${props => props.$horizontal && `
-        width: auto;
-        height: 10%;
-        min-height: 10px;
-        flex-direction: row;
-        justify-content: flex-start;
-    `}
+    overflow: hidden;
+    margin-top: auto;
 `;
 
 export const Progress = styled.div<{ $progress: number, $horizontal?: boolean }>`
-    width: 100%;
-    height: ${props => props.$progress}%;
-    background-color: green;
-    border-radius: 1vw;
-    ${props => props.$horizontal && `
-        width: ${props.$progress}%;
-        height: 10%;
-    `}
+    height: 100%;
+    width: ${props => Math.max(8, props.$progress)}%;
+    background-color: ${GREEN};
+    border-radius: 10px;
+    transition: width 0.3s ease;
 `;
 
 /******************************* Other Machines ******************************** */

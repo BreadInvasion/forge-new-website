@@ -93,7 +93,6 @@ const CalendarCard = styled.div`
 
   @media (max-width: 768px) {
     height: 500px;
-    width: calc(100% - 40px);
   }
 `;
 

@@ -3,9 +3,12 @@ import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
 
 // ── Figma Assets ──────────────────────────────────────────────────────────
-const RULER_HERO    = 'https://www.figma.com/api/mcp/asset/b426b84f-2581-4ff9-a424-ceec5398c918';
-const RULER_SECTION = 'https://www.figma.com/api/mcp/asset/654fb1de-c65d-4527-b4d9-0ad91b65b34a';
-const HERO_DECO     = 'https://www.figma.com/api/mcp/asset/366c8e9b-0c94-4167-934e-fb6eff4d35f9';
+// Ruler images — three variants, alternated between sections so consecutive
+// sections never show the same pattern (matches the Create/GettingStarted page).
+const RULER_1   = 'https://www.figma.com/api/mcp/asset/c96236fb-9208-4949-9a04-e9e32cf364fe';
+const RULER_2   = 'https://www.figma.com/api/mcp/asset/7c80f8d8-834a-4822-b125-67a1c47398d7';
+const RULER_3   = 'https://www.figma.com/api/mcp/asset/be993c25-e7d4-4f74-bebf-6dfba428cb75';
+const HERO_DECO = 'https://www.figma.com/api/mcp/asset/366c8e9b-0c94-4167-934e-fb6eff4d35f9';
 
 // ── Design tokens ─────────────────────────────────────────────────────────
 const C = {
@@ -18,6 +21,9 @@ const C = {
   slate:     '#64748b',
   lightBlue: '#bac8db',
   divider:   '#e2e8f0',
+  // Alternating section backgrounds (matches the Create/GettingStarted page)
+  bgWhite:   '#ffffff',
+  bgLight:   '#eef2f8',
 };
 
 // ── Data ──────────────────────────────────────────────────────────────────
@@ -110,28 +116,37 @@ const HeroSection = styled.section`
   align-items: center;
 `;
 
-const RulerStrip = styled.div<{ $url: string }>`
+/**
+ * Vertical ruler decoration. A single 750px image is centered vertically
+ * inside a 79px-wide strip and clipped by the parent section's
+ * `overflow: hidden`. Each section renders its OWN ruler, so consecutive
+ * sections never visually collide — matching the Create/GettingStarted page.
+ *
+ * Flip logic:
+ *   - $side="left"  → rotate(-90deg) scaleY(-1)   (tick marks face inward / right)
+ *   - $side="right" → rotate( 90deg) scaleY(-1)   (tick marks face inward / left)
+ */
+const RulerStrip = styled.div<{ $side?: 'left' | 'right' }>`
   position: absolute;
-  left: -1px;
-  top: 0;
+  ${p => p.$side === 'right' ? 'right: -1px;' : 'left: -1px;'}
+  top: 50%;
+  transform: translateY(-50%);
   width: 79px;
-  height: 100%;
-  overflow: hidden;
+  height: 750px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
   z-index: 0;
 
-  &::after {
-    content: '';
-    position: absolute;
-    width: 5000px;
+  img {
+    width: 750px;
     height: 79px;
-    left: calc(50% - 2500px);
-    top: calc(50% - 39.5px);
-    transform: rotate(-90deg) scaleY(-1);
-    transform-origin: center center;
-    background-image: url(${p => p.$url});
-    background-size: 750px 79px;
-    background-repeat: repeat-x;
+    object-fit: fill;
+    flex-shrink: 0;
+    transform: ${p => p.$side === 'right'
+      ? 'rotate(90deg) scaleY(-1)'
+      : 'rotate(-90deg) scaleY(-1)'};
   }
 `;
 
@@ -191,10 +206,10 @@ const HeroSubtitle = styled.p`
 
 // SectionRuler reuses RulerStrip — defined above
 
-const ContentSection = styled.section`
+const ContentSection = styled.section<{ $bg?: 'white' | 'light' }>`
   position: relative;
   width: 100%;
-  background: #fff;
+  background: ${p => p.$bg === 'light' ? C.bgLight : C.bgWhite};
   overflow: hidden;
 
   &::before {
@@ -212,15 +227,16 @@ const ContentSection = styled.section`
 const SectionInner = styled.div`
   max-width: 1440px;
   margin: 0 auto;
-  padding: 64px 120px 80px 174px;
+  /* leave room on the right for the ruler strip (79px wide) */
+  padding: 64px 174px 80px 120px;
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 56px;
+  gap: 40px;
 
-  @media (max-width: 1024px) { padding: 48px 60px 64px 80px; }
-  @media (max-width: 640px)  { padding: 40px 24px 56px 24px; }
+  @media (max-width: 1024px) { padding: 48px 100px 64px 60px; }
+  @media (max-width: 640px)  { padding: 40px 40px 56px 24px; }
 `;
 
 // ── Pricing ───────────────────────────────────────────────────────────────
@@ -350,6 +366,14 @@ const RulePanel = styled.div<{ variant: 'banned' | 'allowed' }>`
   background: ${p => p.variant === 'banned' ? C.redLight : C.blueLight};
   border-radius: 0 5px 5px 0;
   overflow: hidden;
+  /* frosted/blurred effect */
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px ${p => p.variant === 'banned'
+      ? 'rgba(165, 28, 28, 0.18)'
+      : 'rgba(45, 74, 128, 0.18)'};
 `;
 
 const RulePanelTop = styled.div`
@@ -510,7 +534,9 @@ export default function Materials() {
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <HeroSection>
-        <RulerStrip $url={RULER_HERO} />
+        <RulerStrip $side="right">
+          <img src={RULER_1} alt="" aria-hidden="true" />
+        </RulerStrip>
         <HeroDecoWrap>
           <img src={HERO_DECO} alt="" aria-hidden="true" />
         </HeroDecoWrap>
@@ -522,12 +548,12 @@ export default function Materials() {
         </HeroInner>
       </HeroSection>
 
-      {/* ── Content ──────────────────────────────────────────────────────── */}
-      <ContentSection>
-        <RulerStrip $url={RULER_SECTION} />
+      {/* ── Pricing section (white) ──────────────────────────────────────── */}
+      <ContentSection $bg="white">
+        <RulerStrip $side="right">
+          <img src={RULER_2} alt="" aria-hidden="true" />
+        </RulerStrip>
         <SectionInner>
-
-          {/* Pricing */}
           <div>
             <PricingSectionTitle>Material Pricing</PricingSectionTitle>
             <PricingSectionSub>
@@ -554,15 +580,33 @@ export default function Materials() {
               ))}
             </PricingGrid>
           </div>
-          
-          {/* Machine rules */}
-          {MACHINE_RULES.map((machine, index) => (
-            <React.Fragment key={machine.title}>
+        </SectionInner>
+      </ContentSection>
+
+      {/* ── Machine rule sections (each in its own container) ───────────── */}
+      {MACHINE_RULES.map((machine, index) => {
+        // Alternate ruler images so consecutive sections never repeat the same pattern.
+        // Machine sections start at index 0 (FDM) → RULER_3, (Laser) → RULER_2, (Vinyl) → RULER_3.
+        const machineRuler = index % 2 === 0 ? RULER_3 : RULER_2;
+        // Background alternation across ALL sections (Pricing, FDM, Laser, Resin, Vinyl).
+        // Pricing is white; the Resin info block (inserted after Laser) takes the "light"
+        // slot between Laser and Vinyl — so Vinyl at idx 2 flips back to white to keep
+        // the stripe cadence going.
+        //   FDM (idx 0) → light, Laser (idx 1) → white, Vinyl (idx 2) → white
+        const machineBg: 'white' | 'light' =
+          (['light', 'white', 'white'] as const)[index];
+        return (
+        <React.Fragment key={machine.title}>
+          <ContentSection $bg={machineBg}>
+            <RulerStrip $side="right">
+              <img src={machineRuler} alt="" aria-hidden="true" />
+            </RulerStrip>
+            <SectionInner>
               <MachineBlock>
                 <MachineLabel>{machine.label}</MachineLabel>
                 <MachineTitle>{machine.title}</MachineTitle>
                 <MachineSubtitle>{machine.subtitle}</MachineSubtitle>
-                
+
                 <RulesPanelRow>
                   {machine.banned.map(panel => (
                     <RulePanel key={panel.sub} variant="banned">
@@ -577,7 +621,7 @@ export default function Materials() {
                       </RuleList>
                     </RulePanel>
                   ))}
-                  
+
                   {machine.allowed.map(panel => (
                     <RulePanel key={panel.sub} variant="allowed">
                       <RulePanelTop>
@@ -593,9 +637,17 @@ export default function Materials() {
                   ))}
                 </RulesPanelRow>
               </MachineBlock>
+            </SectionInner>
+          </ContentSection>
 
-              {/* Resin Printer Info Box - appears after Laser Cutter (index 1) */}
-              {index === 1 && (
+          {/* Resin Printer Info Box — its own container, rendered after the
+              Laser Cutter section (index 1). Uses the blue ruler (RULER_2). */}
+          {index === 1 && (
+            <ContentSection $bg="light">
+              <RulerStrip $side="right">
+                <img src={RULER_2} alt="" aria-hidden="true" />
+              </RulerStrip>
+              <SectionInner>
                 <InfoBoxSection>
                   <InfoBoxLeft>
                     <InfoBoxLeftTitle>{RESIN_INFO.title}</InfoBoxLeftTitle>
@@ -609,12 +661,12 @@ export default function Materials() {
                     </InfoBoxContent>
                   </InfoBox>
                 </InfoBoxSection>
-              )}
-            </React.Fragment>
-          ))}
-
-        </SectionInner>
-      </ContentSection>
+              </SectionInner>
+            </ContentSection>
+          )}
+        </React.Fragment>
+        );
+      })}
 
     </PageWrapper>
   );

@@ -34,4 +34,5 @@
         "src/svg.d.ts",
         "src/components/MyForge/MyForge.tsx"
     ],
+    
 }

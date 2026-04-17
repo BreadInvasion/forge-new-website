@@ -14,12 +14,16 @@ const RULER_IMG  = 'https://www.figma.com/api/mcp/asset/6ec9052a-dfc2-46ee-946b-
 // Styled components
 // ---------------------------------------------------------------------------
 
-/** Scrollable page wrapper that fills the remaining height below the NavBar */
+/** Page wrapper that fills the viewport height minus NavBar and Footer.
+ *  NavBar max-height = 72px, Footer min-height = 100px. */
 const PageWrapper = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
-    overflow-x: hidden;
+    height: calc(100vh - 72px - 100px);
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
 `;
 
 // ── Hero ────────────────────────────────────────────────────────────────────
@@ -27,20 +31,20 @@ const PageWrapper = styled.div`
 const HeroSection = styled.section`
     position: relative;
     width: 100%;
-    min-height: 826px;
+    flex: 1 1 auto;
+    min-height: 0;
     background: linear-gradient(to right, #2d4a80 10%, #a51c1c 100%);
     overflow: hidden;
-    flex-shrink: 0;
 `;
 
-/** Vertical ruler along the left edge */
+/** Vertical ruler along the left edge — sized to viewport height. */
 const RulerWrap = styled.div`
     position: absolute;
     left: -3px;
     top: 50%;
     transform: translateY(-50%);
     width: 70px;
-    height: 850px;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -49,7 +53,7 @@ const RulerWrap = styled.div`
 
     img {
         transform: rotate(-90deg) scaleY(-1);
-        width: 850px;
+        width: calc(100vh - 72px - 100px - 91px);
         height: 70px;
         object-fit: fill;
         flex-shrink: 0;
@@ -59,18 +63,18 @@ const RulerWrap = styled.div`
 /** "Build. Create. Invent." block */
 const HeroTextBlock = styled.div`
     position: absolute;
-    left: 127px;
+    left: clamp(80px, 9vw, 127px);
     top: 50%;
-    transform: translateY(calc(-50% - 126.5px));
-    width: 477px;
+    transform: translateY(calc(-50% - 10vh));
+    width: min(477px, 45%);
     z-index: 2;
 `;
 
 const HeroTitle = styled.h1`
     font-family: 'Funnel Display', sans-serif;
     font-weight: 700;
-    font-size: clamp(60px, 7vw, 100px);
-    line-height: 1.25;
+    font-size: clamp(40px, 9vh, 100px);
+    line-height: 1.15;
     color: #ffffff;
     white-space: pre;
     margin: 0;
@@ -79,14 +83,14 @@ const HeroTitle = styled.h1`
 /** Services list beneath the title */
 const HeroServices = styled.p`
     position: absolute;
-    left: 127px;
-    top: calc(50% + 220px);
+    left: clamp(80px, 9vw, 127px);
+    top: calc(50% + 22vh);
     transform: translateY(-50%);
     font-family: 'Funnel Display', sans-serif;
     font-weight: 700;
-    font-size: clamp(22px, 2.5vw, 35px);
+    font-size: clamp(16px, 3vh, 35px);
     color: #ffffff;
-    line-height: normal;
+    line-height: 1.3;
     margin: 0;
     white-space: pre;
     z-index: 2;
@@ -98,14 +102,13 @@ const HeroImagePanel = styled.div`
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 920px;
-    height: 792px;
+    width: min(920px, 60%);
+    height: 100%;
     /* make sure it sits behind text */
     z-index: 0;
 
     img {
         position: absolute;
-        /* Figma framing offsets */
         height: 103.28%;
         left: -58.18%;
         top: -2.27%;
@@ -120,7 +123,7 @@ const HeroImagePanel = styled.div`
 const InfoBar = styled.div`
     position: relative;
     width: 100%;
-    height: 91px;
+    height: clamp(70px, 10vh, 91px);
     background: #ffffff;
     flex-shrink: 0;
     display: flex;
@@ -155,12 +158,12 @@ const MembershipText = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 20px 0 100px;
+    padding: 0 20px 0 clamp(40px, 8vw, 100px);
 
     p {
         font-family: 'Funnel Display', sans-serif;
         font-weight: 700;
-        font-size: clamp(22px, 3.5vw, 50px);
+        font-size: clamp(18px, 3vw, 50px);
         color: #111c36;
         text-align: center;
         white-space: nowrap;
@@ -170,9 +173,9 @@ const MembershipText = styled.div`
 
 const GetStartedButton = styled(Link)`
     flex-shrink: 0;
-    margin-right: 80px;
-    width: 260px;
-    height: 50px;
+    margin-right: clamp(24px, 6vw, 80px);
+    width: clamp(160px, 20vw, 260px);
+    height: clamp(36px, 6vh, 50px);
     background: #a51c1c;
     border: 2px solid #111c36;
     border-radius: 10px;
@@ -189,7 +192,7 @@ const GetStartedButton = styled(Link)`
     span {
         font-family: 'Funnel Display', sans-serif;
         font-weight: 600;
-        font-size: 30px;
+        font-size: clamp(16px, 2.2vw, 30px);
         color: #ffffff;
     }
 `;
