@@ -52,9 +52,6 @@ const UserMenu: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
                     {user.RCSID} <CaretDownIcon className="caret-down dropdown-spinner" aria-hidden />
                 </NavMenu.Trigger>
                 <NavMenu.Content className="user-content">
-                    <NavMenu.Link className="link" href="/myforge/create">Create</NavMenu.Link>
-                    <NavMenu.Link className="link" href="/myforge">Summary</NavMenu.Link>
-                    <NavMenu.Link className="link" href="/myforge/usages">Usages</NavMenu.Link>
                     <NavMenu.Link className="link" href="/" onSelect={() => onSignOut()}>Logout</NavMenu.Link>
                 </NavMenu.Content>
             </NavMenu.Item>

@@ -1,140 +1,443 @@
-@use "./UserMenu.variables.scss" as um;
+// =============================================================================
+// My Dashboard — member / volunteer landing page
+// =============================================================================
+// Shared layout. The Failure Form button is rendered conditionally in the TSX
+// based on the CAN_FAIL_MACHINES permission so the same component covers both
+// the Member and Volunteer Figma frames.
+// =============================================================================
 
-.mf-grid-container {
+.dashboard {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+    font-family: var(--font-body), 'Inter', sans-serif;
+    color: var(--color-navy);
     display: flex;
-    flex-grow: 1;
-    height: 100%;
-    width: 100%;
-    background-color: um.$gray-background;
-}
-
-.mf-grid {
-    height: 100%;
-    width: 100%;
-    gap: 10px;
-    padding: 1rem;
-
-    // display: grid;
-    // grid-auto-columns: 1fr;
-    // grid-auto-rows: 1fr;
-    // grid-template-areas:
-    //     "cost current current current"
-    //     "machines machines usages usages"
-    //     "machines machines usages usages"
-    //     "join join usages usages";
-}
-
-.mf-component {
-    display: flex;
-    width: 100%;
-    height: 100%;
     flex-direction: column;
-    padding: 1rem;
-    background-color: um.$white-background;
-    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
+    gap: 56px;
 }
 
-.mf-list {
-    gap: 1rem;
-    overflow-y: auto;
-}
-
-.mf-list h1 {
-    font-size: 2rem;
-    font-weight: 500;
-    margin-bottom: 1rem;
-    margin-inline: auto;
-}
-
-.mf-display {
-    justify-content: center;
-    align-items: center;
-    
-}
-.mf-display h1 {
-    font-weight: 500;
-}
-
-.mf-chart h1 {
-    font-weight: 500;
-    margin-bottom: 1rem;
-    margin-inline: auto;
-    height: fit-content;
-}
-
-.mf-chart-container {
+// -----------------------------------------------------------------------------
+// Header (title + action buttons)
+// -----------------------------------------------------------------------------
+.dashboard-header {
     display: flex;
     justify-content: space-between;
-    height: 70%;
-    width: 100%;
-    margin-top: 1rem;
+    align-items: flex-start;
+    gap: 24px;
+    flex-wrap: wrap;
 }
 
-.mf-chart-legend {
+.dashboard-title {
+    font-family: var(--font-display), 'Funnel Display', sans-serif;
+    font-weight: 700;
+    font-size: 42px;
+    line-height: 1.1;
+    margin: 0;
+    color: var(--color-navy);
+}
+
+.dashboard-welcome {
+    margin: 6px 0 0;
+    color: var(--color-red);
+    font-weight: 600;
+    font-size: 18px;
+    font-family: var(--font-display), 'Funnel Display', sans-serif;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.dash-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 22px;
+    font-family: var(--font-display), 'Funnel Display', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--color-white);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    white-space: nowrap;
+
+    &:hover {
+        transform: translateY(-1px);
+    }
+}
+
+.dash-btn--navy {
+    background-color: var(--color-navy-light);
+
+    &:hover {
+        background-color: var(--color-navy-mid);
+    }
+}
+
+.dash-btn--navy-dark {
+    background-color: var(--color-navy);
+
+    &:hover {
+        background-color: var(--color-navy-mid);
+    }
+}
+
+.dash-btn--red {
+    background-color: var(--color-red);
+
+    &:hover {
+        background-color: var(--color-red-muted);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Stat cards (Semester Cost + Current Session)
+// -----------------------------------------------------------------------------
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 24px;
+
+    @media (max-width: 760px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stat-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 22px 26px;
+    box-shadow: 0 1px 3px rgba(17, 28, 54, 0.04);
     display: flex;
     flex-direction: column;
-    margin-left: 1rem;
-    width: 40%;
-    height: 100%;
-    overflow-y: auto;
+    gap: 10px;
+    min-height: 160px;
 }
 
-
-.mf-chart-legend::-webkit-scrollbar {
-    width: 8px;
+.stat-label {
+    font-family: var(--font-display), 'Funnel Display', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--color-red);
+    text-transform: uppercase;
 }
 
-.mf-chart-legend::-webkit-scrollbar-thumb {
-    background-color: #cccccc;
-    border-radius: 10px;
+.stat-card--cost {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
-.mf-chart-legend::-webkit-scrollbar-thumb:hover {
-    background-color: #888888;
+.stat-value {
+    font-family: var(--font-display), 'Funnel Display', sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+    color: var(--color-navy);
+    line-height: 1;
 }
 
-.mf-chart-legend::-webkit-scrollbar-track {
-    background-color: #f1f1f1;
-    border-radius: 10px;
+.stat-sub {
+    font-size: 14px;
+    color: var(--color-slate);
 }
 
-.mf-chart-legend-item {
+// --- Current Session card ---------------------------------------------------
+.session-head {
     display: flex;
     align-items: center;
-    margin-bottom: 0.5rem;
-    overflow: visible;
+    gap: 10px;
 }
 
-.mf-chart-legend-item h2 {
-    font-size: 1rem;
+.live-badge {
+    background: var(--color-navy);
+    color: var(--color-white);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+}
+
+.session-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.session-machine-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-display), 'Funnel Display', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--color-navy);
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        background: var(--color-navy);
+        border-radius: 50%;
+    }
+}
+
+.session-started {
+    font-size: 13px;
+    color: var(--color-slate);
+    padding-top: 4px;
+}
+
+.session-foot {
+    margin-top: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-divider);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.session-foot-label {
+    font-size: 12px;
+    color: var(--color-slate);
+    margin-bottom: 2px;
+}
+
+.session-foot-value {
+    font-family: var(--font-display), 'Funnel Display', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--color-navy);
+}
+
+.session-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-slate);
+    font-size: 18px;
+    font-weight: 500;
+    padding: 20px 0;
+}
+
+// -----------------------------------------------------------------------------
+// Spending chart section
+// -----------------------------------------------------------------------------
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.section-title {
+    margin: 0;
+    font-family: var(--font-display), 'Funnel Display', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--color-red);
+}
+
+.activity-title {
+    color: var(--color-navy);
+    font-size: 22px;
+}
+
+.section-meta {
+    font-size: 14px;
+    color: var(--color-navy);
+    font-weight: 600;
+}
+
+.spending-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 1px 3px rgba(17, 28, 54, 0.04);
+}
+
+.spending-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.spending-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 80px;
+    gap: 18px;
+    align-items: center;
+}
+
+.spending-label {
+    color: var(--color-red);
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spending-bar-track {
+    display: block;
+    height: 10px;
+    background: var(--color-divider);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.spending-bar-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        var(--color-navy) 0%,
+        var(--color-navy-light) 60%,
+        var(--color-red) 100%
+    );
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.spending-amount {
+    text-align: right;
+    color: var(--color-navy);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.spending-empty {
+    color: var(--color-slate);
+    font-size: 14px;
+    text-align: center;
+    padding: 18px 0;
+}
+
+// -----------------------------------------------------------------------------
+// Recent Activity table
+// -----------------------------------------------------------------------------
+.activity-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--color-navy);
+}
+
+.activity-filter-label {
     font-weight: 500;
 }
 
-.mf-chart-legend-color {
-    width: 1rem;
-    height: 1rem;
-    margin-right: 0.5rem;
+.activity-filter-select {
+    font-family: var(--font-body), 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-white);
+    color: var(--color-navy);
 }
 
-.mf-pie-chart {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
+.activity-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(17, 28, 54, 0.04);
+}
+
+.activity-table {
     width: 100%;
-    flex-shrink: 1;
+    border-collapse: collapse;
+    table-layout: fixed;
 }
 
-.mf-link {
-    justify-content: center;
+.activity-table thead tr {
+    background: var(--color-navy);
+}
+
+.activity-table th {
+    text-align: left;
+    color: var(--color-white);
+    font-family: var(--font-display), 'Funnel Display', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    padding: 14px 24px;
+}
+
+.activity-table td {
+    padding: 16px 24px;
+    font-size: 14px;
+    color: var(--color-navy);
+    border-bottom: 1px solid var(--color-divider);
+}
+
+.activity-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.activity-machine {
+    color: var(--color-red);
+    font-weight: 600;
+}
+
+.activity-empty {
+    text-align: center;
+    color: var(--color-slate);
+    padding: 28px 24px;
+}
+
+.activity-foot {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    color: inherit;
+    padding: 14px 24px;
+    font-size: 13px;
+    color: var(--color-slate);
+    background: var(--color-white);
+    border-top: 1px solid var(--color-divider);
 }
 
-.mf-link a {
-    color: inherit;
-    text-decoration: none;
-    font-size: 2rem;
-    font-weight: 500;
+.activity-pager {
+    display: flex;
+    gap: 6px;
+
+    button {
+        all: unset;
+        cursor: pointer;
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        color: var(--color-navy);
+        font-size: 14px;
+        font-weight: 600;
+        transition: background-color 0.15s ease;
+
+        &:hover:not(:disabled) {
+            background: var(--color-bg-light);
+        }
+
+        &:disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
+    }
 }

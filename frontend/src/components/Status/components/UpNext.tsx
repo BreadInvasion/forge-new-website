@@ -5,7 +5,6 @@ import { OmniAPI } from 'src/apis/OmniAPI';
 import { MachineStatus } from 'src/interfaces';
 import { StatusText, ProgressBar, Progress, BigCardInfo } from '../StatusComponents';
 
-<<<<<<< Updated upstream
 const UpNextContainer = styled.div`
     background: #ffffff;
     border: 1px solid #2d4a80;
@@ -95,106 +94,6 @@ const UserName = styled.p`
 const EstTime = styled(StatusText)`
     font-size: 11px;
     text-align: left;
-=======
-// Figma spec (node 97:2663): navy-bordered "Machines Up Next" panel with
-// navy header bar. Each machine item uses the same white card styling as the
-// main grid's MachineCard.
-
-const NAVY = '#111c36';
-
-const PanelWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    border: 2px solid ${NAVY};
-    border-radius: 10px;
-    background: #ffffff;
-    overflow: hidden;
-    box-shadow: 0px 4px 8px rgba(17, 28, 54, 0.15);
-    flex-shrink: 0;
-`;
-
-const PanelHeader = styled.div`
-    background: ${NAVY};
-    color: #ffffff;
-    font-family: 'Funnel Display', 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 16px;
-    text-align: center;
-    padding: 8px 12px;
-`;
-
-const PanelBody = styled.div`
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-height: 320px;
-    overflow-y: auto;
-
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-    &::-webkit-scrollbar-thumb {
-        background: rgba(17, 28, 54, 0.25);
-        border-radius: 3px;
-    }
-`;
-
-const EmptyText = styled.p`
-    font-family: 'Funnel Display', 'Montserrat', sans-serif;
-    font-size: 12px;
-    color: #64748b;
-    text-align: center;
-    margin: 0;
-    padding: 8px 4px;
-`;
-
-const MachineItem = styled.div`
-    position: relative;
-    background: #ffffff;
-    border: 1px solid ${NAVY};
-    border-radius: 10px;
-    padding: 10px 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.12);
-`;
-
-const MachineName = styled.h3`
-    font-family: 'Funnel Display', 'Montserrat', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: ${NAVY};
-    text-align: center;
-    margin: 0 0 4px 0;
-`;
-
-const FieldRow = styled.div`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 5px;
-    padding: 2px 5px;
-    width: 100%;
-`;
-
-const FieldLabel = styled.span`
-    font-family: 'Funnel Display', 'Montserrat', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    color: #000;
-    white-space: nowrap;
-`;
-
-const FieldColon = styled.span`
-    font-family: 'Funnel Display', 'Montserrat', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    color: #000;
->>>>>>> Stashed changes
 `;
 
 const UpNext: React.FC = () => {
@@ -257,24 +156,14 @@ const UpNext: React.FC = () => {
 
     if (upNextMachines.length === 0) {
         return (
-<<<<<<< Updated upstream
             <UpNextContainer>
                 <UpNextHeader><h2>Machines Up Next</h2></UpNextHeader>
                 <UpNextBody><p>Nothing finishing in the next 30 min.</p></UpNextBody>
             </UpNextContainer>
-=======
-            <PanelWrapper>
-                <PanelHeader>Machines Up Next</PanelHeader>
-                <PanelBody>
-                    <EmptyText>No machines to be completed in the next 30 minutes.</EmptyText>
-                </PanelBody>
-            </PanelWrapper>
->>>>>>> Stashed changes
         );
     }
 
     return (
-<<<<<<< Updated upstream
         <UpNextContainer>
             <UpNextHeader><h2>Machines Up Next</h2></UpNextHeader>
             <UpNextBody>
@@ -295,49 +184,6 @@ const UpNext: React.FC = () => {
             ))}
             </UpNextBody>
         </UpNextContainer>
-=======
-        <PanelWrapper>
-            <PanelHeader>Machines Up Next</PanelHeader>
-            <PanelBody>
-                {upNextMachines.map((machine, index) => {
-                    const endMs = new Date(machine.usage_start!).getTime() + machine.usage_duration! * 1000;
-                    const pct = Math.min(100, Math.max(0, ((now - new Date(machine.usage_start!).getTime()) / (endMs - new Date(machine.usage_start!).getTime())) * 100));
-                    return (
-                        <MachineItem key={index}>
-                            <MachineName>{machine.name}</MachineName>
-                            <FieldRow>
-                                <FieldLabel>User</FieldLabel>
-                                <FieldColon>:</FieldColon>
-                                <BigCardInfo>{machine.user ? machine.user : ''}</BigCardInfo>
-                            </FieldRow>
-                            <FieldRow>
-                                <FieldLabel>Est. Completion</FieldLabel>
-                                <FieldColon>:</FieldColon>
-                                <BigCardInfo>
-                                    {machine.usage_start && machine.usage_duration
-                                        ? getEndTime(machine.usage_start!, machine.usage_duration!)
-                                        : ''}
-                                </BigCardInfo>
-                            </FieldRow>
-                            <FieldRow>
-                                <FieldLabel>Material</FieldLabel>
-                                <FieldColon>:</FieldColon>
-                                <BigCardInfo></BigCardInfo>
-                            </FieldRow>
-                            <FieldRow>
-                                <FieldLabel>Status</FieldLabel>
-                                <FieldColon>:</FieldColon>
-                                <BigCardInfo>In Progress</BigCardInfo>
-                            </FieldRow>
-                            <ProgressBar>
-                                <Progress $progress={pct} />
-                            </ProgressBar>
-                        </MachineItem>
-                    );
-                })}
-            </PanelBody>
-        </PanelWrapper>
->>>>>>> Stashed changes
     );
 };
 

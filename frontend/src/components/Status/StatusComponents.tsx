@@ -55,7 +55,6 @@ export const Card = styled.div<{
     $symbol?: string;
     $minimized?: boolean;
     $highlightFailed?: boolean;
-<<<<<<< Updated upstream
     $failed?: boolean;
     progress: number;
 }>`
@@ -101,39 +100,6 @@ export const Card = styled.div<{
 
     @media screen and (max-width: 850px) {
         width: ${({ $minimized }) => ($minimized ? '180px' : '100%')};
-=======
-    progress: number;
-}>`
-    position: relative;
-    background-color: #ffffff;
-    border: 1px solid ${NAVY};
-    border-radius: 10px;
-    padding: 10px 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-    width: 100%;
-    max-width: 100%;
-    min-height: 170px;
-    box-sizing: border-box;
-    box-shadow: ${({ $highlightFailed }) =>
-        $highlightFailed
-            ? '0 0 10px 2px rgba(255,0,0,0.55), 0px 4px 4px 0px rgba(0, 0, 0, 0.25)'
-            : '0px 4px 4px 0px rgba(0, 0, 0, 0.25)'};
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.25);
-    }
-
-    @media screen and (max-width: 850px) {
-        min-height: 160px;
->>>>>>> Stashed changes
     }
 `;
 
@@ -148,7 +114,6 @@ export const BigCardAttribute = styled.div`
 `;
 
 export const BigCardText = styled.p<{ $minimized?: boolean, $clearable?: boolean }>`
-<<<<<<< Updated upstream
     font-size: ${({ $minimized }) => ($minimized ? '10px' : '12px')};
     font-weight: 700;
     color: #64748b;
@@ -156,19 +121,9 @@ export const BigCardText = styled.p<{ $minimized?: boolean, $clearable?: boolean
     text-transform: uppercase;
     margin: 0;
     line-height: 1.3;
-=======
-    font-family: 'Funnel Display', 'Montserrat', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    color: #000;
-    text-align: right;
-    margin: 0;
-    white-space: nowrap;
->>>>>>> Stashed changes
 `;
 
 export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
-<<<<<<< Updated upstream
     font-size: ${({ $minimized }) => ($minimized ? '11px' : '14px')};
     font-weight: 500;
     color: #111c36;
@@ -194,39 +149,6 @@ export const StatusText = styled.p<{ $area?: string, $minimized?: boolean, $clea
     color: #64748b;
     font-weight: 500;
     line-height: 1.3;
-=======
-    font-family: 'Funnel Display', 'Montserrat', sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    color: #000;
-    text-align: left;
-    flex: 0 0 80px;
-    min-width: 80px;
-    border-bottom: 1px solid #000;
-    padding: 0 4px 2px;
-    min-height: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-`;
-
-export const MachineName = styled.h3<{ $minimized?: boolean, $clearable?: boolean }>`
-    font-family: 'Funnel Display', 'Montserrat', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: ${NAVY};
-    text-align: center;
-    margin: 0 0 4px 0;
-    text-transform: none;
-`;
-
-export const StatusText = styled.p<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
-    font-family: 'Funnel Display', 'Montserrat', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    color: #000;
-    text-align: center;
->>>>>>> Stashed changes
     margin: 0;
 `;
 

@@ -4,41 +4,6 @@ import { Card, MachineName, BigCardAttribute, BigCardText, BigCardInfo, StatusTe
 import { OmniAPI } from "src/apis/OmniAPI";
 import { useSelectedMachine } from './SelectedMachineContext';
 
-// Figma-spec helper row components for consistent label : value layout
-const FieldRow = styled.div`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5px;
-    padding: 2px 5px;
-    width: 100%;
-    justify-content: flex-end;
-`;
-
-const FieldLabel = styled.span`
-    font-family: 'Funnel Display', 'Montserrat', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    color: #000;
-    white-space: nowrap;
-`;
-
-const FieldColon = styled.span`
-    font-family: 'Funnel Display', 'Montserrat', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    color: #000;
-`;
-
-const FieldsStack = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: center;
-    width: 100%;
-    gap: 2px;
-`;
-
 export const getEndTime = (usage_start: Date, usage_duration: number) => {
     const start = usage_start;
     const end = new Date(start.getTime() + usage_duration * 1000);
@@ -360,7 +325,6 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
     return statuses.length > 0 ? statuses.join(", ") : "Operational";
 };
 
-<<<<<<< Updated upstream
     const statusKey: 'available' | 'in_use' | 'completed' | 'failed' | 'maintenance' | 'disabled' =
         failed ? 'failed'
         : maintenance_mode ? 'maintenance'
@@ -368,17 +332,11 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
         : liveProgress === 100 ? 'completed'
         : in_use ? 'in_use'
         : 'available';
-=======
-    const progress = getProgress(usage_start, usage_duration);
-    const endTime = usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : '';
-    const statusLabel = getStatusText(in_use, failed, maintenance_mode, disabled);
->>>>>>> Stashed changes
 
     return (
         <Card
             $symbol={name}
             $minimized={$minimized}
-<<<<<<< Updated upstream
             $highlightFailed={$highlightFailed && !!failed}
             $failed={!!failed}
             progress={liveProgress}
@@ -443,53 +401,6 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
                         <ProgressPillFill $pct={failed ? 100 : liveProgress} $failed={!!failed} />
                     </ProgressPillTrack>
                 </>
-=======
-            $highlightFailed={$highlightFailed && failed}
-            progress={$minimized ? progress : 0}
-            onClick={handleClick}
-        >
-            <MachineName $minimized={$minimized} $clearable={$highlightFailed && (failed || in_use)}>
-                {name}
-            </MachineName>
-
-            <FieldsStack>
-                <FieldRow>
-                    <FieldLabel>User</FieldLabel>
-                    <FieldColon>:</FieldColon>
-                    <BigCardInfo>{user ? user : ''}</BigCardInfo>
-                </FieldRow>
-                <FieldRow>
-                    <FieldLabel>Est. Completion</FieldLabel>
-                    <FieldColon>:</FieldColon>
-                    <BigCardInfo>{endTime}</BigCardInfo>
-                </FieldRow>
-                <FieldRow>
-                    <FieldLabel>Material</FieldLabel>
-                    <FieldColon>:</FieldColon>
-                    <BigCardInfo>{material ? material : ''}</BigCardInfo>
-                </FieldRow>
-                <FieldRow>
-                    <FieldLabel>Status</FieldLabel>
-                    <FieldColon>:</FieldColon>
-                    <BigCardInfo>{statusLabel}</BigCardInfo>
-                </FieldRow>
-            </FieldsStack>
-
-            {!$minimized && failed && (
-                <FieldRow>
-                    <FieldLabel>Failed At</FieldLabel>
-                    <FieldColon>:</FieldColon>
-                    <BigCardInfo>{failed_at?.toDateString() ?? ''}</BigCardInfo>
-                </FieldRow>
-            )}
-
-            <ProgressBar>
-                <Progress $progress={progress} />
-            </ProgressBar>
-
-            {$highlightFailed && (failed || in_use) && $minimized && (
-                <StyledButton onClick={handleClearClick}>Clear</StyledButton>
->>>>>>> Stashed changes
             )}
         </Card>
     );

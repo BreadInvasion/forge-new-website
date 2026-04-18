@@ -86,7 +86,6 @@ const GRID_BG_IMG = 'https://www.figma.com/api/mcp/asset/89bf1385-c30b-461c-8573
 // ---------------------------------------------------------------------------
 
 const Page = styled.div`
-<<<<<<< Updated upstream
   flex: 1;
   display: grid;
   grid-template-columns: 1fr minmax(280px, 320px);
@@ -138,107 +137,6 @@ const Sidebar = styled.div`
   scrollbar-color: rgba(0,0,0,0.15) transparent;
   &::-webkit-scrollbar { width: 5px; }
   &::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
-=======
-    position: relative;
-    width: 100%;
-    flex: 1 1 auto;
-    min-height: 0;
-    background: linear-gradient(to bottom, #ffffff 0%, #e0e7f0 100%);
-    overflow: hidden;
-
-    /* Blueprint grid pattern */
-    &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image: url(${GRID_BG_IMG});
-        background-size: cover;
-        background-position: center;
-        opacity: 0.12;
-        pointer-events: none;
-        z-index: 0;
-    }
-`;
-
-/** Vertical ruler along the left edge */
-const RulerWrap = styled.div`
-    position: absolute;
-    left: -1px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 70px;
-    height: calc(100% - 20px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 1;
-
-    img {
-        transform: rotate(-90deg) scaleY(-1);
-        width: 100%;
-        height: 70px;
-        /* Match image width to column height */
-        width: calc(100vh - 72px - 100px - 40px);
-        object-fit: fill;
-        flex-shrink: 0;
-    }
-
-    @media screen and (max-width: 850px) {
-        display: none;
-    }
-`;
-
-/** Main layout grid — toolbar | machine grid | sidebar */
-const Layout = styled.div`
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: 80px 1fr 270px;
-    grid-template-areas: "tools status highlight";
-    gap: 16px;
-    padding: 24px 32px 24px 90px;
-    box-sizing: border-box;
-    overflow: hidden;
-
-    @media screen and (max-width: 850px) {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
-        grid-template-areas:
-            "tools"
-            "status"
-            "highlight";
-        padding: 12px 16px;
-        overflow-y: auto;
-    }
-`;
-
-const Sidebar = styled.div`
-    grid-area: highlight;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-width: 250px;
-    overflow-y: auto;
-    padding-right: 4px;
-
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-    &::-webkit-scrollbar-thumb {
-        background: rgba(17, 28, 54, 0.25);
-        border-radius: 3px;
-    }
-
-    @media screen and (max-width: 850px) {
-        flex-direction: row;
-        overflow-x: auto;
-        overflow-y: visible;
-        padding: 0.5rem 0;
-    }
->>>>>>> Stashed changes
 `;
 
 export const Status: React.FC = () => {
@@ -321,7 +219,6 @@ export const Status: React.FC = () => {
     return statusOk && otherOk;
   });
 
-<<<<<<< Updated upstream
   return (
     <SelectedMachineProvider>
       <PageBackground>
@@ -363,54 +260,6 @@ export const Status: React.FC = () => {
       </PageBackground>
     </SelectedMachineProvider>
   );
-=======
-    return (
-        <SelectedMachineProvider>
-            <Page>
-                <RulerWrap>
-                    <img src={RULER_IMG} alt="" aria-hidden="true" />
-                </RulerWrap>
-
-                <Layout>
-                    <Toolbar
-                        highlightFailed={highlightFailed}
-                        setHighlightFailed={setHighlightFailed}
-                        activeFilters={activeFilters}
-                        setActiveFilters={setActiveFilters}
-                    />
-                    <StatusWrapper>
-                        <GridContainer>
-                            {filteredMachines.map((machine, index) => {
-                                return (
-                                    <MachineCard
-                                        key={`${machine.name}-${index}`}
-                                        id={machine.id}
-                                        name={machine.name}
-                                        in_use={machine.in_use}
-                                        usage_start={machine.usage_start}
-                                        usage_duration={machine.usage_duration}
-                                        user={machine.user}
-                                        maintenance_mode={machine.maintenance_mode}
-                                        disabled={machine.disabled}
-                                        failed={machine.failed}
-                                        failed_at={machine.failed_at}
-                                        machine={(machine as any)}
-                                        $highlightFailed={highlightFailed}
-                                        $minimized={true}
-                                    />
-                                );
-                            })}
-                        </GridContainer>
-                    </StatusWrapper>
-                    <Sidebar>
-                        <Highlight />
-                        <UpNext />
-                    </Sidebar>
-                </Layout>
-            </Page>
-        </SelectedMachineProvider>
-    );
->>>>>>> Stashed changes
 };
 
 export default Status;

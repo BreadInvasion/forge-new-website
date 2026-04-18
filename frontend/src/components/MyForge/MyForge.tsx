@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from 'react';
-import UserMenu from './components/UserMenu';
 import { Route, Routes } from 'react-router-dom';
+import bgPattern from 'src/assets/img/background.svg?url';
 
 import './styles/MyForge.scss';
 import './styles/TabStyles.scss';
@@ -10,24 +10,26 @@ import { FailAMachineForm } from './tabs/FailAMachine';
 const Summary = lazy(() => import('./tabs/Summary'));
 const Usages = lazy(() => import('./tabs/Usages'));
 
-
-interface MyForgeProps {
-
-}
-
 const MyForge: React.FC = () => {
     /** MyForge Component
-     *  - Operates as a functional Router for the subpage types. Which are defined in the App.tsx file.
-     *  - Management-only tabs (Machines / Machine Types / Machine Groups / Resources /
-     *    Resource Slots / Users / Semesters / Charge Sheets / Change Configuration)
-     *    have been moved to the Admin page (/admin).
-     *  - All children share the same prop API, defined above, which is passed through context.
+     *  - Routes the logged-in user through their dashboard + related forms.
+     *  - The Summary dashboard now matches the Member/Volunteer Figma frames:
+     *    the action buttons (Failure Form, + Use a Machine, Admin) are rendered
+     *    inline at the top of the dashboard, so the old sidebar has been
+     *    removed. Volunteer = has CAN_FAIL_MACHINES. Admin/superuser also gets
+     *    the Admin button.
+     *  - A hex-pattern background (the same asset used on the Admin / Status /
+     *    Hours pages) is painted behind the content to match the Figma.
     */
 
     return (
-        <div className='myforge'>
-            <UserMenu />
-            <div className='tab-container'>
+        <div className="myforge">
+            <div
+                className="myforge-bg-pattern"
+                style={{ backgroundImage: `url(${bgPattern})` }}
+                aria-hidden="true"
+            />
+            <div className="myforge-content">
                 <Suspense fallback={<div></div>}>
                     <Routes>
                         <Route index element={<Summary />} />
