@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { Pencil2Icon, TrashIcon } from '@radix-ui/react-icons';
 
 export interface AdminTableColumn<T> {
     /** Column header label (UPPERCASE, matches Figma). */
@@ -19,6 +20,17 @@ interface AdminTableProps<T> {
     emptyMessage?: string;
     /** Optional action buttons (green/purple) rendered under the title. */
     actions?: ReactNode;
+    /**
+     * Optional action buttons rendered inline with the title on the right
+     * side of the header bar. Use this when a single primary action should
+     * share the title row (e.g. the "Advance Semester" button on the
+     * Semesters tab) rather than stacking below the title.
+     */
+    titleActions?: ReactNode;
+    /** If provided, a trailing actions column with a pencil icon is rendered. */
+    onEdit?: (row: T) => void;
+    /** If provided, a trailing actions column with a trash icon is rendered. */
+    onDelete?: (row: T) => void;
 }
 
 /**
@@ -40,12 +52,23 @@ export function AdminTable<T>({
     error,
     emptyMessage = 'No records found.',
     actions,
+    titleActions,
+    onEdit,
+    onDelete,
 }: AdminTableProps<T>): React.ReactElement {
-    const colCount = columns.length;
+    const showRowActions = Boolean(onEdit || onDelete);
+    const colCount = columns.length + (showRowActions ? 1 : 0);
 
     return (
         <div className="data-card">
-            <h2 className="data-card-title">{title}</h2>
+            {titleActions ? (
+                <div className="data-card-header">
+                    <h2 className="data-card-title">{title}</h2>
+                    <div className="data-card-title-actions">{titleActions}</div>
+                </div>
+            ) : (
+                <h2 className="data-card-title">{title}</h2>
+            )}
 
             {actions && <div className="data-card-actions">{actions}</div>}
 
@@ -58,6 +81,7 @@ export function AdminTable<T>({
                                 style={col.width ? { width: col.width } : undefined}
                             />
                         ))}
+                        {showRowActions && <col style={{ width: '110px' }} />}
                     </colgroup>
 
                     <thead>
@@ -71,6 +95,13 @@ export function AdminTable<T>({
                                     {col.label}
                                 </th>
                             ))}
+                            {showRowActions && (
+                                <th
+                                    className="data-th-actions"
+                                    scope="col"
+                                    aria-label="Row actions"
+                                />
+                            )}
                         </tr>
                     </thead>
 
@@ -115,6 +146,30 @@ export function AdminTable<T>({
                                     {columns.map((col, i) => (
                                         <td key={i}>{col.render(row)}</td>
                                     ))}
+                                    {showRowActions && (
+                                        <td className="data-row-actions">
+                                            {onEdit && (
+                                                <button
+                                                    type="button"
+                                                    className="data-row-edit"
+                                                    aria-label="Edit row"
+                                                    onClick={() => onEdit(row)}
+                                                >
+                                                    <Pencil2Icon />
+                                                </button>
+                                            )}
+                                            {onDelete && (
+                                                <button
+                                                    type="button"
+                                                    className="data-row-delete"
+                                                    aria-label="Delete row"
+                                                    onClick={() => onDelete(row)}
+                                                >
+                                                    <TrashIcon />
+                                                </button>
+                                            )}
+                                        </td>
+                                    )}
                                 </tr>
                             ))}
                     </tbody>

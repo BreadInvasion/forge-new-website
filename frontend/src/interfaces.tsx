@@ -44,9 +44,15 @@ export interface UserCharge {
 export interface Machine {
     id: string;
     name: string;
-    group: string;
+    // Canonical fields returned by the backend's MachineInfo schema.
+    group_name?: string | null;
+    type_name?: string;
+    // Legacy aliases — some client-side code (e.g. Status.tsx, Summary.tsx)
+    // builds Machine objects and populates these directly. Kept optional so
+    // both shapes type-check.
+    group?: string;
+    type?: string;
     group_id: string;
-    type: string;
     type_id: string;
     in_use: boolean;
     usage_start?: Date;
@@ -76,11 +82,17 @@ export const emptyMachine: Machine = {
 export interface MachineType {
     id: string;
     name: string;
-    resource_slots: number;
-    count: number;
     cost_per_hour: number;
     resource_slot_ids: string[];
-    resource_types: string[];
+    // Populated by the /machinetypes endpoint (MachineTypeInfo schema).
+    num_machines?: number;
+    resource_slot_names?: string[];
+    resource_names?: string[];
+    // Legacy aliases retained so older code paths that read these fields
+    // don't break while we migrate. Prefer the canonical fields above.
+    count?: number;
+    resource_types?: string[];
+    resource_slots?: number;
 };
 
 export interface MachineGroup {

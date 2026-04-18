@@ -141,6 +141,33 @@
     }
 }
 
+// Header row that pairs the title with an inline action (e.g. the
+// "Advance Semester" button on the Semesters tab). The child title drops
+// its own horizontal padding so this wrapper controls the layout.
+.data-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 5px 36px;
+
+    .data-card-title {
+        padding: 0;
+    }
+
+    @media (max-width: 900px) {
+        padding: 12px 20px;
+    }
+}
+
+.data-card-title-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
 .data-card-actions {
     display: flex;
     flex-wrap: wrap;
@@ -171,26 +198,33 @@
 .data-table th {
     font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 16px;
     text-align: left;
     color: var(--color-white); // All header labels are white
-    padding: 14px 16px;
+    padding: 16px 12px;
     vertical-align: middle;
     // Allow long headers (e.g. "MAINTENANCE MODE", "SEMESTER BALANCE") to wrap
-    // inside the box instead of overflowing.
+    // inside the box instead of overflowing — but only break at word
+    // boundaries (spaces), never mid-word. Previously `overflow-wrap: anywhere`
+    // was chopping labels like "SEMESTER" into "SEME / STER".
     white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    line-height: 1.2;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
+    // Loosened line-height so wrapped labels like "IS RPI STAFF",
+    // "FIRST NAME", "SEMESTER BALANCE" have room to breathe instead of
+    // stacking on top of each other.
+    line-height: 1.45;
 
     &:first-child,
     &.data-th--active {
-        padding-left: 36px;
+        padding-left: 28px;
     }
 
     @media (max-width: 900px) {
         font-size: 13px;
-        padding: 10px 10px;
+        padding: 12px 10px;
+        line-height: 1.4;
 
         &:first-child,
         &.data-th--active {
@@ -243,6 +277,100 @@
 
 .data-table-error {
     color: var(--color-red);
+}
+
+// =============================================================================
+// Per-row edit / delete action buttons
+// =============================================================================
+// When the parent `<AdminTable>` is given `onEdit` / `onDelete` props it
+// renders a trailing column containing pencil and/or trash icon buttons.
+// These classes style that column and its buttons.
+// =============================================================================
+
+.data-th-actions {
+    width: 110px;
+    padding: 0 !important;
+    background-color: var(--color-navy);
+}
+
+.data-row-actions {
+    padding: 8px 16px !important;
+    text-align: right;
+    white-space: nowrap;
+    vertical-align: middle;
+
+    // Horizontal gap between the pencil and trash buttons. Siblings inside
+    // a <td> can't use flex reliably across browsers, so we use margin.
+    // Bumped up per design request so the edit / delete icons have more
+    // breathing room on each row.
+    > * + * {
+        margin-left: 20px;
+    }
+
+    @media (max-width: 900px) {
+        padding: 6px 10px !important;
+
+        > * + * {
+            margin-left: 14px;
+        }
+    }
+}
+
+.data-row-edit,
+.data-row-delete {
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-navy-light);
+        outline-offset: 2px;
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    @media (max-width: 900px) {
+        width: 28px;
+        height: 28px;
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+}
+
+.data-row-edit {
+    color: var(--color-navy-mid);
+    background-color: rgba(45, 74, 128, 0.08);
+
+    &:hover {
+        background-color: rgba(45, 74, 128, 0.18);
+        color: var(--color-navy);
+    }
+}
+
+.data-row-delete {
+    color: var(--color-red);
+    background-color: rgba(165, 28, 28, 0.08);
+
+    &:hover {
+        background-color: rgba(165, 28, 28, 0.18);
+        color: var(--color-red);
+    }
 }
 
 // =============================================================================

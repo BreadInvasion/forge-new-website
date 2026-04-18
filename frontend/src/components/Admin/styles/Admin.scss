@@ -76,12 +76,12 @@
     align-items: flex-end;
     flex-wrap: wrap;
     row-gap: 12px;
-    gap: 48px;
+    gap: 28px;
     padding: 16px var(--content-px) 0 var(--content-px);
     z-index: 1;
 
     @media (max-width: 900px) {
-        gap: 20px;
+        gap: 16px;
         padding: 16px 24px 0 24px;
     }
 }
@@ -91,7 +91,7 @@
     cursor: pointer;
     font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
     font-weight: 700;
-    font-size: 36px;
+    font-size: 20px;
     color: var(--color-navy);
     line-height: 1.1;
     padding: 4px 0 8px 0;
@@ -124,19 +124,19 @@
     }
 }
 
-// Blue underline for manager-level admin tabs.
-.admin-tab-button--blue.active::after {
-    background: var(--color-navy-light);
-}
-
-// Red underline for eboard-level admin tabs (matches the site red accent).
+// All admin tab underlines use the site red accent. The `--blue` / `--red`
+// modifier classes are retained as no-ops so existing TSX that passes an
+// accent keeps compiling, but both resolve to red here.
+.admin-tab-button--blue.active::after,
 .admin-tab-button--red.active::after {
     background: var(--color-red);
 }
 
 .admin-tab-divider {
     position: relative;
-    margin: 0 var(--content-px);
+    // Pushed the red bar further below the tab labels so it isn't hugging
+    // the bottom of the text.
+    margin: 18px var(--content-px) 0 var(--content-px);
     height: 4px;
     background-image: linear-gradient(to right, var(--color-red) 0%, var(--color-red) 100%);
     background-repeat: no-repeat;
@@ -149,7 +149,7 @@
     }
 
     @media (max-width: 900px) {
-        margin: 0 24px;
+        margin: 14px 24px 0 24px;
     }
 }
 

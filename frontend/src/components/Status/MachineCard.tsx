@@ -75,6 +75,7 @@ const FieldRow = styled.div`
     justify-content: center;
     align-items: baseline;
     gap: 4px;
+    height: 25px;
     width: 100%;
 `;
 

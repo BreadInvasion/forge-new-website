@@ -1,0 +1,407 @@
+// =============================================================================
+// "Adding a Machine Type" dialog — matches the Figma mock
+// =============================================================================
+// Scoped by the `.mtd-*` class prefix so these styles don't leak into other
+// Radix Dialog usages on the site. Structurally identical to the Machine
+// Groups dialog, with two additions:
+//   • `.mtd-cost-row`   — a second labelled numeric input ("Hourly Usage Cost")
+//   • `.mtd-section-label` — the bold "Resources" subheading above the
+//     checkbox list
+// =============================================================================
+
+// Subtle geometric line pattern (inline SVG as a data URL) to mimic the
+// thin criss-cross lines visible in the Figma mock.
+$mtd-pattern: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'><g fill='none' stroke='%23c9cfda' stroke-width='0.6' opacity='0.55'><path d='M0 0 L180 120'/><path d='M0 80 L180 0'/><path d='M0 180 L180 60'/><path d='M30 0 L180 180'/><path d='M0 140 L150 0'/><path d='M90 0 L180 180'/><path d='M0 0 L120 180'/></g></svg>");
+
+// -----------------------------------------------------------------------------
+// Tab wrapper + top-right "+" button
+// -----------------------------------------------------------------------------
+.mtd-tab-wrap {
+    position: relative;
+}
+
+// The + button floats inside the data-card's title row (the big "Machine
+// Types" heading). It's vertically centered on that 50-px-tall row so it
+// never overlaps the navy table header below.
+.mtd-open-btn {
+    position: absolute;
+    top: 8px;
+    right: 28px;
+    z-index: 5;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+
+    background-color: var(--color-red);
+    color: var(--color-white);
+    border: 2px solid var(--color-red);
+    border-radius: 10px;
+    cursor: pointer;
+
+    box-shadow: 0 2px 0 rgba(80, 16, 14, 0.35);
+    transition: background-color 0.12s ease, transform 0.06s ease;
+
+    svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    &:hover {
+        background-color: #861717;
+        border-color: #861717;
+    }
+
+    &:active {
+        transform: translateY(1px);
+        box-shadow: 0 1px 0 rgba(80, 16, 14, 0.35);
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(165, 28, 28, 0.35), 0 2px 0 rgba(80, 16, 14, 0.35);
+    }
+
+    @media (max-width: 900px) {
+        top: 10px;
+        right: 14px;
+        width: 32px;
+        height: 32px;
+
+        svg {
+            width: 18px;
+            height: 18px;
+        }
+    }
+}
+
+// Friendly inline message when there are no resource slots yet to link.
+.mtd-slot-empty {
+    color: var(--color-navy);
+    font-style: italic;
+    padding: 8px 4px;
+    opacity: 0.75;
+}
+
+// -----------------------------------------------------------------------------
+// Dialog overlay + content frame
+// -----------------------------------------------------------------------------
+.mtd-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(5, 10, 30, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+
+    @media (prefers-reduced-motion: no-preference) {
+        &[data-state='open'] {
+            animation: mtd-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    }
+}
+
+.mtd-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1100;
+
+    width: min(34rem, calc(100% - 2rem));
+    max-height: 90vh;
+    overflow: auto;
+    box-sizing: border-box;
+
+    padding: 18px;
+    background-color: var(--color-bg-light);
+    border-radius: 16px;
+    box-shadow: 0 18px 60px rgba(5, 10, 30, 0.28);
+
+    // The real navy frame with the hex/line pattern is drawn with ::before so
+    // that the dialog's actual content can sit above it. Keep the padding on
+    // `.mtd-content` large enough to clear the inset border.
+    padding-left: 42px;
+    padding-right: 42px;
+    padding-top: 30px;
+    padding-bottom: 36px;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 18px;
+        border: 3px solid var(--color-navy);
+        border-radius: 12px;
+        background-color: var(--color-white);
+        // Prefer the site-wide technical-drawing pattern (passed in via the
+        // `--dialog-bg` CSS variable from each tab component, same way
+        // Admin.tsx / Status.tsx drive `.admin-bg-pattern`). Falls back to
+        // the original hatched SVG so dialogs that don't set the var still
+        // render correctly.
+        //
+        // Layering a near-opaque white gradient on top of the pattern
+        // knocks its effective opacity down to ~5% — matching the site's
+        // `.admin-bg-pattern` so the dialog reads as a cut-out of the
+        // admin page behind it.
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
+            var(--dialog-bg, #{$mtd-pattern});
+        background-repeat: repeat, repeat;
+        background-size: auto, 122px 140px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        &[data-state='open'] {
+            animation: mtd-content-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Close button (small X in the corner)
+// -----------------------------------------------------------------------------
+.mtd-close {
+    position: absolute;
+    top: 26px;
+    right: 26px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 2px;
+
+    background: transparent;
+    border: none;
+    color: var(--color-navy);
+    border-radius: 999px;
+    cursor: pointer;
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    &:hover {
+        background: rgba(17, 28, 54, 0.08);
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(17, 28, 54, 0.25);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Title + divider
+// -----------------------------------------------------------------------------
+.mtd-title {
+    text-align: center;
+    font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    letter-spacing: 0.01em;
+    color: var(--color-navy);
+    padding: 18px 0 14px 0;
+    margin: 0;
+}
+
+.mtd-title-divider {
+    height: 3px;
+    background-color: var(--color-navy);
+    border-radius: 2px;
+    margin: 0 32px 18px 32px;
+}
+
+// -----------------------------------------------------------------------------
+// Form body
+// -----------------------------------------------------------------------------
+.mtd-form {
+    padding: 6px 16px 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+// Name / Cost label + input side-by-side, like the Figma mock.
+.mtd-name-row,
+.mtd-cost-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 18px;
+    padding: 8px 4px 8px 4px;
+}
+
+.mtd-name-label,
+.mtd-cost-label {
+    color: var(--color-navy);
+    font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.mtd-name-input,
+.mtd-cost-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2.5px solid var(--color-navy);
+    border-radius: 8px;
+    background: var(--color-white);
+    font-size: 1rem;
+    color: var(--color-navy);
+    box-sizing: border-box;
+
+    &:focus {
+        outline: none;
+        border-color: var(--color-navy-mid);
+        box-shadow: 0 0 0 3px rgba(17, 28, 54, 0.15);
+    }
+}
+
+// "Resources" subheading above the checkbox list.
+.mtd-section-label {
+    color: var(--color-navy);
+    font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.05rem;
+    margin: 6px 0 4px 4px;
+}
+
+// Checkbox list of existing resource slots.
+.mtd-slot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 32vh;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.mtd-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 2px 0;
+}
+
+.mtd-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    border: 2.5px solid var(--color-navy);
+    border-radius: 6px;
+    background: var(--color-white);
+    cursor: pointer;
+    position: relative;
+    flex: 0 0 auto;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+
+    &:hover {
+        border-color: var(--color-navy-mid);
+    }
+
+    &:checked {
+        background-color: var(--color-navy);
+        border-color: var(--color-navy);
+    }
+
+    &:checked::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 1px;
+        width: 6px;
+        height: 12px;
+        border: solid #ffffff;
+        border-width: 0 2.5px 2.5px 0;
+        transform: rotate(45deg);
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(17, 28, 54, 0.25);
+    }
+}
+
+.mtd-checkbox-label {
+    color: var(--color-navy);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+// -----------------------------------------------------------------------------
+// Save button (centered at the bottom, red, bold)
+// -----------------------------------------------------------------------------
+.mtd-save-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 22px;
+}
+
+.mtd-save-btn {
+    background-color: var(--color-red);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: 0.02em;
+    padding: 10px 44px;
+    border: 2.5px solid #6f1d1a;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(80, 16, 14, 0.35);
+    transition: background-color 0.12s ease, transform 0.06s ease;
+
+    &:hover {
+        background-color: #861717;
+    }
+
+    &:active {
+        transform: translateY(1px);
+        box-shadow: 0 1px 0 rgba(80, 16, 14, 0.35);
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(165, 28, 28, 0.35), 0 3px 0 rgba(80, 16, 14, 0.35);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Animations
+// -----------------------------------------------------------------------------
+@keyframes mtd-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes mtd-content-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, calc(-50% + 6px)) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}

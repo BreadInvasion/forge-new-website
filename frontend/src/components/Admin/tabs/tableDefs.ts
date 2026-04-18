@@ -55,8 +55,20 @@ export const getSemesterName = (sem: Semester | null | undefined): string => {
 
 export const machineColumns: AdminTableColumn<Machine>[] = [
     { label: 'NAME', width: '18%', render: (m) => m.name },
-    { label: 'GROUP NAME', width: '20%', render: (m) => m.group || '—' },
-    { label: 'TYPE NAME', width: '22%', render: (m) => m.type || '—' },
+    // Backend (MachineInfo) sends the resolved group/type names as
+    // `group_name` / `type_name`. Fall back to the legacy `group` / `type`
+    // fields so any callers still passing them (e.g. Status.tsx builds its
+    // own rows) keep working.
+    {
+        label: 'GROUP NAME',
+        width: '20%',
+        render: (m) => m.group_name || m.group || '—',
+    },
+    {
+        label: 'TYPE NAME',
+        width: '22%',
+        render: (m) => m.type_name || m.type || '—',
+    },
     {
         label: 'MAINTENANCE MODE',
         width: '22%',
@@ -67,12 +79,20 @@ export const machineColumns: AdminTableColumn<Machine>[] = [
 
 export const machineTypeColumns: AdminTableColumn<MachineType>[] = [
     { label: 'NAME', width: '18%', render: (t) => t.name },
-    { label: 'NUM MACHINES', width: '16%', render: (t) => (t.count ?? 0).toString() },
-    { label: 'RESOURCE NAMES', width: '24%', render: (t) => joinList(t.resource_types) },
+    {
+        label: 'NUM MACHINES',
+        width: '16%',
+        render: (t) => String(t.num_machines ?? t.count ?? 0),
+    },
+    {
+        label: 'RESOURCE NAMES',
+        width: '24%',
+        render: (t) => joinList(t.resource_names ?? t.resource_types),
+    },
     {
         label: 'RESOURCE SLOT NAMES',
         width: '24%',
-        render: (t) => joinList(t.resource_slot_ids),
+        render: (t) => joinList(t.resource_slot_names),
     },
     { label: 'COST BY HOUR', width: '18%', render: (t) => formatCost(t.cost_per_hour) },
 ];
@@ -114,18 +134,22 @@ export const resourceSlotColumns: AdminTableColumn<ResourceSlot>[] = [
 ];
 
 export const userColumns: AdminTableColumn<User>[] = [
-    { label: 'IS RPI STAFF', width: '12%', render: (u) => (u.is_rpi_staff ? 'Yes' : 'No') },
-    { label: 'RCSID', width: '10%', render: (u) => u.RCSID || '—' },
-    { label: 'RIN', width: '10%', render: (u) => u.RIN || '—' },
-    { label: 'FIRST NAME', width: '10%', render: (u) => u.first_name || '—' },
-    { label: 'LAST NAME', width: '10%', render: (u) => u.last_name || '—' },
-    { label: 'MAJOR', width: '10%', render: (u) => u.major || '—' },
-    { label: 'PRONOUNS', width: '10%', render: (u) => u.pronouns || '—' },
+    { label: 'IS RPI STAFF', width: '9%', render: (u) => (u.is_rpi_staff ? 'Yes' : 'No') },
+    { label: 'RCSID', width: '7%', render: (u) => u.RCSID || '—' },
+    { label: 'RIN', width: '7%', render: (u) => u.RIN || '—' },
+    { label: 'FIRST NAME', width: '9%', render: (u) => u.first_name || '—' },
+    { label: 'LAST NAME', width: '9%', render: (u) => u.last_name || '—' },
+    { label: 'MAJOR', width: '8%', render: (u) => u.major || '—' },
+    // PRONOUNS is a single word (8 chars) — needs extra room to avoid a
+    // mid-word break like "PRONO / UNS".
+    { label: 'PRONOUNS', width: '12%', render: (u) => u.pronouns || '—' },
     { label: 'DISPLAY ROLE', width: '10%', render: (u) => u.display_role || '—' },
-    { label: 'IS GRADUATING', width: '10%', render: (u) => (u.is_graduating ? 'Yes' : 'No') },
+    // "GRADUATING" is the longest single word (10 chars) — give it room to
+    // wrap cleanly as "IS / GRADUATING".
+    { label: 'IS GRADUATING', width: '15%', render: (u) => (u.is_graduating ? 'Yes' : 'No') },
     {
         label: 'SEMESTER BALANCE',
-        width: '8%',
+        width: '14%',
         render: (u) => u.semester_balance ?? '—',
     },
 ];

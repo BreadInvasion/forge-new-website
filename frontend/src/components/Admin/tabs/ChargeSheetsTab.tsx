@@ -175,7 +175,7 @@ const ChargeSheetsTab: React.FC = () => {
             loading={users.loading}
             error={users.error}
             emptyMessage="No users found."
-            actions={actions}
+            titleActions={actions}
         />
     );
 };

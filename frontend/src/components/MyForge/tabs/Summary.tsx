@@ -1,7 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import useAuth from '../../Auth/useAuth';
 import { Link } from 'react-router-dom';
-import { Machine, MachineType, MachineUsage } from 'src/interfaces';
+import {
+    AllMachinesStatusResponse,
+    Machine,
+    MachineStatus,
+    MachineType,
+    MachineUsage,
+} from 'src/interfaces';
 import { OmniAPI } from 'src/apis/OmniAPI';
 import { UserPermission } from '../../../enums';
 import '../styles/Summary.scss';
@@ -43,6 +49,16 @@ const formatMoney = (value: number | string | undefined | null): string => {
     return n.toFixed(2);
 };
 
+// The backend sometimes serializes the semester enum as "SemesterType.FALL 2026"
+// rather than the bare value. Strip that prefix so the UI shows just the
+// human-readable semester label.
+const formatSemester = (value: string | undefined | null): string => {
+    if (!value) return '';
+    const raw = String(value);
+    const idx = raw.indexOf('.');
+    return idx >= 0 ? raw.slice(idx + 1) : raw;
+};
+
 const Summary: React.FC = () => {
     const { user } = useAuth();
 
@@ -54,21 +70,17 @@ const Summary: React.FC = () => {
     const canUseMachines =
         hasPermission(UserPermission.CAN_USE_MACHINES) ||
         hasPermission(UserPermission.CAN_USE_MACHINES_BETWEEN_SEMESTERS);
-    // Admin access = anyone with an admin-ish permission. Admins and superusers
-    // get the volunteer layout plus the extra "Admin" button.
-    const isAdmin =
-        hasPermission(UserPermission.CAN_SEE_MACHINE_TYPES) ||
-        hasPermission(UserPermission.CAN_SEE_MACHINE_GROUPS) ||
-        hasPermission(UserPermission.CAN_SEE_MACHINES) ||
-        hasPermission(UserPermission.CAN_SEE_RESOURCES) ||
-        hasPermission(UserPermission.CAN_SEE_RESOURCE_SLOTS) ||
-        hasPermission(UserPermission.CAN_SEE_USERS) ||
-        hasPermission(UserPermission.CAN_SEE_SEMESTERS) ||
-        hasPermission(UserPermission.CAN_GET_CHARGES);
 
     const [machineUsages, setMachineUsages] = useState<MachineUsage[]>([]);
     const [machines, setMachines] = useState<Machine[]>([]);
     const [machineTypes, setMachineTypes] = useState<MachineType[]>([]);
+    // Names of machines currently flagged `failed` per the public
+    // /machinestatus endpoint. We source failure state from there rather than
+    // the authenticated /machines endpoint so it also works for volunteers
+    // (and plain members) who don't have CAN_SEE_MACHINES.
+    const [failedMachineNames, setFailedMachineNames] = useState<Set<string>>(
+        new Set(),
+    );
     const [currentUsage, setCurrentUsage] = useState<MachineUsage | null>(null);
     const [nowMs, setNowMs] = useState<number>(Date.now());
     const [semesterFilter, setSemesterFilter] = useState<string>('all');
@@ -112,31 +124,134 @@ const Summary: React.FC = () => {
 
     // Load current (in-progress) usage if any. Only the single most recent
     // session is shown, even if the API returns more than one.
+    //
+    // We also poll /usages/current and /machines every 15s so that state
+    // changes made by a volunteer (flagging a machine as failed, or
+    // clearing the machine which removes the usage) are reflected in the
+    // session card without a full page reload.
     useEffect(() => {
-        (async () => {
+        let cancelled = false;
+
+        const refreshCurrentUsage = async () => {
             try {
                 const response = await OmniAPI.get('usages/current', 'me');
+                if (cancelled) return;
                 const data: MachineUsage[] = Array.isArray(response) ? response : [];
                 setCurrentUsage(data[0] ?? null);
             } catch (err) {
                 console.error('Error fetching current usage:', err);
             }
-        })();
+        };
+
+        const refreshMachines = async () => {
+            try {
+                const response = await OmniAPI.getAll('machines');
+                if (cancelled) return;
+                setMachines(Array.isArray(response) ? response : []);
+            } catch {
+                // Non-fatal: plain members without CAN_SEE_MACHINES will
+                // 403 here. The session card still works — it just can't
+                // surface the failed state for them.
+            }
+        };
+
+        // Public /machinestatus: authoritative source for machine failure
+        // state. We use this rather than /machines so the failed badge shows
+        // up for all users regardless of CAN_SEE_MACHINES permission.
+        const refreshStatuses = async () => {
+            try {
+                const response = (await OmniAPI.getPublic(
+                    'machinestatus',
+                )) as AllMachinesStatusResponse;
+                if (cancelled) return;
+
+                const failed = new Set<string>();
+                const collect = (m: MachineStatus | undefined) => {
+                    if (m && m.failed && m.name) failed.add(m.name);
+                };
+                response?.loners?.forEach(collect);
+                response?.groups?.forEach((g) => g.machines?.forEach(collect));
+                setFailedMachineNames(failed);
+            } catch (err) {
+                console.error('Error fetching machine statuses:', err);
+            }
+        };
+
+        refreshCurrentUsage();
+        refreshStatuses();
+        // Poll quickly enough that the "Failed" badge appears within a few
+        // seconds of a volunteer flagging the machine from the failure form.
+        const id = window.setInterval(() => {
+            refreshCurrentUsage();
+            refreshMachines();
+            refreshStatuses();
+        }, 5000);
+
+        return () => {
+            cancelled = true;
+            window.clearInterval(id);
+        };
     }, []);
 
-    // Tick clock every second so the "Elapsed Time" stays live while a session is open.
-    useEffect(() => {
-        if (!currentUsage) return;
-        const id = window.setInterval(() => setNowMs(Date.now()), 1000);
-        return () => window.clearInterval(id);
-    }, [currentUsage]);
-
-    const liveElapsedSeconds = useMemo(() => {
+    // Tick clock every second so the "Elapsed Time" stays live while a
+    // session is open. Once the session has run past its allotted duration
+    // we stop ticking — the timer is pinned at `duration` and the badge
+    // flips to "Completed" until the machine gets cleared.
+    // Raw wall-clock elapsed since the session started (in seconds).
+    const rawElapsedSeconds = useMemo(() => {
         if (!currentUsage) return 0;
         const started = new Date(currentUsage.time_started).getTime();
         if (Number.isNaN(started)) return Number(currentUsage.duration ?? 0);
         return Math.max(0, Math.floor((nowMs - started) / 1000));
     }, [currentUsage, nowMs]);
+
+    // The session has "failed" when the machine backing the current usage
+    // has been flagged failed on the backend. The usage stays on
+    // /usages/current until a volunteer clears the machine, so we surface
+    // the failure in the session card.
+    //
+    // We check the public /machinestatus source first (works for every user
+    // regardless of permission). The authenticated /machines list is only
+    // used as a fallback — it may be empty for users who can't see machines.
+    const sessionFailed = useMemo(() => {
+        if (!currentUsage) return false;
+        const name = currentUsage.machine_name;
+        if (!name) return false;
+        if (failedMachineNames.has(name)) return true;
+        const machine = machines.find((m) => m.name === name);
+        return Boolean(machine?.failed);
+    }, [currentUsage, machines, failedMachineNames]);
+
+    // The session is "finished" once the wall clock has ticked past its
+    // allotted `duration`. The backend keeps returning it on /usages/current
+    // until a volunteer clears the machine, so we flip the UI into a
+    // terminal state here rather than letting the timer run forever.
+    const sessionDuration = Number(currentUsage?.duration ?? 0);
+    const sessionFinished =
+        !!currentUsage &&
+        Number.isFinite(sessionDuration) &&
+        sessionDuration > 0 &&
+        rawElapsedSeconds >= sessionDuration;
+
+    // Failure takes precedence over the normal "Completed" terminal state.
+    const sessionEnded = sessionFailed || sessionFinished;
+
+    // Cap the displayed elapsed time at the allotted duration so it doesn't
+    // keep counting past the end of the session.
+    const liveElapsedSeconds = sessionEnded
+        ? Math.min(rawElapsedSeconds, sessionDuration || rawElapsedSeconds)
+        : rawElapsedSeconds;
+
+    // Tick clock every second while a session is running. Once the session
+    // has passed its allotted duration or the machine has failed we stop
+    // ticking — the elapsed-time display stays pinned and the badge flips
+    // to "Completed" or "Failed" until the machine gets cleared on the
+    // volunteer side.
+    useEffect(() => {
+        if (!currentUsage || sessionEnded) return;
+        const id = window.setInterval(() => setNowMs(Date.now()), 1000);
+        return () => window.clearInterval(id);
+    }, [currentUsage, sessionEnded]);
 
     // type_id -> type name. Built from the (optional) machine_types list.
     const typeIdToName = useMemo(() => {
@@ -159,7 +274,12 @@ const Summary: React.FC = () => {
         machines.forEach((m) => {
             if (!m.name) return;
 
+            // Backend's MachineInfo schema sends the resolved type as
+            // `type_name`. Fall back to the legacy `type` field (populated
+            // by some client-side code paths) and finally to a lookup via
+            // `type_id` against the machine_types endpoint.
             const typeName =
+                (m.type_name && String(m.type_name).trim()) ||
                 (m.type && String(m.type).trim()) ||
                 (m.type_id && typeIdToName[String(m.type_id)]) ||
                 '';
@@ -210,6 +330,21 @@ const Summary: React.FC = () => {
         return Array.from(set).sort((a, b) => b.localeCompare(a));
     }, [machineUsages]);
 
+    // Total spent this semester, computed from the usage list so it stays in
+    // sync with the "Your Spending by Machine" chart below. We prefer the
+    // most-recent semester if the user has usages across multiple; otherwise
+    // we fall back to summing everything we have.
+    const totalSemesterCost = useMemo(() => {
+        if (machineUsages.length === 0) return 0;
+        const currentSemester = semesterOptions[0];
+        const relevant = currentSemester
+            ? machineUsages.filter(
+                  (u) => String(u.semester ?? '') === currentSemester,
+              )
+            : machineUsages;
+        return relevant.reduce((sum, u) => sum + Number(u.cost || 0), 0);
+    }, [machineUsages, semesterOptions]);
+
     // Table rows after filtering.
     const filteredRows = useMemo(() => {
         const rows =
@@ -241,11 +376,6 @@ const Summary: React.FC = () => {
                     </p>
                 </div>
                 <div className="dashboard-actions">
-                    {isAdmin && (
-                        <Link to="/admin" className="dash-btn dash-btn--navy-dark">
-                            Admin
-                        </Link>
-                    )}
                     {isVolunteer && (
                         <Link to="/myforge/fail" className="dash-btn dash-btn--navy">
                             Failure Form
@@ -262,14 +392,26 @@ const Summary: React.FC = () => {
             <section className="dashboard-stats">
                 <div className="stat-card stat-card--cost">
                     <div className="stat-label">SEMESTER COST</div>
-                    <div className="stat-value">${formatMoney(user.semester_balance)}</div>
+                    <div className="stat-value">${formatMoney(totalSemesterCost)}</div>
                     <div className="stat-sub">Total spent this semester</div>
                 </div>
 
                 <div className="stat-card stat-card--session">
                     <div className="session-head">
                         <span className="stat-label">CURRENT SESSION</span>
-                        {currentUsage && <span className="live-badge">Live</span>}
+                        {currentUsage && (
+                            sessionFailed ? (
+                                <span className="session-badge session-badge--failed">
+                                    Failed
+                                </span>
+                            ) : sessionFinished ? (
+                                <span className="session-badge session-badge--completed">
+                                    Completed
+                                </span>
+                            ) : (
+                                <span className="live-badge">Live</span>
+                            )
+                        )}
                     </div>
 
                     {currentUsage ? (
@@ -301,14 +443,14 @@ const Summary: React.FC = () => {
                             </div>
                         </>
                     ) : (
-                        <div className="session-empty">No sessions</div>
+                        <div className="session-empty">No sessions active</div>
                     )}
                 </div>
             </section>
 
             <section className="dashboard-spending">
                 <div className="section-head">
-                    <h2 className="section-title">Your Spending my Machine</h2>
+                    <h2 className="section-title">Your Spending by Machine</h2>
                     <span className="section-meta">This Semester</span>
                 </div>
                 <div className="spending-card">
@@ -344,19 +486,36 @@ const Summary: React.FC = () => {
                 <div className="section-head">
                     <h2 className="section-title activity-title">Recent Activity</h2>
                     <label className="activity-filter">
-                        <span className="activity-filter-label">Filter:</span>
-                        <select
-                            className="activity-filter-select"
-                            value={semesterFilter}
-                            onChange={(e) => setSemesterFilter(e.target.value)}
-                        >
-                            <option value="all">All semesters</option>
-                            {semesterOptions.map((s) => (
-                                <option key={s} value={s}>
-                                    {s}
-                                </option>
-                            ))}
-                        </select>
+                        <span className="activity-filter-label">Filter</span>
+                        <span className="activity-filter-select-wrap">
+                            <select
+                                className="activity-filter-select"
+                                value={semesterFilter}
+                                onChange={(e) => setSemesterFilter(e.target.value)}
+                            >
+                                <option value="all">All semesters</option>
+                                {semesterOptions.map((s) => (
+                                    <option key={s} value={s}>
+                                        {formatSemester(s)}
+                                    </option>
+                                ))}
+                            </select>
+                            <svg
+                                className="activity-filter-chevron"
+                                viewBox="0 0 16 16"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <path
+                                    d="M4 6l4 4 4-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </span>
                     </label>
                 </div>
 
@@ -380,7 +539,7 @@ const Summary: React.FC = () => {
                             ) : (
                                 pageRows.map((u, i) => (
                                     <tr key={`${u.time_started}-${u.machine_name}-${i}`}>
-                                        <td>{u.semester}</td>
+                                        <td>{formatSemester(u.semester)}</td>
                                         <td>{formatShortDate(u.time_started)}</td>
                                         <td className="activity-machine">{u.machine_name}</td>
                                         <td>${formatMoney(u.cost)}</td>

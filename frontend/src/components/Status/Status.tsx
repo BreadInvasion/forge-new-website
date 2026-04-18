@@ -117,7 +117,10 @@ const StatusArea = styled.div`
   gap: 12px;
   align-content: flex-start;
   overflow-y: auto;
-  padding-bottom: 1rem;
+  /* Top padding leaves room for the card's hover transform (translateY(-1px))
+     and its enlarged drop-shadow so the first row doesn't get clipped by the
+     scroll container's top edge. */
+  padding: 8px 4px 1rem 4px;
 
   /* subtle scrollbar */
   scrollbar-width: thin;

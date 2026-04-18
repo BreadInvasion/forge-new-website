@@ -22,7 +22,7 @@ const SemestersTab: React.FC = () => {
         }
     };
 
-    const actions = (
+    const advanceButton = (
         <button
             type="button"
             className="btn-action btn-action--red"
@@ -42,7 +42,7 @@ const SemestersTab: React.FC = () => {
             loading={loading}
             error={error}
             emptyMessage="No semesters found."
-            actions={actions}
+            titleActions={advanceButton}
         />
     );
 };
