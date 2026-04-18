@@ -124,17 +124,14 @@
     }
 }
 
-// Green underline for manager-level admin tabs (matches the green
-// buttons on the user page: Machines / Types / Groups / Resources /
-// Resource Slots / Users).
-.admin-tab-button--green.active::after {
-    background: #97bb63;
+// Blue underline for manager-level admin tabs.
+.admin-tab-button--blue.active::after {
+    background: var(--color-navy-light);
 }
 
-// Purple underline for eboard-level admin tabs (matches the purple
-// buttons on the user page: Semesters / Charge Sheets).
-.admin-tab-button--purple.active::after {
-    background: #8650a0;
+// Red underline for eboard-level admin tabs (matches the site red accent).
+.admin-tab-button--red.active::after {
+    background: var(--color-red);
 }
 
 .admin-tab-divider {

@@ -165,38 +165,42 @@
 
 .data-table thead tr {
     background-color: var(--color-navy);
-    height: 53px;
+    min-height: 53px;
 }
 
 .data-table th {
     font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
     font-weight: 700;
-    font-size: 20px;
+    font-size: 18px;
     text-align: left;
-    color: #4a6080;
-    padding: 12px 20px;
-    white-space: nowrap;
+    color: var(--color-white); // All header labels are white
+    padding: 14px 16px;
+    vertical-align: middle;
+    // Allow long headers (e.g. "MAINTENANCE MODE", "SEMESTER BALANCE") to wrap
+    // inside the box instead of overflowing.
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.2;
 
     &:first-child,
     &.data-th--active {
-        color: var(--color-white);
-        padding-left: 62px;
+        padding-left: 36px;
     }
 
     @media (max-width: 900px) {
-        font-size: 14px;
-        padding: 10px 12px;
+        font-size: 13px;
+        padding: 10px 10px;
 
         &:first-child,
         &.data-th--active {
-            padding-left: 20px;
+            padding-left: 16px;
         }
     }
 }
 
 .data-table tbody tr {
     border-bottom: 0.5px solid var(--color-divider);
-    height: 64px;
 
     &:last-child {
         border-bottom: none;
@@ -205,22 +209,27 @@
 
 .data-table td {
     font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
-    font-weight: 700;
-    font-size: 20px;
+    font-weight: 600;
+    font-size: 16px;
     color: #4a6080;
-    padding: 12px 20px;
+    padding: 14px 16px;
     vertical-align: middle;
+    // Wrap cell content inside the cell instead of overflowing.
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.35;
 
     &:first-child {
-        padding-left: 62px;
+        padding-left: 36px;
     }
 
     @media (max-width: 900px) {
-        font-size: 14px;
-        padding: 10px 12px;
+        font-size: 13px;
+        padding: 10px 10px;
 
         &:first-child {
-            padding-left: 20px;
+            padding-left: 16px;
         }
     }
 }
@@ -237,11 +246,10 @@
 }
 
 // =============================================================================
-// Shared action buttons (green = manager, purple = eboard)
+// Shared action buttons (blue = manager, red = eboard)
 // =============================================================================
-// Mirrors the green / purple button colors from the MyForge UserMenu so the
-// Admin page can reuse them for tab-level actions (e.g. "Create Charge Sheet",
-// "Advance Semester").
+// The Admin page reuses these for tab-level actions (e.g. "Create Charge
+// Sheet", "Advance Semester").
 // =============================================================================
 
 .btn-action {
@@ -267,18 +275,18 @@
     }
 }
 
-.btn-action--green {
-    background-color: #97bb63; // muted-green (manager)
+.btn-action--blue {
+    background-color: var(--color-navy-light);
 
     &:hover {
-        background-color: #718d4a; // hover-muted-green
+        background-color: var(--color-navy-mid);
     }
 }
 
-.btn-action--purple {
-    background-color: #8650a0; // muted-purple (eboard)
+.btn-action--red {
+    background-color: var(--color-red);
 
     &:hover {
-        background-color: #643b77; // hover-muted-purple
+        background-color: var(--color-red-muted);
     }
 }

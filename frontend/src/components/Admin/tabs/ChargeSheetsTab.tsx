@@ -1,54 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { OmniAPI } from 'src/apis/OmniAPI';
 import { UserCharge, Semester } from 'src/interfaces';
-import AdminTable, { AdminTableColumn } from './AdminTable';
-
-const SEMESTER_TYPE_MAP: { [key: number]: string } = {
-    0: 'Fall',
-    1: 'Spring',
-    2: 'Summer',
-};
-
-const getSemesterName = (sem: Semester | null | undefined): string => {
-    if (!sem) return 'Semester';
-    const typeKey =
-        typeof sem.semester_type === 'number'
-            ? sem.semester_type
-            : Number(sem.semester_type);
-    const typeStr = SEMESTER_TYPE_MAP[typeKey] ?? String(sem.semester_type);
-    return `${typeStr}_${sem.calendar_year}`;
-};
-
-const columns: AdminTableColumn<UserCharge>[] = [
-    {
-        label: 'RIN',
-        width: '18%',
-        render: (c) => c.RIN || '—',
-    },
-    {
-        label: 'FIRST NAME',
-        width: '22%',
-        render: (c) => c.first_name || '—',
-    },
-    {
-        label: 'LAST NAME',
-        width: '22%',
-        render: (c) => c.last_name || '—',
-    },
-    {
-        label: 'SEMESTER BALANCE',
-        width: '22%',
-        render: (c) =>
-            c.semester_balance === undefined || c.semester_balance === null
-                ? '—'
-                : String(c.semester_balance),
-    },
-    {
-        label: 'IS GRADUATING',
-        width: '16%',
-        render: (c) => (c.is_graduating ? 'Yes' : 'No'),
-    },
-];
+import AdminTable from './AdminTable';
+import { useOmniList } from './useOmniList';
+import { userChargeColumns, getSemesterName } from './tableDefs';
 
 type CsvRow = {
     rin: string;
@@ -106,48 +61,28 @@ const downloadCSV = (
 };
 
 const ChargeSheetsTab: React.FC = () => {
-    const [data, setData] = useState<UserCharge[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-    const [semesters, setSemesters] = useState<Semester[]>([]);
+    const users = useOmniList<UserCharge>('users', 'users');
+    const semesters = useOmniList<Semester>('semesters', 'semesters');
+
     const [semesterId, setSemesterId] = useState<string>('');
     const [membershipCharge, setMembershipCharge] = useState<string>('');
     const [generating, setGenerating] = useState<boolean>(false);
 
     useEffect(() => {
-        let cancelled = false;
-
+        if (semesterId || semesters.rows.length === 0) return;
         (async () => {
             try {
-                setLoading(true);
-                setError(null);
-                const [users, allSemesters, current] = await Promise.all([
-                    OmniAPI.getAll('users'),
-                    OmniAPI.getAll('semesters', { limit: 1000 }),
-                    OmniAPI.get('semesters', 'current').catch(() => null),
-                ]);
-                if (cancelled) return;
-                setData(Array.isArray(users) ? users : []);
-                const semList = Array.isArray(allSemesters) ? allSemesters : [];
-                setSemesters(semList);
+                const current = await OmniAPI.get('semesters', 'current');
                 if (current && current.id) {
                     setSemesterId(current.id);
-                } else if (semList.length > 0) {
-                    setSemesterId(semList[0].id);
+                    return;
                 }
-            } catch (err) {
-                if (cancelled) return;
-                console.error('Failed to load charge sheet data:', err);
-                setError('Unable to load charge sheet data. Please try again later.');
-            } finally {
-                if (!cancelled) setLoading(false);
+            } catch {
+                // fall through to default
             }
+            setSemesterId(semesters.rows[0].id);
         })();
-
-        return () => {
-            cancelled = true;
-        };
-    }, []);
+    }, [semesters.rows, semesterId]);
 
     const handleCreate = async () => {
         if (!semesterId) {
@@ -178,7 +113,9 @@ const ChargeSheetsTab: React.FC = () => {
             };
             const graduating = charges.filter((c) => c.is_graduating).map(makeRow);
             const nongrad = charges.filter((c) => !c.is_graduating).map(makeRow);
-            const semName = getSemesterName(semesters.find((s) => String(s.id) === String(semesterId)));
+            const semName = getSemesterName(
+                semesters.rows.find((s) => String(s.id) === String(semesterId)),
+            );
 
             if (graduating.length > 0) downloadCSV(graduating, semName, 'graduating');
             if (nongrad.length > 0) downloadCSV(nongrad, semName, 'nongraduating');
@@ -199,11 +136,11 @@ const ChargeSheetsTab: React.FC = () => {
                 className="Input"
                 value={semesterId}
                 onChange={(e) => setSemesterId(e.target.value)}
-                disabled={semesters.length === 0}
+                disabled={semesters.rows.length === 0}
                 aria-label="Semester"
             >
-                {semesters.length === 0 && <option value="">No semesters</option>}
-                {semesters.map((s) => (
+                {semesters.rows.length === 0 && <option value="">No semesters</option>}
+                {semesters.rows.map((s) => (
                     <option key={s.id} value={s.id}>
                         {getSemesterName(s).replace('_', ' ')}
                     </option>
@@ -220,7 +157,7 @@ const ChargeSheetsTab: React.FC = () => {
             />
             <button
                 type="button"
-                className="btn-action btn-action--purple"
+                className="btn-action btn-action--red"
                 onClick={handleCreate}
                 disabled={generating}
             >
@@ -232,11 +169,11 @@ const ChargeSheetsTab: React.FC = () => {
     return (
         <AdminTable<UserCharge>
             title="Charge Sheets"
-            columns={columns}
-            rows={data}
+            columns={userChargeColumns}
+            rows={users.rows}
             rowKey={(c) => `${c.RIN}-${c.first_name}-${c.last_name}`}
-            loading={loading}
-            error={error}
+            loading={users.loading}
+            error={users.error}
             emptyMessage="No users found."
             actions={actions}
         />
