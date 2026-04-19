@@ -81,6 +81,18 @@ const MachineTypesTab: React.FC = () => {
         }
     }, []);
 
+    // Just the resource-slot checkbox list — cheap side-fetch so the dialog
+    // picks up slots added in other admin tabs without refetching the whole
+    // machine-types table and flashing its loading state.
+    const refreshSlots = useCallback(async () => {
+        try {
+            const slotsRes = await OmniAPI.getAll('resourceslots');
+            setSlots(Array.isArray(slotsRes) ? (slotsRes as ResourceSlot[]) : []);
+        } catch (err) {
+            console.error('Failed to refresh resource slots:', err);
+        }
+    }, []);
+
     useEffect(() => {
         fetchTypes();
     }, [fetchTypes]);
@@ -91,6 +103,7 @@ const MachineTypesTab: React.FC = () => {
         setCostPerHour('');
         setSlotIDS([]);
         setIsOpen(true);
+        refreshSlots();
     };
 
     // Edit flow: fetch the machine type by id (so we can pre-fill
@@ -100,6 +113,9 @@ const MachineTypesTab: React.FC = () => {
             alert('You do not have permission to edit machine types.');
             return;
         }
+        // Refresh the slot checkbox list alongside the prefill fetch so newly
+        // added resource slots are present when editing an existing type.
+        refreshSlots();
         OmniAPI.get('machinetypes', mt.id)
             .then((full: any) => {
                 setEditingId(mt.id);

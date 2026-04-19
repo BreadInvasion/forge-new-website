@@ -32,7 +32,7 @@ const AnvilImage = styled.img`
     left: 4%;
     top: 50%;
     transform: translateY(-50%);
-    height: 90%;
+    height: 100%;
     max-height: 816px;
     width: auto;
     object-fit: contain;
@@ -88,7 +88,7 @@ const FormCard = styled.div`
         background-image: url(${bgPattern});
         background-repeat: repeat;
         background-size: 122px 140px;
-        opacity: 0.05;
+        opacity: 0.03;
         pointer-events: none;
         z-index: 0;
     }
@@ -257,7 +257,11 @@ const SubmitBtn = styled.button`
     color: ${C.white};
     cursor: pointer;
     margin-top: 4px;
-    transition: background 0.15s ease, transform 0.1s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
 
     &:hover {
         background: #8a1515;

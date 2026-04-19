@@ -37,7 +37,7 @@ const CalendarSection = styled.section`
     background-image: url(${bgPattern});
     background-repeat: repeat;
     background-size: 122px 140px;
-    opacity: 0.05;
+    opacity: 0.03;
     pointer-events: none;
     z-index: 0;
   }

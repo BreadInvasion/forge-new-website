@@ -218,7 +218,14 @@ const MachineGroupsTab: React.FC = () => {
 
             <Dialog.Portal>
                 <Dialog.Overlay className="mgd-overlay" />
-                <Dialog.Content className="mgd-content">
+                <Dialog.Content
+                    className="mgd-content"
+                    style={
+                        {
+                            ['--dialog-bg' as string]: `url(${bgPattern})`,
+                        } as React.CSSProperties
+                    }
+                >
                     <Dialog.Close asChild>
                         <button type="button" className="mgd-close" aria-label="Close">
                             <Cross2Icon />

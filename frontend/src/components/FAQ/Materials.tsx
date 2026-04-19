@@ -16,8 +16,16 @@ const C = {
   navyMid:   '#2d4a80',
   navyLight: '#31519c',
   red:       '#a51c1c',
-  redLight:  'rgba(165,28,28,0.15)',
-  blueLight: 'rgba(45,74,128,0.15)',
+  redBright: '#d12b2b',
+  // Vibrant red / blue panel fills — top-lit gradient so the panel reads as
+  // an actual coloured card instead of a flat 15%-alpha wash. Paired with a
+  // thicker left accent bar and a saturated drop-shadow below.
+  redFill:     'linear-gradient(180deg, rgba(209, 43, 43, 0.22) 0%, rgba(165, 28, 28, 0.12) 100%)',
+  redBorder:   'rgba(165, 28, 28, 0.35)',
+  redShadow:   'rgba(165, 28, 28, 0.28)',
+  blueFill:    'linear-gradient(180deg, rgba(62, 99, 172, 0.22) 0%, rgba(45, 74, 128, 0.12) 100%)',
+  blueBorder:  'rgba(45, 74, 128, 0.35)',
+  blueShadow:  'rgba(45, 74, 128, 0.28)',
   slate:     '#64748b',
   lightBlue: '#bac8db',
   divider:   '#e2e8f0',
@@ -219,7 +227,7 @@ const ContentSection = styled.section<{ $bg?: 'white' | 'light' }>`
     background-image: url(${bgPattern});
     background-repeat: repeat;
     background-size: 122px 140px;
-    opacity: 0.05;
+    opacity: 0.03;
     pointer-events: none;
   }
 `;
@@ -362,18 +370,31 @@ const RulesPanelRow = styled.div`
 
 const RulePanel = styled.div<{ variant: 'banned' | 'allowed' }>`
   flex: 1 1 280px;
-  border-left: 2px solid ${p => p.variant === 'banned' ? C.red : C.navyMid};
-  background: ${p => p.variant === 'banned' ? C.redLight : C.blueLight};
-  border-radius: 0 5px 5px 0;
+  position: relative;
+  /* Thicker accent bar on the left + a soft framing border everywhere else
+     so the panel reads as a contained, coloured card instead of a wash. */
+  border-left: 5px solid ${p => p.variant === 'banned' ? C.red : C.navyMid};
+  border-top: 1px solid ${p => p.variant === 'banned' ? C.redBorder : C.blueBorder};
+  border-right: 1px solid ${p => p.variant === 'banned' ? C.redBorder : C.blueBorder};
+  border-bottom: 1px solid ${p => p.variant === 'banned' ? C.redBorder : C.blueBorder};
+  background: ${p => p.variant === 'banned' ? C.redFill : C.blueFill};
+  border-radius: 0 6px 6px 0;
   overflow: hidden;
-  /* frosted/blurred effect */
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  /* Saturated drop-shadow in the panel's own hue — lifts the card off the
+     page without turning grey like a generic black shadow would. */
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 8px 24px ${p => p.variant === 'banned'
-      ? 'rgba(165, 28, 28, 0.18)'
-      : 'rgba(45, 74, 128, 0.18)'};
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 2px 4px rgba(17, 28, 54, 0.06),
+    0 12px 28px ${p => p.variant === 'banned' ? C.redShadow : C.blueShadow};
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.5) inset,
+      0 4px 8px rgba(17, 28, 54, 0.08),
+      0 16px 36px ${p => p.variant === 'banned' ? C.redShadow : C.blueShadow};
+  }
 `;
 
 const RulePanelTop = styled.div`
@@ -386,7 +407,10 @@ const RulePanelTop = styled.div`
 const RuleBadge = styled.div<{ variant: 'banned' | 'allowed' }>`
   background: ${p => p.variant === 'banned' ? C.red : C.navyMid};
   padding: 6px 12px;
-  border-radius: 2px;
+  border-radius: 3px;
+  box-shadow: 0 2px 6px ${p => p.variant === 'banned'
+    ? 'rgba(165, 28, 28, 0.35)'
+    : 'rgba(45, 74, 128, 0.35)'};
 
   span {
     font-family: var(--font-display);
@@ -415,6 +439,13 @@ const RuleList = styled.ul`
   gap: 8px;
 `;
 
+// Inline SVG data URLs for the bullet icons. Banned items get a red circle
+// with a white X; allowed items get a navy circle with a white checkmark.
+// Using %23 for the `#` so the hex colors survive URL-encoding, and keeping
+// the stroke chunky so the glyphs read clearly at 16px.
+const BANNED_ICON = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='8' fill='%23a51c1c'/><path d='M5 5l6 6M11 5l-6 6' stroke='white' stroke-width='2.2' stroke-linecap='round'/></svg>")`;
+const ALLOWED_ICON = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='8' fill='%232d4a80'/><path d='M4.3 8.2l2.4 2.4 5-5' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>")`;
+
 const RuleListItem = styled.li<{ variant: 'banned' | 'allowed' }>`
   display: flex;
   align-items: center;
@@ -427,11 +458,17 @@ const RuleListItem = styled.li<{ variant: 'banned' | 'allowed' }>`
 
   &::before {
     content: '';
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+    width: 16px;
+    height: 16px;
     flex-shrink: 0;
-    background: ${p => p.variant === 'banned' ? C.red : C.navyMid};
+    border-radius: 50%;
+    background-image: ${p => p.variant === 'banned' ? BANNED_ICON : ALLOWED_ICON};
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    box-shadow: 0 0 0 2px ${p => p.variant === 'banned'
+      ? 'rgba(165, 28, 28, 0.18)'
+      : 'rgba(45, 74, 128, 0.18)'};
   }
 `;
 // ── Info Box (for special notes like Resin Printer) ──────────────────────
@@ -470,13 +507,20 @@ const InfoBoxLeftSubtitle = styled.p`
 
 const InfoBox = styled.div`
   flex: 1;
-  border-left: 4px solid ${C.red};
-  background: ${C.redLight};
+  border-left: 5px solid ${C.red};
+  border-top: 1px solid ${C.redBorder};
+  border-right: 1px solid ${C.redBorder};
+  border-bottom: 1px solid ${C.redBorder};
+  background: ${C.redFill};
   border-radius: 0 6px 6px 0;
   padding: 24px;
   display: flex;
   gap: 16px;
   align-items: flex-start;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 2px 4px rgba(17, 28, 54, 0.06),
+    0 12px 28px ${C.redShadow};
 `;
 
 const InfoBoxIcon = styled.div`
@@ -491,6 +535,7 @@ const InfoBoxIcon = styled.div`
   color: #fff;
   font-weight: 700;
   font-size: 24px;
+  box-shadow: 0 3px 10px rgba(165, 28, 28, 0.4);
 `;
 
 const InfoBoxContent = styled.div`
@@ -585,9 +630,18 @@ export default function Materials() {
 
       {/* ── Machine rule sections (each in its own container) ───────────── */}
       {MACHINE_RULES.map((machine, index) => {
-        // Alternate ruler images so consecutive sections never repeat the same pattern.
-        // Machine sections start at index 0 (FDM) → RULER_3, (Laser) → RULER_2, (Vinyl) → RULER_3.
-        const machineRuler = index % 2 === 0 ? RULER_3 : RULER_2;
+        // Ruler sequence down the page — RULER_2 is red, RULER_3 is blue.
+        // No two adjacent sections share a ruler so the eye keeps moving.
+        //   Hero      → R1
+        //   Pricing   → R2  (red)
+        //   FDM       → R3  (blue)   — machine idx 0
+        //   Laser     → R2  (red)    — machine idx 1
+        //   Resin box → R3  (blue)   — conditional, injected after Laser below
+        //   Vinyl     → R2  (red)    — machine idx 2
+        // Vinyl (the Sticker Printer) is explicitly red per design; Resin
+        // explicitly blue; both drive the picks on their respective rows.
+        const MACHINE_RULERS = [RULER_3, RULER_2, RULER_2];
+        const machineRuler = MACHINE_RULERS[index];
         // Background alternation across ALL sections (Pricing, FDM, Laser, Resin, Vinyl).
         // Pricing is white; the Resin info block (inserted after Laser) takes the "light"
         // slot between Laser and Vinyl — so Vinyl at idx 2 flips back to white to keep
@@ -641,11 +695,13 @@ export default function Materials() {
           </ContentSection>
 
           {/* Resin Printer Info Box — its own container, rendered after the
-              Laser Cutter section (index 1). Uses the blue ruler (RULER_2). */}
+              Laser Cutter section (index 1). Uses RULER_3 (blue) per design;
+              its neighbours — Laser above (red R2) and Vinyl below (red R2)
+              — both sit on red, so the blue ruler breaks up the run cleanly. */}
           {index === 1 && (
             <ContentSection $bg="light">
               <RulerStrip $side="right">
-                <img src={RULER_2} alt="" aria-hidden="true" />
+                <img src={RULER_3} alt="" aria-hidden="true" />
               </RulerStrip>
               <SectionInner>
                 <InfoBoxSection>

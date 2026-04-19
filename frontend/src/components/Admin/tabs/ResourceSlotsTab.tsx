@@ -84,6 +84,20 @@ const ResourceSlotsTab: React.FC = () => {
         }
     }, []);
 
+    // Just the resources checkbox list — cheap side-fetch so the dialog picks
+    // up resources added in the sibling Resources tab without refetching the
+    // whole slots table and flashing its loading state.
+    const refreshResources = useCallback(async () => {
+        try {
+            const resourcesRes = await OmniAPI.getAll('resources');
+            setResources(
+                Array.isArray(resourcesRes) ? (resourcesRes as Resource[]) : [],
+            );
+        } catch (err) {
+            console.error('Failed to refresh resources:', err);
+        }
+    }, []);
+
     useEffect(() => {
         fetchSlots();
     }, [fetchSlots]);
@@ -95,6 +109,7 @@ const ResourceSlotsTab: React.FC = () => {
         setAllowEmpty(false);
         setAllowOwn(false);
         setIsOpen(true);
+        refreshResources();
     };
 
     // Edit flow: fetch by id so we can prefill valid_resource_ids and flags.
@@ -103,6 +118,9 @@ const ResourceSlotsTab: React.FC = () => {
             alert('You do not have permission to edit resource slots.');
             return;
         }
+        // Refresh the resource checkbox list alongside the prefill fetch so
+        // newly added resources show up when editing an existing slot.
+        refreshResources();
         OmniAPI.get('resourceslots', s.id)
             .then((full: any) => {
                 setEditingId(s.id);

@@ -57,7 +57,7 @@ const Section = styled.section<{ bg?: string }>`
     background-repeat: repeat;
     background-size: 122px 140px;
     background-position: 0 var(--pattern-y, 0px);
-    opacity: 0.05;
+    opacity: 0.03;
     pointer-events: none;
   }
 `;
@@ -224,6 +224,24 @@ const StepBar = styled.div`
   justify-content: center;
   padding: 12px 0 8px 0;
   flex-wrap: wrap;
+`;
+
+// Red rectangle that runs under the step progress bar. Starts just past the
+// ruler on the left edge so it visually plugs into one of the ruler ticks
+// (like the Admin page tab divider does). Full-bleed to the right edge.
+const StepBarDivider = styled.div`
+  height: 4px;
+  width: 100%;
+  margin: 0;
+  background: ${C.red};
+  position: relative;
+  top: 11px;
+  z-index: 1;
+
+  @media (max-width: 640px) {
+    width: calc(100% - 24px);
+    margin-left: 24px;
+  }
 `;
 
 const StepItem = styled.div`
@@ -578,6 +596,143 @@ const LocationText = styled.p`
 `;
 
 // ============================================================
+// REGISTER CTA  (Step 5)
+// ============================================================
+// Mirrors the InfoCard chrome used in Step 4 (navy gradient header + light
+// body) so the final step feels like a visual sibling to "Where to Find Us"
+// rather than a one-off. Sized a little wider since it's the page's closing
+// call-to-action.
+
+// Two-column layout for Step 5: heading / copy on the left, RegisterCard on
+// the right. Wraps to a stacked column on narrow viewports.
+const RegisterLayout = styled.div`
+  display: flex;
+  gap: 56px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+`;
+
+const RegisterTextCol = styled.div`
+  flex: 1 1 320px;
+  max-width: 520px;
+  min-width: 0;
+`;
+
+const RegisterCardCol = styled.div`
+  flex: 1 1 420px;
+  max-width: 560px;
+  min-width: 0;
+`;
+
+const RegisterCard = styled.div`
+  border: 1px solid ${C.navyLight};
+  border-radius: 5px;
+  background: ${C.bgLight};
+  overflow: hidden;
+  width: 100%;
+`;
+
+const RegisterCardHeader = styled.div`
+  background: linear-gradient(to right, ${C.navy}, ${C.navyLight});
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const RegisterCardTitle = styled.h3`
+  font-family: 'Funnel Display', sans-serif;
+  font-weight: 700;
+  font-size: 34px;
+  color: #fff;
+  letter-spacing: 2.52px;
+  margin: 0;
+`;
+
+const RegisterCardBody = styled.div`
+  padding: 24px 28px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+`;
+
+const RegisterCardText = styled.p`
+  font-family: 'Funnel Display', sans-serif;
+  font-weight: 500;
+  font-size: 19px;
+  color: ${C.slate};
+  letter-spacing: 1.4px;
+  line-height: 1.4;
+  margin: 0;
+
+  strong { font-weight: 700; color: ${C.red}; }
+`;
+
+const RegisterBulletList = styled.ul`
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const RegisterBullet = styled.li`
+  font-family: 'Funnel Display', sans-serif;
+  font-weight: 500;
+  font-size: 17px;
+  color: ${C.navyMid};
+  letter-spacing: 1.05px;
+  line-height: 1.4;
+  padding-left: 26px;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: ${C.red};
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M4.3 8.2l2.4 2.4 5-5' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>");
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+  }
+`;
+
+const RegisterBtn = styled.a`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 40px;
+  background: ${C.red};
+  border: 2px solid ${C.navy};
+  border-radius: 10px;
+  font-family: 'Funnel Display', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: #fff;
+  letter-spacing: 1.2px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(80, 16, 14, 0.35);
+  transition: background-color 0.12s ease, transform 0.06s ease, opacity 0.15s;
+
+  &:hover {
+    background-color: #861717;
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 rgba(80, 16, 14, 0.35);
+  }
+`;
+
+// ============================================================
 // FILE TYPES DATA
 // ============================================================
 const FILE_TYPES = [
@@ -683,6 +838,10 @@ export default function GettingStarted() {
           ))}
         </StepBar>
 
+        {/* Red bar under the step progress — matches the Figma mockup and
+            lines up with the ruler tick on the left edge. */}
+        <StepBarDivider aria-hidden="true" />
+
         <SectionInner style={{ paddingTop: 48, paddingBottom: 64 }}>
           <StepLabel>STEP 1</StepLabel>
           <SectionTitle>What file type do you need?</SectionTitle>
@@ -781,7 +940,7 @@ export default function GettingStarted() {
             </PricingCard>
           </PricingGrid>
 
-          <BannedBtn href="#">Banned Filaments</BannedBtn>
+          <BannedBtn href="../faq/materials">Banned Filaments</BannedBtn>
         </SectionInner>
       </Section>
 
@@ -864,6 +1023,50 @@ export default function GettingStarted() {
               </LocationBody>
             </InfoCard>
           </LocationGrid>
+        </SectionInner>
+      </Section>
+
+      {/* ── STEP 5: REGISTER ───────────────────────────────────────────────── */}
+      {/* Closing call-to-action — nudges visitors to create a Forge account so
+          they can sign in on-site and start a machine. Reuses the card chrome
+          from Step 4 so it feels like a sibling section rather than a bolt-on.
+          Two-column layout: heading / blurb on the left, Register card on the
+          right. Collapses to a stacked column on narrow viewports. */}
+      <Section data-pattern bg="#fff">
+        <RulerWrap>
+          <img src={RULER_2} alt="" aria-hidden="true" />
+        </RulerWrap>
+        <SectionInner style={{ paddingTop: 64, paddingBottom: 80 }}>
+          <RegisterLayout>
+            <RegisterTextCol>
+              <StepLabel>STEP 5</StepLabel>
+              <SectionTitle>Register for a Forge Account</SectionTitle>
+              <SectionSubtitle style={{ marginBottom: 0 }}>
+                Create your account before you come by — it only takes a minute and
+                lets us link your machine usage, charges, and reservations to your RCSID.
+              </SectionSubtitle>
+            </RegisterTextCol>
+
+            <RegisterCardCol>
+              <RegisterCard>
+                <RegisterCardHeader>
+                  <RegisterCardTitle>Register!</RegisterCardTitle>
+                </RegisterCardHeader>
+                <RegisterCardBody>
+                  <RegisterCardText>
+                    Sign up with your <strong>RCSID</strong> and <strong>RIN</strong> so
+                    volunteers can check you in at any machine the moment you walk in.
+                  </RegisterCardText>
+                  <RegisterBulletList>
+                    <RegisterBullet>Track your usage and semester balance in one place.</RegisterBullet>
+                    <RegisterBullet>Reserve machines and get notified when they're free.</RegisterBullet>
+                    <RegisterBullet>Pick up where you left off on any printer or cutter.</RegisterBullet>
+                  </RegisterBulletList>
+                  <RegisterBtn href="/register">Create an Account</RegisterBtn>
+                </RegisterCardBody>
+              </RegisterCard>
+            </RegisterCardCol>
+          </RegisterLayout>
         </SectionInner>
       </Section>
 

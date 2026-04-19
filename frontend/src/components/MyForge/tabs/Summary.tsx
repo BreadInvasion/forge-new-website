@@ -62,9 +62,13 @@ const formatSemester = (value: string | undefined | null): string => {
 const Summary: React.FC = () => {
     const { user } = useAuth();
 
+    // Defensive: if the user object hasn't loaded yet (fresh login race or a
+    // /users/me failure), treat the user as having no permissions rather than
+    // crashing the whole page on `permissions.includes`.
+    const permissions: UserPermission[] = user?.permissions ?? [];
     const hasPermission = (p: UserPermission) =>
-        user.permissions.includes(p) ||
-        user.permissions.includes(UserPermission.IS_SUPERUSER);
+        permissions.includes(p) ||
+        permissions.includes(UserPermission.IS_SUPERUSER);
 
     const isVolunteer = hasPermission(UserPermission.CAN_FAIL_MACHINES);
     const canUseMachines =
@@ -317,8 +321,13 @@ const Summary: React.FC = () => {
         const entries = Object.values(totals)
             .map(({ label, amount }) => ({ machine: label, amount }))
             .sort((a, b) => b.amount - a.amount);
+        // `total` drives bar widths as a share of the whole semester's
+        // spending, so the chart bars add up to 100% instead of normalizing
+        // against the single largest machine-type (which made the top bar
+        // always fill the track).
+        const total = entries.reduce((s, e) => s + e.amount, 0);
         const max = entries.reduce((m, e) => Math.max(m, e.amount), 0);
-        return { entries, max };
+        return { entries, total, max };
     }, [machineUsages, machineNameToType]);
 
     // Semester options for the filter dropdown.
@@ -459,8 +468,15 @@ const Summary: React.FC = () => {
                     ) : (
                         <ul className="spending-list">
                             {spendingByMachine.entries.map(({ machine, amount }) => {
-                                const pct = spendingByMachine.max > 0
-                                    ? Math.max(4, Math.round((amount / spendingByMachine.max) * 100))
+                                // Share of total spending — bars across the
+                                // chart add up to ~100%. A tiny minimum width
+                                // is applied only to nonzero amounts so very
+                                // small shares are still visible.
+                                const rawPct = spendingByMachine.total > 0
+                                    ? (amount / spendingByMachine.total) * 100
+                                    : 0;
+                                const pct = amount > 0
+                                    ? Math.max(4, rawPct)
                                     : 0;
                                 return (
                                     <li className="spending-row" key={machine}>

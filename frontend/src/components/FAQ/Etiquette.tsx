@@ -3,23 +3,22 @@ import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
 
 // ── Figma Assets ──────────────────────────────────────────────────────────
-const RULER_HERO    = 'https://www.figma.com/api/mcp/asset/b898873a-74bf-4a50-8908-851628aa2d27';
+const RULER_HERO = 'https://www.figma.com/api/mcp/asset/b898873a-74bf-4a50-8908-851628aa2d27';
 const RULER_SECTION = 'https://www.figma.com/api/mcp/asset/87c5c392-123f-42ff-8433-68d7da8166c2';
-const HERO_DECO     = 'https://www.figma.com/api/mcp/asset/366c8e9b-0c94-4167-934e-fb6eff4d35f9';
+const HERO_DECO = 'https://www.figma.com/api/mcp/asset/366c8e9b-0c94-4167-934e-fb6eff4d35f9';
 
 // ── Design tokens ─────────────────────────────────────────────────────────
 const C = {
-  navy:      '#111c36',
-  navyMid:   '#2d4a80',
-  red:       '#a51c1c',
-  slate:     '#64748b',
+  navy: '#111c36',
+  navyMid: '#2d4a80',
+  red: '#a51c1c',
+  slate: '#64748b',
   lightBlue: '#bac8db',
-  bgLight:   '#eef2f8',
-  divider:   '#e2e8f0',
+  bgLight: '#eef2f8',
+  divider: '#e2e8f0',
 };
 
 // ── Data ──────────────────────────────────────────────────────────────────
-
 const DOS = [
   {
     title: 'Ask Questions',
@@ -62,6 +61,32 @@ const PageWrapper = styled.div`
   overflow-x: hidden;
 `;
 
+// ── Shared ruler, same approach as About Us ───────────────────────────────
+const RulerWrap = styled.div`
+  position: absolute;
+  left: -1px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 79px;
+  height: 750px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+
+  img {
+    transform: rotate(90deg);
+    width: 750px;
+    height: 79px;
+    object-fit: fill;
+    flex-shrink: 0;
+    display: block;
+    max-width: none;
+  }
+`;
+
 // ── Hero ──────────────────────────────────────────────────────────────────
 
 const HeroSection = styled.section`
@@ -73,32 +98,6 @@ const HeroSection = styled.section`
   flex-shrink: 0;
   display: flex;
   align-items: center;
-`;
-
-const RulerStrip = styled.div<{ $url: string }>`
-  position: absolute;
-  right: -1px;
-  top: 0;
-  width: 79px;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-
-  &::after {
-    content: '';
-    position: absolute;
-    width: 5000px;
-    height: 79px;
-    left: calc(50% - 2500px);
-    top: -2539.5px;
-    transform: rotate(-90deg) scaleY(-1);
-    transform-origin: center center;
-    background-image: url(${p => p.$url});
-    background-size: 750px 79px;
-    background-repeat: repeat-x;
-    background-position: 0 0;
-  }
 `;
 
 const HeroDecoWrap = styled.div`
@@ -119,6 +118,7 @@ const HeroDecoWrap = styled.div`
     top: -4.18%;
     max-width: none;
     object-fit: cover;
+    display: block;
   }
 `;
 
@@ -130,8 +130,13 @@ const HeroInner = styled.div`
   position: relative;
   z-index: 1;
 
-  @media (max-width: 1024px) { padding: 60px 80px; }
-  @media (max-width: 640px)  { padding: 48px 24px; }
+  @media (max-width: 1024px) {
+    padding: 60px 80px;
+  }
+
+  @media (max-width: 640px) {
+    padding: 48px 24px;
+  }
 `;
 
 const HeroTitle = styled.h1`
@@ -155,8 +160,6 @@ const HeroSubtitle = styled.p`
 
 // ── Content section ───────────────────────────────────────────────────────
 
-// SectionRuler reuses RulerStrip — defined above
-
 const ContentSection = styled.section`
   position: relative;
   width: 100%;
@@ -170,7 +173,7 @@ const ContentSection = styled.section`
     background-image: url(${bgPattern});
     background-repeat: repeat;
     background-size: 122px 140px;
-    opacity: 0.05;
+    opacity: 0.03;
     pointer-events: none;
   }
 `;
@@ -182,8 +185,13 @@ const SectionInner = styled.div`
   position: relative;
   z-index: 1;
 
-  @media (max-width: 1024px) { padding: 48px 60px 64px 80px; }
-  @media (max-width: 640px)  { padding: 40px 24px 56px 24px; }
+  @media (max-width: 1024px) {
+    padding: 48px 60px 64px 80px;
+  }
+
+  @media (max-width: 640px) {
+    padding: 40px 24px 56px 24px;
+  }
 `;
 
 // ── Do's and Don'ts ───────────────────────────────────────────────────────
@@ -248,7 +256,7 @@ const TriangleIcon = styled.div`
     position: absolute;
     inset: 0;
     clip-path: polygon(50% 8%, 95% 90%, 5% 90%);
-    background: #f5c518;
+    background: ${C.red};
   }
 
   span {
@@ -257,7 +265,7 @@ const TriangleIcon = styled.div`
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 13px;
-    color: ${C.navy};
+    color: #fff;
     line-height: 1;
     margin-top: 4px;
   }
@@ -289,13 +297,15 @@ const DDItemDesc = styled.p`
 export default function Etiquette() {
   return (
     <PageWrapper>
-
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <HeroSection>
-        <RulerStrip $url={RULER_HERO} />
+        <RulerWrap>
+          <img src={RULER_HERO} alt="" aria-hidden="true" />
+        </RulerWrap>
+
         <HeroDecoWrap>
           <img src={HERO_DECO} alt="" aria-hidden="true" />
         </HeroDecoWrap>
+
         <HeroInner>
           <HeroTitle>Etiquette</HeroTitle>
           <HeroSubtitle>
@@ -304,13 +314,13 @@ export default function Etiquette() {
         </HeroInner>
       </HeroSection>
 
-      {/* ── Do's and Don'ts ───────────────────────────────────────────────── */}
       <ContentSection>
-        <RulerStrip $url={RULER_SECTION} />
+        <RulerWrap>
+          <img src={RULER_SECTION} alt="" aria-hidden="true" />
+        </RulerWrap>
+
         <SectionInner>
           <DosDontsGrid>
-
-            {/* Do column */}
             <DDColumn>
               <DDColTitle>Do</DDColTitle>
               {DOS.map(item => (
@@ -324,24 +334,23 @@ export default function Etiquette() {
               ))}
             </DDColumn>
 
-            {/* Don't column */}
             <DDColumn>
               <DDColTitle>Don't</DDColTitle>
               {DONTS.map(item => (
                 <DDItem key={item.title}>
                   <DDItemHeader>
-                    <TriangleIcon><span>!</span></TriangleIcon>
+                    <TriangleIcon>
+                      <span>!</span>
+                    </TriangleIcon>
                     <DDItemTitle>{item.title}</DDItemTitle>
                   </DDItemHeader>
                   <DDItemDesc>{item.desc}</DDItemDesc>
                 </DDItem>
               ))}
             </DDColumn>
-
           </DosDontsGrid>
         </SectionInner>
       </ContentSection>
-
     </PageWrapper>
   );
 }
