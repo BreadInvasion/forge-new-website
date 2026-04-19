@@ -77,6 +77,7 @@ const FieldRow = styled.div`
     gap: 4px;
     height: 25px;
     width: 100%;
+    height: 30px;
 `;
 
 const FieldLabel = styled.span`
