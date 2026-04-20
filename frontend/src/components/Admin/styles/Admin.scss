@@ -40,32 +40,7 @@
     z-index: 0;
 }
 
-// Ruler strip down the left edge
-.admin-ruler {
-    position: absolute;
-    left: -1px;
-    top: 0;
-    bottom: 0;
-    width: 70px;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 0;
-
-    &::after {
-        content: '';
-        position: absolute;
-        width: 5000px;
-        height: 70px;
-        left: calc(50% - 2500px);
-        top: -2535px;
-        transform: rotate(-90deg) scaleY(-1);
-        transform-origin: center center;
-        background-image: var(--ruler-url);
-        background-size: 750px 70px;
-        background-repeat: repeat-x;
-        background-position: 0 0;
-    }
-}
+// Ruler strip is now rendered by the shared <PageRuler> component.
 
 // ──────────────────────────────────────────────────────────────────────────
 // Tab bar at the top of the admin page

@@ -1,9 +1,9 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import PageRuler from '../shared/PageRuler';
 
 // ── Figma Assets ──────────────────────────────────────────────────────────
-const RULER_HERO = 'https://www.figma.com/api/mcp/asset/b898873a-74bf-4a50-8908-851628aa2d27';
 const RULER_SECTION = 'https://www.figma.com/api/mcp/asset/87c5c392-123f-42ff-8433-68d7da8166c2';
 const HERO_DECO = 'https://www.figma.com/api/mcp/asset/366c8e9b-0c94-4167-934e-fb6eff4d35f9';
 
@@ -54,37 +54,12 @@ const DONTS = [
 // =============================================================================
 
 const PageWrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
   flex: 1;
   overflow-x: hidden;
-`;
-
-// ── Shared ruler, same approach as About Us ───────────────────────────────
-const RulerWrap = styled.div`
-  position: absolute;
-  left: -1px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 79px;
-  height: 750px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-
-  img {
-    transform: rotate(90deg);
-    width: 750px;
-    height: 79px;
-    object-fit: fill;
-    flex-shrink: 0;
-    display: block;
-    max-width: none;
-  }
 `;
 
 // ── Hero ──────────────────────────────────────────────────────────────────
@@ -297,11 +272,10 @@ const DDItemDesc = styled.p`
 export default function Etiquette() {
   return (
     <PageWrapper>
-      <HeroSection>
-        <RulerWrap>
-          <img src={RULER_HERO} alt="" aria-hidden="true" />
-        </RulerWrap>
+      {/* Single continuous ruler across the page */}
+      <PageRuler src={RULER_SECTION} side="left" />
 
+      <HeroSection>
         <HeroDecoWrap>
           <img src={HERO_DECO} alt="" aria-hidden="true" />
         </HeroDecoWrap>
@@ -315,10 +289,6 @@ export default function Etiquette() {
       </HeroSection>
 
       <ContentSection>
-        <RulerWrap>
-          <img src={RULER_SECTION} alt="" aria-hidden="true" />
-        </RulerWrap>
-
         <SectionInner>
           <DosDontsGrid>
             <DDColumn>

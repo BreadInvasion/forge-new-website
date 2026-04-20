@@ -1,13 +1,15 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import PageRuler from '../shared/PageRuler';
 
 // ── Figma Assets ──────────────────────────────────────────────────────────
-// Ruler images — three variants, alternated between sections so consecutive
-// sections never show the same pattern (matches the Create/GettingStarted page).
-const RULER_1   = 'https://www.figma.com/api/mcp/asset/c96236fb-9208-4949-9a04-e9e32cf364fe';
-const RULER_2   = 'https://www.figma.com/api/mcp/asset/7c80f8d8-834a-4822-b125-67a1c47398d7';
-const RULER_3   = 'https://www.figma.com/api/mcp/asset/be993c25-e7d4-4f74-bebf-6dfba428cb75';
+// A single ruler asset is used as the tick SHAPE for every section. Per-
+// section color (white hero / red / navy) comes from the `color` prop on
+// PageRuler, which uses the image as a CSS mask and paints it with
+// background-color. This means ticks have identical pixel positions in
+// every section, so rulers line up perfectly across the page boundary.
+const RULER     = 'https://www.figma.com/api/mcp/asset/7c80f8d8-834a-4822-b125-67a1c47398d7';
 const HERO_DECO = 'https://www.figma.com/api/mcp/asset/366c8e9b-0c94-4167-934e-fb6eff4d35f9';
 
 // ── Design tokens ─────────────────────────────────────────────────────────
@@ -104,6 +106,7 @@ const MACHINE_RULES = [
 // =============================================================================
 
 const PageWrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -122,40 +125,6 @@ const HeroSection = styled.section`
   flex-shrink: 0;
   display: flex;
   align-items: center;
-`;
-
-/**
- * Vertical ruler decoration. A single 750px image is centered vertically
- * inside a 79px-wide strip and clipped by the parent section's
- * `overflow: hidden`. Each section renders its OWN ruler, so consecutive
- * sections never visually collide — matching the Create/GettingStarted page.
- *
- * Flip logic:
- *   - $side="left"  → rotate(-90deg) scaleY(-1)   (tick marks face inward / right)
- *   - $side="right" → rotate( 90deg) scaleY(-1)   (tick marks face inward / left)
- */
-const RulerStrip = styled.div<{ $side?: 'left' | 'right' }>`
-  position: absolute;
-  ${p => p.$side === 'right' ? 'right: -1px;' : 'left: -1px;'}
-  top: 50%;
-  transform: translateY(-50%);
-  width: 79px;
-  height: 750px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 0;
-
-  img {
-    width: 750px;
-    height: 79px;
-    object-fit: fill;
-    flex-shrink: 0;
-    transform: ${p => p.$side === 'right'
-      ? 'rotate(90deg) scaleY(-1)'
-      : 'rotate(-90deg) scaleY(-1)'};
-  }
 `;
 
 const HeroDecoWrap = styled.div`
@@ -211,8 +180,6 @@ const HeroSubtitle = styled.p`
 `;
 
 // ── Content section ───────────────────────────────────────────────────────
-
-// SectionRuler reuses RulerStrip — defined above
 
 const ContentSection = styled.section<{ $bg?: 'white' | 'light' }>`
   position: relative;
@@ -577,11 +544,14 @@ export default function Materials() {
   return (
     <PageWrapper>
 
+      {/* Per-section rulers. Each <PageRuler> self-measures its document Y
+          and phase-locks its tile pattern — so the red/blue alternation is
+          preserved AND ticks read as one continuous ruler down the page.
+          See shared/PageRuler.tsx for the math. */}
+
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <HeroSection>
-        <RulerStrip $side="right">
-          <img src={RULER_1} alt="" aria-hidden="true" />
-        </RulerStrip>
+        <PageRuler src={RULER} side="right" color="#ffffff" zIndex={1} />
         <HeroDecoWrap>
           <img src={HERO_DECO} alt="" aria-hidden="true" />
         </HeroDecoWrap>
@@ -595,9 +565,7 @@ export default function Materials() {
 
       {/* ── Pricing section (white) ──────────────────────────────────────── */}
       <ContentSection $bg="white">
-        <RulerStrip $side="right">
-          <img src={RULER_2} alt="" aria-hidden="true" />
-        </RulerStrip>
+        <PageRuler src={RULER} side="right" color={C.red} />
         <SectionInner>
           <div>
             <PricingSectionTitle>Material Pricing</PricingSectionTitle>
@@ -630,18 +598,6 @@ export default function Materials() {
 
       {/* ── Machine rule sections (each in its own container) ───────────── */}
       {MACHINE_RULES.map((machine, index) => {
-        // Ruler sequence down the page — RULER_2 is red, RULER_3 is blue.
-        // No two adjacent sections share a ruler so the eye keeps moving.
-        //   Hero      → R1
-        //   Pricing   → R2  (red)
-        //   FDM       → R3  (blue)   — machine idx 0
-        //   Laser     → R2  (red)    — machine idx 1
-        //   Resin box → R3  (blue)   — conditional, injected after Laser below
-        //   Vinyl     → R2  (red)    — machine idx 2
-        // Vinyl (the Sticker Printer) is explicitly red per design; Resin
-        // explicitly blue; both drive the picks on their respective rows.
-        const MACHINE_RULERS = [RULER_3, RULER_2, RULER_2];
-        const machineRuler = MACHINE_RULERS[index];
         // Background alternation across ALL sections (Pricing, FDM, Laser, Resin, Vinyl).
         // Pricing is white; the Resin info block (inserted after Laser) takes the "light"
         // slot between Laser and Vinyl — so Vinyl at idx 2 flips back to white to keep
@@ -649,12 +605,18 @@ export default function Materials() {
         //   FDM (idx 0) → light, Laser (idx 1) → white, Vinyl (idx 2) → white
         const machineBg: 'white' | 'light' =
           (['light', 'white', 'white'] as const)[index];
+        // Ruler tick COLOR alternates red/blue down the page. Pattern across
+        // the whole page (Pricing → FDM → Laser → Resin → Vinyl):
+        //   red, blue, red, blue, red. So machine sections are blue, red,
+        // red — the second `red` lands on Vinyl because Resin (blue) sits
+        // between Laser and Vinyl. Matches the original design.
+        const machineRulerColor = (
+          [C.navyMid, C.red, C.red] as const
+        )[index];
         return (
         <React.Fragment key={machine.title}>
           <ContentSection $bg={machineBg}>
-            <RulerStrip $side="right">
-              <img src={machineRuler} alt="" aria-hidden="true" />
-            </RulerStrip>
+            <PageRuler src={RULER} side="right" color={machineRulerColor} />
             <SectionInner>
               <MachineBlock>
                 <MachineLabel>{machine.label}</MachineLabel>
@@ -695,14 +657,10 @@ export default function Materials() {
           </ContentSection>
 
           {/* Resin Printer Info Box — its own container, rendered after the
-              Laser Cutter section (index 1). Uses RULER_3 (blue) per design;
-              its neighbours — Laser above (red R2) and Vinyl below (red R2)
-              — both sit on red, so the blue ruler breaks up the run cleanly. */}
+              Laser Cutter section (index 1). */}
           {index === 1 && (
             <ContentSection $bg="light">
-              <RulerStrip $side="right">
-                <img src={RULER_3} alt="" aria-hidden="true" />
-              </RulerStrip>
+              <PageRuler src={RULER} side="right" color={C.navyMid} />
               <SectionInner>
                 <InfoBoxSection>
                   <InfoBoxLeft>

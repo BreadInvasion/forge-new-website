@@ -10,6 +10,7 @@ import ResourceSlotsTab from './tabs/ResourceSlotsTab';
 import UsersTab from './tabs/UsersTab';
 import SemestersTab from './tabs/SemestersTab';
 import ChargeSheetsTab from './tabs/ChargeSheetsTab';
+import PageRuler from '../shared/PageRuler';
 
 import './styles/Admin.scss';
 
@@ -98,11 +99,7 @@ const Admin: React.FC = () => {
                 style={{ backgroundImage: `url(${bgPattern})` }}
                 aria-hidden="true"
             />
-            <div
-                className="admin-ruler"
-                style={{ ['--ruler-url' as string]: `url(${RULER_URL})` } as React.CSSProperties}
-                aria-hidden="true"
-            />
+            <PageRuler src={RULER_URL} side="left" />
 
             <nav className="admin-tabs" aria-label="Admin sections">
                 {TABS.map((tab) => (

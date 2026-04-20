@@ -8,6 +8,7 @@ import Toolbar from './components/Toolbar';
 import MachineCard, { getProgress } from './MachineCard';
 import { Machine, AllMachinesStatusResponse } from "src/interfaces";
 import bgPattern from '../../assets/img/background.svg?url';
+import PageRuler from '../shared/PageRuler';
 
 // ── Figma assets ─────────────────────────────────────────────────────────────
 const RULER_URL = 'https://www.figma.com/api/mcp/asset/aff3de3c-e4e6-42fe-ba0d-f29b38e0e322';
@@ -45,40 +46,7 @@ const PageBackground = styled.div`
   }
 `;
 
-const RulerStrip = styled.div`
-  position: absolute;
-  left: -1px;
-  top: 0;
-  width: 70px;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-
-  &::after {
-    content: '';
-    position: absolute;
-    width: 5000px;
-    height: 70px;
-    left: calc(50% - 2500px);
-    top: -2535px;
-    transform: rotate(-90deg) scaleY(-1);
-    transform-origin: center center;
-    background-image: url(${RULER_URL});
-    background-size: 750px 70px;
-    background-repeat: repeat-x;
-    background-position: 0 0;
-  }
-`;
-
 // ── Main grid layout ───────────────────────────────────────────────────────
-
-// ---------------------------------------------------------------------------
-// Figma asset URLs (hosted for 7 days after code generation).
-// TODO: Download and replace with local imports when finalizing the design.
-// ---------------------------------------------------------------------------
-const RULER_IMG = 'https://www.figma.com/api/mcp/asset/d07c6fc6-b5ad-4bfc-871c-bf9605ab8300';
-const GRID_BG_IMG = 'https://www.figma.com/api/mcp/asset/89bf1385-c30b-461c-8573-dba6604a5f6e';
 
 // ---------------------------------------------------------------------------
 // Styled components — matches the Figma "Status Page" design (node 97:2663).
@@ -225,7 +193,7 @@ export const Status: React.FC = () => {
   return (
     <SelectedMachineProvider>
       <PageBackground>
-        <RulerStrip />
+        <PageRuler src={RULER_URL} side="left" />
         <Page>
           <Toolbar
             highlightFailed={highlightFailed}

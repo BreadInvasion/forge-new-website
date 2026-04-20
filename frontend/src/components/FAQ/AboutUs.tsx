@@ -1,10 +1,10 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import PageRuler from '../shared/PageRuler';
 
 // ── Figma Assets (fresh) ──────────────────────────────────────────────────
 const FORGE_PHOTO = 'https://www.figma.com/api/mcp/asset/09344755-fef6-4d67-835d-d6a67d76e91e';
-const RULER_HERO  = 'https://www.figma.com/api/mcp/asset/38734e6c-bd37-40a0-8ec8-db3a837c4103';
 const RULER_MAIN  = 'https://www.figma.com/api/mcp/asset/02019811-b8fc-4937-bf9e-c260373092ea';
 const LOC_PIN     = 'https://www.figma.com/api/mcp/asset/31583bbc-4b05-48fa-8877-c4caddcfd7bc';
 
@@ -24,34 +24,12 @@ const C = {
 // =============================================================================
 
 const PageWrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
   flex: 1;
   overflow-x: hidden;
-`;
-
-// ── Shared ruler ──────────────────────────────────────────────────────────
-const RulerWrap = styled.div`
-  position: absolute;
-  left: -1px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 79px;
-  height: 750px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 0;
-
-  img {
-    transform: rotate(-90deg) scaleY(-1);
-    width: 750px;
-    height: 79px;
-    object-fit: fill;
-    flex-shrink: 0;
-  }
 `;
 
 // =============================================================================
@@ -379,12 +357,13 @@ const AboutUs = () => {
   return (
     <PageWrapper>
 
+      {/* Single page-level ruler — continuous ticks across every section.
+           Uses the main section's ruler asset so the color matches the body
+           of the page rather than only the hero band. */}
+      <PageRuler src={RULER_MAIN} side="left" />
+
       {/* ── HERO BANNER ─────────────────────────────────────────────────── */}
       <HeroBanner>
-        <RulerWrap style={{ top: 'calc(50% + 15.5px)' }}>
-          <img src={RULER_HERO} alt="" aria-hidden="true" />
-        </RulerWrap>
-
         <HeroInner>
           <HeroYears>10+ Years of</HeroYears>
           <HeroActions>
@@ -395,10 +374,6 @@ const AboutUs = () => {
 
       {/* ── MAIN CONTENT ────────────────────────────────────────────────── */}
       <MainSection>
-        <RulerWrap style={{ top: 'calc(50% - 31.5px)' }}>
-          <img src={RULER_MAIN} alt="" aria-hidden="true" />
-        </RulerWrap>
-
         <MainInner>
 
           {/* Left column */}

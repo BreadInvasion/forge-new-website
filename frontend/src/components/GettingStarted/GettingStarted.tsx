@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import PageRuler from '../shared/PageRuler';
 
 // ---------------------------------------------------------------------------
 // Figma asset URLs — valid for 7 days after generation.
@@ -8,9 +9,11 @@ import bgPattern from '../../assets/img/background.svg?url';
 // ---------------------------------------------------------------------------
 const HERO_BG_DESKTOP = 'https://www.figma.com/api/mcp/asset/2ee84860-092b-437d-a811-cd043d04c5d0';
 const HERO_BG_MOBILE  = 'https://www.figma.com/api/mcp/asset/eac57d69-f072-4e3a-b856-5314d8f551a8';
-const RULER_1         = 'https://www.figma.com/api/mcp/asset/c96236fb-9208-4949-9a04-e9e32cf364fe';
-const RULER_2         = 'https://www.figma.com/api/mcp/asset/7c80f8d8-834a-4822-b125-67a1c47398d7';
-const RULER_3         = 'https://www.figma.com/api/mcp/asset/be993c25-e7d4-4f74-bebf-6dfba428cb75';
+// One ruler asset drives the tick SHAPE on every section; per-section COLOR
+// (white hero / red / navy) comes from the `color` prop on PageRuler. This
+// keeps tick pixel positions identical across sections so the ticks read as
+// one continuous ruler down the page.
+const RULER           = 'https://www.figma.com/api/mcp/asset/7c80f8d8-834a-4822-b125-67a1c47398d7';
 const STEP_DOT        = 'https://www.figma.com/api/mcp/asset/8f36fbb2-423f-4013-a256-1e53fb0798a2';
 const LOC_PIN         = 'https://www.figma.com/api/mcp/asset/70eb0629-d89b-47c7-8c0a-2b33fc9a6b24';
 
@@ -33,6 +36,7 @@ const C = {
 // Shared layout
 // ---------------------------------------------------------------------------
 const PageWrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -77,32 +81,6 @@ const SectionInner = styled.div`
   @media (max-width: 640px) {
     padding-left: 24px;
     padding-right: 24px;
-  }
-`;
-
-/** Vertical ruler decoration pinned to the left edge of a section.
- *  Height is capped at the artwork's native 750px but never exceeds the
- *  containing section — that keeps the ruler from overhanging sections
- *  that happen to be shorter than 750px on wider-than-design viewports. */
-const RulerWrap = styled.div`
-  position: absolute;
-  left: -1px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 79px;
-  height: min(750px, 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 0;
-
-  img {
-    transform: rotate(-90deg) scaleY(-1);
-    width: 750px;
-    height: 79px;
-    object-fit: fill;
-    flex-shrink: 0;
   }
 `;
 
@@ -159,31 +137,6 @@ const HeroInner = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-`;
-
-const HeroRuler = styled.div`
-  position: absolute;
-  left: -1px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 79px;
-  /* Cap the ruler at 750px (the artwork's native length) but don't force
-     it to 750px when the hero itself is shorter — on a 1920x1080 Forge TV
-     the hero sits near its min-height and a taller-than-section ruler
-     sticking past the top/bottom read as a misplaced graphic. */
-  height: min(750px, 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-
-  img {
-    transform: rotate(-90deg) scaleY(-1);
-    width: 750px;
-    height: 79px;
-    object-fit: fill;
-    flex-shrink: 0;
-  }
 `;
 
 /** Decorative floating geometry in the hero right area */
@@ -809,11 +762,15 @@ export default function GettingStarted() {
   return (
     <PageWrapper ref={wrapperRef}>
 
+      {/* Per-section rulers. Each <PageRuler> measures its own document Y
+          and shifts the tiled background phase accordingly, so the ticks
+          read as ONE continuous ruler down the whole page even though the
+          hero and each step use different tick graphics (white / red / blue
+          alternation). See shared/PageRuler.tsx for the math. */}
+
       {/* ── HERO ───────────────────────────────────────────────────────────── */}
       <HeroSection>
-        <HeroRuler>
-          <img src={RULER_1} alt="" aria-hidden="true" />
-        </HeroRuler>
+        <PageRuler src={RULER} side="left" color="#ffffff" zIndex={1} />
         <HeroInner>
           {/* Decorative background shapes — anchored inside HeroInner so
               they track the 1440px max-width content container rather than
@@ -832,9 +789,7 @@ export default function GettingStarted() {
 
       {/* ── STEP 1: FILE TYPES ─────────────────────────────────────────────── */}
       <Section data-pattern bg="#fff">
-        <RulerWrap>
-          <img src={RULER_2} alt="" aria-hidden="true" />
-        </RulerWrap>
+        <PageRuler src={RULER} side="left" color={C.red} />
 
         {/* Step progress bar */}
         <StepBar>
@@ -878,9 +833,7 @@ export default function GettingStarted() {
 
       {/* ── STEP 2: MATERIALS & PRICING ────────────────────────────────────── */}
       <Section data-pattern bg={C.bgLight}>
-        <RulerWrap>
-          <img src={RULER_3} alt="" aria-hidden="true" />
-        </RulerWrap>
+        <PageRuler src={RULER} side="left" color={C.navyMid} />
         <SectionInner style={{ paddingTop: 64, paddingBottom: 64 }}>
           <StepLabel>STEP 2</StepLabel>
           <SectionTitle>Materials &amp; Pricing</SectionTitle>
@@ -957,9 +910,7 @@ export default function GettingStarted() {
 
       {/* ── STEP 3: MACHINES ───────────────────────────────────────────────── */}
       <Section data-pattern bg="#fff">
-        <RulerWrap>
-          <img src={RULER_2} alt="" aria-hidden="true" />
-        </RulerWrap>
+        <PageRuler src={RULER} side="left" color={C.red} />
         <SectionInner style={{ paddingTop: 64, paddingBottom: 64 }}>
           <StepLabel>STEP 3</StepLabel>
           <SectionTitle>Pick a Machine</SectionTitle>
@@ -990,9 +941,7 @@ export default function GettingStarted() {
 
       {/* ── STEP 4: WHERE TO FIND US ───────────────────────────────────────── */}
       <Section data-pattern bg={C.bgLight}>
-        <RulerWrap>
-          <img src={RULER_3} alt="" aria-hidden="true" />
-        </RulerWrap>
+        <PageRuler src={RULER} side="left" color={C.navyMid} />
         <SectionInner style={{ paddingTop: 64, paddingBottom: 80 }}>
           <StepLabel>STEP 4</StepLabel>
           <SectionTitle>Where to Find Us</SectionTitle>
@@ -1044,9 +993,7 @@ export default function GettingStarted() {
           Two-column layout: heading / blurb on the left, Register card on the
           right. Collapses to a stacked column on narrow viewports. */}
       <Section data-pattern bg="#fff">
-        <RulerWrap>
-          <img src={RULER_2} alt="" aria-hidden="true" />
-        </RulerWrap>
+        <PageRuler src={RULER} side="left" color={C.red} />
         <SectionInner style={{ paddingTop: 64, paddingBottom: 80 }}>
           <RegisterLayout>
             <RegisterTextCol>

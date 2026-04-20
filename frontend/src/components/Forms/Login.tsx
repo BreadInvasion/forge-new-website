@@ -9,6 +9,7 @@ import { User } from 'src/interfaces';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { AuthAPI } from 'src/apis/AuthAPI';
 import bgPattern from '../../assets/img/background.svg?url';
+import PageRuler from '../shared/PageRuler';
 
 // ── Figma assets ──────────────────────────────────────────────────────────────
 const ANVIL_URL  = 'https://www.figma.com/api/mcp/asset/0ca5af14-4911-42d6-b056-db8c2c2dec01';
@@ -45,32 +46,6 @@ const AnvilImage = styled.img`
     object-fit: contain;
     pointer-events: none;
     user-select: none;
-`;
-
-const RulerStrip = styled.div`
-    position: absolute;
-    left: -1px;
-    top: 0;
-    width: 70px;
-    height: 100%;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 1;
-
-    &::after {
-        content: '';
-        position: absolute;
-        width: 5000px;
-        height: 70px;
-        left: calc(50% - 2500px);
-        top: -2535px;
-        transform: rotate(-90deg) scaleY(-1);
-        transform-origin: center center;
-        background-image: url(${RULER_URL});
-        background-size: 750px 70px;
-        background-repeat: repeat-x;
-        background-position: 0 0;
-    }
 `;
 
 const FormCard = styled.div`
@@ -347,7 +322,7 @@ export default function Login() {
     return (
         <PageBackground>
             <AnvilImage src={ANVIL_URL} alt="" />
-            <RulerStrip />
+            <PageRuler src={RULER_URL} side="left" zIndex={1} />
 
             <FormCard>
                 <CardInner>

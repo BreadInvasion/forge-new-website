@@ -1,6 +1,7 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import PageRuler from '../shared/PageRuler';
 
 // TODO: Download and store locally in src/assets/img/hours/
 const RULER_IMG = 'https://www.figma.com/api/mcp/asset/f5317051-1b0b-4812-a79c-8e691f277dcd';
@@ -10,6 +11,7 @@ const RULER_IMG = 'https://www.figma.com/api/mcp/asset/f5317051-1b0b-4812-a79c-8
 // ---------------------------------------------------------------------------
 
 const PageWrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -55,32 +57,6 @@ const CalendarSection = styled.section`
   }
 `;
 
-/* Red right accent — separate element since ::before and ::after are taken */
-const RightAccent = styled.div`
-  
-`;
-
-const RulerWrap = styled.div`
-  position: absolute;
-  left: -1px;
-  bottom: -31px;
-  width: 70px;
-  height: 737px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 1;
-
-  img {
-    transform: rotate(-90deg) scaleY(-1);
-    width: 737px;
-    height: 70px;
-    object-fit: fill;
-    flex-shrink: 0;
-  }
-`;
-
 const CalendarCard = styled.div`
   position: relative;
   width: min(1250px, calc(100% - 80px));
@@ -109,13 +85,9 @@ const CalendarFrame = styled.iframe`
 const Hours = () => {
   return (
     <PageWrapper>
+      {/* Single continuous ruler spanning the entire page */}
+      <PageRuler src={RULER_IMG} side="left" zIndex={1} />
       <CalendarSection>
-        <RulerWrap>
-          <img src={RULER_IMG} alt="" aria-hidden="true" />
-        </RulerWrap>
-
-        <RightAccent />
-
         <CalendarCard>
           <CalendarFrame
             src="https://calendar.google.com/calendar/embed?src=k2r6osjjms6lqt41bi5a7j48n0%40group.calendar.google.com&ctz=America%2FNew_York&mode=WEEK"

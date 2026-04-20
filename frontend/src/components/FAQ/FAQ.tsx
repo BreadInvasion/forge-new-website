@@ -3,9 +3,9 @@ import * as Accordion from '@radix-ui/react-accordion';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { styled, keyframes } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import PageRuler from '../shared/PageRuler';
 
 // ── Figma Assets (expire 7 days) ──────────────────────────────────────────
-const RULER_HERO    = 'https://www.figma.com/api/mcp/asset/985350f4-0e73-467a-a68c-d3a49c3e1c07';
 const RULER_SECTION = 'https://www.figma.com/api/mcp/asset/fcadc8e2-4ed1-4591-8ceb-9844b0a96897';
 const HERO_DECO     = 'https://www.figma.com/api/mcp/asset/89f022fa-4c4b-433d-9526-8f0955c8c183';
 
@@ -133,6 +133,7 @@ const MACHINE_RULES = [
 // =============================================================================
 
 const PageWrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -153,28 +154,6 @@ const HeroSection = styled.section`
   align-items: center;
 `;
 
-
-const RulerWrap = styled.div`
-    position: absolute;
-    left: -3px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 70px;
-    height: 850px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 1;
-
-    img {
-        transform: rotate(-90deg) scaleY(-1);
-        width: 850px;
-        height: 70px;
-        object-fit: fill;
-        flex-shrink: 0;
-    }
-`;
 
 const HeroDecoWrap = styled.div`
   position: absolute;
@@ -245,28 +224,6 @@ const ContentSection = styled.section`
     background-size: 122px 140px;
     opacity: 0.03;
     pointer-events: none;
-  }
-`;
-
-const SectionRuler = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 79px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-
-  img {
-    transform: rotate(-90deg) scaleY(-1);
-    width: 2000px;
-    height: 79px;
-    object-fit: fill;
-    flex-shrink: 0;
   }
 `;
 
@@ -785,11 +742,11 @@ export default function FAQ() {
   return (
     <PageWrapper>
 
+      {/* Single continuous ruler down the left edge of the page */}
+      <PageRuler src={RULER_SECTION} side="left" />
+
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <HeroSection>
-        <RulerWrap>
-          <img src={RULER_HERO} alt="" aria-hidden="true" />
-        </RulerWrap>
         <HeroDecoWrap>
           <img src={HERO_DECO} alt="" aria-hidden="true" />
         </HeroDecoWrap>
@@ -803,9 +760,6 @@ export default function FAQ() {
 
       {/* ── Accordion section ─────────────────────────────────────────────── */}
       <ContentSection>
-        <SectionRuler>
-          <img src={RULER_SECTION} alt="" aria-hidden="true" />
-        </SectionRuler>
         <SectionInner>
 
           <AccordionRoot type="multiple">

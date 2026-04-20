@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { styled } from 'styled-components';
+import PageRuler from '../shared/PageRuler';
 
 // ---------------------------------------------------------------------------
 // Figma asset URLs (hosted for 7 days after code generation).
@@ -8,15 +9,26 @@ import { styled } from 'styled-components';
 //   import anvilImg from 'src/assets/img/home/anvil_hero.png';
 // ---------------------------------------------------------------------------
 const ANVIL_IMG  = 'https://www.figma.com/api/mcp/asset/e305a98f-4e8a-4f0d-9728-79c478ed49fa';
-const RULER_IMG  = 'https://www.figma.com/api/mcp/asset/6ec9052a-dfc2-46ee-946b-c83d3607a3ea';
+// Use the long-tick ruler graphic (same asset as RULER_2 on the Getting
+// Started page) and recolor it to white via CSS filter. The original Home
+// ruler asset had noticeably shorter ticks inside its canvas and read as a
+// different graphic than the rulers on Getting Started.
+const RULER_IMG  = 'https://www.figma.com/api/mcp/asset/7c80f8d8-834a-4822-b125-67a1c47398d7';
 
 // ---------------------------------------------------------------------------
 // Styled components
 // ---------------------------------------------------------------------------
+// Layout philosophy: use flex containers with auto sizing so the page looks
+// structurally identical on every display type (1440p laptop, 1080p desktop,
+// 4K, ultrawide, Forge TV). Avoid absolute-positioned children driven by
+// viewport-math offsets — those have to be tuned per resolution and drift
+// out of place on the Forge TV.
 
 /** Page wrapper that fills the viewport height minus NavBar and Footer.
- *  NavBar max-height = 72px, Footer min-height = 100px. */
+ *  NavBar max-height = 72px, Footer min-height = 100px.
+ *  `position: relative` scopes the shared <PageRuler /> to the whole page. */
 const PageWrapper = styled.div`
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -28,52 +40,34 @@ const PageWrapper = styled.div`
 
 // ── Hero ────────────────────────────────────────────────────────────────────
 
+/** Hero is a flex row: text column on the left, image panel on the right.
+ *  The page-level <PageRuler /> renders the left-edge ruler. */
 const HeroSection = styled.section`
     position: relative;
     width: 100%;
     flex: 1 1 auto;
     min-height: 0;
+    display: flex;
+    align-items: stretch;
     background: linear-gradient(to right, #2d4a80 10%, #a51c1c 100%);
     overflow: hidden;
 `;
 
-/** Vertical ruler along the left edge — sized to viewport height.
- *  Capped at 750px so that on tall desktop monitors (e.g. the Forge
- *  TV at 1920x1080 where `100vh - 263px` = 817px) the ruler artwork
- *  doesn't stretch into an elongated, warped-looking strip. */
-const RulerWrap = styled.div`
-    position: absolute;
-    left: -3px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 70px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 1;
-
-    img {
-        transform: rotate(-90deg) scaleY(-1);
-        width: min(calc(100vh - 72px - 100px - 91px), 750px);
-        height: 70px;
-        object-fit: fill;
-        flex-shrink: 0;
-    }
-`;
-
-/** "Build. Create. Invent." block
- *  The vertical offset is clamped so `10vh` doesn't push the title
- *  absurdly high on tall viewports (Forge TV 1080p, ultrawides, etc.)
- *  — capped at ~80px above center. */
-const HeroTextBlock = styled.div`
-    position: absolute;
-    left: clamp(80px, 9vw, 127px);
-    top: 50%;
-    transform: translateY(calc(-50% - min(10vh, 80px)));
-    width: min(477px, 45%);
+/** Text column — title stacked above the services list. Vertical centering
+ *  comes from `justify-content: center`; `gap` controls the visual split
+ *  between the two blocks the same way on every display. No viewport-math
+ *  offsets required. */
+const HeroContent = styled.div`
+    position: relative;
     z-index: 2;
+    flex: 0 0 auto;
+    width: min(477px, 45%);
+    padding-left: clamp(80px, 9vw, 127px);
+    padding-right: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(40px, 8vh, 120px);
 `;
 
 const HeroTitle = styled.h1`
@@ -86,13 +80,7 @@ const HeroTitle = styled.h1`
     margin: 0;
 `;
 
-/** Services list beneath the title — offset below center is clamped so the
- *  block doesn't fall out toward the InfoBar on tall viewports. */
 const HeroServices = styled.p`
-    position: absolute;
-    left: clamp(80px, 9vw, 127px);
-    top: calc(50% + min(22vh, 180px));
-    transform: translateY(-50%);
     font-family: 'Funnel Display', sans-serif;
     font-weight: 700;
     font-size: clamp(16px, 3vh, 35px);
@@ -100,18 +88,21 @@ const HeroServices = styled.p`
     line-height: 1.3;
     margin: 0;
     white-space: pre;
-    z-index: 2;
 `;
 
-/** Full-height image panel on the right */
+/** Image panel pinned to the right edge of the hero. Capped at the design's
+ *  native 920px (60% of a 1440px-wide hero) so the anvil doesn't balloon on
+ *  wide displays like the 1920x1080 Forge TV — on those, the extra width
+ *  becomes empty gradient between the text column and the image instead of
+ *  making the anvil grotesquely large. `margin-left: auto` pushes the panel
+ *  to the right; everything to its left is the hero's gradient background. */
 const HeroImagePanel = styled.div`
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: min(920px, 60%);
-    height: 100%;
-    /* make sure it sits behind text */
+    position: relative;
+    flex: 0 0 min(920px, 60%);
+    margin-left: auto;
+    min-width: 0;
+    align-self: stretch;
+    overflow: hidden;
     z-index: 0;
 
     img {
@@ -213,27 +204,29 @@ export default function Home() {
     return (
         <PageWrapper>
 
+            {/* Single continuous vertical ruler down the left edge of the
+                 page. White tint so it reads on the navy/red hero gradient. */}
+            <PageRuler
+                src={RULER_IMG}
+                side="left"
+                color="#ffffff"
+                zIndex={1}
+            />
+
             {/* ── Hero ─────────────────────────────────────────────────── */}
             <HeroSection>
 
-                {/* Vertical ruler decoration */}
-                <RulerWrap>
-                    <img src={RULER_IMG} alt="" aria-hidden="true" />
-                </RulerWrap>
-
-                {/* "Build. Create. Invent." */}
-                <HeroTextBlock>
+                {/* Text column — title + services list */}
+                <HeroContent>
                     <HeroTitle>
                         {'Build.\n  Create.\n      Invent.'}
                     </HeroTitle>
-                </HeroTextBlock>
+                    <HeroServices>
+                        {'3D Print\n   Laser Cut\n       Sticker Print\n            and Much More!'}
+                    </HeroServices>
+                </HeroContent>
 
-                {/* Services list */}
-                <HeroServices>
-                    {'3D Print\n   Laser Cut\n       Sticker Print\n            and Much More!'}
-                </HeroServices>
-
-                {/* Hero image */}
+                {/* Hero image panel */}
                 <HeroImagePanel>
                     <img
                         src={ANVIL_IMG}
