@@ -50,7 +50,10 @@ async def get_semester_balance(
         else 0.0
     )
 
-    return Decimal(semester_balance)
+    # Quantize to 2dp — `cost` is DECIMAL(10, 5) so SUM can return up to 5
+    # decimal places, but the consumer schemas (UserNoHash, UserCharge) are
+    # declared with decimal_places=2 and Pydantic will 500 otherwise.
+    return Decimal(semester_balance).quantize(Decimal("0.01"))
 
 @router.post("/signup")
 async def register_user(
@@ -269,6 +272,9 @@ async def get_all_users(
                 ""
             ),
             is_graduating=user.is_graduating,
+            # Quantize to 2dp — UserNoHash.semester_balance has
+            # decimal_places=2, but SUM(cost) inherits 5dp precision from the
+            # DECIMAL(10, 5) column.
             semester_balance=Decimal(
                 next(
                     (balance.tuple()[1]
@@ -278,7 +284,7 @@ async def get_all_users(
                 )
                 if semester_balances and len(semester_balances) > 0
                 else 0.0
-            ),
+            ).quantize(Decimal("0.01")),
         )
         for user in users
     ]

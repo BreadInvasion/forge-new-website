@@ -112,5 +112,8 @@ async def get_current_user(
             ""
         ),
         is_graduating=current_user.is_graduating,
-        semester_balance=Decimal(semester_balance),
+        # Quantize to 2dp — `cost` is DECIMAL(10, 5) so SUM can return up to
+        # 5 decimal places, but UserNoHash.semester_balance is declared with
+        # decimal_places=2 and Pydantic will 500 otherwise.
+        semester_balance=Decimal(semester_balance).quantize(Decimal("0.01")),
     )

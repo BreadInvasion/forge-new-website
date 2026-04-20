@@ -160,6 +160,9 @@ async def get_charge_sheet(
             first_name=user.first_name,
             last_name=user.last_name,
             is_graduating=user.is_graduating,
+            # Quantize to 2dp — UserChargeResponse.semester_balance has
+            # decimal_places=2, but SUM(cost) inherits 5dp precision from the
+            # DECIMAL(10, 5) column and Pydantic would 500 otherwise.
             semester_balance=Decimal(
                 next(
                     (balance.tuple()[1]
@@ -169,7 +172,7 @@ async def get_charge_sheet(
                 )
                 if semester_balances and len(semester_balances) > 0
                 else 0.0
-            ),
+            ).quantize(Decimal("0.01")),
         )
         for user in users
     ]
