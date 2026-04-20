@@ -66,6 +66,16 @@
     gap: 1.75rem;
     list-style: none;
     padding: 0.75rem 1.75rem;
+
+    /* On desktop, right-align the menu items so they can't bleed back into
+       the absolutely-positioned `.logo-link` on the left. With many items
+       (e.g. a signed-in admin: Create / Status / Hours / FAQ / Admin /
+       RCSID dropdown) `justify-content: center` was pushing the leftmost
+       links under the logo on wider viewports like the 1920x1080 Forge TV. */
+    @media (min-width: nav.$mobile-breakpoint) {
+        justify-content: flex-end;
+        padding-left: 20rem; /* reserve at least the logo's min-width (18rem) + breathing room */
+    }
 }
 
 .list-item {

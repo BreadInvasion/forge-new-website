@@ -37,7 +37,10 @@ const HeroSection = styled.section`
     overflow: hidden;
 `;
 
-/** Vertical ruler along the left edge — sized to viewport height. */
+/** Vertical ruler along the left edge — sized to viewport height.
+ *  Capped at 750px so that on tall desktop monitors (e.g. the Forge
+ *  TV at 1920x1080 where `100vh - 263px` = 817px) the ruler artwork
+ *  doesn't stretch into an elongated, warped-looking strip. */
 const RulerWrap = styled.div`
     position: absolute;
     left: -3px;
@@ -53,19 +56,22 @@ const RulerWrap = styled.div`
 
     img {
         transform: rotate(-90deg) scaleY(-1);
-        width: calc(100vh - 72px - 100px - 91px);
+        width: min(calc(100vh - 72px - 100px - 91px), 750px);
         height: 70px;
         object-fit: fill;
         flex-shrink: 0;
     }
 `;
 
-/** "Build. Create. Invent." block */
+/** "Build. Create. Invent." block
+ *  The vertical offset is clamped so `10vh` doesn't push the title
+ *  absurdly high on tall viewports (Forge TV 1080p, ultrawides, etc.)
+ *  — capped at ~80px above center. */
 const HeroTextBlock = styled.div`
     position: absolute;
     left: clamp(80px, 9vw, 127px);
     top: 50%;
-    transform: translateY(calc(-50% - 10vh));
+    transform: translateY(calc(-50% - min(10vh, 80px)));
     width: min(477px, 45%);
     z-index: 2;
 `;
@@ -80,11 +86,12 @@ const HeroTitle = styled.h1`
     margin: 0;
 `;
 
-/** Services list beneath the title */
+/** Services list beneath the title — offset below center is clamped so the
+ *  block doesn't fall out toward the InfoBar on tall viewports. */
 const HeroServices = styled.p`
     position: absolute;
     left: clamp(80px, 9vw, 127px);
-    top: calc(50% + 22vh);
+    top: calc(50% + min(22vh, 180px));
     transform: translateY(-50%);
     font-family: 'Funnel Display', sans-serif;
     font-weight: 700;

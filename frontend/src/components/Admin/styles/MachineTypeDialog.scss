@@ -234,10 +234,16 @@ $mtd-pattern: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/sv
 }
 
 // Name / Cost label + input side-by-side, like the Figma mock.
+// First column is pinned to a fixed min-width so every row in the
+// "Adding a Resource" dialog (Resource Name / Brand / Color / Units /
+// Cost) shares the same input-start x-position. Previously each row
+// had its own `auto 1fr` grid, which let label width variance stagger
+// the inputs left-to-right — visible as the "background / form not
+// aligned" issue on the 1920x1080 Forge TV view.
 .mtd-name-row,
 .mtd-cost-row {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: minmax(170px, auto) 1fr;
     align-items: center;
     gap: 18px;
     padding: 8px 4px 8px 4px;

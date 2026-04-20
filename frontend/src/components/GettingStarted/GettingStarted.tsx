@@ -80,14 +80,17 @@ const SectionInner = styled.div`
   }
 `;
 
-/** Vertical ruler decoration pinned to the left edge of a section */
+/** Vertical ruler decoration pinned to the left edge of a section.
+ *  Height is capped at the artwork's native 750px but never exceeds the
+ *  containing section — that keeps the ruler from overhanging sections
+ *  that happen to be shorter than 750px on wider-than-design viewports. */
 const RulerWrap = styled.div`
   position: absolute;
   left: -1px;
   top: 50%;
   transform: translateY(-50%);
   width: 79px;
-  height: 750px;
+  height: min(750px, 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -164,7 +167,11 @@ const HeroRuler = styled.div`
   top: 50%;
   transform: translateY(-50%);
   width: 79px;
-  height: 750px;
+  /* Cap the ruler at 750px (the artwork's native length) but don't force
+     it to 750px when the hero itself is shorter — on a 1920x1080 Forge TV
+     the hero sits near its min-height and a taller-than-section ruler
+     sticking past the top/bottom read as a misplaced graphic. */
+  height: min(750px, 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -807,10 +814,14 @@ export default function GettingStarted() {
         <HeroRuler>
           <img src={RULER_1} alt="" aria-hidden="true" />
         </HeroRuler>
-        {/* Decorative background shapes */}
-        <HeroDeco src={HERO_BG_MOBILE}  w={321} h={315} right={12}  top={23}  />
-        <HeroDeco src={HERO_BG_DESKTOP} w={283} h={101} right={336} top={265} />
         <HeroInner>
+          {/* Decorative background shapes — anchored inside HeroInner so
+              they track the 1440px max-width content container rather than
+              the full-viewport `<HeroSection>`. Previously on the 1920x1080
+              Forge TV the decorations floated ~240px away from the text,
+              pinned to the right edge of the screen. */}
+          <HeroDeco src={HERO_BG_MOBILE}  w={321} h={315} right={12}  top={23}  />
+          <HeroDeco src={HERO_BG_DESKTOP} w={283} h={101} right={336} top={265} />
           <HeroTitle>Getting Started at The Forge</HeroTitle>
           <HeroSubtitle>
             Everything you need to know before your first visit — what machines we have,
