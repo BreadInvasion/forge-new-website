@@ -32,7 +32,7 @@
   // ---------------------------------------------------------------------------
   --font-display:  'Funnel Display', sans-serif;
   --font-heading:  'Familjen Grotesk', 'Helvetica Neue', Arial, sans-serif;
-  --font-body:     'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-body:     'Funnel Display', 'Helvetica Neue', Arial, sans-serif;
   --font-mono:     'Geist Mono', 'Fira Code', monospace;
 
   // ---------------------------------------------------------------------------
@@ -270,7 +270,7 @@
 
 .data-table-empty {
     padding: 40px 62px;
-    font-family: var(--font-body), 'Inter', sans-serif;
+    font-family: var(--font-body), 'Funnel Display', sans-serif;
     font-size: 16px;
     color: var(--color-slate);
 }

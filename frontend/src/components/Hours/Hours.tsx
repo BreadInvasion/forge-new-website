@@ -1,10 +1,10 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
 import PageRuler from '../shared/PageRuler';
 
-// TODO: Download and store locally in src/assets/img/hours/
-const RULER_IMG = 'https://www.figma.com/api/mcp/asset/f5317051-1b0b-4812-a79c-8e691f277dcd';
+const RULER_IMG = rulerMask;
 
 // ---------------------------------------------------------------------------
 // Styled components

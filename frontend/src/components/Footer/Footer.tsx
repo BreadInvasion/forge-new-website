@@ -8,11 +8,12 @@ import { styled } from 'styled-components';
 const FooterContainer = styled.footer`
     position: relative;
     width: 100%;
-    min-height: 100px;
+    min-height: 64px;
     background: #111c36;
     display: flex;
     align-items: center;
     flex-shrink: 0;
+
     /* Red top accent bar */
     &::before {
         content: '';
@@ -29,7 +30,7 @@ const FooterContainer = styled.footer`
 const FooterLeft = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 28px 0 24px 40px;
+    padding: 14px 0 14px 40px;
 `;
 
 const FooterTitle = styled.p`
@@ -42,7 +43,7 @@ const FooterTitle = styled.p`
 `;
 
 const FooterAddress = styled.div`
-    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Funnel Display', 'Helvetica Neue', Arial, sans-serif;
     font-weight: 400;
     font-size: 12px;
     color: #4a6080;

@@ -1,15 +1,11 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
 import PageRuler from '../shared/PageRuler';
 
 // ── Figma Assets ──────────────────────────────────────────────────────────
-// A single ruler asset is used as the tick SHAPE for every section. Per-
-// section color (white hero / red / navy) comes from the `color` prop on
-// PageRuler, which uses the image as a CSS mask and paints it with
-// background-color. This means ticks have identical pixel positions in
-// every section, so rulers line up perfectly across the page boundary.
-const RULER     = 'https://www.figma.com/api/mcp/asset/7c80f8d8-834a-4822-b125-67a1c47398d7';
+const RULER     = rulerMask;
 const HERO_DECO = 'https://www.figma.com/api/mcp/asset/366c8e9b-0c94-4167-934e-fb6eff4d35f9';
 
 // ── Design tokens ─────────────────────────────────────────────────────────
@@ -145,6 +141,10 @@ const HeroDecoWrap = styled.div`
     top: -4.18%;
     max-width: none;
     object-fit: cover;
+  }
+    @media (max-width: 640px) {
+    right: -30%;
+    opacity: 0.6;
   }
 `;
 
@@ -445,11 +445,21 @@ const InfoBoxSection = styled.div`
   gap: 48px;
   align-items: flex-start;
   padding: 0;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 20px;
+  }
 `;
 
 const InfoBoxLeft = styled.div`
   flex: 0 0 auto;
   max-width: 320px;
+
+  @media (max-width: 640px) {
+    max-width: 100%;
+    width: 100%;
+  }
 `;
 
 const InfoBoxLeftTitle = styled.h3`
@@ -488,6 +498,12 @@ const InfoBox = styled.div`
     0 1px 0 rgba(255, 255, 255, 0.4) inset,
     0 2px 4px rgba(17, 28, 54, 0.06),
     0 12px 28px ${C.redShadow};
+
+  @media (max-width: 640px) {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
 `;
 
 const InfoBoxIcon = styled.div`

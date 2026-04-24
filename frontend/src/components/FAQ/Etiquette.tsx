@@ -1,10 +1,11 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
 import PageRuler from '../shared/PageRuler';
 
 // ── Figma Assets ──────────────────────────────────────────────────────────
-const RULER_SECTION = 'https://www.figma.com/api/mcp/asset/87c5c392-123f-42ff-8433-68d7da8166c2';
+const RULER_SECTION = rulerMask;
 const HERO_DECO = 'https://www.figma.com/api/mcp/asset/366c8e9b-0c94-4167-934e-fb6eff4d35f9';
 
 // ── Design tokens ─────────────────────────────────────────────────────────
@@ -272,10 +273,10 @@ const DDItemDesc = styled.p`
 export default function Etiquette() {
   return (
     <PageWrapper>
-      {/* Single continuous ruler across the page */}
-      <PageRuler src={RULER_SECTION} side="left" />
 
       <HeroSection>
+        {/* White ruler in the dark hero */}
+        <PageRuler src={RULER_SECTION} side="left" color="#ffffff" />
         <HeroDecoWrap>
           <img src={HERO_DECO} alt="" aria-hidden="true" />
         </HeroDecoWrap>
@@ -289,6 +290,8 @@ export default function Etiquette() {
       </HeroSection>
 
       <ContentSection>
+        {/* Red ruler in the white content section */}
+        <PageRuler src={RULER_SECTION} side="left" color={C.red} />
         <SectionInner>
           <DosDontsGrid>
             <DDColumn>
@@ -323,4 +326,4 @@ export default function Etiquette() {
       </ContentSection>
     </PageWrapper>
   );
-}
+} 

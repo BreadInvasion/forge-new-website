@@ -1,12 +1,14 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
+import locPin from '../../assets/img/loc-pin.svg?url';
 import PageRuler from '../shared/PageRuler';
 
-// ── Figma Assets (fresh) ──────────────────────────────────────────────────
+// ── Figma Assets ──────────────────────────────────────────────────────────
 const FORGE_PHOTO = 'https://www.figma.com/api/mcp/asset/09344755-fef6-4d67-835d-d6a67d76e91e';
-const RULER_MAIN  = 'https://www.figma.com/api/mcp/asset/02019811-b8fc-4937-bf9e-c260373092ea';
-const LOC_PIN     = 'https://www.figma.com/api/mcp/asset/31583bbc-4b05-48fa-8877-c4caddcfd7bc';
+const RULER_MAIN  = rulerMask;
+const LOC_PIN     = locPin;
 
 // ── Design tokens ─────────────────────────────────────────────────────────
 const C = {
@@ -464,4 +466,4 @@ const AboutUs = () => {
   );
 };
 
-export default AboutUs;
+export default AboutUs;

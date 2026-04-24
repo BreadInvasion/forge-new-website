@@ -21,3 +21,7 @@ declare module '*.svg?url' {
   export default content;
 }
 declare module "*.css";
+declare module '*.png?url' {
+  const src: string
+  export default src
+}

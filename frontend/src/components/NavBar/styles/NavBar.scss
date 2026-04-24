@@ -342,27 +342,47 @@
 }
 
 @media screen and (width < nav.$mobile-breakpoint) {
-    .logo-text, .list-item {
-        transform: translate(0, -200pt);
-        opacity: 0;
-        scale: 0%;
+    /* Hide all nav links and dropdowns on mobile */
+    .list-item {
+        display: none;
     }
+    /* Hide FAQ dropdown + auth avatar; keep only the hamburger user-item */
+    .user-item:not(:has(.hamburger-icon)) {
+        display: none;
+    }
+    /* Hide wordmark — logo images are enough at small sizes */
+    .logo-text {
+        display: none;
+    }
+    /* Show the hamburger trigger */
     .hamburger-icon {
-        size: 100%;
         transform: translate(0);
         margin-right: .2rem;
         opacity: 1;
+        width: 18pt;
+        height: 18pt;
     }
     .user-trigger:has(.hamburger-icon) {
-        transform: translate(0pt, 0pt);
+        transform: translate(0);
         position: relative;
-        width: 15pt;
-        height: 20pt;
+        width: auto;
+        height: auto;
         scale: 100%;
         opacity: 1;
-        z-index: 999; // prevent going under logo icon
+        z-index: 999;
     }
+    /* Move separator flush left since logo-text is gone */
     .separator {
         margin-left: 0;
+    }
+    /* Shrink the logo area so it doesn't eat the full navbar width */
+    .logo-link {
+        min-width: unset;
+        gap: 0.5rem;
+    }
+    /* Keep sign-in legible */
+    .sign-in-button .link {
+        font-size: 1rem;
+        padding: 0.25rem 0.4rem;
     }
 }

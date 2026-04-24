@@ -9,11 +9,13 @@ import { User } from 'src/interfaces';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { AuthAPI } from 'src/apis/AuthAPI';
 import bgPattern from '../../assets/img/background.svg?url';
+import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
+import anvilImg from '../../assets/img/anvil_with_benchys.png';
 import PageRuler from '../shared/PageRuler';
 
-// ── Figma assets ──────────────────────────────────────────────────────────────
-const ANVIL_URL  = 'https://www.figma.com/api/mcp/asset/0ca5af14-4911-42d6-b056-db8c2c2dec01';
-const RULER_URL  = 'https://www.figma.com/api/mcp/asset/c39237df-01e0-4113-8117-8aff7f16b4bb';
+// ── Assets ────────────────────────────────────────────────────────────────────
+const ANVIL_URL  = anvilImg;
+const RULER_URL  = rulerMask;
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const C = {
@@ -33,6 +35,10 @@ const PageBackground = styled.div`
     align-items: center;
     justify-content: flex-end;
     overflow: hidden;
+
+    @media screen and (max-width: 700px) {
+        justify-content: center;
+    }
 `;
 
 const AnvilImage = styled.img`
@@ -46,6 +52,10 @@ const AnvilImage = styled.img`
     object-fit: contain;
     pointer-events: none;
     user-select: none;
+
+    @media screen and (max-width: 700px) {
+        display: none;
+    }
 `;
 
 const FormCard = styled.div`
@@ -116,6 +126,10 @@ const FieldsContainer = styled.div`
     gap: 8px;
     width: calc(100% - 40px);
     padding: 16px 0;
+
+    @media screen and (max-width: 700px) {
+        align-items: stretch;
+    }
 `;
 
 const FieldRow = styled.div`
@@ -125,6 +139,12 @@ const FieldRow = styled.div`
     padding: 6px 10px;
     width: 100%;
     justify-content: flex-end;
+
+    @media screen and (max-width: 700px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
 `;
 
 const FieldLabel = styled.label`
@@ -151,6 +171,11 @@ const FieldInput = styled.input`
     &:focus {
         border-color: ${C.navy};
         box-shadow: 0 0 0 2px rgba(17,28,54,0.15);
+    }
+
+    @media screen and (max-width: 700px) {
+        width: 100%;
+        flex-shrink: 1;
     }
 `;
 

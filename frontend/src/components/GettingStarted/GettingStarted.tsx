@@ -1,21 +1,22 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
+import stepDot from '../../assets/img/step-dot.svg?url';
+import locPin from '../../assets/img/loc-pin.svg?url';
+import heroMobileBg from '../../assets/img/background_mobile.png';
 import PageRuler from '../shared/PageRuler';
 
 // ---------------------------------------------------------------------------
-// Figma asset URLs — valid for 7 days after generation.
-// TODO: Download and replace with local imports from src/assets/img/getting-started/
+// Figma asset URLs — hero background images (still active).
 // ---------------------------------------------------------------------------
 const HERO_BG_DESKTOP = 'https://www.figma.com/api/mcp/asset/2ee84860-092b-437d-a811-cd043d04c5d0';
 const HERO_BG_MOBILE  = 'https://www.figma.com/api/mcp/asset/eac57d69-f072-4e3a-b856-5314d8f551a8';
-// One ruler asset drives the tick SHAPE on every section; per-section COLOR
-// (white hero / red / navy) comes from the `color` prop on PageRuler. This
-// keeps tick pixel positions identical across sections so the ticks read as
-// one continuous ruler down the page.
-const RULER           = 'https://www.figma.com/api/mcp/asset/7c80f8d8-834a-4822-b125-67a1c47398d7';
-const STEP_DOT        = 'https://www.figma.com/api/mcp/asset/8f36fbb2-423f-4013-a256-1e53fb0798a2';
-const LOC_PIN         = 'https://www.figma.com/api/mcp/asset/70eb0629-d89b-47c7-8c0a-2b33fc9a6b24';
+
+// Local assets replace expired Figma URLs.
+const RULER    = rulerMask;
+const STEP_DOT = stepDot;
+const LOC_PIN  = locPin;
 
 // ---------------------------------------------------------------------------
 // Design tokens
@@ -78,9 +79,11 @@ const SectionInner = styled.div`
     padding-right: 60px;
   }
 
-  @media (max-width: 640px) {
-    padding-left: 24px;
-    padding-right: 24px;
+  @media (max-width: 768px) {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    padding-top: 28px !important;
+    padding-bottom: 28px !important;
   }
 `;
 
@@ -94,6 +97,11 @@ const StepLabel = styled.p`
   color: ${C.red};
   letter-spacing: 1.12px;
   margin: 0 0 12px 0;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    margin: 0 0 14px 0;
+  }
 `;
 
 const SectionTitle = styled.h2`
@@ -103,6 +111,12 @@ const SectionTitle = styled.h2`
   color: ${C.navy};
   line-height: 1.25;
   margin: 0 0 16px 0;
+
+  @media (max-width: 768px) {
+    font-size: 26px;
+    line-height: 32px;
+    margin: 0 0 14px 0;
+  }
 `;
 
 const SectionSubtitle = styled.p`
@@ -114,6 +128,14 @@ const SectionSubtitle = styled.p`
   line-height: 1.25;
   max-width: 572px;
   margin: 0 0 40px 0;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0;
+    margin: 0 0 14px 0;
+    max-width: 100%;
+  }
 `;
 
 // ============================================================
@@ -126,6 +148,22 @@ const HeroSection = styled.section`
   background: linear-gradient(to right, ${C.navy}, ${C.navyLight});
   overflow: hidden;
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    min-height: 260px;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url(${heroMobileBg});
+      background-size: cover;
+      background-position: center center;
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: 0;
+    }
+  }
 `;
 
 const HeroInner = styled.div`
@@ -137,6 +175,13 @@ const HeroInner = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  @media (max-width: 768px) {
+    padding: 36px 30px;
+    min-height: 260px;
+    position: relative;
+    z-index: 1;
+  }
 `;
 
 /** Decorative floating geometry in the hero right area */
@@ -152,6 +197,10 @@ const HeroDeco = styled.div<{ src: string; w: number; h: number; right: number; 
   border-radius: 4px;
   overflow: hidden;
   pointer-events: none;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const HeroTitle = styled.h1`
@@ -162,6 +211,12 @@ const HeroTitle = styled.h1`
   line-height: 1.25;
   margin: 0 0 20px 0;
   max-width: 820px;
+
+  @media (max-width: 768px) {
+    font-size: 30px;
+    line-height: 36px;
+    margin: 0 0 12px 0;
+  }
 `;
 
 const HeroSubtitle = styled.p`
@@ -172,6 +227,12 @@ const HeroSubtitle = styled.p`
   line-height: 1.25;
   max-width: 780px;
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 700;
+  }
 `;
 
 // ============================================================
@@ -184,6 +245,17 @@ const StepBar = styled.div`
   justify-content: center;
   padding: 12px 0 8px 0;
   flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0;
+    padding: 16px 20px;
+    background: ${C.bgLight};
+  }
 `;
 
 // Red rectangle that runs under the step progress bar. Starts just past the
@@ -195,12 +267,11 @@ const StepBarDivider = styled.div`
   margin: 0;
   background: ${C.red};
   position: relative;
-  top: 11px;
+  top: 9px;
   z-index: 1;
 
-  @media (max-width: 640px) {
-    width: calc(100% - 24px);
-    margin-left: 24px;
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -208,6 +279,12 @@ const StepItem = styled.div`
   display: flex;
   gap: 12px;
   align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
 `;
 
 const StepDot = styled.div`
@@ -220,14 +297,24 @@ const StepDot = styled.div`
 
   span {
     position: absolute;
-    top: 2px;
-    left: 8px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     font-family: 'Funnel Display', sans-serif;
     font-weight: 700;
-    font-size: 20px;
+    font-size: 18px;
     color: #fff;
-    line-height: 1.25;
+    line-height: 1;
     pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    width: 28px;
+    height: 28px;
+
+    span {
+      font-size: 14px;
+    }
   }
 `;
 
@@ -238,6 +325,25 @@ const StepName = styled.span`
   color: ${C.navy};
   line-height: 1.25;
   white-space: nowrap;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const StepNameMobile = styled.span`
+  display: none;
+  font-family: 'Funnel Display', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  color: ${C.slate};
+  line-height: normal;
+  white-space: nowrap;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
 `;
 
 // ============================================================
@@ -247,6 +353,12 @@ const FileCardsGrid = styled.div`
   display: flex;
   gap: 24px;
   flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
 `;
 
 const FileCard = styled.div`
@@ -259,6 +371,13 @@ const FileCard = styled.div`
   padding: 24px 16px 20px 16px;
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    min-height: 0;
+    padding: 14px;
+    border-width: 0.5px;
+  }
 `;
 
 const FileExtRow = styled.div`
@@ -281,16 +400,28 @@ const FileExt = styled.span`
   font-size: 24px;
   color: ${C.navy};
   letter-spacing: 1.68px;
+
+  @media (max-width: 768px) {
+    font-size: 22px;
+    letter-spacing: 0;
+  }
 `;
 
 const FileMachine = styled.p`
   font-family: 'Funnel Display', sans-serif;
   font-weight: 700;
   font-size: 18px;
-  color: ${C.slate};
+  color: ${C.navy};
   letter-spacing: 1.4px;
   line-height: 1.25;
   margin: 0 0 8px 0;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+    letter-spacing: 0;
+    color: ${C.navy};
+    margin: 0 0 6px 0;
+  }
 `;
 
 const FileDesc = styled.p`
@@ -301,6 +432,11 @@ const FileDesc = styled.p`
   line-height: 1.35;
   margin: 0;
   flex: 1;
+
+  @media (max-width: 768px) {
+    font-size: 11px;
+    font-weight: 500;
+  }
 `;
 
 // ============================================================
@@ -311,6 +447,11 @@ const PricingGrid = styled.div`
   gap: 48px;
   flex-wrap: wrap;
   margin-bottom: 36px;
+
+  @media (max-width: 768px) {
+    gap: 12px;
+    margin-bottom: 0;
+  }
 `;
 
 const PricingCard = styled.div`
@@ -320,11 +461,35 @@ const PricingCard = styled.div`
   border-radius: 5px;
   background: ${C.bgLight};
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    flex: 1 1 100%;
+    max-width: 100%;
+    border: 0.5px solid ${C.slate};
+    overflow: visible;
+    height: auto;
+  }
 `;
 
 const PricingCardHeader = styled.div`
   padding: 16px 24px 10px 24px;
   border-bottom: 1px solid ${C.divider};
+
+  @media (max-width: 768px) {
+    padding: 12px 16px 12px 16px;
+    border-bottom: none;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 16px;
+      right: 16px;
+      height: 0.5px;
+      background: rgba(49, 81, 156, 0.8);
+    }
+  }
 `;
 
 const PricingCardTitle = styled.p`
@@ -334,6 +499,11 @@ const PricingCardTitle = styled.p`
   color: ${C.navy};
   letter-spacing: 1.68px;
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+    letter-spacing: 0;
+  }
 `;
 
 const PricingRow = styled.div`
@@ -344,6 +514,22 @@ const PricingRow = styled.div`
   border-bottom: 1px solid ${C.divider};
 
   &:last-child { border-bottom: none; }
+
+  @media (max-width: 768px) {
+    padding: 10px 16px;
+    border-bottom: none;
+    position: relative;
+
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 16px;
+      right: 16px;
+      height: 0.5px;
+      background: rgba(49, 81, 156, 0.8);
+    }
+  }
 `;
 
 const PricingMaterial = styled.span`
@@ -352,13 +538,23 @@ const PricingMaterial = styled.span`
   font-size: 19px;
   color: ${C.slate};
   letter-spacing: 1.4px;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    letter-spacing: 0;
+  }
 `;
 
 const PricingAmount = styled.span`
   font-family: 'Funnel Display', sans-serif;
   font-weight: 700;
   font-size: 17px;
-  color: ${C.navyMid};
+  color: ${C.navyLight};
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    color: ${C.navyLight};
+  }
 `;
 
 const PricingUnit = styled.span`
@@ -386,6 +582,16 @@ const BannedBtn = styled.a`
   transition: opacity 0.15s;
 
   &:hover { opacity: 0.85; }
+
+  @media (max-width: 768px) {
+    height: auto;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: 4px;
+    margin-bottom: 14px;
+  }
 `;
 
 // ============================================================
@@ -395,6 +601,13 @@ const MachineGrid = styled.div`
   display: flex;
   gap: 24px;
   flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: visible;
+  }
 `;
 
 const MachineCard = styled.div`
@@ -408,6 +621,17 @@ const MachineCard = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    max-width: 100%;
+    min-height: 260px;
+    height: auto;
+    overflow: visible;
+    border: 1px solid ${C.slate};
+    padding: 0 0 20px 0;
+    flex-shrink: 0;
+  }
 `;
 
 const MachineTag = styled.div`
@@ -418,6 +642,10 @@ const MachineTag = styled.div`
   border-radius: 5px;
   margin: 12px 0 0 16px;
   align-self: flex-start;
+
+  @media (max-width: 768px) {
+    margin: 16px 0 0 16px;
+  }
 `;
 
 const MachineTagText = styled.span`
@@ -426,6 +654,11 @@ const MachineTagText = styled.span`
   font-size: 14px;
   color: #fff;
   letter-spacing: 1.05px;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+    letter-spacing: 0.9px;
+  }
 `;
 
 const MachineName = styled.h3`
@@ -437,6 +670,12 @@ const MachineName = styled.h3`
   line-height: 1.25;
   padding: 10px 16px 0 16px;
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 22px;
+    letter-spacing: 1.4px;
+    padding: 12px 16px 6px 16px;
+  }
 `;
 
 const MachineDesc = styled.p`
@@ -449,6 +688,15 @@ const MachineDesc = styled.p`
   padding: 8px 16px 0 16px;
   margin: 0;
   flex: 1;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0.6px;
+    font-weight: 500;
+    flex: 0 0 auto;
+    padding: 4px 16px 0 16px;
+  }
 `;
 
 const MachineBestFor = styled.p`
@@ -459,6 +707,11 @@ const MachineBestFor = styled.p`
   letter-spacing: 1.05px;
   padding: 10px 16px 6px 16px;
   margin: 0;
+
+  @media (max-width: 768px) {
+    padding: 14px 16px 8px 16px;
+    letter-spacing: 0.9px;
+  }
 `;
 
 const MachineTags = styled.div`
@@ -466,6 +719,10 @@ const MachineTags = styled.div`
   flex-wrap: wrap;
   gap: 6px;
   padding: 0 16px;
+
+  @media (max-width: 768px) {
+    padding: 0 16px 0 16px;
+  }
 `;
 
 const MachineUseTag = styled.span`
@@ -477,6 +734,12 @@ const MachineUseTag = styled.span`
   font-size: 14px;
   color: #fff;
   letter-spacing: 1.05px;
+
+  @media (max-width: 768px) {
+    padding: 5px 10px;
+    font-size: 13px;
+    letter-spacing: 0.6px;
+  }
 `;
 
 // ============================================================
@@ -486,6 +749,11 @@ const LocationGrid = styled.div`
   display: flex;
   gap: 72px;
   flex-wrap: wrap;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    gap: 20px;
+  }
 `;
 
 const InfoCard = styled.div`
@@ -495,6 +763,11 @@ const InfoCard = styled.div`
   border-radius: 5px;
   background: ${C.bgLight};
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
 `;
 
 const InfoCardHeader = styled.div<{ from: string; to: string }>`
@@ -512,6 +785,11 @@ const InfoCardHeaderTitle = styled.h3`
   color: #fff;
   letter-spacing: 2.52px;
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 24px;
+    letter-spacing: 1.4px;
+  }
 `;
 
 const HoursRow = styled.div`
@@ -530,6 +808,11 @@ const HoursDay = styled.span`
   font-size: 19px;
   color: ${C.slate};
   letter-spacing: 1.4px;
+
+  @media (max-width: 768px) {
+    font-size: 15px;
+    letter-spacing: 1.05px;
+  }
 `;
 
 const HoursTime = styled.span`
@@ -537,6 +820,12 @@ const HoursTime = styled.span`
   font-weight: 700;
   font-size: 17px;
   color: ${C.navyMid};
+
+  @media (max-width: 768px) {
+    font-size: 15px;
+    letter-spacing: 1.05px;
+    color: ${C.navyLight};
+  }
 `;
 
 const LocationBody = styled.div`
@@ -570,6 +859,10 @@ const RegisterLayout = styled.div`
   gap: 56px;
   align-items: flex-start;
   flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    gap: 24px;
+  }
 `;
 
 const RegisterTextCol = styled.div`
@@ -582,14 +875,24 @@ const RegisterCardCol = styled.div`
   flex: 1 1 420px;
   max-width: 560px;
   min-width: 0;
+
+  @media (max-width: 768px) {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
 `;
 
 const RegisterCard = styled.div`
   border: 1px solid ${C.navyLight};
   border-radius: 5px;
-  background: ${C.bgLight};
+  background: #fff;
   overflow: hidden;
   width: 100%;
+
+  @media (max-width: 768px) {
+    border: 1px solid ${C.slate};
+    border-radius: 6px;
+  }
 `;
 
 const RegisterCardHeader = styled.div`
@@ -607,6 +910,11 @@ const RegisterCardTitle = styled.h3`
   color: #fff;
   letter-spacing: 2.52px;
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 24px;
+    letter-spacing: 1.4px;
+  }
 `;
 
 const RegisterCardBody = styled.div`
@@ -615,6 +923,11 @@ const RegisterCardBody = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 22px;
+
+  @media (max-width: 768px) {
+    padding: 18px 20px 20px 20px;
+    gap: 14px;
+  }
 `;
 
 const RegisterCardText = styled.p`
@@ -627,6 +940,15 @@ const RegisterCardText = styled.p`
   margin: 0;
 
   strong { font-weight: 700; color: ${C.red}; }
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 20px;
+    color: ${C.navy};
+
+    strong { color: ${C.red}; }
+  }
 `;
 
 const RegisterBulletList = styled.ul`
@@ -647,6 +969,13 @@ const RegisterBullet = styled.li`
   line-height: 1.4;
   padding-left: 26px;
   position: relative;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 20px;
+    color: ${C.navy};
+  }
 
   &::before {
     content: '';
@@ -689,6 +1018,16 @@ const RegisterBtn = styled.a`
   &:active {
     transform: translateY(1px);
     box-shadow: 0 1px 0 rgba(80, 16, 14, 0.35);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 48px;
+    font-size: 15px;
+    border-radius: 4px;
+    padding: 0 18px;
+    border: none;
+    box-shadow: none;
   }
 `;
 
@@ -738,11 +1077,11 @@ const MACHINES = [
 // STEPS DATA
 // ============================================================
 const STEPS = [
-  { n: 1, label: 'File Types' },
-  { n: 2, label: 'Materials & Pricing' },
-  { n: 3, label: 'Pick a Machine' },
-  { n: 4, label: 'Where to Find Us' },
-  { n: 5, label: 'Register!' },
+  { n: 1, label: 'File Types',          mobileLabel: 'Files' },
+  { n: 2, label: 'Materials & Pricing', mobileLabel: 'Materials' },
+  { n: 3, label: 'Pick a Machine',      mobileLabel: 'Machines' },
+  { n: 4, label: 'Where to Find Us',    mobileLabel: 'Location' },
+  { n: 5, label: 'Register!',           mobileLabel: 'Register' },
 ];
 
 // ============================================================
@@ -800,6 +1139,7 @@ export default function GettingStarted() {
                 <span>{s.n}</span>
               </StepDot>
               <StepName>{s.label}</StepName>
+              <StepNameMobile>{s.mobileLabel}</StepNameMobile>
             </StepItem>
           ))}
         </StepBar>
@@ -842,6 +1182,8 @@ export default function GettingStarted() {
             or inch depending on the material. Before you come to the space check out the{' '}
             <strong style={{ fontWeight: 800, color: C.red }}>banned filaments page.</strong>
           </SectionSubtitle>
+
+          <BannedBtn href="../faq/materials">Banned Filaments →</BannedBtn>
 
           <PricingGrid>
             {/* Filament */}
@@ -903,8 +1245,6 @@ export default function GettingStarted() {
               ))}
             </PricingCard>
           </PricingGrid>
-
-          <BannedBtn href="../faq/materials">Banned Filaments</BannedBtn>
         </SectionInner>
       </Section>
 

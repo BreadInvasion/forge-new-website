@@ -5,16 +5,16 @@ import { AuthAPI } from "../AuthAPI";
 
 export const api = axios.create({
     withCredentials: true,
-    baseURL: "http://localhost:3000/api",
+    baseURL: "/api",
 });
 
 export const authApi = axios.create({
-    baseURL: "http://localhost:3000/api",
+    baseURL: "/api",
     withCredentials: true,
 });
 
 export const publicApi = axios.create({
-    baseURL: "http://localhost:3000/api"
+    baseURL: "/api"
 });
 
 api.interceptors.request.use(

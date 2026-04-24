@@ -8,10 +8,9 @@ import Toolbar from './components/Toolbar';
 import MachineCard, { getProgress } from './MachineCard';
 import { Machine, AllMachinesStatusResponse } from "src/interfaces";
 import bgPattern from '../../assets/img/background.svg?url';
+import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
 import PageRuler from '../shared/PageRuler';
 
-// ── Figma assets ─────────────────────────────────────────────────────────────
-const RULER_URL = 'https://www.figma.com/api/mcp/asset/aff3de3c-e4e6-42fe-ba0d-f29b38e0e322';
 
 // ── Design tokens ─────────────────────────────────────────────────────────
 const C = {
@@ -193,7 +192,6 @@ export const Status: React.FC = () => {
   return (
     <SelectedMachineProvider>
       <PageBackground>
-        <PageRuler src={RULER_URL} side="left" />
         <Page>
           <Toolbar
             highlightFailed={highlightFailed}

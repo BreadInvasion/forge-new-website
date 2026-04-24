@@ -1,32 +1,23 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { styled } from 'styled-components';
+import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
+import bgPattern from '../../assets/img/background.svg?url';
+import anvilMobileImg from '../../assets/img/background_mobile_crop.png';
+import mobileBenchys from '../../assets/img/mobile_benchys.png';
+import anvilDesktopImg from '../../assets/img/anvil_with_benchys_right.png';
 import PageRuler from '../shared/PageRuler';
 
-// ---------------------------------------------------------------------------
-// Figma asset URLs (hosted for 7 days after code generation).
-// TODO: Download these images and replace with local imports, e.g.
-//   import anvilImg from 'src/assets/img/home/anvil_hero.png';
-// ---------------------------------------------------------------------------
-const ANVIL_IMG  = 'https://www.figma.com/api/mcp/asset/e305a98f-4e8a-4f0d-9728-79c478ed49fa';
-// Use the long-tick ruler graphic (same asset as RULER_2 on the Getting
-// Started page) and recolor it to white via CSS filter. The original Home
-// ruler asset had noticeably shorter ticks inside its canvas and read as a
-// different graphic than the rulers on Getting Started.
-const RULER_IMG  = 'https://www.figma.com/api/mcp/asset/7c80f8d8-834a-4822-b125-67a1c47398d7';
+const RULER_IMG = rulerMask;
 
 // ---------------------------------------------------------------------------
 // Styled components
 // ---------------------------------------------------------------------------
-// Layout philosophy: use flex containers with auto sizing so the page looks
-// structurally identical on every display type (1440p laptop, 1080p desktop,
-// 4K, ultrawide, Forge TV). Avoid absolute-positioned children driven by
-// viewport-math offsets — those have to be tuned per resolution and drift
-// out of place on the Forge TV.
 
-/** Page wrapper that fills the viewport height minus NavBar and Footer.
- *  NavBar max-height = 72px, Footer min-height = 100px.
- *  `position: relative` scopes the shared <PageRuler /> to the whole page. */
+/** Page wrapper — on desktop fills exactly the viewport minus NavBar + Footer
+ *  so nothing scrolls. On mobile clamps to the same viewport-minus-navbar
+ *  height with overflow hidden so the hero + info bar are a fixed, non-scrollable
+ *  full-screen block. */
 const PageWrapper = styled.div`
     position: relative;
     display: flex;
@@ -36,12 +27,17 @@ const PageWrapper = styled.div`
     min-height: 0;
     flex: 1 1 auto;
     overflow: hidden;
+
+    @media (max-width: 768px) {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+        flex: 1 1 auto;
+    }
 `;
 
 // ── Hero ────────────────────────────────────────────────────────────────────
 
-/** Hero is a flex row: text column on the left, image panel on the right.
- *  The page-level <PageRuler /> renders the left-edge ruler. */
 const HeroSection = styled.section`
     position: relative;
     width: 100%;
@@ -51,12 +47,59 @@ const HeroSection = styled.section`
     align-items: stretch;
     background: linear-gradient(to right, #2d4a80 10%, #a51c1c 100%);
     overflow: hidden;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Mobile anvil background — baked into the section as a pseudo-element
+     * so it can't shift or scroll independently of its container. Using
+     * background-image (not an <img>) avoids the object-position reflow that
+     * iOS Safari triggers when the address bar appears/disappears. */
+    &::after {
+        content: '';
+        display: none;
+
+        @media (max-width: 768px) {
+            display: block;
+            position: absolute;
+            inset: 0;
+            background-image: url(${anvilMobileImg});
+            background-size: 75%;
+            background-position: right top;
+            background-repeat: no-repeat;
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: 1;
+            height: 120%;
+            object-fit: cover;
+            object-position: right;
+
+        }
+    }
 `;
 
-/** Text column — title stacked above the services list. Vertical centering
- *  comes from `justify-content: center`; `gap` controls the visual split
- *  between the two blocks the same way on every display. No viewport-math
- *  offsets required. */
+/** Benchy scatter — mobile only, far right lower half of hero.
+ *  mix-blend-mode: screen makes the black background transparent. */
+const MobileBenchyScatter = styled.img`
+    display: none;
+
+    @media (max-width: 768px) {
+        display: block;
+        position: absolute;
+        right: -30%;
+        bottom: 5%;
+        width: 70%;
+        mix-blend-mode: screen;
+        opacity: 0.85;
+        pointer-events: none;
+        z-index: 1;
+    }
+`;
+
+/** Text column */
 const HeroContent = styled.div`
     position: relative;
     z-index: 2;
@@ -68,16 +111,34 @@ const HeroContent = styled.div`
     flex-direction: column;
     justify-content: center;
     gap: clamp(40px, 8vh, 120px);
+
+    @media (max-width: 768px) {
+        width: 100%;
+        padding: 50px 32px 22px 32px;  /* increase the top value */
+        align-items: flex-start;
+        gap: clamp(20px, 5vh, 40px);
+        z-index: 2;
+
+    }
 `;
 
 const HeroTitle = styled.h1`
     font-family: 'Funnel Display', sans-serif;
     font-weight: 700;
     font-size: clamp(40px, 9vh, 100px);
-    line-height: 1.15;
+    line-height: 1.2;
     color: #ffffff;
-    white-space: pre;
     margin: 0;
+
+    @media (max-width: 768px) {
+        font-size: clamp(36px, 12vw, 64px);
+    }
+`;
+
+/** One line of the staggered hero title. */
+const TitleLine = styled.span<{ $ml?: string }>`
+    display: block;
+    margin-left: ${p => p.$ml ?? '0'};
 `;
 
 const HeroServices = styled.p`
@@ -85,17 +146,21 @@ const HeroServices = styled.p`
     font-weight: 700;
     font-size: clamp(16px, 3vh, 35px);
     color: #ffffff;
-    line-height: 1.3;
+    line-height: 1.35;
     margin: 0;
-    white-space: pre;
+
+    @media (max-width: 768px) {
+        font-size: clamp(14px, 4.5vw, 24px);
+    }
 `;
 
-/** Image panel pinned to the right edge of the hero. Capped at the design's
- *  native 920px (60% of a 1440px-wide hero) so the anvil doesn't balloon on
- *  wide displays like the 1920x1080 Forge TV — on those, the extra width
- *  becomes empty gradient between the text column and the image instead of
- *  making the anvil grotesquely large. `margin-left: auto` pushes the panel
- *  to the right; everything to its left is the hero's gradient background. */
+/** One line of the staggered services list. */
+const ServiceLine = styled.span<{ $ml?: string }>`
+    display: block;
+    margin-left: ${p => p.$ml ?? '0'};
+`;
+
+/** Image panel — right side on desktop, hidden on mobile (MobileBg replaces it). */
 const HeroImagePanel = styled.div`
     position: relative;
     flex: 0 0 min(920px, 60%);
@@ -114,6 +179,10 @@ const HeroImagePanel = styled.div`
         max-width: none;
         object-fit: cover;
     }
+
+    @media (max-width: 768px) {
+        display: none;
+    }
 `;
 
 // ── Info Bar ────────────────────────────────────────────────────────────────
@@ -127,36 +196,46 @@ const InfoBar = styled.div`
     display: flex;
     align-items: center;
     overflow: hidden;
+    /* Red accents as borders — frees up both pseudo-elements */
+    border-top: 4px solid #a51c1c;
+    border-right: 4px solid #a51c1c;
 
-    /* Red top accent */
+    /* Repeating navy geometric pattern */
     &::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: #a51c1c;
+        inset: 0;
+        background-image: url(${bgPattern});
+        background-repeat: repeat;
+        background-size: 122px 140px;
+        opacity: 0.12;
+        pointer-events: none;
+        z-index: 0;
     }
 
-    /* Red right accent */
-    &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 4px;
-        height: 100%;
-        background: #a51c1c;
+    @media (max-width: 768px) {
+        flex-direction: column;
+        height: auto;
+        padding: 12px 20px;
+        gap: 8px;
+        align-items: center;
+        border-right: none;
     }
 `;
 
 const MembershipText = styled.div`
+    position: relative;
+    z-index: 1;
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0 20px 0 clamp(40px, 8vw, 100px);
+
+    @media (max-width: 768px) {
+        padding: 0 20px;
+        flex: unset;
+    }
 
     p {
         font-family: 'Funnel Display', sans-serif;
@@ -166,10 +245,17 @@ const MembershipText = styled.div`
         text-align: center;
         white-space: nowrap;
         margin: 0;
+
+        @media (max-width: 768px) {
+            white-space: normal;
+            font-size: clamp(13px, 4vw, 18px);
+        }
     }
 `;
 
 const GetStartedButton = styled(Link)`
+    position: relative;
+    z-index: 1;
     flex-shrink: 0;
     margin-right: clamp(24px, 6vw, 80px);
     width: clamp(160px, 20vw, 260px);
@@ -183,15 +269,21 @@ const GetStartedButton = styled(Link)`
     text-decoration: none;
     transition: opacity 0.15s ease;
 
-    &:hover {
-        opacity: 0.85;
-    }
+    &:hover { opacity: 0.85; }
 
     span {
         font-family: 'Funnel Display', sans-serif;
         font-weight: 600;
         font-size: clamp(16px, 2.2vw, 30px);
         color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+        width: clamp(130px, 50vw, 200px);
+        margin-right: 0;
+        height: 34px;
+
+        span { font-size: 16px; }
     }
 `;
 
@@ -201,38 +293,50 @@ const GetStartedButton = styled(Link)`
 // ---------------------------------------------------------------------------
 
 export default function Home() {
+
     return (
         <PageWrapper>
-
-            {/* Single continuous vertical ruler down the left edge of the
-                 page. White tint so it reads on the navy/red hero gradient. */}
-            <PageRuler
-                src={RULER_IMG}
-                side="left"
-                color="#ffffff"
-                zIndex={1}
-            />
 
             {/* ── Hero ─────────────────────────────────────────────────── */}
             <HeroSection>
 
-                {/* Text column — title + services list */}
+    
+                {/* Benchy scatter — mobile only, bottom-right */}
+                <MobileBenchyScatter
+                    src={mobileBenchys}
+                    alt=""
+                    aria-hidden="true"
+                />
+
+                {/* Text column */}
                 <HeroContent>
                     <HeroTitle>
-                        {'Build.\n  Create.\n      Invent.'}
+                        <TitleLine>Build.</TitleLine>
+                        <TitleLine $ml="0.6em">Create.</TitleLine>
+                        <TitleLine $ml="1.8em">Invent.</TitleLine>
                     </HeroTitle>
                     <HeroServices>
-                        {'3D Print\n   Laser Cut\n       Sticker Print\n            and Much More!'}
+                        <ServiceLine>3D Print</ServiceLine>
+                        <ServiceLine $ml="0.8em">Laser Cut</ServiceLine>
+                        <ServiceLine $ml="2em">Sticker Print</ServiceLine>
+                        <ServiceLine $ml="3.2em">and Much More!</ServiceLine>
                     </HeroServices>
                 </HeroContent>
 
-                {/* Hero image panel */}
+                {/* Desktop-only: right-side image panel */}
                 <HeroImagePanel>
                     <img
-                        src={ANVIL_IMG}
+                        src={anvilDesktopImg}
                         alt="The Forge makerspace tools and equipment"
                     />
                 </HeroImagePanel>
+
+                <PageRuler
+                    src={RULER_IMG}
+                    side="left"
+                    color="#ffffff"
+                    zIndex={1}
+                />
 
             </HeroSection>
 

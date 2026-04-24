@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import bgPattern from '../../assets/img/background.svg?url';
+import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
 import PageRuler from '../shared/PageRuler';
 
 // ── Figma assets ───────────────────────────────────────────────────────────────
 const ANVIL_URL = 'https://www.figma.com/api/mcp/asset/e8a3284e-3457-4355-bbdf-65163140905b';
-const RULER_URL = 'https://www.figma.com/api/mcp/asset/bba8fd43-c457-48c7-9661-f9b17452f667';
+const RULER_URL = rulerMask;
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const C = {

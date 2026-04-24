@@ -3,10 +3,11 @@ import * as Accordion from '@radix-ui/react-accordion';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { styled, keyframes } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
+import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
 import PageRuler from '../shared/PageRuler';
 
-// ── Figma Assets (expire 7 days) ──────────────────────────────────────────
-const RULER_SECTION = 'https://www.figma.com/api/mcp/asset/fcadc8e2-4ed1-4591-8ceb-9844b0a96897';
+// ── Figma Assets ──────────────────────────────────────────────────────────
+const RULER_SECTION = rulerMask;
 const HERO_DECO     = 'https://www.figma.com/api/mcp/asset/89f022fa-4c4b-433d-9526-8f0955c8c183';
 
 // ── Design tokens ─────────────────────────────────────────────────────────

@@ -10,12 +10,8 @@ import ResourceSlotsTab from './tabs/ResourceSlotsTab';
 import UsersTab from './tabs/UsersTab';
 import SemestersTab from './tabs/SemestersTab';
 import ChargeSheetsTab from './tabs/ChargeSheetsTab';
-import PageRuler from '../shared/PageRuler';
 
 import './styles/Admin.scss';
-
-// ── Figma asset (ruler) — same asset used on the Status / Hours pages ──────
-const RULER_URL = 'https://www.figma.com/api/mcp/asset/bdc76774-85d6-41c4-8ea4-dad90eacaf1c';
 
 type AdminTabKey =
     | 'machines'
@@ -99,8 +95,6 @@ const Admin: React.FC = () => {
                 style={{ backgroundImage: `url(${bgPattern})` }}
                 aria-hidden="true"
             />
-            <PageRuler src={RULER_URL} side="left" />
-
             <nav className="admin-tabs" aria-label="Admin sections">
                 {TABS.map((tab) => (
                     <button
