@@ -126,7 +126,7 @@ export const NavBar: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
                     </NavMenu.Item>
                 )}
 
-                <Hamburger.default />
+                <Hamburger.default showAdmin={isAuthed && isAdmin(user)} />
 
                 {/* Vertical divider before Sign In */}
                 <div className="separator horizontal" />

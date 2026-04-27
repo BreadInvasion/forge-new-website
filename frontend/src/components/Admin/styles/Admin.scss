@@ -58,6 +58,15 @@
     @media (max-width: 900px) {
         gap: 16px;
         padding: 16px 24px 0 24px;
+        // Scroll horizontally so all 8 tabs stay on one row without piling up
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        // Hide the scrollbar visually but keep scroll behaviour
+        scrollbar-width: none;
+        &::-webkit-scrollbar { display: none; }
+        // Padding so the last tab isn't flush against the edge when scrolled
+        padding-right: 32px;
     }
 }
 
@@ -79,7 +88,7 @@
     }
 
     @media (max-width: 900px) {
-        font-size: 24px;
+        font-size: 16px;
     }
 }
 

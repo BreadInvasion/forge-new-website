@@ -246,6 +246,15 @@ const StepBar = styled.div`
   padding: 12px 0 8px 0;
   flex-wrap: wrap;
 
+  /* Intermediate desktop: tighten gap so all 5 steps stay on one row */
+  @media (max-width: 1300px) and (min-width: 769px) {
+    gap: 16px;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
   @media (max-width: 768px) {
     display: flex;
     flex-direction: row;
@@ -325,6 +334,10 @@ const StepName = styled.span`
   color: ${C.navy};
   line-height: 1.25;
   white-space: nowrap;
+
+  @media (max-width: 1300px) and (min-width: 769px) {
+    font-size: 16px;
+  }
 
   @media (max-width: 768px) {
     display: none;
@@ -582,16 +595,6 @@ const BannedBtn = styled.a`
   transition: opacity 0.15s;
 
   &:hover { opacity: 0.85; }
-
-  @media (max-width: 768px) {
-    height: auto;
-    padding: 10px 16px;
-    font-size: 13px;
-    font-weight: 700;
-    border: none;
-    border-radius: 4px;
-    margin-bottom: 14px;
-  }
 `;
 
 // ============================================================
@@ -1183,8 +1186,6 @@ export default function GettingStarted() {
             <strong style={{ fontWeight: 800, color: C.red }}>banned filaments page.</strong>
           </SectionSubtitle>
 
-          <BannedBtn href="../faq/materials">Banned Filaments →</BannedBtn>
-
           <PricingGrid>
             {/* Filament */}
             <PricingCard>
@@ -1245,6 +1246,8 @@ export default function GettingStarted() {
               ))}
             </PricingCard>
           </PricingGrid>
+
+          <BannedBtn href="../faq/materials" style={{ marginTop: 24 }}>Banned Filaments →</BannedBtn>
         </SectionInner>
       </Section>
 
