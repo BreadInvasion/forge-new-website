@@ -112,6 +112,12 @@ const HeroContent = styled.div`
     justify-content: center;
     gap: clamp(40px, 8vh, 120px);
 
+    /* At intermediate widths, don't let the image panel compress us */
+    @media (max-width: 1300px) and (min-width: 769px) {
+        flex-shrink: 0;
+        width: min(540px, 48%);
+    }
+
     @media (max-width: 768px) {
         width: 100%;
         padding: 50px 32px 22px 32px;  /* increase the top value */
@@ -178,6 +184,13 @@ const HeroImagePanel = styled.div`
         object-fit: cover;
         /* Keep focus on the right side where the anvil + benchys sit */
         object-position: right center;
+    }
+
+    /* At intermediate widths the image panel can squeeze the text column because
+       it won't shrink. Allow it to give ground so HeroContent keeps enough room
+       for the staggered service lines without wrapping. */
+    @media (max-width: 1300px) and (min-width: 769px) {
+        flex: 0 1 52%;
     }
 
     @media (max-width: 768px) {

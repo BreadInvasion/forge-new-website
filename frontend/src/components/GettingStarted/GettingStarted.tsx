@@ -240,13 +240,23 @@ const StepBar = styled.div`
   padding: 12px 0 8px 0;
   flex-wrap: wrap;
 
-  /* Intermediate desktop: tighten gap so all 5 steps stay on one row */
+  /* Intermediate desktop: tighten gap so all 5 steps stay on one row.
+     Using center instead of space-evenly so items cluster together with a
+     consistent gap rather than being spread across the full bar width on
+     wider viewports like the Forge TV. */
   @media (max-width: 1300px) and (min-width: 769px) {
     gap: 16px;
     flex-wrap: nowrap;
-    justify-content: space-evenly;
+    justify-content: center;
     padding-left: 16px;
     padding-right: 16px;
+  }
+
+  /* Large desktop / TV (> 1300px): keep items together with a scaled gap */
+  @media (min-width: 1301px) {
+    gap: clamp(20px, 2.5vw, 48px);
+    justify-content: center;
+    flex-wrap: nowrap;
   }
 
   @media (max-width: 768px) {
