@@ -3,12 +3,12 @@ import { styled } from 'styled-components';
 import bgPattern from '../../assets/img/background.svg?url';
 import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
 import locPin from '../../assets/img/loc-pin.svg?url';
+import forgePhoto from '../../assets/img/Blurred-forge.png';
 import PageRuler from '../shared/PageRuler';
 
-// ── Figma Assets ──────────────────────────────────────────────────────────
-const FORGE_PHOTO = 'https://www.figma.com/api/mcp/asset/09344755-fef6-4d67-835d-d6a67d76e91e';
-const RULER_MAIN  = rulerMask;
-const LOC_PIN     = locPin;
+// ── Assets ────────────────────────────────────────────────────────────────
+const RULER_MAIN = rulerMask;
+const LOC_PIN    = locPin;
 
 // ── Design tokens ─────────────────────────────────────────────────────────
 const C = {
@@ -359,13 +359,9 @@ const AboutUs = () => {
   return (
     <PageWrapper>
 
-      {/* Single page-level ruler — continuous ticks across every section.
-           Uses the main section's ruler asset so the color matches the body
-           of the page rather than only the hero band. */}
-      <PageRuler src={RULER_MAIN} side="left" />
-
       {/* ── HERO BANNER ─────────────────────────────────────────────────── */}
       <HeroBanner>
+        <PageRuler src={RULER_MAIN} side="left" color="#ffffff" zIndex={2} />
         <HeroInner>
           <HeroYears>10+ Years of</HeroYears>
           <HeroActions>
@@ -376,6 +372,7 @@ const AboutUs = () => {
 
       {/* ── MAIN CONTENT ────────────────────────────────────────────────── */}
       <MainSection>
+        <PageRuler src={RULER_MAIN} side="left" color={C.navyMid} />
         <MainInner>
 
           {/* Left column */}
@@ -455,7 +452,7 @@ const AboutUs = () => {
           {/* Right column — photo centered vertically */}
           <RightCol>
             <ForgePhoto>
-              <img src={FORGE_PHOTO} alt="The Forge makerspace interior" />
+              <img src={forgePhoto} alt="The Forge makerspace interior" />
             </ForgePhoto>
           </RightCol>
 

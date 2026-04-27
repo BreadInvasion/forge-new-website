@@ -172,12 +172,12 @@ const HeroImagePanel = styled.div`
 
     img {
         position: absolute;
-        height: 103.28%;
-        left: -58.18%;
-        top: -2.27%;
-        width: 158.18%;
-        max-width: none;
+        inset: 0;
+        width: 100%;
+        height: 100%;
         object-fit: cover;
+        /* Keep focus on the right side where the anvil + benchys sit */
+        object-position: right center;
     }
 
     @media (max-width: 768px) {

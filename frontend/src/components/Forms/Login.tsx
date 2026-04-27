@@ -46,8 +46,8 @@ const AnvilImage = styled.img`
     left: 4%;
     top: 50%;
     transform: translateY(-50%);
-    height: 100%;
-    max-height: 816px;
+    /* Scale to viewport height so it never dominates on shorter screens */
+    height: clamp(280px, 72vh, 680px);
     width: auto;
     object-fit: contain;
     pointer-events: none;
