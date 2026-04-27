@@ -6,9 +6,8 @@ import bgPattern from '../../assets/img/background.svg?url';
 import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
 import PageRuler from '../shared/PageRuler';
 
-// ── Figma Assets ──────────────────────────────────────────────────────────
+// ── Assets ────────────────────────────────────────────────────────────────
 const RULER_SECTION = rulerMask;
-const HERO_DECO     = 'https://www.figma.com/api/mcp/asset/89f022fa-4c4b-433d-9526-8f0955c8c183';
 
 // ── Design tokens ─────────────────────────────────────────────────────────
 const C = {
@@ -156,26 +155,6 @@ const HeroSection = styled.section`
 `;
 
 
-const HeroDecoWrap = styled.div`
-  position: absolute;
-  right: 100px;
-  top: 23px;
-  width: 550px;
-  height: 310px;
-  transform: rotate(180deg) scaleY(-1);
-  overflow: hidden;
-  pointer-events: none;
-
-  img {
-    position: absolute;
-    width: 122.18%;
-    height: 216.89%;
-    left: -3.51%;
-    top: -4.18%;
-    max-width: none;
-    object-fit: cover;
-  }
-`;
 
 const HeroInner = styled.div`
   max-width: 1440px;
@@ -215,6 +194,7 @@ const ContentSection = styled.section`
   width: 100%;
   background: #fff;
   overflow: hidden;
+  flex: 1 0 auto;
 
   &::before {
     content: '';
@@ -743,14 +723,9 @@ export default function FAQ() {
   return (
     <PageWrapper>
 
-      {/* Single continuous ruler down the left edge of the page */}
-      <PageRuler src={RULER_SECTION} side="left" />
-
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <HeroSection>
-        <HeroDecoWrap>
-          <img src={HERO_DECO} alt="" aria-hidden="true" />
-        </HeroDecoWrap>
+        <PageRuler src={RULER_SECTION} side="left" color="#ffffff" zIndex={2} />
         <HeroInner>
           <HeroTitle>FAQ</HeroTitle>
           <HeroSubtitle>
@@ -761,6 +736,7 @@ export default function FAQ() {
 
       {/* ── Accordion section ─────────────────────────────────────────────── */}
       <ContentSection>
+        <PageRuler src={RULER_SECTION} side="left" color={C.red} />
         <SectionInner>
 
           <AccordionRoot type="multiple">

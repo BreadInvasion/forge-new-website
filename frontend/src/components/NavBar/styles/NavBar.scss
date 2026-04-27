@@ -344,17 +344,29 @@
 /* ── Intermediate desktop (900–1300px) ─────────────────────────────────────
    The full logo (RPI lockup + separator + sticker + wordmark) is ~400px wide
    but the nav list only reserves 20rem (320px) of left padding, causing the
-   first nav link to overlap the wordmark at ~1030px. Hiding the text-only
-   wordmark at this range clears the overlap while keeping the RPI lockup and
-   forge-sticker branding visible.
+   first nav link to overlap the wordmark at ~1030px. At this range we shrink
+   the logo proportionally (smaller images + smaller text + tighter gap) and
+   bump padding-left so there's no overlap — while keeping the wordmark visible
+   for large-TV viewports that fall in this range.
    ────────────────────────────────────────────────────────────────────────── */
 @media screen and (nav.$mobile-breakpoint <= width < 1300px) {
     .logo-text {
-        display: none;
+        font-size: 0.8rem;
+        letter-spacing: 0.01em;
+    }
+    .nav-rpi-lockup,
+    .nav-forge-sticker {
+        height: 22px;
+    }
+    .nav-brand-separator {
+        height: 30px;
     }
     .logo-link {
         min-width: unset;
-        gap: 0.5rem;
+        gap: 0.4rem;
+    }
+    .nav-menu-list {
+        padding-left: 22rem;
     }
 }
 

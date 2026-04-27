@@ -4,9 +4,8 @@ import bgPattern from '../../assets/img/background.svg?url';
 import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
 import PageRuler from '../shared/PageRuler';
 
-// ── Figma Assets ──────────────────────────────────────────────────────────
-const RULER     = rulerMask;
-const HERO_DECO = 'https://www.figma.com/api/mcp/asset/366c8e9b-0c94-4167-934e-fb6eff4d35f9';
+// ── Assets ────────────────────────────────────────────────────────────────
+const RULER = rulerMask;
 
 // ── Design tokens ─────────────────────────────────────────────────────────
 const C = {
@@ -123,30 +122,6 @@ const HeroSection = styled.section`
   align-items: center;
 `;
 
-const HeroDecoWrap = styled.div`
-  position: absolute;
-  right: 100px;
-  top: 23px;
-  width: 550px;
-  height: 310px;
-  transform: rotate(180deg) scaleY(-1);
-  overflow: hidden;
-  pointer-events: none;
-
-  img {
-    position: absolute;
-    width: 122.18%;
-    height: 216.89%;
-    left: -3.51%;
-    top: -4.18%;
-    max-width: none;
-    object-fit: cover;
-  }
-    @media (max-width: 640px) {
-    right: -30%;
-    opacity: 0.6;
-  }
-`;
 
 const HeroInner = styled.div`
   max-width: 1440px;
@@ -568,9 +543,6 @@ export default function Materials() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <HeroSection>
         <PageRuler src={RULER} side="right" color="#ffffff" zIndex={1} />
-        <HeroDecoWrap>
-          <img src={HERO_DECO} alt="" aria-hidden="true" />
-        </HeroDecoWrap>
         <HeroInner>
           <HeroTitle>Material Information</HeroTitle>
           <HeroSubtitle>

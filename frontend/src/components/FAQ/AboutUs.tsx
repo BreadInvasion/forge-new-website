@@ -114,7 +114,7 @@ const MainSection = styled.section`
   width: 100%;
   background: ${C.bgLight};
   overflow: hidden;
-  flex-shrink: 0;
+  flex: 1 0 auto;
 
   &::before {
     content: '';
@@ -142,7 +142,6 @@ const MainInner = styled.div`
   display: flex;
   align-items: stretch;
   gap: 60px;
-  min-height: 697px;
 
   @media (max-width: 1200px) { padding: 40px 80px 55px 80px; gap: 48px; }
   @media (max-width: 768px)  {

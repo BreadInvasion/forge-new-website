@@ -7,13 +7,7 @@ import locPin from '../../assets/img/loc-pin.svg?url';
 import heroMobileBg from '../../assets/img/background_mobile.png';
 import PageRuler from '../shared/PageRuler';
 
-// ---------------------------------------------------------------------------
-// Figma asset URLs — hero background images (still active).
-// ---------------------------------------------------------------------------
-const HERO_BG_DESKTOP = 'https://www.figma.com/api/mcp/asset/2ee84860-092b-437d-a811-cd043d04c5d0';
-const HERO_BG_MOBILE  = 'https://www.figma.com/api/mcp/asset/eac57d69-f072-4e3a-b856-5314d8f551a8';
-
-// Local assets replace expired Figma URLs.
+// Local assets
 const RULER    = rulerMask;
 const STEP_DOT = stepDot;
 const LOC_PIN  = locPin;
@@ -1119,8 +1113,6 @@ export default function GettingStarted() {
               the full-viewport `<HeroSection>`. Previously on the 1920x1080
               Forge TV the decorations floated ~240px away from the text,
               pinned to the right edge of the screen. */}
-          <HeroDeco src={HERO_BG_MOBILE}  w={321} h={315} right={12}  top={23}  />
-          <HeroDeco src={HERO_BG_DESKTOP} w={283} h={101} right={336} top={265} />
           <HeroTitle>Getting Started at The Forge</HeroTitle>
           <HeroSubtitle>
             Everything you need to know before your first visit — what machines we have,
