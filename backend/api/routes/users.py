@@ -284,6 +284,84 @@ async def get_all_users(
     ]
 
 
+@router.get("/users/role/{role_id}", tags=["users"])
+async def get_users_by_role(
+    role_id: UUID,
+    session: DBSession,
+    current_user: Annotated[
+        User, Depends(PermittedUserChecker({Permissions.CAN_SEE_USERS}))
+    ],
+) -> list[UserNoHash]:
+    """Get all users that have a given role."""
+
+    current_semester_id = await session.scalar(select(State.active_semester_id))
+
+    users = (
+        await session.scalars(
+            select(User)
+            .join(User.roles)
+            .where(Role.id == role_id)
+            .options(selectinload(User.roles))
+        )
+    ).all()
+
+    semester_balances = (
+        (
+            await session.execute(
+                select(User.id, func.sum(MachineUsage.cost))
+                .join(MachineUsage.user)
+                .where(
+                    and_(
+                        MachineUsage.semester_id == current_semester_id,
+                        User.id.in_([u.id for u in users])
+                    )
+                )
+                .group_by(User.id)
+            )
+        ).all()
+        if current_semester_id
+        else None
+    )
+
+    user_permissions = {
+        user.id: await get_user_permissions(session, user.id)
+        for user in users
+    }
+
+    return [
+        UserNoHash(
+            id=user.id,
+            is_rpi_staff=user.is_rpi_staff,
+            RCSID=user.RCSID,
+            RIN=user.RIN,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            major=user.major,
+            gender_identity=user.gender_identity,
+            pronouns=user.pronouns,
+            permissions=user_permissions[user.id],
+            display_role=next((
+                    role.name 
+                    for role in user.roles 
+                    if role.display_role
+                ), 
+                ""
+            ),
+            is_graduating=user.is_graduating,
+            semester_balance=Decimal(
+                next(
+                    (balance.tuple()[1]
+                     for balance in semester_balances
+                     if balance.tuple()[0] == user.id),
+                    0.0
+                )
+                if semester_balances and len(semester_balances) > 0
+                else 0.0
+            ),
+        )
+        for user in users
+    ]
+
 # GET ALL USERS
 
 # EDIT USER PREFERENCES

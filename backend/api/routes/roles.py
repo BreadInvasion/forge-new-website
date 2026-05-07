@@ -10,7 +10,7 @@ from models.role import Role, UserRoleAssociation
 from models.audit_log import AuditLog
 from schemas.enums import Permissions, LogType
 from schemas.responses import CreateResponse, AuditLogModel, RoleInfo, RoleDetails
-from schemas.requests import RoleCreateRequest, RoleEditRequest
+from schemas.requests import RoleCreateRequest, RoleEditRequest, UserAddRoleRequest
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
 
@@ -150,6 +150,52 @@ async def get_all_roles(
         )
         for role in roles
     ]
+
+
+@router.post("/roles/user")
+async def change_user_role(
+    request: UserAddRoleRequest,
+    session: DBSession,
+    current_user: Annotated[
+        User, Depends(PermittedUserChecker({Permissions.CAN_CHANGE_USER_ROLES}))
+    ],
+):
+    """Assign or unassign a role for a user."""
+
+    user = await session.scalar(select(User).where(User.id == request.user_id))
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User with provided ID not found",
+        )
+
+    role = await session.scalar(select(Role).where(Role.id == request.role_id))
+    if not role:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Role with provided ID not found",
+        )
+
+    association = await session.scalar(
+        select(UserRoleAssociation).where(
+            and_(
+                UserRoleAssociation.user_id == request.user_id,
+                UserRoleAssociation.role_id == request.role_id,
+            )
+        )
+    )
+
+    if request.should_have_role:
+        if not association:
+            session.add(
+                UserRoleAssociation(user_id=request.user_id, role_id=request.role_id)
+            )
+            await session.commit()
+        return
+
+    if association:
+        await session.delete(association)
+        await session.commit()
 
 
 @router.post("/roles/{role_id}")
