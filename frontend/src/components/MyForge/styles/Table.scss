@@ -23,12 +23,16 @@
         scale: 1.2;
         background-color: #e9ffe9;
     }
-    h2 { float: left;}
+    h2 { float: left; }
 }
 
 .table-container {
     margin-top: 20px;
+    align-self: stretch;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     overflow-x: auto;
     padding: 0 2rem 0 2rem;    
     max-height: 60vh;
@@ -37,6 +41,8 @@
 
     table {
         width: 100%;
+        min-width: 100%;
+        table-layout: auto;
         border-collapse: separate;
         border-spacing: 0;
         border: 1px solid #a7a7a7;
@@ -52,31 +58,69 @@
         padding: 8px;
         border-bottom: 1px solid #a0a0a0;
         border-right: 1px solid #a0a0a0;
+        max-width: min(32vw, 26rem);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-    th:has(+ #edit-col) {border-right:none;}
-    
     th:last-of-type {
         border-right: none;
         border-radius: 0 0.5rem 0 0;
         min-width: 3rem;
     }
 
-    
-    td:has(+ .icon) {border-right:none;}
-
     td {
         color: #333333;
         padding: 12px;
         border-bottom: 1px solid #a0a0a0;
         border-right: 1px solid #a0a0a0;
+        max-width: min(32vw, 26rem);
         overflow: hidden;
         white-space: nowrap;
     }
 
-    td:last-of-type {
+    table.has-actions th:nth-last-child(2),
+    table.has-actions td:nth-last-child(2) {
         border-right: none;
-        white-space: normal;
+    }
+
+    .cell-content {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        text-overflow: clip;
+        white-space: nowrap;
+        scrollbar-width: thin;
+        scrollbar-color: #9a9a9a #e8e8e8;
+    }
+
+    .cell-content::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .cell-content::-webkit-scrollbar-thumb {
+        background-color: #9a9a9a;
+        border-radius: 999px;
+    }
+
+    .cell-content::-webkit-scrollbar-track {
+        background-color: #e8e8e8;
+        border-radius: 999px;
+    }
+
+    td.icon {
+        width: 5.5rem;
+        min-width: 5.5rem;
+        max-width: 5.5rem;
+        border-right: none;
+        white-space: nowrap;
+        text-align: center;
+        vertical-align: middle;
+        padding-left: 8px;
+        padding-right: 24px;
         .edit,.trash { opacity: 0; }
     }
     
@@ -105,22 +149,22 @@
 }
 
 #edit-col {
-    width: 10%;
+    width: 5.5rem;
+    min-width: 5.5rem;
+    max-width: 5.5rem;
     text-align: center;
 }
 
 .icon {
     text-align: center;
-    display: flex;
-    flex-direction: row;
 }
 
 .icon * {
     transition-duration: .15s;
-    display: block;
+    display: inline-block;
     width: 20pt;
-    height: inherit;
-    padding-right: 5px;
+    height: 20pt;
+    margin: 0 2px;
     cursor: pointer;
     color: inherit;
 }
