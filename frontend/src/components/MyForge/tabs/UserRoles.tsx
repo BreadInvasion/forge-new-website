@@ -32,6 +32,7 @@ const UserRoles: React.FC = () => {
     const [addUsersPageData, setAddUsersPageData] = useState<RoleUserRow[]>([]);
     const [addUsersHasMore, setAddUsersHasMore] = useState(false);
     const [userSearchQuery, setUserSearchQuery] = useState('');
+    const selectedRoleName = allRoles.find((activeRole) => activeRole.id === selectedRoleId)?.name ?? 'Selected Role';
 
     const fetchRoles = async () => {
         try {
@@ -246,7 +247,7 @@ const UserRoles: React.FC = () => {
                                     <Cross2Icon />
                                 </button>
                             </Dialog.Close>
-                            <Dialog.Title className='DialogTitle'>Add Users to Role</Dialog.Title>
+                            <Dialog.Title className='DialogTitle'>Assign Users the {selectedRoleName} Role</Dialog.Title>
                             <fieldset className='Fieldset'>
                                 <label className='Label' htmlFor='user-search'>Search</label>
                                 <input
@@ -258,7 +259,7 @@ const UserRoles: React.FC = () => {
                                         setAddUsersPageIndex(1);
                                         fetchAddUsersPage(1);
                                     }}
-                                    placeholder='Search by first name, last name, or RCSID'
+                                    placeholder='Search by name or RCSID'
                                 />
                                 <label className='Label'>Users</label>
                                 <div className='table-container' style={{ marginTop: '0.25rem', padding: 0, maxHeight: '30vh' }}>
