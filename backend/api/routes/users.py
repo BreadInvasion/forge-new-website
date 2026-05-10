@@ -291,6 +291,8 @@ async def get_users_by_role(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_USERS}))
     ],
+    limit: int = 20,
+    offset: int = 0,
 ) -> list[UserNoHash]:
     """Get all users that have a given role."""
 
@@ -302,6 +304,9 @@ async def get_users_by_role(
             .join(User.roles)
             .where(Role.id == role_id)
             .options(selectinload(User.roles))
+            .order_by(User.RCSID)
+            .limit(limit)
+            .offset(offset)
         )
     ).all()
 
