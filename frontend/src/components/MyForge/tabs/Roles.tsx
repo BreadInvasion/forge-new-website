@@ -274,6 +274,7 @@ const Roles: React.FC = () => {
                 onDelete={onDelete}
                 onEdit={onEdit}
                 canEdit={canEdit}
+                canDelete={canDelete}
                 currentPage={currentPage}
                 onPageChange={fetchPage}
                 resourceType="roles"

@@ -234,6 +234,7 @@ const UserRoles: React.FC = () => {
                     columns={['first_name', 'last_name', 'RCSID']}
                     data={assignedUsers}
                     onDelete={canChangeUserRoles ? onDelete : undefined}
+                    canDelete={canChangeUserRoles}
                 />
             </div>
 

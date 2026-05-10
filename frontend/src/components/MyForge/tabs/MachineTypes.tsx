@@ -207,6 +207,7 @@ const MachineTypes: React.FC = () => {
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit={canEdit}
+                canDelete={canDelete}
                 currentPage={currentPage}
                 onPageChange={(p) => fetchPage(p)}
                 resourceType={"machinetypes"}

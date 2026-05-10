@@ -211,6 +211,7 @@ const MachineGroups: React.FC = () => {
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit={canEdit}
+                canDelete={canDelete}
                 currentPage={currentPage}
                 onPageChange={fetchPage}
                 resourceType="machinegroups"
