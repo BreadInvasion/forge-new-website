@@ -6,7 +6,7 @@ import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
-// @ts-ignore temporary: stylesheet module typing not configured in this project path yet
+// @ts-ignore temporary: stylesheet module typing not configured in this project path yet // this'll get fixed soon
 import '../styles/TabStyles.scss';
 
 interface AEMenuProps {
