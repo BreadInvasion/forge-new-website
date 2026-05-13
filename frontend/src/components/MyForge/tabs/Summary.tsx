@@ -591,6 +591,26 @@ const Summary: React.FC = () => {
                     </div>
                 </div>
             </section>
+
+            <section className="dashboard-discord">
+                <div className="discord-inner">
+                    <div className="discord-text">
+                        <h2 className="discord-title">Join our Community</h2>
+                        <p className="discord-sub">
+                            Connect with other Forge members, ask questions, get updates,
+                            and stay in the loop — all in our Discord server.
+                        </p>
+                    </div>
+                    <a
+                        className="discord-btn"
+                        href="https://discord.com/invite/ZxUXDH3Me"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Join our Discord →
+                    </a>
+                </div>
+            </section>
         </div>
     );
 };

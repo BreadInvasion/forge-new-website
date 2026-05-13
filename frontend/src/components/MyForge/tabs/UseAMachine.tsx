@@ -542,6 +542,17 @@ export const DynamicMachineForm: React.FC = () => {
             updateStatus("Please select a machine first.", "error");
             return;
         }
+        if (nextPage == 2) {
+            const selected = machines.find(m => m.id === selectedMachineId);
+            if (selected?.maintenance_mode) {
+                updateStatus("This machine is currently under maintenance and cannot be used.", "error");
+                return;
+            }
+            if (selected?.disabled) {
+                updateStatus("This machine is disabled and cannot be used.", "error");
+                return;
+            }
+        }
         if (nextPage == 3) {
             const invalidSlot = slotValues.find((slot) => validateResourceUsage(slot));
             if (invalidSlot) {
@@ -572,7 +583,7 @@ export const DynamicMachineForm: React.FC = () => {
                         <TitleBand><Title>Machine Usage Form</Title></TitleBand>
 
                         {/* ── Page 1: Choose a Machine ── */}
-                        {page === 1 && (
+                        <div style={{ display: page === 1 ? '' : 'none', width: '100%' }}>
                             <FieldsArea>
                                 <FieldRow>
                                     <FieldLabel htmlFor="machine-select">Choose a Machine</FieldLabel>
@@ -583,23 +594,30 @@ export const DynamicMachineForm: React.FC = () => {
                                     >
                                         <option value="0" disabled hidden>Please Select a Machine</option>
                                         {machines.map((machine: Machine) => (
-                                            <option key={machine.id} value={machine.id}>{machine.name}</option>
+                                            <option
+                                                key={machine.id}
+                                                value={machine.id}
+                                                disabled={!!machine.maintenance_mode || !!machine.disabled}
+                                            >
+                                                {machine.name}
+                                                {machine.maintenance_mode ? ' (Under Maintenance)' : machine.disabled ? ' (Disabled)' : ''}
+                                            </option>
                                         ))}
                                     </FieldSelect>
                                 </FieldRow>
                             </FieldsArea>
-                        )}
+                        </div>
 
                         {/* ── Page 2: Resource Selection ── */}
-                        {page === 2 && (
+                        <div style={{ display: page === 2 ? '' : 'none', width: '100%' }}>
                             <ResourceArea>
                                 <ResourceSectionLabel>Resource Selection</ResourceSectionLabel>
                                 {resourceUsageForm}
                             </ResourceArea>
-                        )}
+                        </div>
 
                         {/* ── Page 3: Usage Duration ── */}
-                        {page === 3 && (
+                        <div style={{ display: page === 3 ? '' : 'none', width: '100%' }}>
                             <FieldsArea>
                                 <DurationRow>
                                     <DurationLabel>Usage Duration</DurationLabel>
@@ -627,15 +645,16 @@ export const DynamicMachineForm: React.FC = () => {
                                     <DurationLabel>min</DurationLabel>
                                 </DurationRow>
                             </FieldsArea>
-                        )}
+                        </div>
 
                         {/* ── Page 4: Policies ── */}
-                        {page === 4 && (
+                        <div style={{ display: page === 4 ? '' : 'none', width: '100%' }}>
                             <CheckboxArea>
                                 <CheckRow>
                                     <StyledCheckbox
                                         id="policy"
                                         type="checkbox"
+                                        checked={formData.policy}
                                         onChange={(e) => setFormData((prev) => ({ ...prev, policy: e.target.checked }))}
                                     />
                                     <CheckLabel htmlFor="policy">
@@ -647,6 +666,7 @@ export const DynamicMachineForm: React.FC = () => {
                                     <StyledCheckbox
                                         id="reprint"
                                         type="checkbox"
+                                        checked={formData.reprint}
                                         onChange={(e) => setFormData((prev) => ({ ...prev, reprint: e.target.checked }))}
                                     />
                                     <CheckLabel htmlFor="reprint">Is this a reprint?</CheckLabel>
@@ -655,12 +675,13 @@ export const DynamicMachineForm: React.FC = () => {
                                     <StyledCheckbox
                                         id="org"
                                         type="checkbox"
+                                        checked={formData.org}
                                         onChange={(e) => setFormData((prev) => ({ ...prev, org: e.target.checked }))}
                                     />
                                     <CheckLabel htmlFor="org">Is this usage for an organization?</CheckLabel>
                                 </CheckRow>
                             </CheckboxArea>
-                        )}
+                        </div>
 
                         <StatusText id="status-text" $type={status.type}>{status.text || " "}</StatusText>
 

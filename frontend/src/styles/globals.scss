@@ -185,9 +185,10 @@
 }
 
 .data-table {
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
+    table-layout: auto;
 }
 
 .data-table thead tr {
@@ -203,17 +204,7 @@
     color: var(--color-white); // All header labels are white
     padding: 16px 12px;
     vertical-align: middle;
-    // Allow long headers (e.g. "MAINTENANCE MODE", "SEMESTER BALANCE") to wrap
-    // inside the box instead of overflowing — but only break at word
-    // boundaries (spaces), never mid-word. Previously `overflow-wrap: anywhere`
-    // was chopping labels like "SEMESTER" into "SEME / STER".
-    white-space: normal;
-    overflow-wrap: break-word;
-    word-break: normal;
-    hyphens: none;
-    // Loosened line-height so wrapped labels like "IS RPI STAFF",
-    // "FIRST NAME", "SEMESTER BALANCE" have room to breathe instead of
-    // stacking on top of each other.
+    white-space: nowrap;
     line-height: 1.45;
 
     &:first-child,
@@ -248,10 +239,7 @@
     color: #4a6080;
     padding: 14px 16px;
     vertical-align: middle;
-    // Wrap cell content inside the cell instead of overflowing.
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    white-space: nowrap;
     line-height: 1.35;
 
     &:first-child {

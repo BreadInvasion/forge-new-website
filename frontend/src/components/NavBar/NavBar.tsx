@@ -7,19 +7,11 @@ import { CaretDownIcon } from '@radix-ui/react-icons';
 import * as Avatar from '../MyForge/components/Avatar';
 import * as Hamburger from './Hamburger';
 import { isAdmin } from '../Auth/roleUtils';
-import { ReactComponent as ForgeSVG } from 'src/assets/img/RPI_Lockup_Eng_Sm.svg'
+import { ReactComponent as ForgeSVG } from 'src/assets/img/RPI_Lockup_Eng_Sm.svg';
+import forgeLogoUrl from 'src/assets/img/logo.svg?url';
 
 import './styles/UserMenu.scss';
 import './styles/NavBar.scss';
-
-// ---------------------------------------------------------------------------
-// Figma asset URLs (hosted for 7 days after code generation).
-// TODO: Download these images and replace with local imports, e.g.:
-//   import rpiLockupImg from 'src/assets/img/home/rpi_lockup.png';
-//   import forgeStickerImg from 'src/assets/img/home/forge_sticker_logo.png';
-// ---------------------------------------------------------------------------
-const RPI_LOCKUP_IMG = 'C:\Users\Julia Camman\Downloads\site\forge-new-website\frontend\src\assets\img\RPI_Lockup_Eng_Sm.svg';
-const FORGE_STICKER_IMG = 'https://www.figma.com/api/mcp/asset/8aed9ba2-5b57-42ab-bd78-7b3f6d4e02e6';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -82,12 +74,11 @@ export const NavBar: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
                 {/* Vertical separator */}
                 <div className="nav-brand-separator" aria-hidden="true" />
 
-                {/* Forge sticker logo */}
+                {/* Forge logo */}
                 <img
                     className="nav-forge-sticker"
-                    src={FORGE_STICKER_IMG}
-                    alt=""
-                    aria-hidden="true"
+                    src={forgeLogoUrl}
+                    alt="The Forge logo"
                 />
 
                 {/* Wordmark */}

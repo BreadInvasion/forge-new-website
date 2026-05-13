@@ -89,10 +89,10 @@ const FieldLabel = styled.span`
     white-space: nowrap;
 `;
 
-const FieldValue = styled.span`
+const FieldValue = styled.span<{ $maintenance?: boolean }>`
     font-family: var(--font-display, 'Funnel Display', sans-serif);
     font-size: 11px;
-    font-weight: 400;
+    font-weight: ${p => p.$maintenance ? 700 : 400};
     color: #111c36;
     text-align: left;
     white-space: nowrap;
@@ -125,10 +125,10 @@ const DLabel = styled.span`
     line-height: 1.4;
 `;
 
-const DValue = styled.span<{ $failed?: boolean }>`
+const DValue = styled.span<{ $failed?: boolean; $maintenance?: boolean }>`
     font-family: var(--font-display, 'Funnel Display', sans-serif);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: ${p => p.$maintenance ? 700 : 500};
     color: ${p => p.$failed ? '#a51c1c' : '#111c36'};
     text-align: left;
     line-height: 1.4;
@@ -341,6 +341,7 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
             $minimized={$minimized}
             $highlightFailed={$highlightFailed && !!failed}
             $failed={!!failed}
+            $maintenance={!!maintenance_mode && !failed}
             progress={liveProgress}
             onClick={handleClick}
         >
@@ -350,7 +351,7 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
                     <FieldRow><FieldLabel>User :</FieldLabel><FieldValue>{user || 'N/A'}</FieldValue></FieldRow>
                     <FieldRow><FieldLabel>Est. Completion :</FieldLabel><FieldValue>{usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</FieldValue></FieldRow>
                     <FieldRow><FieldLabel>Material :</FieldLabel><FieldValue>{material || 'N/A'}</FieldValue></FieldRow>
-                    <FieldRow><FieldLabel>Status :</FieldLabel><FieldValue>{getStatusText(in_use, failed, maintenance_mode, disabled)}</FieldValue></FieldRow>
+                    <FieldRow><FieldLabel>Status :</FieldLabel><FieldValue $maintenance={!!maintenance_mode && !failed}>{getStatusText(in_use, failed, maintenance_mode, disabled)}</FieldValue></FieldRow>
                     {$highlightFailed && (failed || in_use) && (
                         <StyledButton onClick={handleClearClick}>Clear</StyledButton>
                     )}
@@ -392,7 +393,7 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
 
                         <DividerLine />
                         <DLabel>Status</DLabel>
-                        <DValue $failed={!!failed}>{getStatusText(in_use, failed, maintenance_mode, disabled)}</DValue>
+                        <DValue $failed={!!failed} $maintenance={!!maintenance_mode && !failed}>{getStatusText(in_use, failed, maintenance_mode, disabled)}</DValue>
                     </DetailsGrid>
 
                     {usage_start && usage_duration && !failed && (

@@ -56,15 +56,21 @@ export const Card = styled.div<{
     $minimized?: boolean;
     $highlightFailed?: boolean;
     $failed?: boolean;
+    $maintenance?: boolean;
     progress: number;
 }>`
     /* ── Figma small card ── */
-    background: #ffffff;
+    background: ${({ $maintenance }) => $maintenance ? '#fffbea' : '#ffffff'};
     border-radius: 5px;
-    border: 1px solid ${({ $highlightFailed, $failed }) => ($highlightFailed || $failed ? '#a51c1c' : '#2d4a80')};
-    box-shadow: ${({ $highlightFailed, $failed }) =>
+    border: 1px solid ${({ $highlightFailed, $failed, $maintenance }) =>
+        $highlightFailed || $failed ? '#a51c1c'
+        : $maintenance ? '#b8860b'
+        : '#2d4a80'};
+    box-shadow: ${({ $highlightFailed, $failed, $maintenance }) =>
         $highlightFailed || $failed
             ? '0 0 8px 2px rgba(165,28,28,0.5)'
+            : $maintenance
+            ? '0 0 6px 1px rgba(184,134,11,0.35)'
             : '0 1px 4px rgba(17,28,54,0.10)'};
     padding: ${({ $minimized }) => ($minimized ? '10px 10px 18px 10px' : '18px 20px 20px 20px')};
     display: flex;

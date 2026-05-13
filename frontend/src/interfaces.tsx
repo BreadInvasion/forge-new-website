@@ -158,6 +158,7 @@ export interface ResourceSlot {
     db_name: string; // this NEEDS to be changed
     display_name: string;
     valid_resource_ids: string[];
+    resource_names?: string[];
     allow_own_material: boolean;
     allow_empty: boolean;
 };

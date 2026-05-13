@@ -1004,7 +1004,7 @@ const RegisterBtn = styled.a`
   align-items: center;
   justify-content: center;
   height: 52px;
-  padding: 0 40px;
+  padding: 0 24px;
   background: ${C.red};
   border: 2px solid ${C.navy};
   border-radius: 10px;
@@ -1025,6 +1025,43 @@ const RegisterBtn = styled.a`
   &:active {
     transform: translateY(1px);
     box-shadow: 0 1px 0 rgba(80, 16, 14, 0.35);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 48px;
+    font-size: 15px;
+    border-radius: 4px;
+    padding: 0 18px;
+    border: none;
+    box-shadow: none;
+  }
+`;
+
+const DiscordBtn = styled.a`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 24px;
+  background: #5865f2;
+  border: 2px solid ${C.navy};
+  border-radius: 10px;
+  font-family: 'Funnel Display', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #fff;
+  letter-spacing: 1.2px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(40, 48, 140, 0.3);
+  transition: background-color 0.12s ease, transform 0.06s ease;
+
+  &:hover { background-color: #4752c4; }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 rgba(40, 48, 140, 0.3);
   }
 
   @media (max-width: 768px) {
@@ -1365,7 +1402,17 @@ export default function GettingStarted() {
                     <RegisterBullet>Reserve machines and get notified when they're free.</RegisterBullet>
                     <RegisterBullet>Pick up where you left off on any printer or cutter.</RegisterBullet>
                   </RegisterBulletList>
-                  <RegisterBtn href="/register">Create an Account</RegisterBtn>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', width: '100%' }}>
+                    <RegisterBtn href="/register" style={{ flex: '1 1 auto' }}>Create an Account</RegisterBtn>
+                    <DiscordBtn
+                      href="https://discord.com/invite/ZxUXDH3Me"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ flex: '1 1 auto' }}
+                    >
+                      Join our Discord
+                    </DiscordBtn>
+                  </div>
                 </RegisterCardBody>
               </RegisterCard>
             </RegisterCardCol>

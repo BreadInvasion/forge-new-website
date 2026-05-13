@@ -55,7 +55,16 @@ const ResourceSlotsTab: React.FC = () => {
     // All existing resources — populates the checkbox list in the dialog.
     const [resources, setResources] = useState<Resource[]>([]);
 
-    // Dialog state. When `editingId` is null the dialog is in "create" mode.
+    // View dialog — opens when a row is clicked, shows resources for that slot.
+    const [viewSlot, setViewSlot] = useState<ResourceSlot | null>(null);
+    const [isViewOpen, setIsViewOpen] = useState<boolean>(false);
+
+    const openViewDialog = (s: ResourceSlot) => {
+        setViewSlot(s);
+        setIsViewOpen(true);
+    };
+
+    // Edit/create dialog state. When `editingId` is null the dialog is in "create" mode.
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [name, setName] = useState<string>('');
@@ -222,6 +231,7 @@ const ResourceSlotsTab: React.FC = () => {
     ) : null;
 
     return (
+        <>
         <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
             <div className="mtd-tab-wrap">
                 <AdminTable<ResourceSlot>
@@ -232,6 +242,7 @@ const ResourceSlotsTab: React.FC = () => {
                     loading={loading}
                     error={error}
                     emptyMessage="No resource slots found."
+                    onRowClick={openViewDialog}
                     onEdit={canEdit ? openEditDialog : undefined}
                     onDelete={canDelete ? onDelete : undefined}
                 />
@@ -348,6 +359,46 @@ const ResourceSlotsTab: React.FC = () => {
                 </Dialog.Content>
             </Dialog.Portal>
         </Dialog.Root>
+
+        {/* View dialog — shows resources assigned to the clicked slot */}
+        <Dialog.Root open={isViewOpen} onOpenChange={setIsViewOpen}>
+            <Dialog.Portal>
+                <Dialog.Overlay className="mtd-overlay" />
+                <Dialog.Content
+                    className="mtd-content"
+                    style={{ ['--dialog-bg' as string]: `url(${bgPattern})` } as React.CSSProperties}
+                >
+                    <Dialog.Close asChild>
+                        <button type="button" className="mtd-close" aria-label="Close">
+                            <Cross2Icon />
+                        </button>
+                    </Dialog.Close>
+
+                    <Dialog.Title className="mtd-title">
+                        {viewSlot?.display_name || viewSlot?.name || 'Resource Slot'}
+                    </Dialog.Title>
+                    <div className="mtd-title-divider" />
+
+                    <div className="mtd-form">
+                        <div className="mtd-section-label">Resources</div>
+                        <div className="mtd-slot-list">
+                            {(viewSlot?.resource_names ?? []).length === 0 ? (
+                                <div className="mtd-slot-empty">
+                                    No resources assigned to this slot.
+                                </div>
+                            ) : (
+                                (viewSlot?.resource_names ?? []).map((name) => (
+                                    <div className="mtd-checkbox-row" key={name}>
+                                        <span className="mtd-checkbox-label">{name}</span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </Dialog.Content>
+            </Dialog.Portal>
+        </Dialog.Root>
+        </>
     );
 };
 

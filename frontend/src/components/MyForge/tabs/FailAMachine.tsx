@@ -1,7 +1,7 @@
 import React, { useEffect, useState, FormEvent } from "react";
 import styled from "styled-components";
 import { OmniAPI } from "src/apis/OmniAPI";
-import { Machine } from "src/interfaces";
+import { Machine, MachineStatus, AllMachinesStatusResponse } from "src/interfaces";
 import { useNavigate } from "react-router-dom";
 import bgPattern from '../../../assets/img/background.svg?url';
 
@@ -241,6 +241,24 @@ const StatusText = styled.div<{ $type: string }>`
         $type === 'warning' ? '#8a5c00' : 'transparent'};
 `;
 
+// ── Read-only progress display ────────────────────────────────────────────────
+
+const ProgressDisplay = styled.div`
+    height: 32px;
+    width: clamp(120px, 25vw, 300px);
+    border: 2px solid #aaa;
+    border-radius: 5px;
+    background: #f4f6fa;
+    padding: 4px 8px;
+    font-size: 14px;
+    font-family: var(--font-display, 'Funnel Display', sans-serif);
+    color: #64748b;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+`;
+
 // ── Submit button ─────────────────────────────────────────────────────────────
 
 const SubmitBtn = styled.button`
@@ -284,19 +302,49 @@ export const FailAMachineForm: React.FC = () => {
 
     const [machines, setMachines] = useState<Machine[]>([]);
     const [selectedMachineId, setSelectedMachineId] = useState<string>("_");
-    const [estimatedPercentCompleted, setEstimatedPercentCompleted] = useState(0);
+    const [machineStatuses, setMachineStatuses] = useState<Map<string, MachineStatus>>(new Map());
+    const [liveProgress, setLiveProgress] = useState<number | null>(null);
     const [printerErrorMessage, setPrinterErrorMessage] = useState<string>("");
     const [noticeableFaults, setNoticeableFaults] = useState<string[]>([]);
     const [status, setStatus] = useState<{ text: string; type: string }>({ text: "", type: "" });
     const navigate = useNavigate();
 
+    // Compute progress the same way MachineCard does
+    const computeProgress = (usage_start: Date | string | undefined, usage_duration: number | undefined): number => {
+        if (!usage_start || !usage_duration) return 0;
+        const start = new Date(usage_start as string);
+        const end = new Date(start.getTime() + usage_duration * 1000);
+        const now = new Date();
+        return Math.min(100, Math.max(0, (now.getTime() - start.getTime()) / (end.getTime() - start.getTime()) * 100));
+    };
+
     useEffect(() => {
-        const fetchMachines = async () => {
-            const allMachines: Machine[] = await OmniAPI.getAll("machines");
-            setMachines(allMachines);
+        const fetchData = async () => {
+            const [allMachines, statusRes] = await Promise.all([
+                OmniAPI.getAll("machines"),
+                OmniAPI.getPublic("machinestatus"),
+            ]);
+            setMachines(allMachines as Machine[]);
+            // Flatten groups + loners into an id→status map
+            const res = statusRes as AllMachinesStatusResponse;
+            const statusMap = new Map<string, MachineStatus>();
+            res.groups?.forEach(g => g.machines?.forEach(m => statusMap.set(m.id, m)));
+            res.loners?.forEach(m => statusMap.set(m.id, m));
+            setMachineStatuses(statusMap);
         };
-        fetchMachines();
+        fetchData();
     }, []);
+
+    // Update live progress every second for the selected machine
+    useEffect(() => {
+        if (selectedMachineId === "_") { setLiveProgress(null); return; }
+        const ms = machineStatuses.get(selectedMachineId);
+        if (!ms?.in_use || !ms.usage_start || !ms.usage_duration) { setLiveProgress(null); return; }
+        const update = () => setLiveProgress(computeProgress(ms.usage_start, ms.usage_duration));
+        update();
+        const interval = setInterval(update, 1000);
+        return () => clearInterval(interval);
+    }, [selectedMachineId, machineStatuses]);
 
     const handleSelectMachine = (id: string) => {
         if (id === "_") return;
@@ -314,17 +362,21 @@ export const FailAMachineForm: React.FC = () => {
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
         const temp = selectedMachineId;
+        // Capture the exact live progress at the moment of submission
+        const ms = machineStatuses.get(temp);
+        const percentAtSubmit = (ms?.in_use && ms.usage_start && ms.usage_duration)
+            ? computeProgress(ms.usage_start, ms.usage_duration)
+            : (liveProgress ?? 0);
         try {
             const response = await OmniAPI.fail(temp, {
-                percent_completed: estimatedPercentCompleted,
+                percent_completed: percentAtSubmit,
                 error_message: printerErrorMessage,
                 noticeable_faults: noticeableFaults,
             });
             if (response == null) {
-                // Store the user-entered data locally so the status page can display it accurately,
-                // since the backend only records the time of the API call (not the actual failure time).
+                // Store the computed data locally so the status page can display it accurately.
                 localStorage.setItem(`failure_data_${temp}`, JSON.stringify({
-                    percent_completed: estimatedPercentCompleted,
+                    percent_completed: percentAtSubmit,
                     failed_at: new Date().toISOString(),
                 }));
                 setStatus({ text: "Failure reported. Redirecting to status page...", type: "success" });
@@ -342,7 +394,7 @@ export const FailAMachineForm: React.FC = () => {
     };
 
     const resetFormFields = () => {
-        setEstimatedPercentCompleted(0);
+        setLiveProgress(null);
         setPrinterErrorMessage("");
         setNoticeableFaults([]);
     };
@@ -374,21 +426,14 @@ export const FailAMachineForm: React.FC = () => {
                             </FieldRow>
 
                             <FieldRow>
-                                <FieldLabel htmlFor="percent-completed">Percent Completed</FieldLabel>
-                                <FieldInput
-                                    id="percent-completed"
-                                    type="number"
-                                    value={estimatedPercentCompleted}
-                                    placeholder="0"
-                                    min="0"
-                                    max="100"
-                                    onChange={(e) => {
-                                        const value = parseInt(e.target.value);
-                                        if (value >= 0 && value <= 100) {
-                                            setEstimatedPercentCompleted(value);
-                                        }
-                                    }}
-                                />
+                                <FieldLabel>Percent Completed</FieldLabel>
+                                <ProgressDisplay>
+                                    {liveProgress !== null
+                                        ? `${liveProgress.toFixed(1)}%`
+                                        : selectedMachineId === "_"
+                                            ? "Select a machine"
+                                            : "Not in use — 0%"}
+                                </ProgressDisplay>
                             </FieldRow>
 
                             <FieldRow>

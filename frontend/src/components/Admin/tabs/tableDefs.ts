@@ -54,131 +54,70 @@ export const getSemesterName = (sem: Semester | null | undefined): string => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const machineColumns: AdminTableColumn<Machine>[] = [
-    { label: 'NAME', width: '18%', render: (m) => m.name },
-    // Backend (MachineInfo) sends the resolved group/type names as
-    // `group_name` / `type_name`. Fall back to the legacy `group` / `type`
-    // fields so any callers still passing them (e.g. Status.tsx builds its
-    // own rows) keep working.
-    {
-        label: 'GROUP NAME',
-        width: '20%',
-        render: (m) => m.group_name || m.group || '—',
-    },
-    {
-        label: 'TYPE NAME',
-        width: '22%',
-        render: (m) => m.type_name || m.type || '—',
-    },
-    {
-        label: 'MAINTENANCE MODE',
-        width: '22%',
-        render: (m) => String(Boolean(m.maintenance_mode)),
-    },
-    { label: 'DISABLED', width: '18%', render: (m) => String(Boolean(m.disabled)) },
+    { label: 'NAME', render: (m) => m.name },
+    { label: 'GROUP NAME', render: (m) => m.group_name || m.group || '—' },
+    { label: 'TYPE NAME', render: (m) => m.type_name || m.type || '—' },
+    { label: 'MAINTENANCE MODE', render: (m) => String(Boolean(m.maintenance_mode)) },
+    { label: 'DISABLED', render: (m) => String(Boolean(m.disabled)) },
 ];
 
 export const machineTypeColumns: AdminTableColumn<MachineType>[] = [
-    { label: 'NAME', width: '18%', render: (t) => t.name },
-    {
-        label: 'NUM MACHINES',
-        width: '16%',
-        render: (t) => String(t.num_machines ?? t.count ?? 0),
-    },
-    {
-        label: 'RESOURCE NAMES',
-        width: '24%',
-        render: (t) => joinList(t.resource_names ?? t.resource_types),
-    },
-    {
-        label: 'RESOURCE SLOT NAMES',
-        width: '24%',
-        render: (t) => joinList(t.resource_slot_names),
-    },
-    { label: 'COST BY HOUR', width: '18%', render: (t) => formatCost(t.cost_per_hour) },
+    { label: 'NAME', render: (t) => t.name },
+    { label: 'NUM MACHINES', render: (t) => String(t.num_machines ?? t.count ?? 0) },
+    { label: 'RESOURCE NAMES', render: (t) => joinList(t.resource_names ?? t.resource_types) },
+    { label: 'RESOURCE SLOT NAMES', render: (t) => joinList(t.resource_slot_names) },
+    { label: 'COST BY HOUR', render: (t) => formatCost(t.cost_per_hour) },
 ];
 
 export const machineGroupColumns: AdminTableColumn<MachineGroup>[] = [
-    { label: 'NAME', width: '30%', render: (g) => g.name || 'None' },
-    { label: 'MACHINES', width: '70%', render: (g) => joinList(g.machines) },
+    { label: 'NAME', render: (g) => g.name || 'None' },
+    { label: 'MACHINES', render: (g) => joinList(g.machines) },
 ];
 
 export const resourceColumns: AdminTableColumn<Resource>[] = [
-    { label: 'NAME', width: '22%', render: (r) => r.name },
-    { label: 'BRAND', width: '20%', render: (r) => r.brand || '—' },
-    { label: 'COLOR', width: '18%', render: (r) => r.color || '—' },
-    { label: 'UNITS', width: '20%', render: (r) => r.units || '—' },
-    { label: 'COST', width: '20%', render: (r) => formatCost(r.cost) },
+    { label: 'NAME', render: (r) => r.name },
+    { label: 'BRAND', render: (r) => r.brand || '—' },
+    { label: 'COLOR', render: (r) => r.color || '—' },
+    { label: 'UNITS', render: (r) => r.units || '—' },
+    { label: 'COST', render: (r) => formatCost(r.cost) },
 ];
 
 export const resourceSlotColumns: AdminTableColumn<ResourceSlot>[] = [
-    {
-        label: 'NAME',
-        width: '24%',
-        render: (s) => s.display_name || s.name || '—',
-    },
-    {
-        label: 'VALID RESOURCES',
-        width: '36%',
-        render: (s) => joinList(s.valid_resource_ids),
-    },
-    {
-        label: 'ALLOW OWN MATERIAL',
-        width: '20%',
-        render: (s) => (s.allow_own_material ? 'Yes' : 'No'),
-    },
-    {
-        label: 'ALLOW EMPTY',
-        width: '20%',
-        render: (s) => (s.allow_empty ? 'Yes' : 'No'),
-    },
+    { label: 'NAME', render: (s) => s.display_name || s.name || '—' },
+    { label: 'RESOURCES', render: (s) => joinList(s.resource_names ?? []) },
+    { label: 'ALLOW OWN MATERIAL', render: (s) => (s.allow_own_material ? 'Yes' : 'No') },
+    { label: 'ALLOW EMPTY', render: (s) => (s.allow_empty ? 'Yes' : 'No') },
 ];
 
 export const userColumns: AdminTableColumn<User>[] = [
-    { label: 'IS RPI STAFF', width: '9%', render: (u) => (u.is_rpi_staff ? 'Yes' : 'No') },
-    { label: 'RCSID', width: '7%', render: (u) => u.RCSID || '—' },
-    { label: 'RIN', width: '7%', render: (u) => u.RIN || '—' },
-    { label: 'FIRST NAME', width: '9%', render: (u) => u.first_name || '—' },
-    { label: 'LAST NAME', width: '9%', render: (u) => u.last_name || '—' },
-    { label: 'MAJOR', width: '8%', render: (u) => u.major || '—' },
-    // PRONOUNS is a single word (8 chars) — needs extra room to avoid a
-    // mid-word break like "PRONO / UNS".
-    { label: 'PRONOUNS', width: '12%', render: (u) => u.pronouns || '—' },
-    { label: 'DISPLAY ROLE', width: '10%', render: (u) => u.display_role || '—' },
-    // "GRADUATING" is the longest single word (10 chars) — give it room to
-    // wrap cleanly as "IS / GRADUATING".
-    { label: 'IS GRADUATING', width: '15%', render: (u) => (u.is_graduating ? 'Yes' : 'No') },
-    {
-        label: 'SEMESTER BALANCE',
-        width: '14%',
-        render: (u) => u.semester_balance ?? '—',
-    },
+    { label: 'IS RPI STAFF', render: (u) => (u.is_rpi_staff ? 'Yes' : 'No') },
+    { label: 'RCSID', render: (u) => u.RCSID || '—' },
+    { label: 'RIN', render: (u) => u.RIN || '—' },
+    { label: 'FIRST NAME', render: (u) => u.first_name || '—' },
+    { label: 'LAST NAME', render: (u) => u.last_name || '—' },
+    { label: 'MAJOR', render: (u) => u.major || '—' },
+    { label: 'PRONOUNS', render: (u) => u.pronouns || '—' },
+    { label: 'DISPLAY ROLE', render: (u) => u.display_role || '—' },
+    { label: 'IS GRADUATING', render: (u) => (u.is_graduating ? 'Yes' : 'No') },
+    { label: 'SEMESTER BALANCE', render: (u) => u.semester_balance ?? '—' },
 ];
 
 export const semesterColumns: AdminTableColumn<Semester>[] = [
-    {
-        label: 'SEMESTER',
-        width: '40%',
-        render: (s) => `${formatSemesterType(s.semester_type)} ${s.calendar_year}`,
-    },
-    { label: 'TYPE', width: '30%', render: (s) => formatSemesterType(s.semester_type) },
-    { label: 'YEAR', width: '30%', render: (s) => String(s.calendar_year) },
+    { label: 'SEMESTER', render: (s) => `${formatSemesterType(s.semester_type)} ${s.calendar_year}` },
+    { label: 'TYPE', render: (s) => formatSemesterType(s.semester_type) },
+    { label: 'YEAR', render: (s) => String(s.calendar_year) },
 ];
 
 export const userChargeColumns: AdminTableColumn<UserCharge>[] = [
-    { label: 'RIN', width: '18%', render: (c) => c.RIN || '—' },
-    { label: 'FIRST NAME', width: '22%', render: (c) => c.first_name || '—' },
-    { label: 'LAST NAME', width: '22%', render: (c) => c.last_name || '—' },
+    { label: 'RIN', render: (c) => c.RIN || '—' },
+    { label: 'FIRST NAME', render: (c) => c.first_name || '—' },
+    { label: 'LAST NAME', render: (c) => c.last_name || '—' },
     {
         label: 'SEMESTER BALANCE',
-        width: '22%',
         render: (c) =>
             c.semester_balance === undefined || c.semester_balance === null
                 ? '—'
                 : String(c.semester_balance),
     },
-    {
-        label: 'IS GRADUATING',
-        width: '16%',
-        render: (c) => (c.is_graduating ? 'Yes' : 'No'),
-    },
+    { label: 'IS GRADUATING', render: (c) => (c.is_graduating ? 'Yes' : 'No') },
 ];

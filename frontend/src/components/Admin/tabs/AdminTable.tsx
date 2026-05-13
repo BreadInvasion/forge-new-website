@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, JSX } from 'react';
 import { Pencil2Icon, TrashIcon } from '@radix-ui/react-icons';
 
 export interface AdminTableColumn<T> {
@@ -31,6 +31,8 @@ interface AdminTableProps<T> {
     onEdit?: (row: T) => void;
     /** If provided, a trailing actions column with a trash icon is rendered. */
     onDelete?: (row: T) => void;
+    /** If provided, clicking a data row calls this handler. */
+    onRowClick?: (row: T) => void;
 }
 
 /**
@@ -55,6 +57,7 @@ export function AdminTable<T>({
     titleActions,
     onEdit,
     onDelete,
+    onRowClick,
 }: AdminTableProps<T>): React.ReactElement {
     const showRowActions = Boolean(onEdit || onDelete);
     const colCount = columns.length + (showRowActions ? 1 : 0);
@@ -74,16 +77,6 @@ export function AdminTable<T>({
 
             <div className="data-table-wrapper">
                 <table className="data-table">
-                    <colgroup>
-                        {columns.map((col, i) => (
-                            <col
-                                key={i}
-                                style={col.width ? { width: col.width } : undefined}
-                            />
-                        ))}
-                        {showRowActions && <col style={{ width: '110px' }} />}
-                    </colgroup>
-
                     <thead>
                         <tr>
                             {columns.map((col, i) => (
@@ -142,18 +135,22 @@ export function AdminTable<T>({
                         {!loading &&
                             !error &&
                             rows.map((row) => (
-                                <tr key={rowKey(row)}>
+                                <tr
+                                    key={rowKey(row)}
+                                    onClick={onRowClick ? () => onRowClick(row) : undefined}
+                                    style={onRowClick ? { cursor: 'pointer' } : undefined}
+                                >
                                     {columns.map((col, i) => (
                                         <td key={i}>{col.render(row)}</td>
                                     ))}
                                     {showRowActions && (
-                                        <td className="data-row-actions">
+                                        <td className="data-row-actions" onClick={(e) => e.stopPropagation()}>
                                             {onEdit && (
                                                 <button
                                                     type="button"
                                                     className="data-row-edit"
                                                     aria-label="Edit row"
-                                                    onClick={() => onEdit(row)}
+                                                    onClick={(e) => { e.stopPropagation(); onEdit(row); }}
                                                 >
                                                     <Pencil2Icon />
                                                 </button>
@@ -163,7 +160,7 @@ export function AdminTable<T>({
                                                     type="button"
                                                     className="data-row-delete"
                                                     aria-label="Delete row"
-                                                    onClick={() => onDelete(row)}
+                                                    onClick={(e) => { e.stopPropagation(); onDelete(row); }}
                                                 >
                                                     <TrashIcon />
                                                 </button>
