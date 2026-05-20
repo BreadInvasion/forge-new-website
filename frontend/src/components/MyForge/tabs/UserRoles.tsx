@@ -280,7 +280,7 @@ const UserRoles: React.FC = () => {
                                                     <td>{activeUser.last_name}</td>
                                                     <td>{activeUser.RCSID}</td>
                                                     <td style={{ textAlign: 'center' }}>
-                                                        {assignedUserIds.has(activeUser.id) ? '' : (
+                                                         {!assignedUserIds.has(activeUser.id) && (
                                                             <button
                                                                 className='Button SaveBtn'
                                                                 type='button'
