@@ -20,9 +20,9 @@ interface AEMenuProps {
 const aemenu = (props: AEMenuProps): [ReactNode, (state: boolean, role: Role | null) => void] => {
     const { isDialogOpen, setIsDialogOpen, role, setRole, refresh } = props;
 
-    const { user } = useAuth();
-    const canCreate = user.permissions.includes(UserPermission.CAN_CREATE_ROLES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_ROLES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canCreate = hasPermission(UserPermission.CAN_CREATE_ROLES);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_ROLES);
 
     const [name, setName] = useState('');
     const [priority, setPriority] = useState(0);
@@ -53,8 +53,8 @@ const aemenu = (props: AEMenuProps): [ReactNode, (state: boolean, role: Role | n
     };
 
     const togglePermission = (perm: UserPermission) => {
-        const hasPermission = permissions.includes(perm);
-        if (hasPermission) {
+        const includesPermission = permissions.includes(perm);
+        if (includesPermission) {
             setPermissions((prev) => prev.filter((p) => p !== perm));
             return;
         }
@@ -221,10 +221,10 @@ const aemenu = (props: AEMenuProps): [ReactNode, (state: boolean, role: Role | n
 
 const Roles: React.FC = () => {
 
-    const { user } = useAuth();
-    const canSeeRoles = user.permissions.includes(UserPermission.CAN_SEE_ROLES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canDelete = user.permissions.includes(UserPermission.CAN_DELETE_ROLES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_ROLES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canSeeRoles = hasPermission(UserPermission.CAN_SEE_ROLES);
+    const canDelete = hasPermission(UserPermission.CAN_DELETE_ROLES);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_ROLES);
 
     const [data, setData] = React.useState<Role[]>([]);
     const columns: (keyof Role)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof Role)[]).filter((key) => key !== 'id') : [];

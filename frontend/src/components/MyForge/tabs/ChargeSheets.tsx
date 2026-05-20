@@ -19,8 +19,8 @@ type ChargeSheetCsvRow = {
 };
 
 const ChargeSheets: React.FC = () => {
-    const { user } = useAuth();
-    const canGetCharges = user.permissions.includes(UserPermission.CAN_GET_CHARGES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canGetCharges = hasPermission(UserPermission.CAN_GET_CHARGES);
 
     const [data, setData] = useState<UserCharge[]>([]);
     const [currentPage, setCurrentPage] = useState(1);

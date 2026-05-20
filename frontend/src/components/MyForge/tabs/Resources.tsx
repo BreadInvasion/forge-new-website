@@ -23,9 +23,9 @@ interface aemenuprops {
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource | null) => void] =>  {
     let { isDialogOpen, setIsDialogOpen, resource, setResource, refresh} = props;
     
-    const { user } = useAuth();
-    const canCreate = user.permissions.includes(UserPermission.CAN_CREATE_RESOURCES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_RESOURCES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canCreate = hasPermission(UserPermission.CAN_CREATE_RESOURCES);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_RESOURCES);
 
     const [name, setName] = useState("");
     const [brand, setBrand] = useState("");
@@ -130,9 +130,9 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource 
 
 
 const Resources: React.FC = () => {
-    const { user } = useAuth();
-    const canDelete = user.permissions.includes(UserPermission.CAN_DELETE_RESOURCES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_RESOURCES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canDelete = hasPermission(UserPermission.CAN_DELETE_RESOURCES);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_RESOURCES);
 
     const [data, setData] = React.useState<Resource[]>([]);
     const columns: (keyof Resource)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof Resource)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];

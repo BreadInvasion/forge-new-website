@@ -19,9 +19,9 @@ interface aemenuprops {
 }
 
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineGroup | null) => void] => {
-    const { user } = useAuth();
-    const canCreate = user.permissions.includes(UserPermission.CAN_CREATE_MACHINE_GROUPS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_MACHINE_GROUPS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canCreate = hasPermission(UserPermission.CAN_CREATE_MACHINE_GROUPS);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_GROUPS);
 
     let { isDialogOpen, setIsDialogOpen, machineGroup, setMachineGroup, refresh} = props;
 
@@ -151,9 +151,9 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
 };
 
 const MachineGroups: React.FC = () => {
-    const { user } = useAuth();
-    const canDelete = user.permissions.includes(UserPermission.CAN_DELETE_MACHINE_GROUPS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_MACHINE_GROUPS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINE_GROUPS);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_GROUPS);
 
     const [data, setData] = React.useState<MachineGroup[]>([]);
     const columns: (keyof MachineGroup)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineGroup)[]).filter((key) => key !== 'id') : [];

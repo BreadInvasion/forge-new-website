@@ -13,11 +13,7 @@ import '../styles/TabStyles.scss';
 type RoleUserRow = Pick<User, 'id' | 'first_name' | 'last_name' | 'RCSID'>;
 
 const UserRoles: React.FC = () => {
-    const { user } = useAuth();
-
-    const hasPermission = (permission: UserPermission) => (
-        user.permissions.includes(permission) || user.permissions.includes(UserPermission.IS_SUPERUSER)
-    );
+    const { hasPermission } = useAuth();
 
     const canSeeRoles = hasPermission(UserPermission.CAN_SEE_ROLES);
     const canSeeUsers = hasPermission(UserPermission.CAN_SEE_USERS);

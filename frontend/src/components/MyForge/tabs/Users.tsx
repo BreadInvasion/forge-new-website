@@ -10,8 +10,8 @@ import '../styles/TabStyles.scss';
 
 const Users: React.FC = () => {
 
-    const { user } = useAuth();
-    const canSeeUsers = user.permissions.includes(UserPermission.CAN_SEE_USERS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canSeeUsers = hasPermission(UserPermission.CAN_SEE_USERS);
 
     const [data, setData] = React.useState<User[]>([]);
     //change this to fix gender id

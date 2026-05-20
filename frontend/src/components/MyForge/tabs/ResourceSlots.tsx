@@ -23,9 +23,9 @@ interface aemenuprops {
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: ResourceSlot | null) => void] => {
     let { isDialogOpen, setIsDialogOpen, resourceSlot, setResourceSlot, refresh} = props;
     
-    const { user } = useAuth();
-    const canCreate = user.permissions.includes(UserPermission.CAN_CREATE_RESOURCE_SLOTS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_RESOURCE_SLOTS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canCreate = hasPermission(UserPermission.CAN_CREATE_RESOURCE_SLOTS);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_RESOURCE_SLOTS);
 
     const [name, setName] = useState("");
     const [resources, setResources] = useState<Resource[]>([]);
@@ -187,9 +187,9 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, rslot: Resourc
 }
 
 const ResourceSlots: React.FC = () => {
-    const { user } = useAuth();
-    const canDelete = user.permissions.includes(UserPermission.CAN_DELETE_RESOURCE_SLOTS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_RESOURCE_SLOTS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canDelete = hasPermission(UserPermission.CAN_DELETE_RESOURCE_SLOTS);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_RESOURCE_SLOTS);
 
     const [data, setData] = React.useState<ResourceSlot[]>([]);
     const columns: (keyof ResourceSlot)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof ResourceSlot)[]).filter((key) => !key.includes('db_name') && !(key == 'name') && !key.includes('id') && !key.includes('valid_resource_ids')) : [];

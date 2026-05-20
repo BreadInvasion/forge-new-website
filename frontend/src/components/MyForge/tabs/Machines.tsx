@@ -18,9 +18,9 @@ interface aemenuprops {
 }
 
 const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine, setMachine, refresh,}) => {
-    const { user } = useAuth();
-    const canCreate = user.permissions.includes(UserPermission.CAN_CREATE_MACHINES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_MACHINES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canCreate = hasPermission(UserPermission.CAN_CREATE_MACHINES);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINES);
     
     const [name, setName] = useState("");
 
@@ -155,9 +155,9 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
 
 
 const Machines: React.FC = () => {
-    const { user } = useAuth();
-    const canDelete = user.permissions.includes(UserPermission.CAN_DELETE_MACHINES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_MACHINES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINES);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINES);
 
     const [data, setData] = React.useState<Machine[]>([]);
     const columns: (keyof Machine)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof Machine)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
