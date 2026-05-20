@@ -258,7 +258,7 @@ const UserRoles: React.FC = () => {
                                     }}
                                     placeholder='Search by name or RCSID'
                                 />
-                                <label className='Label'>Users</label>
+                                <div className='Label'>Users</div>
                                 <div className='table-container' style={{ marginTop: '0.25rem', padding: 0, maxHeight: '30vh' }}>
                                     <table>
                                         <thead>

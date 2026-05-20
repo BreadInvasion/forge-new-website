@@ -180,9 +180,9 @@ const aemenu = (props: AEMenuProps): [ReactNode, (state: boolean, role: Role | n
                                         alignItems: 'center',
                                     }}
                                 >
-                                    <label className='checkbox-label' style={{ textAlign: 'center', margin: 0 }}>Y</label>
-                                    <label className='checkbox-label' style={{ textAlign: 'center', margin: 0 }}>N</label>
-                                    <label className='checkbox-label' style={{ margin: 0 }}>Permission</label>
+                                    <div className='checkbox-label' style={{ textAlign: 'center'}}>Y</div>
+                                    <div className='checkbox-label' style={{ textAlign: 'center'}}>N</div>
+                                    <div className='checkbox-label'> Permission</div>
 
                                     {allPermissions.map((permission) => (
                                         <React.Fragment key={`perm-${permission}`}>
@@ -200,9 +200,9 @@ const aemenu = (props: AEMenuProps): [ReactNode, (state: boolean, role: Role | n
                                                 onChange={() => toggleInversePermission(permission)}
                                                 style={{ margin: 0, justifySelf: 'center' }}
                                             />
-                                            <label className='checkbox-label' style={{ margin: 0, overflowWrap: 'anywhere' }}>
+                                            <div className='checkbox-label' style={{ overflowWrap: 'anywhere' }}>
                                                 {permission}
-                                            </label>
+                                            </div>
                                         </React.Fragment>
                                     ))}
                                 </div>
