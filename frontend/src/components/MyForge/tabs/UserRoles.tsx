@@ -110,7 +110,7 @@ const UserRoles: React.FC = () => {
         const activeUser = assignedUsers[index_real];
         if (!activeUser || !selectedRoleId) return;
 
-        OmniAPI.edit('roles', 'user', {
+        OmniAPI.edit('users', 'role', {
             user_id: activeUser.id,
             role_id: selectedRoleId,
             should_have_role: false,
@@ -128,7 +128,7 @@ const UserRoles: React.FC = () => {
         }
         if (!selectedRoleId) return;
 
-        OmniAPI.edit('roles', 'user', {
+        OmniAPI.edit('users', 'role', {
             user_id: activeUser.id,
             role_id: selectedRoleId,
             should_have_role: true,

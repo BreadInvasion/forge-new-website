@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import ScalarSelect, and_, func, or_, select
 from sqlalchemy.orm import selectinload, InstrumentedAttribute
 
@@ -15,7 +15,7 @@ from models.machine_usage import MachineUsage
 from models.role import Role
 from models.user import User
 from schemas.enums import Permissions
-from schemas.requests import UserCreateRequest
+from schemas.requests import UserCreateRequest, UserAddRoleRequest
 from schemas.responses import BasicUserResponse, UserNoHash
 
 from core.security import get_password_hash
@@ -366,6 +366,45 @@ async def get_users_by_role(
         )
         for user in users
     ]
+
+
+@router.post("/users/role")
+async def change_user_role(
+    request: UserAddRoleRequest,
+    session: DBSession,
+    current_user: Annotated[
+        User, Depends(PermittedUserChecker({Permissions.CAN_CHANGE_USER_ROLES}))
+    ],
+):
+    """Assign or unassign a role for a user."""
+
+    user = await session.scalar(
+        select(User).where(User.id == request.user_id).options(selectinload(User.roles))
+    )
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User with provided ID not found",
+        )
+
+    role = await session.scalar(select(Role).where(Role.id == request.role_id))
+    if not role:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Role with provided ID not found",
+        )
+
+    if request.should_have_role:
+        if role not in user.roles:
+            user.roles.append(role)
+            session.add(user)
+            await session.commit()
+        return
+
+    if role in user.roles:
+        user.roles.remove(role)
+        session.add(user)
+        await session.commit()
 
 # GET ALL USERS
 

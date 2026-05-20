@@ -4,9 +4,9 @@ from typing import Annotated, Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, and_
-from sqlalchemy.orm import InstrumentedAttribute
+from sqlalchemy.orm import InstrumentedAttribute, selectinload
 
-from models.role import Role, UserRoleAssociation
+from models.role import Role
 from models.audit_log import AuditLog
 from schemas.enums import Permissions, LogType
 from schemas.responses import CreateResponse, AuditLogModel, RoleInfo, RoleDetails
@@ -152,50 +152,6 @@ async def get_all_roles(
     ]
 
 
-@router.post("/roles/user")
-async def change_user_role(
-    request: UserAddRoleRequest,
-    session: DBSession,
-    current_user: Annotated[
-        User, Depends(PermittedUserChecker({Permissions.CAN_CHANGE_USER_ROLES}))
-    ],
-):
-    """Assign or unassign a role for a user."""
-
-    user = await session.scalar(select(User).where(User.id == request.user_id))
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User with provided ID not found",
-        )
-
-    role = await session.scalar(select(Role).where(Role.id == request.role_id))
-    if not role:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Role with provided ID not found",
-        )
-
-    association = await session.scalar(
-        select(UserRoleAssociation).where(
-            and_(
-                UserRoleAssociation.user_id == request.user_id,
-                UserRoleAssociation.role_id == request.role_id,
-            )
-        )
-    )
-
-    if request.should_have_role:
-        if not association:
-            session.add(
-                UserRoleAssociation(user_id=request.user_id, role_id=request.role_id)
-            )
-            await session.commit()
-        return
-
-    if association:
-        await session.delete(association)
-        await session.commit()
 
 
 @router.post("/roles/{role_id}")
@@ -269,19 +225,16 @@ async def delete_role(
 ):
     """Delete the role with the provided ID."""
 
-    role = await session.scalar(select(Role).where(Role.id == role_id))
+    role = await session.scalar(
+        select(Role).where(Role.id == role_id).options(selectinload(Role.users))
+    )
     if not role:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Role with provided ID not found",
         )
 
-    users = (
-        await session.scalars(
-            select(UserRoleAssociation).where(UserRoleAssociation.role_id == role.id)
-        )
-    ).all()
-    if len(users):
+    if role.users:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot delete a role that is assigned to users",
