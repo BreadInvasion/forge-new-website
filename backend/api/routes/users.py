@@ -76,6 +76,7 @@ async def register_user(
         pronouns=request.pronouns,
         is_rpi_staff=False,
         is_graduating=False,
+        checked_graduating=False,
         hashed_password=get_password_hash(request.password),
     )
     session.add(new_user)
@@ -126,6 +127,7 @@ async def get_user_by_rcsid(
             ""
         ),
         is_graduating=user.is_graduating,
+        checked_graduating=user.checked_graduating,
         semester_balance=semester_balance,
     )
 
@@ -168,6 +170,7 @@ async def get_user_by_rin(
             ""
         ),
         is_graduating=user.is_graduating,
+        checked_graduating=user.checked_graduating,
         semester_balance=semester_balance,
     )
 
@@ -213,6 +216,7 @@ async def get_all_users(
         )
         .as_scalar(),
         "is_graduating": User.is_graduating,
+        "checked_graduating": User.checked_graduating,
         "gender_identity": User.gender_identity,
         "pronouns": User.pronouns,
         "major": User.major,
@@ -269,6 +273,7 @@ async def get_all_users(
                 ""
             ),
             is_graduating=user.is_graduating,
+            checked_graduating=user.checked_graduating,
             semester_balance=Decimal(
                 next(
                     (balance.tuple()[1]

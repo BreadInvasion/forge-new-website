@@ -55,6 +55,10 @@ class User(Base):
 
     # Is this user graduating in this semester? Determines which charge sheet they are added to.
     is_graduating: Mapped[bool]
+    
+
+    # Has whether the user is graduating this semester been checked this semester? Keeps is_graduating accurate
+    checked_graduating: Mapped[bool]
 
     # Organizations that the user is a member of (can charge usages to the organization)
     orgs: Mapped[list["Org"]] = relationship(
