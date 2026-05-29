@@ -278,7 +278,7 @@ const UserRoles: React.FC = () => {
                                                     <td style={{ textAlign: 'center' }}>
                                                          {!assignedUserIds.has(activeUser.id) && (
                                                             <button
-                                                                className='Button SaveBtn'
+                                                                className='Button'
                                                                 type='button'
                                                                 onClick={() => onAdd(activeUser)}
                                                             >

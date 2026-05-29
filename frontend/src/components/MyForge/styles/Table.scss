@@ -371,10 +371,9 @@
     }
 
     .SaveBtn {
-        position: absolute;
-        margin: 1rem;
-        right: 0;
-        bottom: 0;
+        position: static;
+        align-self: flex-end;
+        margin-top: 1rem;
     }
 
     .IconButton {
