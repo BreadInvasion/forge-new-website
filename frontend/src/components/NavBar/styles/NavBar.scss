@@ -371,6 +371,18 @@
 }
 
 @media screen and (width < nav.$mobile-breakpoint) {
+    /* Figma mobile navbar: 56px */
+    .nav-menu-root {
+        min-height: 56px;
+        max-height: 56px;
+    }
+    .nav-rpi-lockup,
+    .nav-forge-sticker {
+        height: 20px;
+    }
+    .nav-brand-separator {
+        height: 28px;
+    }
     /* Hide all nav links and dropdowns on mobile */
     .list-item {
         display: none;

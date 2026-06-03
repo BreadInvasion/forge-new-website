@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReactComponent as ForgeSVG } from 'src/assets/img/logo.svg';
+import forgeLogoUrl from '../../assets/img/logo.svg?url';
 
 import './Home.scss';
 
@@ -7,7 +7,7 @@ const ComingSoon = () => {
 
     return (
         <div className='cs-container'>
-            <ForgeSVG className='cs-logo'/>
+            <img className='cs-logo' src={forgeLogoUrl} alt='The Forge logo' />
             <h1>Coming Soon!</h1>
         </div>
     );

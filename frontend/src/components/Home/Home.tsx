@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { styled } from 'styled-components';
+import styled from 'styled-components';
 import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
 import bgPattern from '../../assets/img/background.svg?url';
 import anvilMobileImg from '../../assets/img/background_mobile_crop.png';
@@ -28,9 +28,9 @@ const PageWrapper = styled.div`
     flex: 1 1 auto;
     overflow: hidden;
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
         height: auto;
-        min-height: 0;
+        min-height: calc(100svh - 56px); /* fill screen minus navbar */
         overflow: visible;
         flex: 1 1 auto;
     }
@@ -48,36 +48,13 @@ const HeroSection = styled.section`
     background: linear-gradient(to right, #2d4a80 10%, #a51c1c 100%);
     overflow: hidden;
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
+        height: auto;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Mobile anvil background — baked into the section as a pseudo-element
-     * so it can't shift or scroll independently of its container. Using
-     * background-image (not an <img>) avoids the object-position reflow that
-     * iOS Safari triggers when the address bar appears/disappears. */
-    &::after {
-        content: '';
-        display: none;
-
-        @media (max-width: 768px) {
-            display: block;
-            position: absolute;
-            inset: 0;
-            background-image: url(${anvilMobileImg});
-            background-size: 75%;
-            background-position: right top;
-            background-repeat: no-repeat;
-            opacity: 0.6;
-            pointer-events: none;
-            z-index: 1;
-            height: 120%;
-            object-fit: cover;
-            object-position: right;
-
-        }
+        align-items: flex-start;
+        justify-content: flex-start;
+        overflow: visible;
+        background: linear-gradient(to right, #2d4a80 10%, #a51c1c 100%);
     }
 `;
 
@@ -85,17 +62,23 @@ const HeroSection = styled.section`
  *  mix-blend-mode: screen makes the black background transparent. */
 const MobileBenchyScatter = styled.img`
     display: none;
+`;
+
+/** Max-width content wrapper inside HeroSection — keeps content ≤ 1440 px centred
+ *  while the gradient background stays full-bleed. */
+const HeroInner = styled.div`
+    position: relative;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
 
     @media (max-width: 768px) {
-        display: block;
-        position: absolute;
-        right: -30%;
-        bottom: 5%;
-        width: 70%;
-        mix-blend-mode: screen;
-        opacity: 0.85;
-        pointer-events: none;
-        z-index: 1;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 `;
 
@@ -105,7 +88,7 @@ const HeroContent = styled.div`
     z-index: 2;
     flex: 0 0 auto;
     width: min(477px, 45%);
-    padding-left: clamp(80px, 9vw, 127px);
+    padding-left: clamp(100px, 11vw, 160px);
     padding-right: 20px;
     display: flex;
     flex-direction: column;
@@ -118,13 +101,15 @@ const HeroContent = styled.div`
         width: min(540px, 48%);
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
+        position: relative;
         width: 100%;
-        padding: 50px 32px 22px 32px;  /* increase the top value */
+        padding: clamp(24px, 6vw, 48px) clamp(20px, 5vw, 40px) 16px;
+        gap: clamp(16px, 4vw, 28px);
+        justify-content: flex-start;
         align-items: flex-start;
-        gap: clamp(20px, 5vh, 40px);
         z-index: 2;
-
+        flex: 0 0 auto;
     }
 `;
 
@@ -136,15 +121,17 @@ const HeroTitle = styled.h1`
     color: #ffffff;
     margin: 0;
 
-    @media (max-width: 768px) {
-        font-size: clamp(36px, 12vw, 64px);
+    @media (max-width: 900px) {
+        font-size: clamp(52px, 15vw, 80px);
+        line-height: 1.15;
+        margin: 0;
     }
 `;
 
 /** One line of the staggered hero title. */
 const TitleLine = styled.span<{ $ml?: string }>`
     display: block;
-    margin-left: ${p => p.$ml ?? '0'};
+    margin-left: ${(p: { $ml?: string }) => p.$ml ?? '0'};
 `;
 
 const HeroServices = styled.p`
@@ -155,46 +142,66 @@ const HeroServices = styled.p`
     line-height: 1.35;
     margin: 0;
 
-    @media (max-width: 768px) {
-        font-size: clamp(14px, 4.5vw, 24px);
+    @media (max-width: 900px) {
+        font-size: clamp(18px, 5vw, 26px);
+        line-height: 1.4;
+        margin: 0;
     }
 `;
 
 /** One line of the staggered services list. */
 const ServiceLine = styled.span<{ $ml?: string }>`
     display: block;
-    margin-left: ${p => p.$ml ?? '0'};
+    margin-left: ${(p: { $ml?: string }) => p.$ml ?? '0'};
 `;
 
-/** Image panel — right side on desktop, hidden on mobile (MobileBg replaces it). */
+/** Desktop image panel */
 const HeroImagePanel = styled.div`
-    position: relative;
-    flex: 0 0 min(920px, 60%);
-    margin-left: auto;
-    min-width: 0;
-    align-self: stretch;
-    overflow: hidden;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    inset: 0;
     z-index: 0;
+    pointer-events: none;
+    /* Fade left edge so image doesn't clash with text */
+    mask-image: linear-gradient(to right, transparent 25%, black 55%);
+    -webkit-mask-image: linear-gradient(to right, transparent 25%, black 55%);
 
     img {
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        /* Keep focus on the right side where the anvil + benchys sit */
+        object-fit: contain;
         object-position: right center;
     }
 
-    /* At intermediate widths the image panel can squeeze the text column because
-       it won't shrink. Allow it to give ground so HeroContent keeps enough room
-       for the staggered service lines without wrapping. */
-    @media (max-width: 1300px) and (min-width: 769px) {
-        flex: 0 1 52%;
-    }
-
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
         display: none;
+    }
+`;
+
+/** Mobile image panel — exact Figma crop, upper-right, hidden on desktop */
+const MobileImagePanel = styled.div`
+    display: none;
+
+    @media (max-width: 900px) {
+        display: block;
+        position: relative;
+        width: 100%;
+        /* Fixed pixel height — never resizes when browser chrome shows/hides */
+        height: 280px;
+        flex-shrink: 0;
+        margin-top: auto; /* push to bottom of hero */
+        background-image: url(${anvilDesktopImg});
+        background-size: cover;
+        background-position: center 30%;
+        background-repeat: no-repeat;
+        /* Fade top edge to blend with text above */
+        mask-image: linear-gradient(to bottom, transparent 0%, black 30%);
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%);
+
+        img { display: none; }
     }
 `;
 
@@ -208,6 +215,8 @@ const InfoBar = styled.div`
     flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 24px;
     overflow: hidden;
     /* Red accents as borders — frees up both pseudo-elements */
     border-top: 4px solid #a51c1c;
@@ -226,28 +235,48 @@ const InfoBar = styled.div`
         z-index: 0;
     }
 
+    @media (max-width: 900px) {
+        /* Figma: single row, 50px tall, text left + button right */
+        flex-direction: row;
+        height: 50px;
+        padding: 0 12px;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+        border-right: none;
+    }
+`;
+
+/** Inner wrapper for InfoBar — caps content at 1440 px and centres it. */
+const InfoBarInner = styled.div`
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    height: 100%;
+
     @media (max-width: 768px) {
         flex-direction: column;
         height: auto;
-        padding: 12px 20px;
         gap: 8px;
         align-items: center;
-        border-right: none;
     }
 `;
 
 const MembershipText = styled.div`
     position: relative;
     z-index: 1;
-    flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0 20px 0 clamp(40px, 8vw, 100px);
+    padding: 0 20px;
 
-    @media (max-width: 768px) {
-        padding: 0 20px;
-        flex: unset;
+    @media (max-width: 900px) {
+        padding: 0;
+        flex: 1;
+        justify-content: flex-start;
     }
 
     p {
@@ -259,9 +288,10 @@ const MembershipText = styled.div`
         white-space: nowrap;
         margin: 0;
 
-        @media (max-width: 768px) {
-            white-space: normal;
-            font-size: clamp(13px, 4vw, 18px);
+        @media (max-width: 900px) {
+            white-space: nowrap;
+            font-size: 16px;
+            text-align: left;
         }
     }
 `;
@@ -270,7 +300,7 @@ const GetStartedButton = styled(Link)`
     position: relative;
     z-index: 1;
     flex-shrink: 0;
-    margin-right: clamp(24px, 6vw, 80px);
+    margin-right: 0;
     width: clamp(160px, 20vw, 260px);
     height: clamp(36px, 6vh, 50px);
     background: #a51c1c;
@@ -291,12 +321,15 @@ const GetStartedButton = styled(Link)`
         color: #ffffff;
     }
 
-    @media (max-width: 768px) {
-        width: clamp(130px, 50vw, 200px);
+    @media (max-width: 900px) {
+        /* Figma: 78×18px pill */
+        width: 78px;
+        height: 22px;
+        flex-shrink: 0;
         margin-right: 0;
-        height: 34px;
+        border-radius: 10px;
 
-        span { font-size: 16px; }
+        span { font-size: 12px; }
     }
 `;
 
@@ -313,7 +346,6 @@ export default function Home() {
             {/* ── Hero ─────────────────────────────────────────────────── */}
             <HeroSection>
 
-    
                 {/* Benchy scatter — mobile only, bottom-right */}
                 <MobileBenchyScatter
                     src={mobileBenchys}
@@ -336,13 +368,22 @@ export default function Home() {
                     </HeroServices>
                 </HeroContent>
 
-                {/* Desktop-only: right-side image panel */}
+                {/* Desktop image panel */}
                 <HeroImagePanel>
                     <img
                         src={anvilDesktopImg}
                         alt="The Forge makerspace tools and equipment"
                     />
                 </HeroImagePanel>
+
+                {/* Mobile image panel — Figma crop offsets, upper-right */}
+                <MobileImagePanel>
+                    <img
+                        src={anvilDesktopImg}
+                        alt=""
+                        aria-hidden="true"
+                    />
+                </MobileImagePanel>
 
                 <PageRuler
                     src={RULER_IMG}

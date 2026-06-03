@@ -7,7 +7,7 @@ import { CaretDownIcon } from '@radix-ui/react-icons';
 import * as Avatar from '../MyForge/components/Avatar';
 import * as Hamburger from './Hamburger';
 import { isAdmin } from '../Auth/roleUtils';
-import { ReactComponent as ForgeSVG } from 'src/assets/img/RPI_Lockup_Eng_Sm.svg';
+import forgeLockupUrl from '../../assets/img/RPI_Lockup_Eng_Sm.svg?url';
 import forgeLogoUrl from 'src/assets/img/logo.svg?url';
 
 import './styles/UserMenu.scss';
@@ -68,8 +68,10 @@ export const NavBar: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
             {/* ── Left: Branding ─────────────────────────────────────── */}
             <NavMenu.Link className="logo-link" href="/">
                 {/* RPI Engineering lockup */}
-                <ForgeSVG
+                <img
                     className="nav-rpi-lockup"
+                    src={forgeLockupUrl}
+                    alt="RPI Engineering lockup"
                 />
                 {/* Vertical separator */}
                 <div className="nav-brand-separator" aria-hidden="true" />
