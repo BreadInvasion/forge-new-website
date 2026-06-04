@@ -1,17 +1,17 @@
-/* Variables */
-$base-color: #000;
-$highlight-color: #222222; // grayDark.gray3 equivalent
-$border-color: #b4b4b4; // grayDark.gray11 equivalent
-$text-color: #eeeeee; // grayDark.gray12 equivalent
+/* Variables — updated to match Figma "The Forge | The MILL" design */
+$base-color: #ffffff;
+$highlight-color: #f0f4fa;
+$border-color: #e0e0e0;
+$text-color: #2d4a80;
 
-$popup-text: #111111; // grayDark.gray1 equivalent
-$popup-color: #eeeeee; // grayDark.gray12 equivalent
-$popup-highlight: #b4b4b4; // grayDark.gray11 equivalent
+$popup-text: #2d4a80;
+$popup-color: #ffffff;
+$popup-highlight: #f0f4fa;
 
 $mobile-breakpoint: 900px;
 
-$layout-transition-speed: .5s; // Speed of the transition between mobile and desktop layouts
-$hover-transition-speed: .15s; // Speed of hover effect transition
+$layout-transition-speed: .5s;
+$hover-transition-speed: .15s;
 
 @mixin itemStyles {
     text-decoration: none;
@@ -45,37 +45,21 @@ $hover-transition-speed: .15s; // Speed of hover effect transition
 }
 
 @keyframes fade-in {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 @keyframes fade-out {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0;
-    }
+    from { opacity: 1; }
+    to   { opacity: 0; }
 }
 
 @keyframes rotate-in {
-    from {
-        transform: rotate(-90deg);
-    }
-    to {
-        transform: rotate(-180deg);
-    }
+    from { transform: rotate(-90deg); }
+    to   { transform: rotate(-180deg); }
 }
 
 @keyframes rotate-out {
-    from {
-        transform: rotate(-180deg);
-    }
-    to {
-        transform: rotate(-90deg);
-    }
+    from { transform: rotate(-180deg); }
+    to   { transform: rotate(-90deg); }
 }

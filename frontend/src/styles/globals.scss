@@ -1,0 +1,408 @@
+// =============================================================================
+// THE FORGE | THE MILL — Global Design Tokens
+// =============================================================================
+// Usage in styled-components:  color: var(--color-red);
+// Usage in SCSS:               color: var(--color-red);
+// =============================================================================
+
+:root {
+
+  // ---------------------------------------------------------------------------
+  // Colors
+  // ---------------------------------------------------------------------------
+  --color-navy:         #111c36;
+  --color-navy-mid:     #2d4a80;
+  --color-navy-light:   #31519c;
+
+  --color-red:          #a51c1c;
+  --color-red-muted:    rgba(165, 28, 28, 0.75);
+
+  --color-slate:        #64748b;
+  --color-light-blue:   #bac8db;
+
+  --color-bg-light:     #eef2f8;
+  --color-divider:      #e2e8f0;
+  --color-border:       #e0e7f0;
+
+  --color-white:        #ffffff;
+  --color-black:        #000000;
+
+  // ---------------------------------------------------------------------------
+  // Typography — font families
+  // ---------------------------------------------------------------------------
+  --font-display:  'Funnel Display', sans-serif;
+  --font-heading:  'Familjen Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --font-body:     'Funnel Display', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:     'Geist Mono', 'Fira Code', monospace;
+
+  // ---------------------------------------------------------------------------
+  // Font sizes (fluid where appropriate)
+  // ---------------------------------------------------------------------------
+  --text-xs:   11px;
+  --text-sm:   12px;
+  --text-base: 14px;
+  --text-md:   16px;
+  --text-lg:   18px;
+  --text-xl:   20px;
+  --text-2xl:  22px;
+  --text-3xl:  32px;
+  --text-4xl:  clamp(32px, 4vw, 50px);
+  --text-hero: clamp(60px, 7vw, 100px);
+
+  // ---------------------------------------------------------------------------
+  // Spacing scale
+  // ---------------------------------------------------------------------------
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+
+  // ---------------------------------------------------------------------------
+  // Border radius
+  // ---------------------------------------------------------------------------
+  --radius-sm:  5px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+
+  // ---------------------------------------------------------------------------
+  // Borders
+  // ---------------------------------------------------------------------------
+  --border-accent:  4px solid var(--color-red);
+  --border-card:    1.5px solid var(--color-border);
+
+  // ---------------------------------------------------------------------------
+  // Shadows
+  // ---------------------------------------------------------------------------
+  --shadow-nav:  0px 1px 3px 0px rgba(0, 0, 0, 0.06);
+
+  // ---------------------------------------------------------------------------
+  // Layout
+  // ---------------------------------------------------------------------------
+  --max-width:      1440px;
+  --content-px:     174px;
+  --content-px-r:   120px;
+  --navbar-height:  72px;
+}
+
+// ---------------------------------------------------------------------------
+// Responsive overrides
+// ---------------------------------------------------------------------------
+@media (max-width: 1024px) {
+  :root {
+    --content-px:    80px;
+    --content-px-r:  60px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --content-px:    24px;
+    --content-px-r:  24px;
+  }
+}
+
+// =============================================================================
+// Shared data card + table
+// =============================================================================
+// Used by any page that displays a tabular data view (Admin tabs, etc.).
+// These classes live in globals.scss so every table across the site shares
+// the same visual design.
+// =============================================================================
+
+.data-card {
+    position: relative;
+    background: var(--color-white);
+    border: 0.5px solid var(--color-navy-mid);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(17, 28, 54, 0.04);
+    min-height: 444px;
+}
+
+.data-card-title {
+    font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    color: var(--color-navy);
+    padding: 5px 36px;
+    line-height: 1.1;
+    margin: 0;
+
+    @media (max-width: 900px) {
+        font-size: 24px;
+        padding: 12px 20px;
+    }
+}
+
+// Header row that pairs the title with an inline action (e.g. the
+// "Advance Semester" button on the Semesters tab). The child title drops
+// its own horizontal padding so this wrapper controls the layout.
+.data-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 5px 36px;
+
+    .data-card-title {
+        padding: 0;
+    }
+
+    @media (max-width: 900px) {
+        padding: 12px 20px;
+    }
+}
+
+.data-card-title-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.data-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0 36px 12px 36px;
+
+    @media (max-width: 900px) {
+        padding: 0 20px 12px 20px;
+    }
+}
+
+.data-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.data-table {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.data-table thead tr {
+    background-color: var(--color-navy);
+    min-height: 53px;
+}
+
+.data-table th {
+    font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    text-align: left;
+    color: var(--color-white); // All header labels are white
+    padding: 16px 12px;
+    vertical-align: middle;
+    white-space: nowrap;
+    line-height: 1.45;
+
+    &:first-child,
+    &.data-th--active {
+        padding-left: 28px;
+    }
+
+    @media (max-width: 900px) {
+        font-size: 13px;
+        padding: 12px 10px;
+        line-height: 1.4;
+
+        &:first-child,
+        &.data-th--active {
+            padding-left: 16px;
+        }
+    }
+}
+
+.data-table tbody tr {
+    border-bottom: 0.5px solid var(--color-divider);
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.data-table td {
+    font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: #4a6080;
+    padding: 14px 16px;
+    vertical-align: middle;
+    white-space: nowrap;
+    line-height: 1.35;
+
+    &:first-child {
+        padding-left: 36px;
+    }
+
+    @media (max-width: 900px) {
+        font-size: 13px;
+        padding: 10px 10px;
+
+        &:first-child {
+            padding-left: 16px;
+        }
+    }
+}
+
+.data-table-empty {
+    padding: 40px 62px;
+    font-family: var(--font-body), 'Funnel Display', sans-serif;
+    font-size: 16px;
+    color: var(--color-slate);
+}
+
+.data-table-error {
+    color: var(--color-red);
+}
+
+// =============================================================================
+// Per-row edit / delete action buttons
+// =============================================================================
+// When the parent `<AdminTable>` is given `onEdit` / `onDelete` props it
+// renders a trailing column containing pencil and/or trash icon buttons.
+// These classes style that column and its buttons.
+// =============================================================================
+
+.data-th-actions {
+    width: 110px;
+    padding: 0 !important;
+    background-color: var(--color-navy);
+}
+
+.data-row-actions {
+    padding: 8px 16px !important;
+    text-align: right;
+    white-space: nowrap;
+    vertical-align: middle;
+
+    // Horizontal gap between the pencil and trash buttons. Siblings inside
+    // a <td> can't use flex reliably across browsers, so we use margin.
+    // Bumped up per design request so the edit / delete icons have more
+    // breathing room on each row.
+    > * + * {
+        margin-left: 20px;
+    }
+
+    @media (max-width: 900px) {
+        padding: 6px 10px !important;
+
+        > * + * {
+            margin-left: 14px;
+        }
+    }
+}
+
+.data-row-edit,
+.data-row-delete {
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-navy-light);
+        outline-offset: 2px;
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    @media (max-width: 900px) {
+        width: 28px;
+        height: 28px;
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+}
+
+.data-row-edit {
+    color: var(--color-navy-mid);
+    background-color: rgba(45, 74, 128, 0.08);
+
+    &:hover {
+        background-color: rgba(45, 74, 128, 0.18);
+        color: var(--color-navy);
+    }
+}
+
+.data-row-delete {
+    color: var(--color-red);
+    background-color: rgba(165, 28, 28, 0.08);
+
+    &:hover {
+        background-color: rgba(165, 28, 28, 0.18);
+        color: var(--color-red);
+    }
+}
+
+// =============================================================================
+// Shared action buttons (blue = manager, red = eboard)
+// =============================================================================
+// The Admin page reuses these for tab-level actions (e.g. "Create Charge
+// Sheet", "Advance Semester").
+// =============================================================================
+
+.btn-action {
+    all: unset;
+    cursor: pointer;
+    font-family: var(--font-display), 'Funnel Display', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--color-white);
+    padding: 10px 18px;
+    border-radius: 8px;
+    line-height: 1;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        opacity: 0.55;
+        cursor: default;
+        pointer-events: none;
+    }
+}
+
+.btn-action--blue {
+    background-color: var(--color-navy-light);
+
+    &:hover {
+        background-color: var(--color-navy-mid);
+    }
+}
+
+.btn-action--red {
+    background-color: var(--color-red);
+
+    &:hover {
+        background-color: var(--color-red-muted);
+    }
+}
