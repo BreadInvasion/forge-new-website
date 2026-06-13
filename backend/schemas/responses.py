@@ -136,6 +136,19 @@ class ResourceSlotInfo(BaseModel):
 class ResourceSlotDetails(ResourceSlotInfo):
     audit_logs: list[AuditLogModel]
 
+    
+class RoleInfo(BaseModel):
+    id: UUID4
+    name: str
+    permissions: list[str]
+    inverse_permissions: list[str]
+    display_role: bool
+    priority: int
+
+
+class RoleDetails(RoleInfo):
+    audit_logs: list[AuditLogModel]
+
 
 class MachineTypeInfo(BaseModel):
     id: UUID4

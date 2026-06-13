@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import ScalarSelect, and_, func, or_, select
 from sqlalchemy.orm import selectinload, InstrumentedAttribute
 
@@ -15,7 +15,7 @@ from models.machine_usage import MachineUsage
 from models.role import Role
 from models.user import User
 from schemas.enums import Permissions
-from schemas.requests import UserCreateRequest
+from schemas.requests import UserCreateRequest, UserAddRoleRequest
 from schemas.responses import BasicUserResponse, UserNoHash
 
 from core.security import get_password_hash
@@ -283,6 +283,128 @@ async def get_all_users(
         for user in users
     ]
 
+
+@router.get("/users/role/{role_id}", tags=["users"])
+async def get_users_by_role(
+    role_id: UUID,
+    session: DBSession,
+    current_user: Annotated[
+        User, Depends(PermittedUserChecker({Permissions.CAN_SEE_USERS}))
+    ],
+    limit: int = 20,
+    offset: int = 0,
+) -> list[UserNoHash]:
+    """Get all users that have a given role."""
+
+    current_semester_id = await session.scalar(select(State.active_semester_id))
+
+    users = (
+        await session.scalars(
+            select(User)
+            .join(User.roles)
+            .where(Role.id == role_id)
+            .options(selectinload(User.roles))
+            .order_by(User.RCSID)
+            .limit(limit)
+            .offset(offset)
+        )
+    ).all()
+
+    semester_balances = (
+        (
+            await session.execute(
+                select(User.id, func.sum(MachineUsage.cost))
+                .join(MachineUsage.user)
+                .where(
+                    and_(
+                        MachineUsage.semester_id == current_semester_id,
+                        User.id.in_([u.id for u in users])
+                    )
+                )
+                .group_by(User.id)
+            )
+        ).all()
+        if current_semester_id
+        else None
+    )
+
+    user_permissions = {
+        user.id: await get_user_permissions(session, user.id)
+        for user in users
+    }
+
+    return [
+        UserNoHash(
+            id=user.id,
+            is_rpi_staff=user.is_rpi_staff,
+            RCSID=user.RCSID,
+            RIN=user.RIN,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            major=user.major,
+            gender_identity=user.gender_identity,
+            pronouns=user.pronouns,
+            permissions=user_permissions[user.id],
+            display_role=next((
+                    role.name 
+                    for role in user.roles 
+                    if role.display_role
+                ), 
+                ""
+            ),
+            is_graduating=user.is_graduating,
+            semester_balance=Decimal(
+                next(
+                    (balance.tuple()[1]
+                     for balance in semester_balances
+                     if balance.tuple()[0] == user.id),
+                    0.0
+                )
+                if semester_balances and len(semester_balances) > 0
+                else 0.0
+            ),
+        )
+        for user in users
+    ]
+
+
+@router.post("/users/role")
+async def change_user_role(
+    request: UserAddRoleRequest,
+    session: DBSession,
+    current_user: Annotated[
+        User, Depends(PermittedUserChecker({Permissions.CAN_CHANGE_USER_ROLES}))
+    ],
+):
+    """Assign or unassign a role for a user."""
+
+    user = await session.scalar(
+        select(User).where(User.id == request.user_id).options(selectinload(User.roles))
+    )
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User with provided ID not found",
+        )
+
+    role = await session.scalar(select(Role).where(Role.id == request.role_id))
+    if not role:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Role with provided ID not found",
+        )
+
+    if request.should_have_role:
+        if role not in user.roles:
+            user.roles.append(role)
+            session.add(user)
+            await session.commit()
+        return
+
+    if role in user.roles:
+        user.roles.remove(role)
+        session.add(user)
+        await session.commit()
 
 # GET ALL USERS
 

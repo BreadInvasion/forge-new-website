@@ -18,6 +18,8 @@ const Usages = lazy(() => import('./tabs/Usages'));
 const ComingSoon = lazy(() => import( '../Home/ComingSoon'));
 const Semesters = lazy(() => import('./tabs/Semesters'));
 const ChargeSheets = lazy(() => import('./tabs/ChargeSheets'));
+const Roles = lazy(() => import('./tabs/Roles'));
+const UserRoles = lazy(() => import('./tabs/UserRoles'));
 
 
 interface MyForgeProps {
@@ -48,9 +50,10 @@ const MyForge: React.FC = () => {
                         <Route path="resources" element={<Resources />} />
                         <Route path="resource_slots" element={<ResourceSlots />} />
                         <Route path="users" element={<Users />} />
+                        <Route path="roles" element={<Roles />} />
+                        <Route path="user_roles" element={<UserRoles />} />
                         <Route path="semesters" element={<Semesters />} />
                         <Route path="charge_sheets" element={<ChargeSheets />} />
-                        <Route path="change_config" element={<ComingSoon />} />
                     </Routes>
                 </Suspense>
             </div>

@@ -8,6 +8,7 @@ interface TableProps<T> {
     columns: (keyof T)[];
     data: T[];
     canEdit?: boolean;
+    canDelete?: boolean;
     onEdit?: (activeItem: T) => void;
     onDelete?: (index_local: number, index_real:number) => void;
     currentPage?: number;
@@ -54,14 +55,15 @@ export function TableHead<T>(props: TableHeadProps<T>) {
 }
 
 function Table<T>(props: TableProps<T>) {
-    const { columns, data, onDelete, onEdit, canEdit } = props;
+    const { columns, data, onDelete, onEdit, canEdit, canDelete } = props;
     const {
         currentPage: currentPageProp,
         onPageChange,
         resourceType
     } = props;
 
-    const hasEditOrDelete = !!(canEdit || onDelete);
+    const hasDelete = !!(canDelete && onDelete);
+    const hasEditOrDelete = !!(canEdit || hasDelete);
 
     const currentPage = currentPageProp ?? 1;
     const [hasNext, setHasNext] = useState(false);
@@ -156,7 +158,7 @@ function Table<T>(props: TableProps<T>) {
                                                 onClick={() => onEdit?.(row)}
                                             />
                                         )}
-                                        {onDelete && (
+                                        {hasDelete && (
                                             <TrashIcon
                                                 className="trash"
                                                 onClick={() => onDelete(rowIndex, rowIndex)}
