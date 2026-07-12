@@ -15,44 +15,46 @@ const colors = {
     white:     '#ffffff',
 };
 
-const mobile = '@media (max-width: 768px)';
-const tablet = '@media (max-width: 1300px) and (min-width: 769px)';
-
-type Variant = 'hero' | 'banner';
+const breakpoints = {
+    mobile:  '768px',
+    tablet:  '1300px',
+};
 
 export interface HeroBannerProps {
     title: React.ReactNode;
     subtitle?: React.ReactNode;
-    variant?: Variant;
+    variant?: 'hero' | 'banner';
     showAnvil?: boolean;
     className?: string;
 }
 
-const Root = styled.section<{ $variant: Variant }>`
+const Root = styled.section<{ $variant: 'hero' | 'banner' }>`
     position: relative;
     width: 100%;
     background: linear-gradient(to right, ${colors.red} 0%, ${colors.navyLight} 100%);
     overflow: hidden;
     flex-shrink: 0;
 
+    /* Hero: stretches to fill available height (minus navbar + footer) */
     ${p => p.$variant === 'hero' && `
         display: flex;
         align-items: stretch;
         flex: 1 1 auto;
         min-height: 0;
 
-        ${mobile} {
+        @media (max-width: ${breakpoints.mobile}) {
             flex-direction: column;
             min-height: 360px;
         }
     `}
 
+    /* Banner: fixed height, content centred vertically */
     ${p => p.$variant === 'banner' && `
         display: flex;
         align-items: center;
         min-height: clamp(160px, 20vw, 279px);
 
-        ${mobile} {
+        @media (max-width: ${breakpoints.mobile}) {
             min-height: clamp(140px, 40vw, 220px);
         }
     `}
@@ -72,7 +74,7 @@ const BackgroundPattern = styled.div`
 const MobileAnvilBackground = styled.div`
     display: none;
 
-    ${mobile} {
+    @media (max-width: ${breakpoints.mobile}) {
         display: block;
         position: absolute;
         inset: 0;
@@ -89,7 +91,7 @@ const MobileAnvilBackground = styled.div`
 const MobileBenchyScatter = styled.img`
     display: none;
 
-    ${mobile} {
+    @media (max-width: ${breakpoints.mobile}) {
         display: block;
         position: absolute;
         right: -18%;
@@ -101,12 +103,11 @@ const MobileBenchyScatter = styled.img`
         z-index: 2;
     }
 `;
-
-const ContentColumn = styled.div<{ $variant: Variant }>`
+const ContentColumn = styled.div<{ $variant: 'hero' | 'banner' }>`
     position: relative;
     z-index: 3;
 
-    ${p => p.$variant === 'hero' && `
+    ${(p: { $variant: 'hero' | 'banner' }) => p.$variant === 'hero' && `
         flex: 0 0 auto;
         width: min(477px, 45%);
         padding-left: clamp(80px, 9vw, 127px);
@@ -116,12 +117,12 @@ const ContentColumn = styled.div<{ $variant: Variant }>`
         justify-content: center;
         gap: clamp(40px, 8vh, 120px);
 
-        ${tablet} {
+        @media (max-width: ${breakpoints.tablet}) and (min-width: 769px) {
             flex-shrink: 0;
             width: min(540px, 48%);
         }
 
-        ${mobile} {
+        @media (max-width: ${breakpoints.mobile}) {
             width: 100%;
             padding: 50px 32px 180px 32px;
             align-items: flex-start;
@@ -139,7 +140,7 @@ const ContentColumn = styled.div<{ $variant: Variant }>`
         justify-content: space-between;
         gap: 40px;
 
-        ${mobile} {
+        @media (max-width: ${breakpoints.mobile}) {
             flex-direction: column;
             align-items: flex-start;
             padding: 32px 24px;
@@ -168,11 +169,11 @@ const DesktopImagePanel = styled.div`
         object-position: right center;
     }
 
-    ${tablet} {
+    @media (max-width: ${breakpoints.tablet}) and (min-width: 769px) {
         flex: 0 1 52%;
     }
 
-    ${mobile} {
+    @media (max-width: ${breakpoints.mobile}) {
         display: none;
     }
 `;
@@ -191,7 +192,7 @@ const BannerAnvilAccent = styled.div`
     pointer-events: none;
     z-index: 1;
 
-    ${mobile} {
+    @media (max-width: ${breakpoints.mobile}) {
         width: 55%;
         opacity: 0.12;
     }
