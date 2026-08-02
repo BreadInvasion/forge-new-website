@@ -48,11 +48,11 @@ class UserChangeNameRequest(BaseRequest):
 
 class UserChangePronounsRequest(BaseRequest):
     pronouns: PronounType
-
-
-class UserChangeDetailsRequest(BaseRequest):
-    major: str
     gender_identity: GenderStatsType
+
+
+class UserChangeMajorRequest(BaseRequest):
+    major: str
 
 
 class UserChangeRCSIDRequest(BaseRequest):
@@ -67,6 +67,11 @@ class UserChangeRINRequest(BaseRequest):
 
 class UserDeleteRequest(BaseRequest):
     target_RCSID: str
+
+
+class UserUpdateGraduationRequest(BaseRequest):
+    is_graduating: bool
+    checked_graduating: bool
 
 
 class ResourceUsage(BaseModel):

@@ -15,7 +15,7 @@ from models.machine_usage import MachineUsage
 from models.role import Role
 from models.user import User
 from schemas.enums import Permissions
-from schemas.requests import UserCreateRequest
+from schemas.requests import UserCreateRequest, UserUpdateGraduationRequest
 from schemas.responses import BasicUserResponse, UserNoHash
 
 from core.security import get_password_hash
@@ -287,6 +287,50 @@ async def get_all_users(
         )
         for user in users
     ]
+
+@router.post("/users/graduation")
+async def edit_user_graduation(
+    request: UserUpdateGraduationRequest,
+    session: DBSession,
+    current_user: Annotated[User, Depends(PermittedUserChecker(set()))],
+) -> UserNoHash:
+    """Update a user's graduation details."""
+
+    current_user.is_graduating = request.is_graduating
+    current_user.checked_graduating = request.checked_graduating
+
+    session.add(current_user)
+    await session.commit()
+    await session.refresh(current_user)
+
+    current_semester_id = await session.scalar(select(State.active_semester_id))
+    user_permissions = await get_user_permissions(session, current_user.id)
+    semester_balance = await get_semester_balance(
+        session, current_user.id, current_semester_id
+    )
+
+    return UserNoHash(
+        id=current_user.id,
+        is_rpi_staff=current_user.is_rpi_staff,
+        RCSID=current_user.RCSID,
+        RIN=current_user.RIN,
+        first_name=current_user.first_name,
+        last_name=current_user.last_name,
+        major=current_user.major,
+        gender_identity=current_user.gender_identity,
+        pronouns=current_user.pronouns,
+        permissions=user_permissions,
+        display_role=next((
+                role.name 
+                for role in current_user.roles 
+                if role.display_role
+            ), 
+            ""
+        ),
+        is_graduating=current_user.is_graduating,
+        checked_graduating=current_user.checked_graduating,
+        semester_balance=semester_balance,
+    )
 
 
 # GET ALL USERS
