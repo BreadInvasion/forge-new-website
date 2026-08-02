@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import useAuth from '../../Auth/useAuth';
+import * as Dialog from "@radix-ui/react-dialog";
 import { PieChart } from 'react-minimal-pie-chart';
 import {ReactComponent as DiscordIcon} from '../../../assets/img/discord-mark-blue.svg'; 
 import { MachineUsage } from 'src/interfaces';
@@ -8,11 +9,14 @@ import '../styles/Summary.scss';
 
 const Summary: React.FC = () => {
 
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
 
     const [currentUsage, setCurrentUsage] = React.useState<MachineUsage | null>(null);
     const [currentUsageCount, setCount] = useState<number>(0)
     const [machineUsages, setMachineUsages] = React.useState<MachineUsage[]>([]);
+    
+    const [showGraduationPrompt, setShowGraduationPrompt] = useState(false);
+    const graduationPromptHandled = useRef(false);
 
     const [costData, setCostData] = React.useState<ChartUsageData[]>([]);
     const [hoursData, setHoursData] = React.useState<ChartUsageData[]>([]);
@@ -21,6 +25,32 @@ const Summary: React.FC = () => {
         machine: string;
         usage: number;
     }
+
+    useEffect(() => {
+        if (graduationPromptHandled.current) return;
+        if (!user?.id || typeof user.checked_graduating !== "boolean") return;
+
+        graduationPromptHandled.current = true;
+
+        if (!user.checked_graduating) {
+            setShowGraduationPrompt(true);
+        }
+    }, [user.id, user.checked_graduating]);
+
+    const saveGraduationDetails = async (isGraduating: boolean) => {
+        setShowGraduationPrompt(false);
+        try {
+            const data = await OmniAPI.edit("users", "graduation", {
+                is_graduating: isGraduating,
+                checked_graduating: true,
+            });
+
+            setUser(data);
+            localStorage.setItem("user", JSON.stringify(data));
+        } catch (error) {
+            console.error("Error saving graduation details:", error);
+        }
+    };
 
     useEffect(() => {
         const getUsages = async () => {
@@ -102,6 +132,24 @@ const Summary: React.FC = () => {
 
     return (
         <div className='mf-flex-container' style={flexStyle}>
+            <Dialog.Root open={showGraduationPrompt} onOpenChange={setShowGraduationPrompt}>
+                <Dialog.Portal>
+                    <Dialog.Overlay className="AlertDialogOverlay" />
+                    <Dialog.Content className="AlertDialogContent" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+                        <Dialog.Title className="AlertDialogTitle">
+                            Are you graduating this semester?
+                        </Dialog.Title>
+                        <div className="mf-graduation-dialog-actions">
+                            <button className="Button" onClick={() => saveGraduationDetails(true)}>
+                                Yes
+                            </button>
+                            <button className="Button" onClick={() => saveGraduationDetails(false)}>
+                                No
+                            </button>
+                        </div>
+                    </Dialog.Content>
+                </Dialog.Portal>
+            </Dialog.Root>
             <div className='mf-flex-row' style={rowStyle} >
                 <DisplayObject id='cost' name='Semester Cost' semester_cost={user.semester_balance} />
                 <SingleObject id='current' name='Current Usage' value={currentUsage} count={currentUsageCount} /> 
