@@ -71,7 +71,6 @@ class UserDeleteRequest(BaseRequest):
 
 class UserUpdateGraduationRequest(BaseRequest):
     is_graduating: bool
-    checked_graduating: bool
 
 
 class ResourceUsage(BaseModel):

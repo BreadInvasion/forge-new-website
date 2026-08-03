@@ -60,7 +60,7 @@ async def main() -> None:
                 roles=[superuser_role],
                 is_rpi_staff=False,
                 is_graduating=False,
-                checked_graduating=True,
+                checked_graduating=None,
             )
 
             session.add(new_superuser)
@@ -85,7 +85,7 @@ async def main() -> None:
                 roles=[superuser_role],
                 is_rpi_staff=False,
                 is_graduating=False,
-                checked_graduating=True,
+                checked_graduating=None,
             )
 
             session.add(new_superuser)
@@ -110,7 +110,7 @@ async def main() -> None:
                 roles=[superuser_role],
                 is_rpi_staff=False,
                 is_graduating=False,
-                checked_graduating=True,
+                checked_graduating=None,
             )
 
             session.add(new_superuser)

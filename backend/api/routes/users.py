@@ -25,11 +25,11 @@ router = APIRouter()
 async def get_semester_balance(
     session: DBSession,
     user_id: UUID,
-    semester_id: str
+    semester_id: UUID | None,
 ) -> Decimal:
     """Calculate the semester balance for a user and semester."""
-    
-    if not semester_id:
+
+    if semester_id is None:
         return Decimal(0)
     
     semester_balance = (
@@ -76,7 +76,7 @@ async def register_user(
         pronouns=request.pronouns,
         is_rpi_staff=False,
         is_graduating=False,
-        checked_graduating=False,
+        checked_graduating=None,
         hashed_password=get_password_hash(request.password),
     )
     session.add(new_user)
@@ -297,13 +297,14 @@ async def edit_user_graduation(
     """Update a user's graduation details."""
 
     current_user.is_graduating = request.is_graduating
-    current_user.checked_graduating = request.checked_graduating
+
+    current_semester_id = await session.scalar(select(State.active_semester_id))
+    current_user.checked_graduating = current_semester_id
 
     session.add(current_user)
     await session.commit()
     await session.refresh(current_user)
 
-    current_semester_id = await session.scalar(select(State.active_semester_id))
     user_permissions = await get_user_permissions(session, current_user.id)
     semester_balance = await get_semester_balance(
         session, current_user.id, current_semester_id

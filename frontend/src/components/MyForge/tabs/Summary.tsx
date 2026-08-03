@@ -3,7 +3,7 @@ import useAuth from '../../Auth/useAuth';
 import * as Dialog from "@radix-ui/react-dialog";
 import { PieChart } from 'react-minimal-pie-chart';
 import {ReactComponent as DiscordIcon} from '../../../assets/img/discord-mark-blue.svg'; 
-import { MachineUsage } from 'src/interfaces';
+import { MachineUsage, Semester } from 'src/interfaces';
 import { OmniAPI } from "src/apis/OmniAPI";
 import '../styles/Summary.scss';
 
@@ -28,13 +28,19 @@ const Summary: React.FC = () => {
 
     useEffect(() => {
         if (graduationPromptHandled.current) return;
-        if (!user?.id || typeof user.checked_graduating !== "boolean") return;
+        if (!user?.id) return;
 
+        const checkGraduationStatus = async () => {
+            const currentSemester = await OmniAPI.get("semesters", "current").catch(() => null);
+
+            if (!currentSemester) return;
+
+            if (!user.checked_graduating || user.checked_graduating !== currentSemester.id) {
+                setShowGraduationPrompt(true);
+            }
+        };
+        checkGraduationStatus();
         graduationPromptHandled.current = true;
-
-        if (!user.checked_graduating) {
-            setShowGraduationPrompt(true);
-        }
     }, [user.id, user.checked_graduating]);
 
     const saveGraduationDetails = async (isGraduating: boolean) => {
@@ -42,7 +48,6 @@ const Summary: React.FC = () => {
         try {
             const data = await OmniAPI.edit("users", "graduation", {
                 is_graduating: isGraduating,
-                checked_graduating: true,
             });
 
             setUser(data);
