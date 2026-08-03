@@ -258,6 +258,7 @@ class RoleDeleteRequest(BaseRequest):
 class UserAddRoleRequest(BaseRequest):
     user_id: UUID4
     role_id: UUID4
+    should_have_role: bool
 
 
 class OrgCreateRequest(BaseRequest):
