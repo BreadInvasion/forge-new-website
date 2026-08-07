@@ -10,6 +10,7 @@ import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { userState } from "src/GlobalAtoms";
 import { AuthAPI } from "src/apis/AuthAPI";
 import { User } from "src/interfaces";
+import { UserPermission } from 'src/enums';
 
 import "./Auth.css"
 
@@ -21,6 +22,7 @@ interface AuthContextType {
     setAuth: (value: boolean) => void;
     setUser: (value: User) => void;
     logout: () => void;
+    hasPermission: (permission: UserPermission) => boolean;
 }
 
 const LOGOUT_TIME_LIMIT = 5;    // minutes user can stay logged in
@@ -91,7 +93,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 const result = await response.data;
 
                 const token = result.access_token;
-                const expiration = Math.floor(Date.now() / 1000) + LOGOUT_TIME_LIMIT * 60; 
+                const expiration = Math.floor(Date.now() / 1000) + LOGOUT_TIME_LIMIT * 60;
 
                 setAuth(true);
                 localStorage.setItem('authToken', token);
@@ -226,6 +228,14 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         logout();
     }, [logoutTimerId, logout]);
 
+
+    // -------------------------
+    //   PERMISSIONS HELPER FUNCTION
+    // -------------------------
+    const hasPermission = (permission: UserPermission) => (
+        user.permissions.includes(permission) || user.permissions.includes(UserPermission.IS_SUPERUSER)
+    );
+
     return (
         <AuthContext.Provider
             value={{
@@ -235,10 +245,11 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 setAuth,
                 setUser,
                 logout,
+                hasPermission,
             }}
         >
             {/*
-                Radix AlertDialog that opens automatically (no <AlertDialog.Trigger>) 
+                Radix AlertDialog that opens automatically (no <AlertDialog.Trigger>)
                 Because we control `open` state ourselves.
             */}
             <AlertDialog.Root
@@ -261,9 +272,9 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                             logged in?`}
                         </AlertDialog.Description>
                         <div style={{ display: "flex", gap: 25, justifyContent: "flex-end" }}>
-                            {/* 
+                            {/*
                                 "Cancel" = STAY LOGGED IN
-                                Radix will call "onOpenChange(false)" automatically. 
+                                Radix will call "onOpenChange(false)" automatically.
                             */}
                             <AlertDialog.Cancel asChild>
                                 <button className="Button" onClick={(e) => {

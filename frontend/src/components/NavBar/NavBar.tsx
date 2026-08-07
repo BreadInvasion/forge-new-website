@@ -13,18 +13,12 @@ import forgeLogoUrl from 'src/assets/img/logo.svg?url';
 import './styles/UserMenu.scss';
 import './styles/NavBar.scss';
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
 interface NavBarProps {
     user: User;
     setAuth: (value: boolean) => void;
     isAuthed: boolean;
 }
 
-// ---------------------------------------------------------------------------
-// User menu (sign-in / signed-in dropdown) — unchanged logic
-// ---------------------------------------------------------------------------
 const UserMenu: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
     const setDefaultUser = useResetRecoilState(userState);
 
@@ -36,72 +30,45 @@ const UserMenu: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
         setDefaultUser();
     };
 
-    if (isAuthed) {
-        return (
-            <NavMenu.Item className="user-item">
-                <NavMenu.Trigger className="user-trigger">
-                    <Avatar.default user={user} isNav={true} />
-                    {user.RCSID} <CaretDownIcon className="caret-down dropdown-spinner" aria-hidden />
-                </NavMenu.Trigger>
-                <NavMenu.Content className="user-content">
-                    <NavMenu.Link className="link" href="/myforge">Summary</NavMenu.Link>
-                    <NavMenu.Link className="link" href="/" onSelect={() => onSignOut()}>Logout</NavMenu.Link>
-                </NavMenu.Content>
-            </NavMenu.Item>
-        );
-    }
-
-    return (
+    if (isAuthed) { return (
+        <NavMenu.Item className="user-item">
+            <NavMenu.Trigger className="user-trigger">
+                <Avatar.default user={user} isNav={true} />
+                {user.RCSID} <CaretDownIcon className="caret-down dropdown-spinner" aria-hidden />
+            </NavMenu.Trigger>
+            <NavMenu.Content className="user-content">
+                <NavMenu.Link className="link" href="/myforge">Summary</NavMenu.Link>
+                <NavMenu.Link className="link" href="/" onSelect={() => onSignOut()}>Logout</NavMenu.Link>
+            </NavMenu.Content>
+        </NavMenu.Item>
+    )} else { return (
         <NavMenu.Item className="sign-in-button">
             <NavMenu.Link className="link" href="/login">Sign In</NavMenu.Link>
         </NavMenu.Item>
-    );
+    )}
 };
 
-// ---------------------------------------------------------------------------
-// NavBar
-// ---------------------------------------------------------------------------
 export const NavBar: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
     return (
         <NavMenu.Root className="nav-menu-root" delayDuration={1000}>
 
-            {/* ── Left: Branding ─────────────────────────────────────── */}
             <NavMenu.Link className="logo-link" href="/">
-                {/* RPI Engineering lockup */}
-                <img
-                    className="nav-rpi-lockup"
-                    src={forgeLockupUrl}
-                    alt="RPI Engineering lockup"
-                />
-                {/* Vertical separator */}
+                <img className="nav-rpi-lockup" src={forgeLockupUrl} alt="RPI Engineering lockup" />
                 <div className="nav-brand-separator" aria-hidden="true" />
-
-                {/* Forge logo */}
-                <img
-                    className="nav-forge-sticker"
-                    src={forgeLogoUrl}
-                    alt="The Forge logo"
-                />
-
-                {/* Wordmark */}
+                <img className="nav-forge-sticker" src={forgeLogoUrl} alt="The Forge logo" />
                 <div className="logo-text">THE FORGE&nbsp;|&nbsp;The MILL</div>
             </NavMenu.Link>
 
-            {/* ── Right: Links ────────────────────────────────────────── */}
             <NavMenu.List className="nav-menu-list">
-
                 <NavMenu.Item className="list-item">
                     <NavMenu.Link className="link" href="/getting-started">Create</NavMenu.Link>
                 </NavMenu.Item>
-
                 <NavMenu.Item className="list-item">
                     <NavMenu.Link className="link" href="/status">Status</NavMenu.Link>
                 </NavMenu.Item>
-
                 <NavMenu.Item className="list-item">
                     <NavMenu.Link className="link" href="/hours">Hours</NavMenu.Link>
                 </NavMenu.Item>
-
                 <NavMenu.Item className="user-item">
                     <NavMenu.Trigger className="user-trigger">
                         FAQ <CaretDownIcon className="caret-down dropdown-spinner" aria-hidden />
@@ -121,7 +88,6 @@ export const NavBar: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
 
                 <Hamburger.default showAdmin={isAuthed && isAdmin(user)} />
 
-                {/* Vertical divider before Sign In */}
                 <div className="separator horizontal" />
 
                 <UserMenu user={user} setAuth={setAuth} isAuthed={isAuthed} />

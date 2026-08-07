@@ -1,7 +1,6 @@
 @use "./NavBar.variables.scss" as nav;
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
-/* Base NavMenu Children */
 .nav-menu-root {
     display: flex;
     justify-content: right;
@@ -14,7 +13,10 @@
     background-color: nav.$base-color;
 }
 
-/* ── Figma branding elements ──────────────────────────────────────── */
+.nav-menu-root > div {
+    overflow: visible;
+}
+
 .nav-rpi-lockup {
     height: 30px;
     width: auto;
@@ -42,6 +44,21 @@
     position: relative;
 }
 
+.logo-link {
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    gap: .75rem;
+    text-decoration: none;
+    background-color: transparent;
+    padding: 0.75rem 1rem;
+    position: absolute;
+    left: 0;
+    min-width: 18rem;
+    width: fit-content;
+    z-index: 1;
+}
+
 .logo-text {
     font-family: 'Funnel Display', 'Montserrat', sans-serif;
     font-weight: 700;
@@ -51,10 +68,6 @@
     letter-spacing: 0.02em;
     top: 5px;
     position: relative;
-}
-
-.nav-menu-root > div {
-    overflow: visible;
 }
 
 .nav-menu-list {
@@ -67,14 +80,9 @@
     list-style: none;
     padding: 0.75rem 1.75rem;
 
-    /* On desktop, right-align the menu items so they can't bleed back into
-       the absolutely-positioned `.logo-link` on the left. With many items
-       (e.g. a signed-in admin: Create / Status / Hours / FAQ / Admin /
-       RCSID dropdown) `justify-content: center` was pushing the leftmost
-       links under the logo on wider viewports like the 1920x1080 Forge TV. */
     @media (min-width: nav.$mobile-breakpoint) {
         justify-content: flex-end;
-        padding-left: 20rem; /* reserve at least the logo's min-width (18rem) + breathing room */
+        padding-left: 20rem;
     }
 }
 
@@ -108,6 +116,7 @@
     color: inherit;
     cursor: pointer;
 }
+
 .nav-menu-trigger[data-state="open"] {
     background-color: nav.$highlight-color;
 }
@@ -124,27 +133,6 @@
     transition-duration: nav.$hover-transition-speed;
 }
 
-.forge-logo {
-    height: 100%;
-}
-
-.logo-link {
-    display: flex;
-    justify-content: left;
-    align-items: left;
-    gap: .75rem;
-    text-decoration: none;
-    background-color: transparent;
-    padding: 0.75rem 1rem;
-    position: absolute;
-    left: 0;
-    min-width: 18rem;
-    width: fit-content;
-    z-index: 1;
-}
-
-/* .logo-text is defined above alongside the Figma branding block */
-
 .nav-menu-content {
     position: absolute;
     top: 100%;
@@ -160,6 +148,7 @@
     box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
     transition: width, height, 250ms ease;
 }
+
 .nav-menu-content[data-state="open"] {
     animation: scale-in 200ms ease;
 }
@@ -168,25 +157,6 @@
     background-color: nav.$popup-highlight;
 }
 
-
-.indicator {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    height: 10px;
-    overflow: hidden;
-    top: 100%;
-    margin-top: -10px;
-    z-index: 1;
-    transition: width, transform 250ms ease;
-}
-.indicator[data-state="visible"] {
-    animation: fade-in 200ms ease;
-}
-.indicator[data-state="hidden"] {
-    animation: fade-out 200ms ease;
-}
-/* Sign In Button/Dropdown */
 .sign-in-button {
     display: flex;
     align-items: center;
@@ -198,13 +168,12 @@
     cursor: pointer;
     overflow: visible;
     white-space: nowrap;
-
 }
+
 .sign-in-button:hover {
     background-color: nav.$highlight-color;
 }
 
-/* Other Components */
 .caret-down, .hamburger-icon {
     color: nav.$text-color;
     transition: nav.$layout-transition-speed ease;
@@ -227,7 +196,7 @@
     height: 20pt;
 }
 
-.user-trigger[data-state="open"] .dropdown-spinner{
+.user-trigger[data-state="open"] .dropdown-spinner {
     transform: rotate(-180deg);
 }
 
@@ -237,9 +206,11 @@
     scale: 1.5;
     animation: rotate-out 250ms ease;
 }
+
 .caret-right[data-state="true"] {
     transform: rotate(-180deg);
 }
+
 .caret-right[data-state="false"] {
     transform: rotate(-90deg);
 }
@@ -252,6 +223,7 @@
     width: 100%;
     margin-left: -1.5rem;
 }
+
 .separator.horizontal {
     height: 100%;
     width: 2px;
@@ -270,6 +242,7 @@
     justify-content: space-between;
     border-radius: 4px;
 }
+
 .text:hover {
     background-color: nav.$highlight-color;
 }
@@ -288,6 +261,7 @@
     padding: 0.25rem 0.5rem;
     cursor: pointer;
 }
+
 .tag:hover {
     background-color: nav.$highlight-color;
 }
@@ -341,14 +315,6 @@
     width: 100%;
 }
 
-/* ── Intermediate desktop (900–1300px) ─────────────────────────────────────
-   The full logo (RPI lockup + separator + sticker + wordmark) is ~400px wide
-   but the nav list only reserves 20rem (320px) of left padding, causing the
-   first nav link to overlap the wordmark at ~1030px. At this range we shrink
-   the logo proportionally (smaller images + smaller text + tighter gap) and
-   bump padding-left so there's no overlap — while keeping the wordmark visible
-   for large-TV viewports that fall in this range.
-   ────────────────────────────────────────────────────────────────────────── */
 @media screen and (nav.$mobile-breakpoint <= width < 1300px) {
     .logo-text {
         font-size: 0.8rem;
@@ -371,7 +337,6 @@
 }
 
 @media screen and (width < nav.$mobile-breakpoint) {
-    /* Figma mobile navbar: 56px */
     .nav-menu-root {
         min-height: 56px;
         max-height: 56px;
@@ -383,19 +348,15 @@
     .nav-brand-separator {
         height: 28px;
     }
-    /* Hide all nav links and dropdowns on mobile */
     .list-item {
         display: none;
     }
-    /* Hide FAQ dropdown + auth avatar; keep only the hamburger user-item */
     .user-item:not(:has(.hamburger-icon)) {
         display: none;
     }
-    /* Hide wordmark — logo images are enough at small sizes */
     .logo-text {
         display: none;
     }
-    /* Show the hamburger trigger */
     .hamburger-icon {
         transform: translate(0);
         margin-right: .2rem;
@@ -412,16 +373,13 @@
         opacity: 1;
         z-index: 999;
     }
-    /* Move separator flush left since logo-text is gone */
     .separator {
         margin-left: 0;
     }
-    /* Shrink the logo area so it doesn't eat the full navbar width */
     .logo-link {
         min-width: unset;
         gap: 0.5rem;
     }
-    /* Keep sign-in legible */
     .sign-in-button .link {
         font-size: 1rem;
         padding: 0.25rem 0.4rem;
