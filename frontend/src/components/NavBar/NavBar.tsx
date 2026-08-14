@@ -100,7 +100,7 @@ export const NavBar: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
             Hours
           </NavMenu.Link>
         </NavMenu.Item>
-        <NavMenu.Item className="user-item">
+        <NavMenu.Item className="user-item nav-faq-item">
           <NavMenu.Trigger className="user-trigger">
             FAQ{" "}
             <CaretDownIcon
