@@ -6,7 +6,7 @@ import * as NavMenu from "@radix-ui/react-navigation-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import * as Avatar from "../MyForge/components/Avatar";
 import * as Hamburger from "./Hamburger";
-import { isAdmin } from "../Auth/roleUtils";
+import { UserPermission } from "src/enums";
 import forgeLockupUrl from "../../assets/img/RPI_Lockup_Eng_Sm.svg?url";
 import forgeLogoUrl from "src/assets/img/logo.svg?url";
 import "./styles/UserMenu.scss";
@@ -55,6 +55,12 @@ const UserMenu: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
       </NavMenu.Item>
     );
   }
+};
+
+const isAdmin = (user: User): boolean => {
+  const role = (user?.display_role || "").toLowerCase();
+  if (role === "admin" || role === "super_admin" || role === "superadmin") return true;
+  return Array.isArray(user?.permissions) && user.permissions.includes(UserPermission.IS_SUPERUSER);
 };
 
 export const NavBar: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
