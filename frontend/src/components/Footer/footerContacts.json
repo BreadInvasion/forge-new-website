@@ -1,0 +1,34 @@
+[
+    {
+        "label": "Director",
+        "name": "Sam Chiappone",
+        "role": "Director, Manufacturing Innovation",
+        "email": "chiaps@rpi.edu",
+        "phone": "518-276-8295",
+        "location": "JEC 3100A"
+    },
+    {
+        "label": "Lab Manager",
+        "name": "Larry Oligny",
+        "role": "Manufacturing Innovation Learning Lab Manager",
+        "email": "olignl2@rpi.edu",
+        "phone": "518-276-6078",
+        "location": "CII 2037"
+    },
+    {
+        "label": "Academic Support",
+        "name": "Scott Yerbury",
+        "role": "Senior Academic Support Technician",
+        "email": "yerbus@rpi.edu",
+        "phone": "518-276-8290",
+        "location": "JEC 3004/3018, 3rd Fl"
+    },
+    {
+        "label": "Advisor",
+        "name": "Sal Ferrara",
+        "role": null,
+        "email": "ferras6@rpi.edu",
+        "phone": null,
+        "location": "CII 2037"
+    }
+]

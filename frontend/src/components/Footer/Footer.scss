@@ -1,7 +1,7 @@
 .footer {
   position: relative;
   width: 100%;
-  background: #111c36;
+  background: var(--color-navy);
   flex-shrink: 0;
 
   &::before {
@@ -11,7 +11,7 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: #a51c1c;
+    background: var(--color-red);
   }
 }
 
@@ -57,7 +57,7 @@
   font-size: 11px;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: #a51c1c;
+  color: var(--color-red);
   margin: 0 0 6px 0;
 }
 
@@ -65,7 +65,7 @@
   font-family: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 15px;
-  color: #ffffff;
+  color: var(--color-white);
   margin: 0 0 2px 0;
 }
 
@@ -73,7 +73,7 @@
   font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   font-size: 12px;
-  color: #7a90aa;
+  color: var(--color-steel-blue);
   margin: 0;
   line-height: 1.7;
 }
@@ -82,7 +82,7 @@
   font-family: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 13px;
-  color: #e8edf5;
+  color: var(--color-ice);
   margin: 0 0 1px 0;
 }
 
@@ -90,7 +90,7 @@
   font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   font-size: 11px;
-  color: #7a90aa;
+  color: var(--color-steel-blue);
   margin: 0 0 6px 0;
   line-height: 1.4;
 }
@@ -99,7 +99,7 @@
   font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   font-size: 11px;
-  color: #7a90aa;
+  color: var(--color-steel-blue);
   margin: 0;
   line-height: 1.7;
 }
@@ -108,17 +108,17 @@
   font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   font-size: 11px;
-  color: #7a90aa;
+  color: var(--color-steel-blue);
   text-decoration: none;
   line-height: 1.7;
 
   &:hover {
-    color: #ffffff;
+    color: var(--color-white);
     text-decoration: underline;
   }
 
   &:focus-visible {
-    outline: 2px solid #a51c1c;
+    outline: 2px solid var(--color-red);
     outline-offset: 2px;
     border-radius: 2px;
   }
@@ -128,17 +128,17 @@
   font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   font-size: 12px;
-  color: #7a90aa;
+  color: var(--color-steel-blue);
   text-decoration: none;
   line-height: 1.9;
 
   &:hover {
-    color: #ffffff;
+    color: var(--color-white);
     text-decoration: underline;
   }
 
   &:focus-visible {
-    outline: 2px solid #a51c1c;
+    outline: 2px solid var(--color-red);
     outline-offset: 2px;
     border-radius: 2px;
   }
@@ -157,7 +157,7 @@
 }
 
 .footer-bottom {
-  border-top: 1px solid #1e2d4a;
+  border-top: 1px solid var(--color-navy-border);
   padding: 10px 40px;
   display: flex;
   align-items: center;
@@ -174,6 +174,6 @@
 .footer-copyright {
   font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
   font-size: 11px;
-  color: #2e3f5c;
+  color: var(--color-steel-blue);
   margin: 0;
 }

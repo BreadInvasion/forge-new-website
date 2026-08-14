@@ -8,11 +8,11 @@ import mobileBenchysImg from '../../assets/img/mobile_benchys.png';
 import PageRuler from './PageRuler';
 
 const colors = {
-    navy:      '#111c36',
-    navyMid:   '#2d4a80',
-    navyLight: '#31519c',
-    red:       '#a51c1c',
-    white:     '#ffffff',
+    navy:      'var(--color-navy)',
+    navyMid:   'var(--color-navy-mid)',
+    navyLight: 'var(--color-navy-light)',
+    red:       'var(--color-red)',
+    white:     'var(--color-white)',
 };
 
 const breakpoints = {

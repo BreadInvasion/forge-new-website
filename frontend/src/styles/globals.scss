@@ -27,6 +27,18 @@
   --color-white:        #ffffff;
   --color-black:        #000000;
 
+  // Dark-background (navy footer) text/border variants
+  --color-navy-border:  #1e2d4a;
+  --color-ice:          #e8edf5;
+  --color-steel-blue:   #7a90aa;
+
+  // NavBar hover/highlight variants
+  --color-nav-highlight: #f0f4fa;
+  --color-nav-border:    #e0e0e0;
+
+  // Data table body text
+  --color-table-text:   #4a6080;
+
   // ---------------------------------------------------------------------------
   // Typography — font families
   // ---------------------------------------------------------------------------
@@ -236,7 +248,7 @@
     font-family: var(--font-display), 'Funnel Display', 'Noto Sans', sans-serif;
     font-weight: 600;
     font-size: 16px;
-    color: #4a6080;
+    color: var(--color-table-text);
     padding: 14px 16px;
     vertical-align: middle;
     white-space: nowrap;

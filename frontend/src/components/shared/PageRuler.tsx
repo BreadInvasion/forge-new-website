@@ -56,7 +56,7 @@ const Strip = styled.div<{
 const PageRuler: React.FC<PageRulerProps> = ({
   src,
   side = 'left',
-  color = '#a51c1c',
+  color = 'var(--color-red)',
   width = 77,
   tilePitch = 74.5514,
   phaseOffset = 0,

@@ -1,5 +1,9 @@
 import React from 'react';
 import './Footer.scss';
+import footerContacts from './footerContacts.json';
+
+// Converts "518-276-8295" -> "+15182768295" for tel: links
+const toTelHref = (phone: string) => `tel:+1${phone.replace(/\D/g, '')}`;
 
 export default function Footer() {
     return (
@@ -27,43 +31,21 @@ export default function Footer() {
                     </a>
                 </div>
 
-                {/* ── Contact: Sam Chiappone ── */}
-                <div className="footer-col">
-                    <h3 className="footer-col-label">Director</h3>
-                    <p className="footer-contact-name">Sam Chiappone</p>
-                    <p className="footer-contact-role">Director, Manufacturing Innovation</p>
-                    <a className="footer-link" href="mailto:chiaps@rpi.edu">chiaps@rpi.edu</a>
-                    <a className="footer-link" href="tel:+15182768295">518-276-8295</a>
-                    <p className="footer-contact-line">JEC 3100A</p>
-                </div>
-
-                {/* ── Contact: Larry Oligny ── */}
-                <div className="footer-col">
-                    <h3 className="footer-col-label">Lab Manager</h3>
-                    <p className="footer-contact-name">Larry Oligny</p>
-                    <p className="footer-contact-role">Manufacturing Innovation Learning Lab Manager</p>
-                    <a className="footer-link" href="mailto:olignl2@rpi.edu">olignl2@rpi.edu</a>
-                    <a className="footer-link" href="tel:+15182766078">518-276-6078</a>
-                    <p className="footer-contact-line">CII 2037</p>
-                </div>
-
-                {/* ── Contact: Scott Yerbury ── */}
-                <div className="footer-col">
-                    <h3 className="footer-col-label">Academic Support</h3>
-                    <p className="footer-contact-name">Scott Yerbury</p>
-                    <p className="footer-contact-role">Senior Academic Support Technician</p>
-                    <a className="footer-link" href="mailto:yerbus@rpi.edu">yerbus@rpi.edu</a>
-                    <a className="footer-link" href="tel:+15182768290">518-276-8290</a>
-                    <p className="footer-contact-line">JEC 3004/3018, 3rd Fl</p>
-                </div>
-
-                {/* ── Contact: Sal Ferrara ── */}
-                <div className="footer-col">
-                    <h3 className="footer-col-label">Advisor</h3>
-                    <p className="footer-contact-name">Sal Ferrara</p>
-                    <a className="footer-link" href="mailto:ferras6@rpi.edu">ferras6@rpi.edu</a>
-                    <p className="footer-contact-line">CII 2037</p>
-                </div>
+                {/* ── Contacts ── */}
+                {footerContacts.map((contact) => (
+                    <div className="footer-col" key={contact.name}>
+                        <h3 className="footer-col-label">{contact.label}</h3>
+                        <p className="footer-contact-name">{contact.name}</p>
+                        {contact.role && (
+                            <p className="footer-contact-role">{contact.role}</p>
+                        )}
+                        <a className="footer-link" href={`mailto:${contact.email}`}>{contact.email}</a>
+                        {contact.phone && (
+                            <a className="footer-link" href={toTelHref(contact.phone)}>{contact.phone}</a>
+                        )}
+                        <p className="footer-contact-line">{contact.location}</p>
+                    </div>
+                ))}
 
                 {/* ── Links ── */}
                 <div className="footer-col">

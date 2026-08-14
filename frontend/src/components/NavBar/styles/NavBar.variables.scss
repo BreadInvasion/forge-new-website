@@ -1,12 +1,12 @@
 /* Variables — updated to match Figma "The Forge | The MILL" design */
-$base-color: #ffffff;
-$highlight-color: #f0f4fa;
-$border-color: #e0e0e0;
-$text-color: #2d4a80;
+$base-color: var(--color-white);
+$highlight-color: var(--color-nav-highlight);
+$border-color: var(--color-nav-border);
+$text-color: var(--color-navy-mid);
 
-$popup-text: #2d4a80;
-$popup-color: #ffffff;
-$popup-highlight: #f0f4fa;
+$popup-text: var(--color-navy-mid);
+$popup-color: var(--color-white);
+$popup-highlight: var(--color-nav-highlight);
 
 $mobile-breakpoint: 900px;
 
