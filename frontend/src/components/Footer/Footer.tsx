@@ -1,56 +1,94 @@
-import React from 'react';
-import { styled } from 'styled-components';
-import { InstagramLogoIcon, EnvelopeOpenIcon } from '@radix-ui/react-icons';
-import { ReactComponent as FacebookLogoIcon } from 'src/assets/img/nav-icon2.svg';
+import React from "react";
+import "./Footer.scss";
+import footerContacts from "./footerContacts.json";
 
-const Container = styled.div`
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    padding-bottom: 15px;
-    padding-right: 50px;
-    display: flex;
-    flex-direction: row;
-
-    @media (max-width: 450px) {
-        display: none;
-    }
-`;
-
-const IconContainer = styled.a`
-    margin: 0 0.25rem;
-    cursor: pointer;
-    color: #000;
-    background-color: transparent;
-    width: fit-content;
-    height: fit-content;
-    display: flex;
-    line-height: 0;
-    justify-content: center;
-    align-items: center;
-
-    svg {
-        width: 30px;
-        height: 30px;
-    }
-`;
-
-
+// Converts "518-276-8295" -> "+15182768295" for tel: links
+const toTelHref = (phone: string) => `tel:+1${phone.replace(/\D/g, "")}`;
 
 export default function Footer() {
+  return (
+    <footer className="footer">
+      <div className="footer-inner">
+        {/* ── Brand ── */}
+        <div className="footer-col">
+          <h3 className="footer-col-label">The Forge</h3>
+          <p className="footer-brand-title">
+            THE FORGE | THE MILL<br></br>Rensselaer Polytechnic Institute
+            <br></br>School of Engineering
+          </p>
+          <p className="footer-brand-sub" style={{ marginTop: 6 }}>
+            George M. Low Center for Industrial
+            <br />
+            Innovation (CII), Room 2037A
+          </p>
+          <a
+            className="footer-link"
+            href="https://maps.google.com/?q=110+8th+St,+Troy,+NY+12180"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ marginTop: 2 }}
+          >
+            110 8th St, Troy, NY 12180
+            <span className="footer-visually-hidden"> (opens in new tab)</span>
+          </a>
+        </div>
 
-    return (
-        <Container>
-            <IconContainer href="https://www.facebook.com/RPIMakerSpace/" target='_blank'>
-                <FacebookLogoIcon />
-            </IconContainer>
-            <IconContainer href="https://www.instagram.com/the_forge_rpi/" target='_blank'>
-                <InstagramLogoIcon />
-            </IconContainer>
-            <IconContainer href="mailto:theforge@rpi.edu" target='_blank'>
-                <EnvelopeOpenIcon />
-            </IconContainer>
-        </Container>
-    );
-    
+        {/* ── Contacts ── */}
+        {footerContacts.map((contact) => (
+          <div className="footer-col" key={contact.name}>
+            <h3 className="footer-col-label">{contact.label}</h3>
+            <p className="footer-contact-name">{contact.name}</p>
+            {contact.role && (
+              <p className="footer-contact-role">{contact.role}</p>
+            )}
+            <a className="footer-link" href={`mailto:${contact.email}`}>
+              {contact.email}
+            </a>
+            {contact.phone && (
+              <a className="footer-link" href={toTelHref(contact.phone)}>
+                {contact.phone}
+              </a>
+            )}
+            <p className="footer-contact-line">{contact.location}</p>
+          </div>
+        ))}
+
+        {/* ── Links ── */}
+        <div className="footer-col">
+          <h3 className="footer-col-label">Links</h3>
+          <a className="footer-nav-link" href="/hours">
+            Hours of Operation
+          </a>
+          <a
+            className="footer-nav-link"
+            href="https://discord.gg/WdJzzyXyWu"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Join our Discord
+            <span className="footer-visually-hidden"> (opens in new tab)</span>
+          </a>
+          <a
+            className="footer-nav-link"
+            href="https://manufacturing.eng.rpi.edu/facilities/forge"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Manufacturing Network
+            <span className="footer-visually-hidden"> (opens in new tab)</span>
+          </a>
+        </div>
+      </div>
+
+      <div className="footer-bottom">
+        <p className="footer-copyright">
+          © {new Date().getFullYear()} The Forge — Rensselaer Polytechnic
+          Institute
+        </p>
+        <p className="footer-copyright">
+          School of Engineering · Manufacturing Innovation
+        </p>
+      </div>
+    </footer>
+  );
 }
