@@ -57,10 +57,14 @@ const UserMenu: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
   }
 };
 
+const ADMIN_PERMISSIONS = Object.values(UserPermission).filter(
+  (p) => p !== UserPermission.IS_SUPERUSER
+);
+
 const isAdmin = (user: User): boolean => {
-  const role = (user?.display_role || "").toLowerCase();
-  if (role === "admin" || role === "super_admin" || role === "superadmin") return true;
-  return Array.isArray(user?.permissions) && user.permissions.includes(UserPermission.IS_SUPERUSER);
+  if (!Array.isArray(user?.permissions)) return false;
+  if (user.permissions.includes(UserPermission.IS_SUPERUSER)) return true;
+  return ADMIN_PERMISSIONS.every((p) => user.permissions.includes(p));
 };
 
 export const NavBar: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
