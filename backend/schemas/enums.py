@@ -20,6 +20,11 @@ class PronounType(StrEnum):
     JUST_USE_MY_NAME = "use_name"
 
 
+class TokenType(StrEnum):
+    EMAIL_VERIFICATION = "email_verification"
+    PASSWORD_RESET = "password_reset"
+
+
 class OrgRole(Enum):
     MEMBER = 0
     OFFICER = 1
