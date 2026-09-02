@@ -50,7 +50,7 @@ async def send_email(email, token, token_type):
     return VerificationTokenResponse(token_type=token_type, success=True)
 
 
-@router.post("/auth/email-verification/{token}")
+@router.post("/email-verification/{token}")
 async def verify_email_token(
     token: str, 
     session: DBSession,
@@ -86,7 +86,7 @@ async def verify_email_token(
     return VerificationTokenResponse(token_type=TokenType.EMAIL_VERIFICATION, success=True)
 
 
-@router.get("/auth/email-verification/{token}")
+@router.get("/email-verification/{token}")
 async def get_email_verification(
     token: str,
     session: DBSession,
@@ -119,7 +119,7 @@ async def get_email_verification(
     return VerificationTokenResponse(token_type=TokenType.EMAIL_VERIFICATION, success=True)
 
 
-@router.post("/auth/verification")
+@router.post("/verification")
 async def create_verification_token(
     session: DBSession,
     request: VerificationTokenRequest,

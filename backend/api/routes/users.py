@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import ScalarSelect, and_, func, or_, select
 from sqlalchemy.orm import selectinload, InstrumentedAttribute
 
@@ -11,14 +11,17 @@ from models.state import State
 from ..deps import DBSession, PermittedUserChecker
 from ..utils import get_user_permissions
 
+from models.audit_log import AuditLog
 from models.machine_usage import MachineUsage
+from models.auth_token import AuthToken
 from models.role import Role
 from models.user import User
-from schemas.enums import Permissions
-from schemas.requests import UserCreateRequest
+from schemas.enums import LogType, Permissions, TokenType
+from schemas.requests import UserCreateRequest, VerificationTokenRequest
 from schemas.responses import BasicUserResponse, UserNoHash
 
 from core.security import get_password_hash
+from .verifications import create_verification_token
 
 router = APIRouter()
 
@@ -56,7 +59,7 @@ async def get_semester_balance(
 async def register_user(
     request: UserCreateRequest, session: DBSession
 ) -> BasicUserResponse:
-    """Register a new Forge user."""
+    """Register a new Forge user and send verification email."""
 
     conflicting_users = await session.scalar(
         select(User).where(or_(User.RCSID == request.RCSID, User.RIN == request.RIN))
@@ -80,8 +83,26 @@ async def register_user(
         hashed_password=get_password_hash(request.password),
     )
     session.add(new_user)
+
+    audit_log = AuditLog(
+        type=LogType.USER_CREATED,
+        content={
+            "user_id": str(new_user.id),
+            "user_rcsid": new_user.RCSID,
+            "props": request.model_dump(mode="json"),
+        },
+    )
+    session.add(audit_log)
+
     await session.commit()
     await session.refresh(new_user)
+
+    try:
+        verification_request = VerificationTokenRequest(tokenType=TokenType.EMAIL_VERIFICATION)
+        await create_verification_token(session, verification_request, current_user=new_user)
+    except Exception as e:
+        print("Failed email")
+
     return BasicUserResponse.model_validate(
         new_user, strict=False, from_attributes=True
     )

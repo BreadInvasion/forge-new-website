@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { CheckboxInput, DropdownInput, Form, TextInput } from './Form';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../Auth/useAuth';
+import { OmniAPI } from '../../apis/OmniAPI';
 // import { ReactComponent as Logo } from 'logo.svg';
 
 import './styles/Form.scss';
@@ -116,37 +117,24 @@ export default function Register() {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/api/signup', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    "RCSID": formValues["rcsid"],
-                    "RIN": formValues["rin"],
-                    "first_name": formValues["first-name"],
-                    "last_name": formValues["last-name"],
-                    "major": formValues["major"],
-                    "gender_identity": "notdisclosed",
-                    "pronouns": "not_shown",
-                    "password": formValues["password"]
-                })
-            });
+            const signupData = {
+                "RCSID": formValues["rcsid"],
+                "RIN": formValues["rin"],
+                "first_name": formValues["first-name"],
+                "last_name": formValues["last-name"],
+                "major": formValues["major"],
+                "gender_identity": "notdisclosed",
+                "pronouns": "not_shown",
+                "password": formValues["password"]
+            };
 
-            if (response.ok) {
-                const result = await response.json();
-                console.log('Register successful:', result);
-                alert('Register successful' + " " + result);
-                navigate('/login');
-            } else {
-                console.error('Register failed:', response.status);
-                console.error('Register failed:', response.statusText);
-                alert('Register failed:' + " " + response.status);
-                alert('Register failed:' + " " + response.statusText);
-            }
+            const result = await OmniAPI.signup(signupData);
+            console.log('Register successful:', result);
+            alert('Registration successful: A verification email has been sent to your RPI email. (It may be in spam)');
+            navigate('/login');
         } catch (error) {
             console.error('Error:', error);
-            alert('Error occured:' + error);
+            alert('Register failed: ' + (error instanceof Error ? error.message : String(error)));
         }
     }
 

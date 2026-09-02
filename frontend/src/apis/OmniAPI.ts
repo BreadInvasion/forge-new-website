@@ -136,4 +136,18 @@ export const OmniAPI = {
 
         return response.data;
     },
+    signup: async (data: Record<string, any>) => {
+        const response = await api.request({
+            url: `/signup`,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+            data: data,
+        });
+        if (response.status != 200) throw response.data;
+
+        return response.data;
+    },
 };
