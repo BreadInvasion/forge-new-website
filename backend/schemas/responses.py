@@ -22,6 +22,11 @@ class AccessTokenResponse(BaseResponse):
     access_token: str
     expires_at: int
     issued_at: int
+    
+
+class VerificationTokenResponse(BaseResponse):
+    token_type: str
+    success: bool
 
 
 class BasicUserResponse(BaseResponse):

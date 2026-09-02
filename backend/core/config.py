@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     TEST_DATABASE_PORT: int
     TEST_DATABASE_DB: str
 
+    # AZURE COMMUNICATION SERVICES
+    AZURE_COMMUNICATION_CONNECTION_STRING: str = ""
+
     @computed_field
     @cached_property
     def DEFAULT_SQLALCHEMY_DATABASE_URI(self) -> str:
