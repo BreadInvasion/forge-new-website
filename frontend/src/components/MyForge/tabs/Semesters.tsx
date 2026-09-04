@@ -32,9 +32,9 @@ interface aemenuprops {
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, sem: Semester | null) => void] => {
     let { isDialogOpen, setIsDialogOpen, semester, setSemester, refresh } = props;
 
-    const { user } = useAuth();
-    const canCreate = user.permissions.includes(UserPermission.CAN_CREATE_SEMESTERS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_SEMESTERS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canCreate = hasPermission(UserPermission.CAN_CREATE_SEMESTERS);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_SEMESTERS);
 
     const [semesterType, setSemesterType] = useState<number>(0);
     const [calendarYear, setCalendarYear] = useState<number>(0);
@@ -126,10 +126,10 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, sem: Semester 
 };
 
 const Semesters: React.FC = () => {
-    const { user } = useAuth();
-    const canDelete = user.permissions.includes(UserPermission.CAN_DELETE_SEMESTERS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_SEMESTERS) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canOfficer = user.permissions.includes(UserPermission.CAN_CHANGE_SEMESTER) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canDelete = hasPermission(UserPermission.CAN_DELETE_SEMESTERS);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_SEMESTERS);
+    const canOfficer = hasPermission(UserPermission.CAN_CHANGE_SEMESTER);
 
     const [data, setData] = useState<Semester[]>([]);
     const [currentSemester, setCurrentSemester] = useState<Semester | null>(null);
@@ -263,6 +263,7 @@ const Semesters: React.FC = () => {
                 onDelete={onDelete}
                 onEdit={(e) => { setOpen(true, e); }}
                 canEdit={canEdit}
+                canDelete={canDelete}
                 currentPage={currentPage}
                 onPageChange={fetchPage}
                 resourceType="semesters"

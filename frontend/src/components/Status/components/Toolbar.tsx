@@ -54,9 +54,7 @@ const ActiveFilters = styled.div`
 
 const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, activeFilters, setActiveFilters}) => {
 
-    const { user } = useAuth();
-    const hasPermission = (permission: UserPermission) => 
-        user?.permissions?.includes(permission) || user?.permissions?.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
    
     const navigate = useNavigate();
 

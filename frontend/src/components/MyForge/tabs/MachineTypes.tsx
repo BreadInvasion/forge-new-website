@@ -23,9 +23,9 @@ interface aemenuprops {
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineType | null) => void] => {
     let { isDialogOpen, setIsDialogOpen, machineType, setMachineType, refresh} = props;
 
-    const { user } = useAuth();
-    const canCreate = user.permissions.includes(UserPermission.CAN_CREATE_MACHINE_TYPES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_MACHINE_TYPES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canCreate = hasPermission(UserPermission.CAN_CREATE_MACHINE_TYPES);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_TYPES);
         
     const [name, setName] = useState("");
     const [resourceSlots, setResourceSlots] = useState<ResourceSlot[]>([]);
@@ -160,9 +160,9 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
 };
 
 const MachineTypes: React.FC = () => {
-    const { user } = useAuth();
-    const canDelete = user.permissions.includes(UserPermission.CAN_DELETE_MACHINE_TYPES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
-    const canEdit = user.permissions.includes(UserPermission.CAN_EDIT_MACHINE_TYPES) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { hasPermission } = useAuth();
+    const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINE_TYPES);
+    const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_TYPES);
 
     const [data, setData] = React.useState<MachineType[]>([]);
     const columns: (keyof MachineType)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineType)[]).filter( (key) => !key.includes('_id') && key !== 'id' ) : [];
@@ -207,6 +207,7 @@ const MachineTypes: React.FC = () => {
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit={canEdit}
+                canDelete={canDelete}
                 currentPage={currentPage}
                 onPageChange={(p) => fetchPage(p)}
                 resourceType={"machinetypes"}
