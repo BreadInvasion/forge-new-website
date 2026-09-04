@@ -64,6 +64,7 @@ const formFields = [
 export default function Register() {
 
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleRegister = async (e: React.FormEvent<HTMLFormElement>, formValues: { [key: string]: string }) => {
         e.preventDefault();
@@ -116,6 +117,8 @@ export default function Register() {
             return;
         }
 
+        setIsSubmitting(true);
+
         try {
             const signupData = {
                 "RCSID": formValues["rcsid"],
@@ -135,6 +138,8 @@ export default function Register() {
         } catch (error) {
             console.error('Error:', error);
             alert('Register failed: ' + (error instanceof Error ? error.message : String(error)));
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -146,6 +151,7 @@ export default function Register() {
                 submitLabel="Register" 
                 title="Register"
                 showIcon={true} 
+                isSubmitting={isSubmitting}
             />
         </div>
     )

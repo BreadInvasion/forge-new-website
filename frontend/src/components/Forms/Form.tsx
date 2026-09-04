@@ -89,11 +89,12 @@ interface FormProps {
     title: string;
     showIcon?: boolean;
     width?: string;
+    isSubmitting?: boolean;
 }
 
 export const Form = (props: FormProps) => {
 
-    const { formFields, submitLabel, title, width } = props;
+    const { formFields, submitLabel, title, width, isSubmitting = false } = props;
     const [formValues, setFormValues] = useState<{ [key: string]: string }>({});
 
     const handleInputChange = (input: string, value: string) => {
@@ -155,8 +156,8 @@ export const Form = (props: FormProps) => {
                         return null;
                 }
             })}
-            <button className='submit-button' type="submit" >
-                {submitLabel}
+            <button className='submit-button' type="submit" disabled={isSubmitting} >
+                {isSubmitting ? <span className='loading-spinner' aria-label='Registering' /> : submitLabel}
             </button>
         </form>
     )
