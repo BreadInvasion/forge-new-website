@@ -80,7 +80,7 @@ async def main() -> None:
                 is_rpi_staff=False,
                 is_graduating=False,
                 is_email_verified=True,
-                checked_graduating=True,
+                checked_graduating=None,
             )
 
             session.add(new_superuser)
@@ -106,7 +106,7 @@ async def main() -> None:
                 is_rpi_staff=False,
                 is_graduating=False,
                 is_email_verified=True,
-                checked_graduating=True,
+                checked_graduating=None,
             )
 
             session.add(new_superuser)
@@ -132,7 +132,7 @@ async def main() -> None:
                 is_rpi_staff=False,
                 is_graduating=False,
                 is_email_verified=True,
-                checked_graduating=True,
+                checked_graduating=None,
             )
 
             session.add(new_superuser)

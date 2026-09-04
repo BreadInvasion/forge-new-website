@@ -17,7 +17,7 @@ from models.auth_token import AuthToken
 from models.role import Role
 from models.user import User
 from schemas.enums import LogType, Permissions, TokenType
-from schemas.requests import UserCreateRequest, UserAddRoleRequest, VerificationTokenRequest
+from schemas.requests import UserCreateRequest, UserAddRoleRequest, UserUpdateGraduationRequest, VerificationTokenRequest
 from schemas.responses import BasicUserResponse, UserNoHash
 
 from core.security import get_password_hash
@@ -28,11 +28,11 @@ router = APIRouter()
 async def get_semester_balance(
     session: DBSession,
     user_id: UUID,
-    semester_id: str
+    semester_id: UUID | None,
 ) -> Decimal:
     """Calculate the semester balance for a user and semester."""
-    
-    if not semester_id:
+
+    if semester_id is None:
         return Decimal(0)
     
     semester_balance = (
@@ -69,6 +69,8 @@ async def register_user(
             status_code=409, detail="A user with that RCSID or RIN already exists"
         )
 
+        #TODO actually take the graduation input
+
     new_user = User(
         RCSID=request.RCSID,
         RIN=request.RIN,
@@ -80,7 +82,7 @@ async def register_user(
         is_rpi_staff=False,
         is_email_verified=False,
         is_graduating=False,
-        checked_graduating=False,
+        checked_graduating=None, 
         hashed_password=get_password_hash(request.password),
     )
     session.add(new_user)
@@ -314,6 +316,51 @@ async def get_all_users(
         )
         for user in users
     ]
+
+@router.post("/users/graduation")
+async def edit_user_graduation(
+    request: UserUpdateGraduationRequest,
+    session: DBSession,
+    current_user: Annotated[User, Depends(PermittedUserChecker(set()))],
+) -> UserNoHash:
+    """Update a user's graduation details."""
+
+    current_user.is_graduating = request.is_graduating
+
+    current_semester_id = await session.scalar(select(State.active_semester_id))
+    current_user.checked_graduating = current_semester_id
+
+    session.add(current_user)
+    await session.commit()
+    await session.refresh(current_user)
+
+    user_permissions = await get_user_permissions(session, current_user.id)
+    semester_balance = await get_semester_balance(
+        session, current_user.id, current_semester_id
+    )
+
+    return UserNoHash(
+        id=current_user.id,
+        is_rpi_staff=current_user.is_rpi_staff,
+        RCSID=current_user.RCSID,
+        RIN=current_user.RIN,
+        first_name=current_user.first_name,
+        last_name=current_user.last_name,
+        major=current_user.major,
+        gender_identity=current_user.gender_identity,
+        pronouns=current_user.pronouns,
+        permissions=user_permissions,
+        display_role=next((
+                role.name 
+                for role in current_user.roles 
+                if role.display_role
+            ), 
+            ""
+        ),
+        is_graduating=current_user.is_graduating,
+        checked_graduating=current_user.checked_graduating,
+        semester_balance=semester_balance,
+    )
 
 
 @router.get("/users/role/{role_id}", tags=["users"])

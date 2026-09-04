@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING
-from sqlalchemy import String
+from sqlalchemy import String, ForeignKey
 from .base import Base
 
 from sqlalchemy import UUID as DB_UUID
@@ -58,6 +58,11 @@ class User(Base):
 
     # Is this user graduating in this semester? Determines which charge sheet they are added to.
     is_graduating: Mapped[bool]
+    
+    # Semester in which the user's graduation was last checked. Keeps is_graduating accurate
+    checked_graduating: Mapped[UUID | None] = mapped_column(
+        ForeignKey("semesters.id"), nullable=True
+    )
 
     # Has whether the user is graduating this semester been checked this semester? Keeps is_graduating accurate
     checked_graduating: Mapped[bool]

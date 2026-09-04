@@ -68,7 +68,7 @@ class UserNoHash(BaseModel):
 
     is_email_verified: bool
 
-    checked_graduating: bool
+    checked_graduating: UUID4 | None
 
     semester_balance: Decimal = Field(max_digits=10, decimal_places=2)
 
