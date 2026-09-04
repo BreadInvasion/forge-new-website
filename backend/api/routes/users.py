@@ -78,6 +78,7 @@ async def register_user(
         gender_identity=request.gender_identity,
         pronouns=request.pronouns,
         is_rpi_staff=False,
+        is_email_verified=False,
         is_graduating=False,
         checked_graduating=False,
         hashed_password=get_password_hash(request.password),
@@ -148,6 +149,7 @@ async def get_user_by_rcsid(
             ""
         ),
         is_graduating=user.is_graduating,
+        is_email_verified=user.is_email_verified,
         checked_graduating=user.checked_graduating,
         semester_balance=semester_balance,
     )
@@ -191,6 +193,7 @@ async def get_user_by_rin(
             ""
         ),
         is_graduating=user.is_graduating,
+        is_email_verified=user.is_email_verified,
         checked_graduating=user.checked_graduating,
         semester_balance=semester_balance,
     )
@@ -210,6 +213,7 @@ async def get_all_users(
         "first_name",
         "last_name",
         "is_rpi_staff",
+        "is_email_verified",
         "semester_balance",
         "is_graduating",
         "gender_identity",
@@ -237,6 +241,7 @@ async def get_all_users(
         )
         .as_scalar(),
         "is_graduating": User.is_graduating,
+        "is_email_verified": User.is_email_verified,
         "checked_graduating": User.checked_graduating,
         "gender_identity": User.gender_identity,
         "pronouns": User.pronouns,
@@ -294,6 +299,7 @@ async def get_all_users(
                 ""
             ),
             is_graduating=user.is_graduating,
+            is_email_verified=user.is_email_verified,
             checked_graduating=user.checked_graduating,
             semester_balance=Decimal(
                 next(

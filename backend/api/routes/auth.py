@@ -112,6 +112,7 @@ async def get_current_user(
             ""
         ),
         is_graduating=current_user.is_graduating,
+        is_email_verified=current_user.is_email_verified,
         checked_graduating=current_user.checked_graduating,
         semester_balance=Decimal(semester_balance),
     )

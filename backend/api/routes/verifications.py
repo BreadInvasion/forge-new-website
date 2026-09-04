@@ -12,7 +12,8 @@ from sqlalchemy import select
 from core.config import settings
 from models.auth_token import AuthToken
 from models.user import User
-from schemas.enums import TokenType
+from models.role import Role
+from schemas.enums import TokenType, Permissions
 from schemas.requests import VerificationTokenRequest, ResetPasswordRequest
 from schemas.responses import VerificationTokenResponse
 
@@ -26,7 +27,7 @@ async def send_email(email, token, token_type):
         settings.AZURE_COMMUNICATION_CONNECTION_STRING
     )
 
-    url = f"{settings.BACKEND_CORS_ORIGINS[0]}/api/auth/email-verification/{token}" # TODO change to fake url
+    url = f"{settings.BACKEND_CORS_ORIGINS[0]}verify-email/{token}" # TODO change to fake url
     
     message = {
         "senderAddress": "DoNotReply@notifications.rpiforge.dev",
@@ -78,7 +79,14 @@ async def verify_email_token(
             detail="Invalid or expired verification token.",
         )
 
-    # TODO actually set verified to true
+    current_user.is_email_verified = True
+
+    # along with verification we also let them use machines
+    role = await session.scalar(select(Role).where(Role.permissions == [Permissions.CAN_USE_MACHINES]))
+    if (role):
+        current_user.roles.append(role)
+        session.add(current_user)
+
     # TODO add something that regularly deletes old used tokens
     auth_token.used_at = now
     await session.commit()
@@ -93,7 +101,6 @@ async def get_email_verification(
     current_user: Annotated[User, Depends(PermittedUserChecker(set()))],
 ):
     """Check whether an email verification token is valid."""
-    print("IT WORKED ", token)
 
     token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
 

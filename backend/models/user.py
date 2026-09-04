@@ -53,9 +53,11 @@ class User(Base):
         secondary="user_role_association", back_populates="users"
     )
 
+    # Is the user's RPI email verified? Determines whether they can use the forge
+    is_email_verified: Mapped[bool]
+
     # Is this user graduating in this semester? Determines which charge sheet they are added to.
     is_graduating: Mapped[bool]
-    
 
     # Has whether the user is graduating this semester been checked this semester? Keeps is_graduating accurate
     checked_graduating: Mapped[bool]

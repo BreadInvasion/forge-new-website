@@ -66,6 +66,8 @@ class UserNoHash(BaseModel):
 
     is_graduating: bool
 
+    is_email_verified: bool
+
     checked_graduating: bool
 
     semester_balance: Decimal = Field(max_digits=10, decimal_places=2)
