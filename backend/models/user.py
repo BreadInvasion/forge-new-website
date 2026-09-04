@@ -64,9 +64,6 @@ class User(Base):
         ForeignKey("semesters.id"), nullable=True
     )
 
-    # Has whether the user is graduating this semester been checked this semester? Keeps is_graduating accurate
-    checked_graduating: Mapped[bool]
-
     # Organizations that the user is a member of (can charge usages to the organization)
     orgs: Mapped[list["Org"]] = relationship(
         secondary="user_org_memberships", back_populates="members"
