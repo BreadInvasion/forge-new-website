@@ -14,6 +14,7 @@ export interface User {
     permissions: UserPermission[];
     display_role: string;
     is_graduating: boolean;
+    checked_graduating: string | null;
     semester_balance: string;
 };
 
@@ -30,6 +31,7 @@ export const defaultUser: User = {
     permissions: [],
     display_role: '',
     is_graduating: false,
+    checked_graduating: null,
     semester_balance: '',
 };
 

@@ -17,23 +17,6 @@ class BaseRequest(BaseModel):
     pass
 
 
-class UserUpdatePasswordRequest(BaseRequest):
-    password: SecretStr
-
-
-class ResourceUsage(BaseModel):
-    resource_id: UUID4
-    amount: Decimal
-    is_own_material: bool
-
-
-class MachineUsageRequest(BaseRequest):
-
-    # Map resource slot id to resource usage quantity details
-    resource_usages: dict[UUID4, ResourceUsage]
-    duration_seconds: int
-    as_org_id: Optional[UUID4]
-
 class UserCreateRequest(BaseRequest):
     # RPI Identification Information
     RCSID: str
@@ -54,6 +37,10 @@ class UserCreateRequest(BaseRequest):
     password: SecretStr
 
 
+class UserUpdatePasswordRequest(BaseRequest):
+    password: SecretStr
+
+
 class UserChangeNameRequest(BaseRequest):
     first_name: str
     last_name: str
@@ -61,11 +48,42 @@ class UserChangeNameRequest(BaseRequest):
 
 class UserChangePronounsRequest(BaseRequest):
     pronouns: PronounType
-
-
-class UserChangeDetailsRequest(BaseRequest):
-    major: str
     gender_identity: GenderStatsType
+
+
+class UserChangeMajorRequest(BaseRequest):
+    major: str
+
+
+class UserChangeRCSIDRequest(BaseRequest):
+    target_RCSID: str
+    new_RCSID: str
+
+
+class UserChangeRINRequest(BaseRequest):
+    target_RCSID: str
+    new_RIN: RIN
+
+
+class UserDeleteRequest(BaseRequest):
+    target_RCSID: str
+
+
+class UserUpdateGraduationRequest(BaseRequest):
+    is_graduating: bool
+
+
+class ResourceUsage(BaseModel):
+    resource_id: UUID4
+    amount: Decimal
+    is_own_material: bool
+
+
+class MachineUsageRequest(BaseRequest):
+    # Map resource slot id to resource usage quantity details
+    resource_usages: dict[UUID4, ResourceUsage]
+    duration_seconds: int
+    as_org_id: Optional[UUID4]
 
 
 class MachineGetTypeRequest(BaseRequest):
@@ -171,11 +189,6 @@ class MachineDeleteRequest(BaseRequest):
     machine_id: UUID4
 
 
-class UserChangeRCSIDRequest(BaseRequest):
-    target_RCSID: str
-    new_RCSID: str
-
-
 class MachineGroupCreateRequest(BaseRequest):
     name: str
     machine_ids: list[UUID4]
@@ -190,15 +203,6 @@ class MachineTypeCreateRequest(BaseRequest):
     name: str
     resource_slot_ids: list[UUID4]
     cost_per_hour: Decimal = Field(max_digits=10, decimal_places=5)
-
-
-class UserChangeRINRequest(BaseRequest):
-    target_RCSID: str
-    new_RIN: RIN
-
-
-class UserDeleteRequest(BaseRequest):
-    target_RCSID: str
 
 
 class GetChargeSheetsRequest(BaseRequest):

@@ -86,6 +86,7 @@ async def default_user(test_db_setup_sessionmaker) -> User:
                 pronouns=default_user_object.pronouns,
                 hashed_password=default_user_object.hashed_password,
                 is_graduating=False,
+                checked_graduating=None,
                 is_rpi_staff=False,
                 active=False,
             )

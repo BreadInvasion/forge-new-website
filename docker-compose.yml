@@ -10,12 +10,12 @@ services:
     image: postgres:latest
     environment:
       # Uncomment the next line for Postgres 18+
-      # PGDATA: /var/lib/postgresql/18/docker
+      PGDATA: /var/lib/postgresql/18/docker
     volumes:
       # For Postgres <18:
-      - postgres_data:/var/lib/postgresql/data
+      # - postgres_data:/var/lib/postgresql/data
       # For Postgres 18+, comment the above and uncomment below:
-      # - postgres_data:/var/lib/postgresql/18/docker
+      - postgres_data:/var/lib/postgresql/18/docker
     env_file:
       - ./database/.env.dev
   backend:
