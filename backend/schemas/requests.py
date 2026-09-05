@@ -18,24 +18,20 @@ class BaseRequest(BaseModel):
 
 
 class UserCreateRequest(BaseRequest):
-    # RPI Identification Information
     RCSID: str
     RIN: RIN
 
-    # Name
     first_name: str
     last_name: str
 
-    # Statistics Data
     major: str
     gender_identity: GenderStatsType
 
-    # Pronouns
     pronouns: PronounType
 
-    # Password
     password: SecretStr
 
+    is_graduating: bool
 
 
 class UserUpdatePasswordRequest(BaseRequest):

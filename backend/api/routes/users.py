@@ -69,7 +69,10 @@ async def register_user(
             status_code=409, detail="A user with that RCSID or RIN already exists"
         )
 
-        #TODO actually take the graduation input
+    # If they checked yes we'll put that in, if they said no they mightve just ignored the check box
+    current_semester_id = await session.scalar(select(State.active_semester_id))
+    if not request.is_graduating:
+        current_semester_id = None
 
     new_user = User(
         RCSID=request.RCSID,
@@ -81,8 +84,8 @@ async def register_user(
         pronouns=request.pronouns,
         is_rpi_staff=False,
         is_email_verified=False,
-        is_graduating=False,
-        checked_graduating=None, 
+        is_graduating=request.is_graduating,
+        checked_graduating=current_semester_id,
         hashed_password=get_password_hash(request.password),
     )
     session.add(new_user)

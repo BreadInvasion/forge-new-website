@@ -128,7 +128,8 @@ export default function Register() {
                 "major": formValues["major"],
                 "gender_identity": "notdisclosed",
                 "pronouns": "not_shown",
-                "password": formValues["password"]
+                "password": formValues["password"],
+                "is_graduating": formValues["graduating"] === "checked" ? true : false
             };
 
             const result = await OmniAPI.signup(signupData);
