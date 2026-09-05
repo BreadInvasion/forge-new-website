@@ -6,7 +6,7 @@ import './styles/VerifyEmail.scss';
 
 export default function VerifyEmail() {
     const { token } = useParams<{ token: string }>();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, setUser } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     
@@ -35,6 +35,12 @@ export default function VerifyEmail() {
             const result = await AuthAPI.verifyEmail(token);
 
             if (result.success) {
+                // Update the users new permission
+                const userResponse = await AuthAPI.me();
+                if (userResponse.status == 200) {
+                    setUser(userResponse.data);
+                    localStorage.setItem('user', JSON.stringify(userResponse.data));
+                }
                 setSuccess(true);
                 setTimeout(() => {
                     navigate('/myforge');

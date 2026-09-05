@@ -137,12 +137,11 @@ export const OmniAPI = {
         return response.data;
     },
     signup: async (data: Record<string, any>) => {
-        const response = await api.request({
+        const response = await publicApi.request({
             url: `/signup`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
             data: data,
         });
