@@ -45,11 +45,12 @@ async def main() -> None:
             print("Superuser role already exists in database")
 
         user_role = await session.scalar(select(Role).where(Role.name == "Default User"))
+        MACHINE_USAGE_MINIMUM = [Permissions.CAN_USE_MACHINES, Permissions.CAN_SEE_MACHINES, Permissions.CAN_SEE_RESOURCE_SLOTS, Permissions.CAN_SEE_RESOURCES]
 
         if not user_role:
             user_role = Role(
                 name="Default User",
-                permissions=[Permissions.CAN_USE_MACHINES],
+                permissions=MACHINE_USAGE_MINIMUM,
                 inverse_permissions=[],
                 display_role=True,
                 priority=0,

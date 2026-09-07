@@ -19,6 +19,7 @@ from schemas.responses import VerificationTokenResponse
 
 from ..deps import DBSession, PermittedUserChecker
 
+MACHINE_USAGE_MINIMUM = [Permissions.CAN_USE_MACHINES, Permissions.CAN_SEE_MACHINES, Permissions.CAN_SEE_RESOURCE_SLOTS, Permissions.CAN_SEE_RESOURCES]
 
 router = APIRouter()
 
@@ -82,7 +83,7 @@ async def verify_email_token(
     current_user.is_email_verified = True
 
     # along with verification we also let them use machines
-    role = await session.scalar(select(Role).where(Role.permissions == [Permissions.CAN_USE_MACHINES]))
+    role = await session.scalar(select(Role).where(Role.permissions == MACHINE_USAGE_MINIMUM))
     if (role):
         current_user.roles.append(role)
         session.add(current_user)

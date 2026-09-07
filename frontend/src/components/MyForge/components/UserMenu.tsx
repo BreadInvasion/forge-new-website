@@ -65,10 +65,16 @@ const UserMenu: React.FC = () => {
                         <li><Link to='/myforge/users' className='btn'>Users</Link></li>
                     )}
                 </ul>
-                { (hasPermission(UserPermission.CAN_SEE_TABLES) || hasPermission(UserPermission.CAN_SEE_SEMESTERS) || hasPermission(UserPermission.CAN_GET_CHARGES)) && (
+                { (hasPermission(UserPermission.CAN_SEE_TABLES) || hasPermission(UserPermission.CAN_SEE_SEMESTERS) || hasPermission(UserPermission.CAN_GET_CHARGES) || hasPermission(UserPermission.CAN_SEE_ROLES) || hasPermission(UserPermission.CAN_CHANGE_USER_ROLES)) && (
                     <hr className='divider' />
                 )}
                 <ul className='user-options eboard'>
+                    { hasPermission(UserPermission.CAN_CHANGE_USER_ROLES) && (
+                        <li><Link to='/myforge/user_roles' className='btn'>User Roles</Link></li>
+                    )}
+                    { hasPermission(UserPermission.CAN_SEE_ROLES) && (
+                        <li><Link to='/myforge/roles' className='btn'>Roles</Link></li>
+                    )}
                     { hasPermission(UserPermission.CAN_SEE_SEMESTERS) && hasPermission(UserPermission.CAN_SEE_TABLES) && (
                         <li><Link to='/myforge/semesters' className='btn'>Semesters</Link></li>
                     )}
