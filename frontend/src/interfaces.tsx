@@ -15,6 +15,7 @@ export interface User {
     display_role: string;
     is_graduating: boolean;
     checked_graduating: string | null;
+    is_email_verified: boolean;
     semester_balance: string;
 };
 
@@ -32,6 +33,7 @@ export const defaultUser: User = {
     display_role: '',
     is_graduating: false,
     checked_graduating: null,
+    is_email_verified: false,
     semester_balance: '',
 };
 

@@ -64,7 +64,7 @@ export default function Login() {
                     localStorage.setItem('user', JSON.stringify(userData));
                 }
                 const from = location.state?.from?.pathname || '/myforge';
-                navigate(from);
+                navigate(from, { state: { justLoggedIn: true } });
             } else {
                 console.error('Login failed:', response.status);
                 console.error('Login failed:', response.statusText);

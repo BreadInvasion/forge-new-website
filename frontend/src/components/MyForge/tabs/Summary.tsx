@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import useAuth from '../../Auth/useAuth';
 import * as Dialog from "@radix-ui/react-dialog";
 import { PieChart } from 'react-minimal-pie-chart';
 import {ReactComponent as DiscordIcon} from '../../../assets/img/discord-mark-blue.svg'; 
 import { MachineUsage, Semester } from 'src/interfaces';
 import { OmniAPI } from "src/apis/OmniAPI";
+import { AuthAPI } from "src/apis/AuthAPI";
 import '../styles/Summary.scss';
 
 const Summary: React.FC = () => {
 
     const { user, setUser } = useAuth();
+    const location = useLocation();
 
     const [currentUsage, setCurrentUsage] = React.useState<MachineUsage | null>(null);
     const [currentUsageCount, setCount] = useState<number>(0)
@@ -17,6 +20,7 @@ const Summary: React.FC = () => {
     
     const [showGraduationPrompt, setShowGraduationPrompt] = useState(false);
     const graduationPromptHandled = useRef(false);
+    const [showEmailVerificationPrompt, setShowEmailVerificationPrompt] = useState(false);
 
     const [costData, setCostData] = React.useState<ChartUsageData[]>([]);
     const [hoursData, setHoursData] = React.useState<ChartUsageData[]>([]);
@@ -30,18 +34,22 @@ const Summary: React.FC = () => {
         if (graduationPromptHandled.current) return;
         if (!user?.id) return;
 
-        const checkGraduationStatus = async () => {
+        const checkGraduationAndVerification = async () => {
             const currentSemester = await OmniAPI.get("semesters", "current").catch(() => null);
 
-            if (!currentSemester) return;
+            console.log("Current Semester:", currentSemester);
+            console.log("User Checked Graduating:", user.checked_graduating, !user.checked_graduating);
 
-            if (!user.checked_graduating || user.checked_graduating !== currentSemester.id) {
+            if (currentSemester && (!user.checked_graduating || user.checked_graduating !== currentSemester.id)) {
                 setShowGraduationPrompt(true);
+            } else if (!user.is_email_verified) {
+                if (!location.state?.justLoggedIn) return;
+                setShowEmailVerificationPrompt(true);
             }
         };
-        checkGraduationStatus();
+        checkGraduationAndVerification();
         graduationPromptHandled.current = true;
-    }, [user.id, user.checked_graduating]);
+    }, [user.id, user.checked_graduating, user.is_email_verified]);
 
     const saveGraduationDetails = async (isGraduating: boolean) => {
         setShowGraduationPrompt(false);
@@ -52,9 +60,19 @@ const Summary: React.FC = () => {
 
             setUser(data);
             localStorage.setItem("user", JSON.stringify(data));
+            if (!data.is_email_verified) {
+                setShowEmailVerificationPrompt(true);
+            }
         } catch (error) {
             console.error("Error saving graduation details:", error);
         }
+    };
+
+    const resendVerificationEmail = () => {
+        setShowEmailVerificationPrompt(false);
+        void AuthAPI.makeToken()
+            .catch((error) => console.error("Error sending verification email:", error));
+        alert('A verification email has been sent to your RPI email (It may be in spam). Please open the email, click the link, and verify your email');
     };
 
     useEffect(() => {
@@ -150,6 +168,25 @@ const Summary: React.FC = () => {
                             </button>
                             <button className="Button" onClick={() => saveGraduationDetails(false)}>
                                 No
+                            </button>
+                        </div>
+                    </Dialog.Content>
+                </Dialog.Portal>
+            </Dialog.Root>
+            <Dialog.Root open={showEmailVerificationPrompt} onOpenChange={setShowEmailVerificationPrompt}>
+                <Dialog.Portal>
+                    <Dialog.Overlay className="AlertDialogOverlay" />
+                    <Dialog.Content className="AlertDialogContent" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+                        <Dialog.Title className="AlertDialogTitle">
+                            Your email is not verified
+                        </Dialog.Title>
+                        <p>If you have just created your account, please click the link sent to your email to verify your account. Click resend if the link expired to send a new email.</p>
+                        <div className="mf-graduation-dialog-actions">
+                            <button className="Button" onClick={resendVerificationEmail}>
+                                Resend
+                            </button>
+                            <button className="Button" onClick={() => setShowEmailVerificationPrompt(false)}>
+                                Close
                             </button>
                         </div>
                     </Dialog.Content>
