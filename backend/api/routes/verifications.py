@@ -7,7 +7,7 @@ from typing import Annotated
 
 from azure.communication.email import EmailClient
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from core.config import settings
 from models.auth_token import AuthToken
@@ -19,6 +19,7 @@ from schemas.responses import VerificationTokenResponse
 
 from ..deps import DBSession, PermittedUserChecker
 
+MACHINE_USAGE_MINIMUM = [Permissions.CAN_USE_MACHINES, Permissions.CAN_SEE_MACHINES, Permissions.CAN_SEE_RESOURCE_SLOTS, Permissions.CAN_SEE_RESOURCES, Permissions.CAN_SEE_SEMESTERS]
 
 router = APIRouter()
 
@@ -82,7 +83,13 @@ async def verify_email_token(
     current_user.is_email_verified = True
 
     # along with verification we also let them use machines
-    role = await session.scalar(select(Role).where(Role.permissions == [Permissions.CAN_USE_MACHINES]))
+    role = await session.scalar(
+        select(Role).where(
+            Role.permissions.op("@>")(MACHINE_USAGE_MINIMUM),
+            func.cardinality(Role.permissions) == len(MACHINE_USAGE_MINIMUM),
+        )
+    )
+
     if (role):
         current_user.roles.append(role)
         session.add(current_user)
