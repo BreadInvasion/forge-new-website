@@ -12,6 +12,7 @@ const Users: React.FC = () => {
 
     const { hasPermission } = useAuth();
     const canSeeUsers = hasPermission(UserPermission.CAN_SEE_USERS);
+    const canSeeTables = hasPermission(UserPermission.CAN_SEE_TABLES);
 
     const [data, setData] = React.useState<User[]>([]);
     //change this to fix gender id
@@ -36,7 +37,7 @@ const Users: React.FC = () => {
         DeleteItem('users', data[index_real], refreshPage);
     };
 
-    if (!canSeeUsers) return null;
+    if (!canSeeTables || !canSeeUsers) return null;
     return (
         <div className='tab-column-cover align-center'>
             <TableHead

@@ -26,6 +26,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
     const { hasPermission } = useAuth();
     const canCreate = hasPermission(UserPermission.CAN_CREATE_MACHINE_TYPES);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_TYPES);
+    const canSeeTables = hasPermission(UserPermission.CAN_SEE_TABLES);
         
     const [name, setName] = useState("");
     const [resourceSlots, setResourceSlots] = useState<ResourceSlot[]>([]);
@@ -109,7 +110,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
         });
     }
 
-    if (!canCreate && !canEdit) return [<></>, () => {}]; 
+    if (!canSeeTables || (!canCreate && !canEdit)) return [<></>, () => {}]; 
     return [(
         <Dialog.Root open={isDialogOpen} onOpenChange={handleOpenChange}>
             {canCreate && (

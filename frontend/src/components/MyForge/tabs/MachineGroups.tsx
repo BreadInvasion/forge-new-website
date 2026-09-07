@@ -22,6 +22,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
     const { hasPermission } = useAuth();
     const canCreate = hasPermission(UserPermission.CAN_CREATE_MACHINE_GROUPS);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_GROUPS);
+    const canSeeTables = hasPermission(UserPermission.CAN_SEE_TABLES);
 
     let { isDialogOpen, setIsDialogOpen, machineGroup, setMachineGroup, refresh} = props;
 
@@ -104,7 +105,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
         });
     }
 
-    if (!canCreate && !canEdit) return [null, setOpenExtra];
+    if (!canSeeTables || (!canCreate && !canEdit)) return [null, setOpenExtra];
     return [(
         <Dialog.Root open={isDialogOpen} onOpenChange={(e: boolean) => { setOpenExtra(e, machineGroup); }}>
             {canCreate && (

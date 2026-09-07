@@ -9,6 +9,8 @@ export enum UserPermission {
 
     // //  VISIBILITY
     CAN_SEE_USERS = "canSeeUsers",
+    
+    CAN_SEE_TABLES = "canSeeTables",
 
     // //  ADMINISTRATIVE
     CAN_CREATE_ORGS = "canCreateOrgs",

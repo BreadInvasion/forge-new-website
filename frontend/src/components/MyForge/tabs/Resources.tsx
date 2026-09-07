@@ -26,6 +26,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource 
     const { hasPermission } = useAuth();
     const canCreate = hasPermission(UserPermission.CAN_CREATE_RESOURCES);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_RESOURCES);
+    const canSeeTables = hasPermission(UserPermission.CAN_SEE_TABLES);
 
     const [name, setName] = useState("");
     const [brand, setBrand] = useState("");
@@ -82,7 +83,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource 
         });
     }
 
-    if (!canCreate && !canEdit) return [null, () => {}];
+    if (!canSeeTables || (!canCreate && !canEdit)) return [null, () => {}];
     return [(
         <Dialog.Root open={isDialogOpen} onOpenChange={(e: boolean) => { setOpenExtra(e, resource); }}>
             {canCreate && (

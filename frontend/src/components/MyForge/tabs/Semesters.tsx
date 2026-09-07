@@ -35,6 +35,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, sem: Semester 
     const { hasPermission } = useAuth();
     const canCreate = hasPermission(UserPermission.CAN_CREATE_SEMESTERS);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_SEMESTERS);
+    const canSeeTables = hasPermission(UserPermission.CAN_SEE_TABLES);
 
     const [semesterType, setSemesterType] = useState<number>(0);
     const [calendarYear, setCalendarYear] = useState<number>(0);
@@ -86,7 +87,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, sem: Semester 
             });
     }
 
-    if (!canCreate && !canEdit) return [null, () => {}];
+    if (!canSeeTables || (!canCreate && !canEdit)) return [null, () => {}];
     return [
         <Dialog.Root open={isDialogOpen} onOpenChange={(e: boolean) => { setOpenExtra(e, semester); }}>
             {canCreate && (

@@ -42,44 +42,41 @@ const UserMenu: React.FC = () => {
                         <li><Link to='/myforge/fail' className='btn'>Failure Form</Link></li>
                     </ul>   
                 )}
-                { (hasPermission(UserPermission.CAN_SEE_MACHINE_TYPES) || hasPermission(UserPermission.CAN_SEE_MACHINE_GROUPS) || hasPermission(UserPermission.CAN_SEE_MACHINES) || hasPermission(UserPermission.CAN_SEE_RESOURCES) || hasPermission(UserPermission.CAN_SEE_USERS)) && (
+                { (hasPermission(UserPermission.CAN_SEE_TABLES) || hasPermission(UserPermission.CAN_SEE_MACHINE_TYPES) || hasPermission(UserPermission.CAN_SEE_MACHINE_GROUPS) || hasPermission(UserPermission.CAN_SEE_MACHINES) || hasPermission(UserPermission.CAN_SEE_RESOURCES) || hasPermission(UserPermission.CAN_SEE_USERS)) && (
                     <hr className='divider' />
                 )}
                 <ul className='user-options manager'>
-                    { hasPermission(UserPermission.CAN_SEE_MACHINE_TYPES) && (
+                    { hasPermission(UserPermission.CAN_SEE_MACHINE_TYPES) && hasPermission(UserPermission.CAN_SEE_TABLES) && (
                         <li><Link to='/myforge/machine_types' className='btn'>Machine Types</Link></li>
                     )}
-                    { hasPermission(UserPermission.CAN_SEE_MACHINE_GROUPS) && (
+                    { hasPermission(UserPermission.CAN_SEE_MACHINE_GROUPS) && hasPermission(UserPermission.CAN_SEE_TABLES) && (
                         <li><Link to='/myforge/machine_groups' className='btn'>Machine Groups</Link></li>
                     )}
-                    { hasPermission(UserPermission.CAN_SEE_MACHINES) && (
+                    { hasPermission(UserPermission.CAN_SEE_MACHINES) && hasPermission(UserPermission.CAN_SEE_TABLES) && (
                         <li><Link to='/myforge/machines' className='btn'>Machines</Link></li>
                     )}
-                    { hasPermission(UserPermission.CAN_SEE_RESOURCES) && (
+                    { hasPermission(UserPermission.CAN_SEE_RESOURCES) && hasPermission(UserPermission.CAN_SEE_TABLES) && (
                         <li><Link to='/myforge/resources' className='btn'>Resources</Link></li>
                     )}
-                    { hasPermission(UserPermission.CAN_SEE_RESOURCE_SLOTS) && (
+                    { hasPermission(UserPermission.CAN_SEE_RESOURCE_SLOTS) && hasPermission(UserPermission.CAN_SEE_TABLES) && (
                         <li><Link to='/myforge/resource_slots' className='btn'>Resource Slots</Link></li>
                     )}
-                    { hasPermission(UserPermission.CAN_SEE_USERS) && (
+                    { hasPermission(UserPermission.CAN_SEE_USERS) && hasPermission(UserPermission.CAN_SEE_TABLES) && (
                         <li><Link to='/myforge/users' className='btn'>Users</Link></li>
                     )}
                 </ul>
-                { (hasPermission(UserPermission.CAN_SEE_SEMESTERS) || hasPermission(UserPermission.CAN_GET_CHARGES) || hasPermission(UserPermission.CAN_SEE_ROLES) || hasPermission(UserPermission.CAN_CHANGE_USER_ROLES)) && (
+                { (hasPermission(UserPermission.CAN_SEE_TABLES) || hasPermission(UserPermission.CAN_SEE_SEMESTERS) || hasPermission(UserPermission.CAN_GET_CHARGES)) && (
                     <hr className='divider' />
                 )}
                 <ul className='user-options eboard'>
-                    { hasPermission(UserPermission.CAN_CHANGE_USER_ROLES) && (
-                        <li><Link to='/myforge/user_roles' className='btn'>User Roles</Link></li>
-                    )}
-                    { hasPermission(UserPermission.CAN_SEE_ROLES) && (
-                        <li><Link to='/myforge/roles' className='btn'>Roles</Link></li>
-                    )}
-                    { hasPermission(UserPermission.CAN_SEE_SEMESTERS) && (
+                    { hasPermission(UserPermission.CAN_SEE_SEMESTERS) && hasPermission(UserPermission.CAN_SEE_TABLES) && (
                         <li><Link to='/myforge/semesters' className='btn'>Semesters</Link></li>
                     )}
-                    { hasPermission(UserPermission.CAN_GET_CHARGES) && (
+                    { hasPermission(UserPermission.CAN_GET_CHARGES) && hasPermission(UserPermission.CAN_SEE_TABLES) && (
                         <li><Link to='/myforge/charge_sheets' className='btn'>Charge Sheets</Link></li>
+                    )}
+                    { hasPermission(UserPermission.IS_SUPERUSER) && hasPermission(UserPermission.CAN_SEE_TABLES) && (
+                        <li><Link to='/myforge/change_config' className='btn'>Change Configuration</Link></li>
                     )}
                 </ul>
             </nav>

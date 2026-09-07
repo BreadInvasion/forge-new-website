@@ -60,6 +60,9 @@ class Permissions(StrEnum):
     # Allows the user to view user data belonging to other users
     CAN_SEE_USERS = "canSeeUsers"
 
+    # Allows the user to see all getall tables
+    CAN_SEE_TABLES = "canSeeTables"
+
     ## ADMINISTRATIVE
     # Permissions in this section are necessary for certain
     # administrative actions, which should not be available
