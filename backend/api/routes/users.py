@@ -362,6 +362,7 @@ async def edit_user_graduation(
         ),
         is_graduating=current_user.is_graduating,
         checked_graduating=current_user.checked_graduating,
+        is_email_verified=current_user.is_email_verified,
         semester_balance=semester_balance,
     )
 
@@ -435,6 +436,8 @@ async def get_users_by_role(
                 ""
             ),
             is_graduating=user.is_graduating,
+            is_email_verified=user.is_email_verified,
+            checked_graduating=user.checked_graduating,
             semester_balance=Decimal(
                 next(
                     (balance.tuple()[1]
