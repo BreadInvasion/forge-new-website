@@ -4,6 +4,7 @@ import { CheckboxInput, DropdownInput, Form, TextInput } from './Form';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../Auth/useAuth';
 import { OmniAPI } from '../../apis/OmniAPI';
+import axios from 'axios';
 // import { ReactComponent as Logo } from 'logo.svg';
 
 import './styles/Form.scss';
@@ -133,12 +134,16 @@ export default function Register() {
             };
 
             const result = await OmniAPI.signup(signupData);
-            console.log('Register successful:', result);
+            console.log('Registration successful');
             alert('Registration successful: A verification email has been sent to your RPI email. (It may be in spam)');
             navigate('/login');
         } catch (error) {
-            console.error('Error:', error);
-            alert('Register failed: ' + (error instanceof Error ? error.message : String(error)));
+            console.log('Registration unsuccessful');
+            if (axios.isAxiosError(error) && error.status == 409) {
+                alert('Registration failed: An account with this RCSID or RIN already exists.');
+            } else {
+                alert('Registration failed: ' + (error instanceof Error ? error.message : String(error)));
+            }
         } finally {
             setIsSubmitting(false);
         }
