@@ -19,6 +19,7 @@ from schemas.responses import VerificationTokenResponse
 
 from ..deps import DBSession, PermittedUserChecker
 
+
 MACHINE_USAGE_MINIMUM = [Permissions.CAN_USE_MACHINES, Permissions.CAN_SEE_MACHINES, Permissions.CAN_SEE_RESOURCE_SLOTS, Permissions.CAN_SEE_RESOURCES, Permissions.CAN_SEE_SEMESTERS]
 
 router = APIRouter()
