@@ -21,6 +21,7 @@ type ChargeSheetCsvRow = {
 const ChargeSheets: React.FC = () => {
     const { hasPermission } = useAuth();
     const canGetCharges = hasPermission(UserPermission.CAN_GET_CHARGES);
+    const canSeeTables = hasPermission(UserPermission.CAN_SEE_TABLES);
 
     const [data, setData] = useState<UserCharge[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -140,7 +141,7 @@ const ChargeSheets: React.FC = () => {
         }
     };
 
-    if (!canGetCharges) return null;
+    if (!canSeeTables || !canGetCharges) return null;
     return (
         <div className='tab-column-cover align-center'>
             <TableHead heading="Charge Sheets" />

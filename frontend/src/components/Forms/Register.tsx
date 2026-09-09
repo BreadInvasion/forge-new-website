@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { CheckboxInput, DropdownInput, Form, TextInput } from './Form';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../Auth/useAuth';
+import { OmniAPI } from '../../apis/OmniAPI';
+import axios from 'axios';
 // import { ReactComponent as Logo } from 'logo.svg';
 
 import './styles/Form.scss';
@@ -63,6 +65,7 @@ const formFields = [
 export default function Register() {
 
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleRegister = async (e: React.FormEvent<HTMLFormElement>, formValues: { [key: string]: string }) => {
         e.preventDefault();
@@ -115,38 +118,34 @@ export default function Register() {
             return;
         }
 
-        try {
-            const response = await fetch('http://localhost:3000/api/signup', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    "RCSID": formValues["rcsid"],
-                    "RIN": formValues["rin"],
-                    "first_name": formValues["first-name"],
-                    "last_name": formValues["last-name"],
-                    "major": formValues["major"],
-                    "gender_identity": "notdisclosed",
-                    "pronouns": "not_shown",
-                    "password": formValues["password"]
-                })
-            });
+        setIsSubmitting(true);
 
-            if (response.ok) {
-                const result = await response.json();
-                console.log('Register successful:', result);
-                alert('Register successful' + " " + result);
-                navigate('/login');
-            } else {
-                console.error('Register failed:', response.status);
-                console.error('Register failed:', response.statusText);
-                alert('Register failed:' + " " + response.status);
-                alert('Register failed:' + " " + response.statusText);
-            }
+        try {
+            const signupData = {
+                "RCSID": formValues["rcsid"],
+                "RIN": formValues["rin"],
+                "first_name": formValues["first-name"],
+                "last_name": formValues["last-name"],
+                "major": formValues["major"],
+                "gender_identity": "notdisclosed",
+                "pronouns": "not_shown",
+                "password": formValues["password"],
+                "is_graduating": formValues["graduating"] === "checked" ? true : false
+            };
+
+            const result = await OmniAPI.signup(signupData);
+            console.log('Registration successful');
+            alert('Registration successful: A verification email has been sent to your RPI email. (It may be in spam)');
+            navigate('/login');
         } catch (error) {
-            console.error('Error:', error);
-            alert('Error occured:' + error);
+            console.log('Registration unsuccessful');
+            if (axios.isAxiosError(error) && error.status == 409) {
+                alert('Registration failed: An account with this RCSID or RIN already exists.');
+            } else {
+                alert('Registration failed: ' + (error instanceof Error ? error.message : String(error)));
+            }
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -158,6 +157,7 @@ export default function Register() {
                 submitLabel="Register" 
                 title="Register"
                 showIcon={true} 
+                isSubmitting={isSubmitting}
             />
         </div>
     )

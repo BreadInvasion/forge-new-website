@@ -44,6 +44,26 @@ async def main() -> None:
         else:
             print("Superuser role already exists in database")
 
+        user_role = await session.scalar(select(Role).where(Role.name == "Default User"))
+        MACHINE_USAGE_MINIMUM = [Permissions.CAN_USE_MACHINES, Permissions.CAN_SEE_MACHINES, Permissions.CAN_SEE_RESOURCE_SLOTS, Permissions.CAN_SEE_RESOURCES, Permissions.CAN_SEE_SEMESTERS]
+
+        if not user_role:
+            user_role = Role(
+                name="Default User",
+                permissions=MACHINE_USAGE_MINIMUM,
+                inverse_permissions=[],
+                display_role=True,
+                priority=0,
+            )
+
+            session.add(user_role)
+            await session.commit()
+            await session.refresh(user_role)
+
+            print("User role was created")
+        else:
+            print("User role already exists in database")
+
         user = await session.scalar(select(User).where(User.RCSID == "haddlg"))
 
         if not user:
@@ -60,6 +80,7 @@ async def main() -> None:
                 roles=[superuser_role],
                 is_rpi_staff=False,
                 is_graduating=False,
+                is_email_verified=True,
                 checked_graduating=None,
             )
 
@@ -85,6 +106,7 @@ async def main() -> None:
                 roles=[superuser_role],
                 is_rpi_staff=False,
                 is_graduating=False,
+                is_email_verified=True,
                 checked_graduating=None,
             )
 
@@ -110,6 +132,7 @@ async def main() -> None:
                 roles=[superuser_role],
                 is_rpi_staff=False,
                 is_graduating=False,
+                is_email_verified=True,
                 checked_graduating=None,
             )
 

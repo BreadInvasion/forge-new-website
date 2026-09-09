@@ -20,6 +20,11 @@ class PronounType(StrEnum):
     JUST_USE_MY_NAME = "use_name"
 
 
+class TokenType(StrEnum):
+    EMAIL_VERIFICATION = "email_verification"
+    PASSWORD_RESET = "password_reset"
+
+
 class OrgRole(Enum):
     MEMBER = 0
     OFFICER = 1
@@ -54,6 +59,9 @@ class Permissions(StrEnum):
 
     # Allows the user to view user data belonging to other users
     CAN_SEE_USERS = "canSeeUsers"
+
+    # Allows the user to see all getall tables
+    CAN_SEE_TABLES = "canSeeTables"
 
     ## ADMINISTRATIVE
     # Permissions in this section are necessary for certain

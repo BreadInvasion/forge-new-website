@@ -11,14 +11,17 @@ from models.state import State
 from ..deps import DBSession, PermittedUserChecker
 from ..utils import get_user_permissions
 
+from models.audit_log import AuditLog
 from models.machine_usage import MachineUsage
+from models.auth_token import AuthToken
 from models.role import Role
 from models.user import User
-from schemas.enums import Permissions
-from schemas.requests import UserCreateRequest, UserAddRoleRequest, UserUpdateGraduationRequest
+from schemas.enums import LogType, Permissions, TokenType
+from schemas.requests import UserCreateRequest, UserAddRoleRequest, UserUpdateGraduationRequest, VerificationTokenRequest
 from schemas.responses import BasicUserResponse, UserNoHash
 
 from core.security import get_password_hash
+from .verifications import create_verification_token
 
 router = APIRouter()
 
@@ -56,7 +59,7 @@ async def get_semester_balance(
 async def register_user(
     request: UserCreateRequest, session: DBSession
 ) -> BasicUserResponse:
-    """Register a new Forge user."""
+    """Register a new Forge user and send verification email."""
 
     conflicting_users = await session.scalar(
         select(User).where(or_(User.RCSID == request.RCSID, User.RIN == request.RIN))
@@ -65,6 +68,11 @@ async def register_user(
         raise HTTPException(
             status_code=409, detail="A user with that RCSID or RIN already exists"
         )
+
+    # If they checked yes we'll put that in, if they said no they mightve just ignored the check box
+    current_semester_id = await session.scalar(select(State.active_semester_id))
+    if not request.is_graduating:
+        current_semester_id = None
 
     new_user = User(
         RCSID=request.RCSID,
@@ -75,13 +83,32 @@ async def register_user(
         gender_identity=request.gender_identity,
         pronouns=request.pronouns,
         is_rpi_staff=False,
-        is_graduating=False,
-        checked_graduating=None,
+        is_email_verified=False,
+        is_graduating=request.is_graduating,
+        checked_graduating=current_semester_id,
         hashed_password=get_password_hash(request.password),
     )
     session.add(new_user)
+
+    audit_log = AuditLog(
+        type=LogType.USER_CREATED,
+        content={
+            "user_id": str(new_user.id),
+            "user_rcsid": new_user.RCSID,
+            "props": request.model_dump(mode="json"),
+        },
+    )
+    session.add(audit_log)
+
     await session.commit()
     await session.refresh(new_user)
+
+    try:
+        verification_request = VerificationTokenRequest(tokenType=TokenType.EMAIL_VERIFICATION)
+        await create_verification_token(session, verification_request, current_user=new_user)
+    except Exception as e:
+        print("Failed email")
+
     return BasicUserResponse.model_validate(
         new_user, strict=False, from_attributes=True
     )
@@ -127,6 +154,7 @@ async def get_user_by_rcsid(
             ""
         ),
         is_graduating=user.is_graduating,
+        is_email_verified=user.is_email_verified,
         checked_graduating=user.checked_graduating,
         semester_balance=semester_balance,
     )
@@ -170,6 +198,7 @@ async def get_user_by_rin(
             ""
         ),
         is_graduating=user.is_graduating,
+        is_email_verified=user.is_email_verified,
         checked_graduating=user.checked_graduating,
         semester_balance=semester_balance,
     )
@@ -189,6 +218,7 @@ async def get_all_users(
         "first_name",
         "last_name",
         "is_rpi_staff",
+        "is_email_verified",
         "semester_balance",
         "is_graduating",
         "gender_identity",
@@ -216,6 +246,7 @@ async def get_all_users(
         )
         .as_scalar(),
         "is_graduating": User.is_graduating,
+        "is_email_verified": User.is_email_verified,
         "checked_graduating": User.checked_graduating,
         "gender_identity": User.gender_identity,
         "pronouns": User.pronouns,
@@ -273,6 +304,7 @@ async def get_all_users(
                 ""
             ),
             is_graduating=user.is_graduating,
+            is_email_verified=user.is_email_verified,
             checked_graduating=user.checked_graduating,
             semester_balance=Decimal(
                 next(
@@ -330,6 +362,7 @@ async def edit_user_graduation(
         ),
         is_graduating=current_user.is_graduating,
         checked_graduating=current_user.checked_graduating,
+        is_email_verified=current_user.is_email_verified,
         semester_balance=semester_balance,
     )
 
@@ -403,6 +436,8 @@ async def get_users_by_role(
                 ""
             ),
             is_graduating=user.is_graduating,
+            is_email_verified=user.is_email_verified,
+            checked_graduating=user.checked_graduating,
             semester_balance=Decimal(
                 next(
                     (balance.tuple()[1]
