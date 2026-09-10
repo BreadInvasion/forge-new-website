@@ -47,8 +47,8 @@ const AboutUs = () => {
             </div>
 
             <div className="service-card">
-              <h3>Workshops</h3>
-              <p>Regular workshops on design, prototyping, and various maker skills.</p>
+              <h3>Trainings</h3>
+              <p>Want to learn how to use the machines in the Forge? Come to the trainings that will be scheduled throughout the semester.</p>
             </div>
 
             <div className="service-card">
