@@ -89,12 +89,14 @@ export default function Login() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
+                    placeholder="RCS ID"
                 />
                 <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    placeholder="Password"
                 />
                 <div className='button-container'>
                     <button type='submit'>Sign In</button>

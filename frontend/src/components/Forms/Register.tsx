@@ -53,7 +53,7 @@ const formFields = [
     },
     {
         type: "checkbox",
-        label: "I acknowledge that $15 will be charged to my bursar account.",
+        label: "I understand that a $20 membership fee will be charged to my bursar account.",
         id: "bursar-acknowledgement",
         required: true,
     },
