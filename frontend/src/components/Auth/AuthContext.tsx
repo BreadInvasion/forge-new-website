@@ -233,7 +233,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     //   PERMISSIONS HELPER FUNCTION
     // -------------------------
     const hasPermission = (permission: UserPermission) => (
-        user.permissions.includes(permission) || user.permissions.includes(UserPermission.IS_SUPERUSER)
+        !!user.permissions && ( user.permissions.includes(permission) || user.permissions.includes(UserPermission.IS_SUPERUSER))
     );
 
     return (
