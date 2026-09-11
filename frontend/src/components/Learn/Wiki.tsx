@@ -96,7 +96,7 @@ const AccordionDemo: React.FC = () => {
           value: "item-1",
           title: "When is The Forge open?",
           content:
-            "Exact hours depend on volunteer availability. Check the calendar that is on the website.",
+            "Exact hours depend on volunteer availability. Check the calendar on the Hours page.",
         },
         {
           value: "item-2",
@@ -133,7 +133,7 @@ const AccordionDemo: React.FC = () => {
           value: "item-7",
           title: "How will the Forge charge me?",
           content:
-            "The Forge will charge you $20 when you create a Forge account at https://www.rpiforge.dev/ . All money that the Forge charges you will be charged to your bursar, which is the same place that RPI charges you tuition. Charges will appear at the end of the semester. To see specific machine costs, refer to the machine-specific FAQs below.",
+            "The Forge will charge you $20 when you create a Forge account. All money that the Forge charges you will be charged to your bursar, which is the same place that RPI charges you tuition. Charges will appear at the end of the semester. To see specific machine costs, refer to the machine-specific FAQs below.",
         },
         {
           value: "item-8",
@@ -157,7 +157,7 @@ const AccordionDemo: React.FC = () => {
           value: "item-2",
           title: "How much does using the sticker printer cost?",
           content:
-            "On top of the $20 memberhsip fee, vinyl costs $0.20 cents per inch of vinyl length and $0.02 per gram of ink used. This comes out to less than $2 per foot of stickers, though prices will vary based on the size and amount of stickers.",
+            "On top of the $20 memberhsip fee, vinyl costs between $0.20 and $0.50 cents per inch of vinyl length and $0.02 per gram of ink used. This comes out to less than $2 per foot of stickers, though prices will vary based on the size and amount of stickers.",
         },
         {
           value: "item-3",
@@ -188,7 +188,7 @@ const AccordionDemo: React.FC = () => {
           value: "item-7",
           title: "How many stickers can I print?",
           content:
-            "Stickers are printed on a continuous 20in or 18in wide roll of vinyl. You may only print a total of 36in of vinyl length per visit. On a 20in wide roll, this corresponds to roughly 480 2in by 2in stickers. If there are more people waiting to use the machine, we may refuse your request or ask you to print less.",
+            "Stickers are printed on a continuous 20in or 18in wide roll of vinyl. You may only print a total of 36in of vinyl length per visit. On a 20in wide roll, this corresponds to roughly 100 2in by 2in stickers. If there are more people waiting to use the machine, we may refuse your request or ask you to print less.",
         },
         {
           value: "item-8",
@@ -235,7 +235,7 @@ const AccordionDemo: React.FC = () => {
           value: "item-5",
           title: "What kind of file should I use for printing?",
           content:
-            "Bring an STL on a USB-accessible computer, or a USB flash drive.",
+            "Bring an STL on a USBC or USB-accessible computer, or a USB flash drive.",
         },
         {
           value: "item-6",
@@ -305,7 +305,7 @@ const AccordionDemo: React.FC = () => {
         {
           value: "item-2",
           title: "How much does using the resin printer cost?",
-          content: "$0.8/mL for the grey and clear resin.",
+          content: "$0.18/mL for the grey and clear resin.",
         },
         {
           value: "item-3",
@@ -313,7 +313,7 @@ const AccordionDemo: React.FC = () => {
           content: "Currently we do not stock specialty resin.",
         },
         {
-          value: "item-3",
+          value: "item-4",
           title: "Can I bring in my own resin?",
           content: "Currently you are NOT allowed to bring in your own resin.",
         },
@@ -333,7 +333,7 @@ const AccordionDemo: React.FC = () => {
           value: "item-2",
           title: "How do I use the embroidery machine?",
           content:
-            "Let people know you are interested in this Discord channel and we will connect you with someone who will help you.",
+            "Let people know you are interested in the Discord channel and we will connect you with someone who will help you.",
         },
       ],
     },
