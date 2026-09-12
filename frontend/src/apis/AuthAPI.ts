@@ -42,9 +42,9 @@ export const AuthAPI = {
     },
     makeToken: async () => {
         const response = await authApi.request({
-            url: "/verification",
+            url: "/email-verification",
             method: "POST",
-            data: { tokenType: "email_verification" },
+            data: { token_type: "email_verification" },
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
