@@ -13,6 +13,7 @@ from core.config import settings
 from models.auth_token import AuthToken
 from models.user import User
 from models.role import Role
+from core.security import get_password_hash
 from schemas.enums import TokenType, Permissions
 from schemas.requests import VerificationTokenRequest, ResetPasswordRequest, ResetPasswordTokenRequest
 from schemas.responses import VerificationTokenResponse
@@ -173,6 +174,29 @@ async def verify_email_token(
     return VerificationTokenResponse(token_type=TokenType.EMAIL_VERIFICATION, success=True)
 
 
+@router.post("/password-verification/{token}")
+async def reset_password(
+    token: str,
+    session: DBSession,
+    request: ResetPasswordRequest,
+):
+    """Reset a user's password with a valid password reset token."""
+
+    response, auth_token = await check_token(session, TokenType.PASSWORD_RESET, token, None, True)
+    if not response.success:
+        return response
+
+    user = await session.get(User, auth_token.user_id)
+    if user is None or user.RCSID != request.rcsid:
+        return VerificationTokenResponse(token_type=TokenType.PASSWORD_RESET, success=False)
+
+    user.hashed_password = get_password_hash(request.new_password)
+    auth_token.used_at = datetime.now(timezone.utc)
+    await session.commit()
+
+    return VerificationTokenResponse(token_type=TokenType.PASSWORD_RESET, success=True)
+
+
 @router.get("/email-verification/{token}")
 async def get_email_verification(
     token: str,
@@ -184,7 +208,7 @@ async def get_email_verification(
     return await check_token(session, TokenType.EMAIL_VERIFICATION, token, current_user)
 
 
-@router.post("/password-verification")
+@router.get("/password-verification/{token}")
 async def get_password_verification(
     token: str,
     session: DBSession,

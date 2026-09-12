@@ -80,7 +80,7 @@ class ResetPasswordTokenRequest(BaseRequest):
 
 
 class ResetPasswordRequest(BaseRequest):
-    token_type: TokenType
+    rcsid: str
     new_password: SecretStr
 
 
