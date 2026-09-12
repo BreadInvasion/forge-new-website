@@ -43,7 +43,7 @@ const AboutUs = () => {
 
             <div className="service-card">
               <h3>Equipment Access</h3>
-              <p>Access to 3D printers, laser cutters, electronics workstations, and more.</p>
+              <p>Access to 3D printers, laser cutters, vinyl printer, electronics workstations, and more.</p>
             </div>
 
             <div className="service-card">
