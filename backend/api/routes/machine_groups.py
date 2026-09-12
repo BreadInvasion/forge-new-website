@@ -60,7 +60,7 @@ async def create_machine_group(
     await session.refresh(new_machine_group)
 
     audit_log = AuditLog(
-        type=LogType.MACHINE_GROUP_DELETED,
+        type=LogType.MACHINE_GROUP_CREATED,
         content={
             "machine_group_id": str(new_machine_group.id),
             "user_rcsid": current_user.RCSID,
