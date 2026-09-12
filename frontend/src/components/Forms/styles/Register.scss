@@ -38,6 +38,27 @@ form {
 	cursor: pointer;
 }
 
+.submit-button:disabled {
+    cursor: wait;
+    opacity: 0.8;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: register-spinner 0.75s linear infinite;
+}
+
+@keyframes register-spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .input-container label {
     font-size: 1rem;
     font-weight: 600;

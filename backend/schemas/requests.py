@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import Annotated, List, Optional
 from pydantic import UUID4, AfterValidator, BaseModel, EmailStr, Field, SecretStr, BeforeValidator
 
-from .enums import GenderStatsType, Permissions, PronounType, SemesterType
+from .enums import GenderStatsType, Permissions, PronounType, SemesterType, TokenType
 
 
 def check_RIN(RIN: str) -> str:
@@ -18,23 +18,20 @@ class BaseRequest(BaseModel):
 
 
 class UserCreateRequest(BaseRequest):
-    # RPI Identification Information
     RCSID: str
     RIN: RIN
 
-    # Name
     first_name: str
     last_name: str
 
-    # Statistics Data
     major: str
     gender_identity: GenderStatsType
 
-    # Pronouns
     pronouns: PronounType
 
-    # Password
     password: SecretStr
+
+    is_graduating: bool
 
 
 class UserUpdatePasswordRequest(BaseRequest):
@@ -71,6 +68,15 @@ class UserDeleteRequest(BaseRequest):
 
 class UserUpdateGraduationRequest(BaseRequest):
     is_graduating: bool
+
+
+class VerificationTokenRequest(BaseRequest):
+    tokenType: TokenType
+
+
+class ResetPasswordRequest(BaseRequest):
+    token: str
+    new_password: SecretStr
 
 
 class ResourceUsage(BaseModel):

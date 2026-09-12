@@ -22,6 +22,11 @@ class AccessTokenResponse(BaseResponse):
     access_token: str
     expires_at: int
     issued_at: int
+    
+
+class VerificationTokenResponse(BaseResponse):
+    token_type: str
+    success: bool
 
 
 class BasicUserResponse(BaseResponse):
@@ -60,6 +65,8 @@ class UserNoHash(BaseModel):
     display_role: str | None
 
     is_graduating: bool
+
+    is_email_verified: bool
 
     checked_graduating: UUID4 | None
 

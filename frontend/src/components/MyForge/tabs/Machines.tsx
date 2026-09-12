@@ -21,6 +21,7 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
     const { hasPermission } = useAuth();
     const canCreate = hasPermission(UserPermission.CAN_CREATE_MACHINES);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINES);
+    const canSeeTables = hasPermission(UserPermission.CAN_SEE_TABLES);
     
     const [name, setName] = useState("");
 
@@ -86,7 +87,7 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
         setSelectedMachineTypeId(id);
     };
 
-    if (!canCreate && !canEdit) return null;
+    if (!canSeeTables || (!canCreate && !canEdit)) return null;
     return (
         <Dialog.Root open={isDialogOpen} onOpenChange={(open) => { if (!open) setMachine(null); setIsDialogOpen(open); }}>
             {canCreate && (

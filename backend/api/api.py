@@ -4,6 +4,7 @@ from api.routes import volunteer_actions
 
 from .routes import (
     auth,
+    verifications,
     machine_groups,
     machine_types,
     machine_usages,
@@ -20,6 +21,7 @@ from .routes import (
 
 api_router = APIRouter()
 api_router.include_router(auth.router, tags=["auth"])
+api_router.include_router(verifications.router, tags=["verifications"])
 api_router.include_router(machine_groups.router, tags=["machine_groups"])
 api_router.include_router(machine_types.router, tags=["machine_types"])
 api_router.include_router(machine_usages.router, tags=["machine_usages"])

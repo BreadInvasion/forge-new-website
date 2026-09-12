@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { FormEvent, useState } from 'react';
 import useAuth from '../Auth/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { userState } from 'src/GlobalAtoms';
 import { User } from 'src/interfaces';
@@ -22,6 +22,7 @@ export default function Login() {
 
     const { setAuth, setUser } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const getUserData = async (): Promise<User | null> => {
         try {
@@ -62,7 +63,8 @@ export default function Login() {
                     setUser(userData);
                     localStorage.setItem('user', JSON.stringify(userData));
                 }
-                navigate('/myforge');
+                const from = location.state?.from?.pathname || '/myforge';
+                navigate(from, { state: { justLoggedIn: true } });
             } else {
                 console.error('Login failed:', response.status);
                 console.error('Login failed:', response.statusText);
