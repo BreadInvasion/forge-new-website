@@ -48,7 +48,7 @@ const AboutUs = () => {
 
             <div className="service-card">
               <h3>Trainings</h3>
-              <p>Want to learn how to use the machines in the Forge? Come to the trainings that will be scheduled throughout the semester.</p>
+              <p>Want to become a volunteer and learn how to use the machines in the Forge? Come to the trainings that will be scheduled throughout the semester.</p>
             </div>
 
             <div className="service-card">
