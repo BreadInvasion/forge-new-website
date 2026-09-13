@@ -40,6 +40,19 @@ export const AuthAPI = {
 
         return response.data;
     },
+    checkEmailToken: async (token: string) => {
+        const response = await authApi.request({
+            url: `/email-verification/${token}`,
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        });
+        if (response.status != 200) throw response.data;
+
+        return response.data;
+    },
     makeVerifyToken: async (data: Record<string, any>) => {
         const response = await authApi.request({
             url: "/email-verification",
