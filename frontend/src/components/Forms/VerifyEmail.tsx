@@ -21,6 +21,7 @@ export default function VerifyEmail() {
         }
     }, [isAuthenticated, navigate, location]);
 
+
     useEffect(() => {
         if (!isAuthenticated) return;
 
@@ -100,10 +101,8 @@ export default function VerifyEmail() {
                 <p className='description'>
                     Click the button below to verify your email address
                 </p>
-
                 {error && <div className='error-message'>{error}</div>}
                 {success && <div className='success-message'>Email verified successfully</div>}
-
                 {isTokenValid && (
                     <div className='button-container'>
                         <button type='submit' disabled={success}>
