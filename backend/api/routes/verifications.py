@@ -31,6 +31,7 @@ async def create_token(
     tokenType: TokenType,
     current_user: User
 ):
+
     token = secrets.token_urlsafe(32)
     token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
 
@@ -63,8 +64,7 @@ async def send_email(email, token, token_type):
         message = {
             "senderAddress": "DoNotReply@notifications.rpiforge.dev",
             "recipients": {
-            #"to": [{"address": f"{email}"}]
-            "to": [{"address": f"xeniak3791@gmail.com"}]
+            "to": [{"address": f"{email}"}]
             },
             "content": {
                 "subject": f"Verify Your Forge Account",
@@ -87,8 +87,7 @@ async def send_email(email, token, token_type):
         message = {
             "senderAddress": "DoNotReply@notifications.rpiforge.dev",
             "recipients": {
-            #"to": [{"address": f"{email}"}]
-            "to": [{"address": f"xeniak3791@gmail.com"}]
+            "to": [{"address": f"{email}"}]
             },
             "content": {
                 "subject": f"Reset your Forge Account Password",
@@ -244,6 +243,7 @@ async def create_password_token(
             User.RCSID == request.rcsid
         )
     )
+
     if (not current_user or request.token_type != TokenType.PASSWORD_RESET):
        return VerificationTokenResponse(token_type=request.token_type, success=False)
         
