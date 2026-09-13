@@ -10,7 +10,8 @@ export default function VerifyEmail() {
     const navigate = useNavigate();
     const location = useLocation();
     
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(Boolean(token));
+    const [isTokenValid, setIsTokenValid] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
 
@@ -19,6 +20,34 @@ export default function VerifyEmail() {
             navigate('/login', { state: { from: location } });
         }
     }, [isAuthenticated, navigate, location]);
+
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        if (!token) {
+            setError('No verification token found');
+            setIsLoading(false);
+            return;
+        }
+
+        const validateToken = async () => {
+            try {
+                const result = await AuthAPI.checkEmailToken(token);
+                if (!result.success) {
+                    setError('This email verification link is invalid or has expired.');
+                    return;
+                }
+                setIsTokenValid(true);
+            } catch (err: any) {
+                setError(err?.detail || err?.message || 'Unable to validate the email verification link.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        validateToken();
+    }, [isAuthenticated, token]);
 
     const handleVerifyEmail = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -60,6 +89,10 @@ export default function VerifyEmail() {
         return <div>Redirecting to login...</div>;
     }
 
+    if (isLoading) {
+        return <div className='verify-email-container'>Checking verification link...</div>;
+    }
+
     return (
         <div className='verify-email-container'>
             <form onSubmit={handleVerifyEmail}>
@@ -68,15 +101,15 @@ export default function VerifyEmail() {
                 <p className='description'>
                     Click the button below to verify your email address
                 </p>
-
                 {error && <div className='error-message'>{error}</div>}
                 {success && <div className='success-message'>Email verified successfully</div>}
-
-                <div className='button-container'>
-                    <button type='submit' disabled={isLoading || success}>
-                        {isLoading ? 'Verifying...' : success ? 'Verified!' : 'Verify Email'}
-                    </button>
-                </div>
+                {isTokenValid && (
+                    <div className='button-container'>
+                        <button type='submit' disabled={success}>
+                            {success ? 'Verified!' : 'Verify Email'}
+                        </button>
+                    </div>
+                )}
             </form>
         </div>
     );
