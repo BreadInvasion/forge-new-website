@@ -212,7 +212,7 @@ const AccordionDemo: React.FC = () => {
           value: "item-1",
           title: "What kind of filament am I allowed to use?",
           content:
-            "PLA, PETG, PLA+, and TPU are allowed. See below for banned brands.",
+            "PLA, PETG and TPU are allowed. See below for banned brands.",
         },
         {
           value: "item-2",
