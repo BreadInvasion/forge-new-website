@@ -55,7 +55,7 @@ const formFields = [
     },
     {
         type: "checkbox",
-        label: "I acknowledge that $15 will be charged to my bursar account.",
+        label: "A $20/semester membership fee applies if I submit a Machine Usage Form",
         id: "bursar-acknowledgement",
         required: true,
     },
