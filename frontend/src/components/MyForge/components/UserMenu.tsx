@@ -8,9 +8,7 @@ import '../styles/UserMenu.scss';
 
 const UserMenu: React.FC = () => {
 
-    const { user } = useAuth();
-
-    const hasPermission = (permission: UserPermission) => user.permissions.includes(permission) || user.permissions.includes(UserPermission.IS_SUPERUSER);
+    const { user, hasPermission } = useAuth();
 
     return (
     <div className="sidebar">

@@ -10,6 +10,7 @@ import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { userState } from "src/GlobalAtoms";
 import { AuthAPI } from "src/apis/AuthAPI";
 import { User } from "src/interfaces";
+import { UserPermission } from 'src/enums';
 
 import "./Auth.css"
 
@@ -21,6 +22,7 @@ interface AuthContextType {
     setAuth: (value: boolean) => void;
     setUser: (value: User) => void;
     logout: () => void;
+    hasPermission: (permission: UserPermission) => boolean;
 }
 
 const LOGOUT_TIME_LIMIT = 5;    // minutes user can stay logged in
@@ -226,6 +228,14 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         logout();
     }, [logoutTimerId, logout]);
 
+    
+    // -------------------------
+    //   PERMISSIONS HELPER FUNCTION
+    // -------------------------
+    const hasPermission = (permission: UserPermission) => (
+        user.permissions.includes(permission) || user.permissions.includes(UserPermission.IS_SUPERUSER)
+    );
+
     return (
         <AuthContext.Provider
             value={{
@@ -235,6 +245,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 setAuth,
                 setUser,
                 logout,
+                hasPermission,
             }}
         >
             {/*
