@@ -54,9 +54,14 @@ export const FailAMachineForm: React.FC = () => {
      */
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
-        const temp = selectedMachineId;
+        const data: Record<string, any> = {
+            machine_id: selectedMachineId,
+            error_message: printerErrorMessage,
+            noticeable_fault: noticeableFaults.join(", "),
+            percentage: estimatedPercentCompleted,
+        };
         try {
-            const response = await OmniAPI.fail(temp);
+            const response = await OmniAPI.fail(data);
             if (response != null) {
                 console.log("Response:", response);
                 alert("An error occurred, please try again.");

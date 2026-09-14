@@ -34,7 +34,8 @@ async def send_email(email, token, token_type):
     message = {
         "senderAddress": "DoNotReply@notifications.rpiforge.dev",
         "recipients": {
-            "to": [{"address": f"{email}"}]
+            #"to": [{"address": f"{email}"}]
+            "to": [{"address": "xeniak3791@gmail.com"}]
         },
         "content": {
             "subject": f"Verify Your Forge Account",

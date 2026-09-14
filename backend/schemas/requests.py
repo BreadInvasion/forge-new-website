@@ -120,7 +120,9 @@ class MachineClearRequest(BaseRequest):
 
 class MachineFailRequest(BaseRequest):
     machine_id: UUID4
-    reason: str
+    error_message: str
+    noticeable_fault: str
+    percentage: Decimal = Field(ge=0, le=100)
 
 
 class ResourceCreateRequest(BaseRequest):
