@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { AuthAPI } from 'src/apis/AuthAPI';
 import './styles/ResetPassword.scss';
 
+const logoSvg = new URL('../../assets/img/logo.svg', import.meta.url).href;
+
 export default function ResetPassword() {
     const { token } = useParams<{ token: string }>();
     const navigate = useNavigate();
@@ -89,7 +91,7 @@ export default function ResetPassword() {
     return (
         <div className='reset-password-container'>
             <form onSubmit={handleResetRequest}>
-                <div className='form-logo' />
+                <img src={logoSvg} alt='Forge logo' className='form-logo' />
                 <label>{isRequestForm ? 'Reset Your Password' : 'Choose a New Password'}</label>
                 <p className='description'>
                     {isRequestForm

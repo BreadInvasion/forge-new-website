@@ -4,6 +4,8 @@ import useAuth from '../Auth/useAuth';
 import { AuthAPI } from 'src/apis/AuthAPI';
 import './styles/VerifyEmail.scss';
 
+const logoSvg = new URL('../../assets/img/logo.svg', import.meta.url).href;
+
 export default function VerifyEmail() {
     const { token } = useParams<{ token: string }>();
     const { isAuthenticated, setUser } = useAuth();
@@ -96,7 +98,7 @@ export default function VerifyEmail() {
     return (
         <div className='verify-email-container'>
             <form onSubmit={handleVerifyEmail}>
-                <div className='form-logo' />
+                <img src={logoSvg} alt='Forge logo' className='form-logo' />
                 <label>Verify Your Email</label>
                 <p className='description'>
                     Click the button below to verify your email address
