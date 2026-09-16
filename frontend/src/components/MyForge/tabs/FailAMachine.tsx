@@ -14,6 +14,7 @@ export const FailAMachineForm: React.FC = () => {
     const [estimatedPercentCompleted, setEstimatedPercentCompleted] = useState(0);
     const [printerErrorMessage, setPrinterErrorMessage] = useState<string>("");
     const [noticeableFaults, setNoticeableFaults] = useState<string[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
     /**
@@ -54,6 +55,7 @@ export const FailAMachineForm: React.FC = () => {
      */
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
+        setIsSubmitting(true);
         const data: Record<string, any> = {
             machine_id: selectedMachineId,
             error_message: printerErrorMessage,
@@ -70,6 +72,8 @@ export const FailAMachineForm: React.FC = () => {
         } catch (error) {
             console.error("Error:", error);
             alert("An error occurred, please try again.");
+        } finally {
+            setIsSubmitting(false);
         }
         
         // Clear form
@@ -189,7 +193,10 @@ export const FailAMachineForm: React.FC = () => {
                 </div>
 
                 {selectedMachineId !== "_" && (
-                    <button type="submit">Submit</button>
+                    <button type="submit" disabled={isSubmitting}>
+                        {isSubmitting && <span className="loading-spinner" aria-label="Submitting" />}
+                        {isSubmitting ? "Submitting..." : "Submit"}
+                    </button>
                 )}
             </form>
         </div>
