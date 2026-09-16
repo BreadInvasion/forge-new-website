@@ -21,7 +21,7 @@ from schemas.requests import UserCreateRequest, UserAddRoleRequest, UserUpdateGr
 from schemas.responses import BasicUserResponse, UserNoHash
 
 from core.security import get_password_hash
-from .verifications import create_verification_token
+from .verifications import create_email_token
 
 router = APIRouter()
 
@@ -104,8 +104,8 @@ async def register_user(
     await session.refresh(new_user)
 
     try:
-        verification_request = VerificationTokenRequest(tokenType=TokenType.EMAIL_VERIFICATION)
-        await create_verification_token(session, verification_request, current_user=new_user)
+        verification_request = VerificationTokenRequest(token_type=TokenType.EMAIL_VERIFICATION)
+        await create_email_token(session, verification_request, current_user=new_user)
     except Exception as e:
         print("Failed email")
 

@@ -70,7 +70,7 @@ const Summary: React.FC = () => {
 
     const resendVerificationEmail = () => {
         setShowEmailVerificationPrompt(false);
-        void AuthAPI.makeToken()
+        void AuthAPI.makeVerifyToken({ token_type: "email_verification" })
             .catch((error) => console.error("Error sending verification email:", error));
         alert('A verification email has been sent to your RPI email (It may be in spam). Please open the email, click the link, and verify your email');
     };

@@ -71,11 +71,16 @@ class UserUpdateGraduationRequest(BaseRequest):
 
 
 class VerificationTokenRequest(BaseRequest):
-    tokenType: TokenType
+    token_type: TokenType
+
+
+class ResetPasswordTokenRequest(BaseRequest):
+    token_type: TokenType
+    rcsid: str
 
 
 class ResetPasswordRequest(BaseRequest):
-    token: str
+    rcsid: str
     new_password: SecretStr
 
 
