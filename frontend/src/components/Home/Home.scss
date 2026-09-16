@@ -1,10 +1,12 @@
 // Home.scss
 
-$white-a11: rgba(255, 255, 255, 1);
+$mobile: 900px;
+$tablet: 1300px;
 
 /* Coming Soon Page */
+
 .cs-container {
-    background-color: #fff;
+    background-color: var(--color-white);
     height: 100%;
     width: 100%;
     display: flex;
@@ -12,13 +14,13 @@ $white-a11: rgba(255, 255, 255, 1);
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 1rem;
-    gap: 1rem;
+    padding: var(--space-4);
+    gap: var(--space-4);
 }
 
 .cs-container h1 {
     font-size: 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 
 .cs-logo {
@@ -27,87 +29,249 @@ $white-a11: rgba(255, 255, 255, 1);
 
 /* Home Page */
 
-.home-container {
-    margin: 0;
-    flex: 1 1 auto;
- 
-    background-image:  url(background_desktop.png);
-    background-color: #D40000;
-    
-    background-size: cover;
-    background-position: center;
-    @media screen and (max-width: 768px) {
-        background-image: url(background_mobile.png);
-    }
-}
-
-.home-cover {
-    align-items: flex-start !important;
-    padding-left: 5%;
-
-    font-weight: 600;
-    font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(90deg, #000 10%, #0000 65%);
-    color: $white-a11;
-
-    @media screen and (max-width: 768px) {
-        background: linear-gradient(0deg, #000 20%,  #0000 100%);
-        justify-content: flex-end;
-        padding: 15% 10%;
-    }
-}
-
-.home-cover h1 {
-    font-size: clamp(1.5rem, calc(1.5rem + 0.926vw), 3rem);
-    width: calc(5/12 * 100%);
-    margin: 0.5rem 0;
-
-    @media screen and (max-width: 768px) {
-        width: 100%;
-        margin: 0.5rem 1rem;
-    }
-}
-
-.home-cover h2 {
-    font-size: 1.25rem;
-    margin: 0 1rem;
-}
-
-.home-cover h2 ul {
-    list-style-type: none;
-    padding: 0.5rem 1.5rem;
-    font-size: inherit;
-}
-
-
-.home-button-container {
-    height: auto !important;
-    padding: 0.5rem 1rem;
-    gap: 1.25rem;
-
-    @media (min-width: 768px) {
-        display: none;
-    }
-}
-
-.home-button {
+.home-page {
+    position: relative;
     display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    font-size: 1.25rem;
-    font-weight: 600;
+    flex-direction: column;
     width: 100%;
-    padding: 0.5rem 0.6255rem;
-    background-color: #FFF;
-    color: #000;
-    border-radius: 0.25rem;
-    cursor: pointer;
+    flex: 1 1 auto;
+}
 
-    @media (min-width: 768px) {
+/* Hero — fills the whole screen below the navbar; the info bar and footer
+   follow underneath it */
+
+.home-hero {
+    position: relative;
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: calc(100vh - var(--navbar-height));
+    display: flex;
+    align-items: stretch;
+    background: linear-gradient(to right, var(--color-navy-mid) 10%, var(--color-red) 100%);
+    overflow: hidden;
+
+    /* On phones there is no hero image to fill a full screen, so the hero is
+       only as tall as its text rather than trailing empty gradient */
+    @media (max-width: $mobile) {
+        min-height: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        overflow: visible;
+    }
+}
+
+.home-hero-content {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+    width: min(477px, 45%);
+    padding-left: clamp(100px, 11vw, 160px);
+    padding-right: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(40px, 8vh, 120px);
+
+    /* At intermediate widths, don't let the image panel compress us */
+    @media (max-width: $tablet) and (min-width: 769px) {
+        width: min(540px, 48%);
+    }
+
+    @media (max-width: $mobile) {
+        width: 100%;
+        padding: clamp(24px, 6vw, 48px) clamp(20px, 5vw, 40px) var(--space-4);
+        gap: clamp(16px, 4vw, 28px);
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+}
+
+.home-hero-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(40px, 9vh, 100px);
+    line-height: 1.2;
+    color: var(--color-white);
+    margin: 0;
+
+    @media (max-width: $mobile) {
+        font-size: clamp(52px, 15vw, 80px);
+        line-height: 1.15;
+    }
+}
+
+/* Staggered indent down the hero title */
+.home-title-line {
+    display: block;
+
+    &:nth-child(2) {
+        margin-left: 0.6em;
+    }
+
+    &:nth-child(3) {
+        margin-left: 1.8em;
+    }
+}
+
+.home-hero-services {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(16px, 3vh, 35px);
+    color: var(--color-white);
+    line-height: 1.35;
+    margin: 0;
+
+    @media (max-width: $mobile) {
+        font-size: clamp(18px, 5vw, 26px);
+        line-height: 1.4;
+    }
+}
+
+/* Staggered indent down the services list */
+.home-service-line {
+    display: block;
+
+    &:nth-child(2) {
+        margin-left: 0.8em;
+    }
+
+    &:nth-child(3) {
+        margin-left: 2em;
+    }
+
+    &:nth-child(4) {
+        margin-left: 3.2em;
+    }
+}
+
+.home-hero-image {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    /* Fade left edge so image doesn't clash with text */
+    mask-image: linear-gradient(to right, transparent 25%, black 55%);
+    -webkit-mask-image: linear-gradient(to right, transparent 25%, black 55%);
+
+    img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: right center;
+    }
+
+    @media (max-width: $mobile) {
         display: none;
     }
-    svg {
-        width: 1.5rem;
-        height: 1.5rem;
+}
+
+/* Info bar */
+
+.home-infobar {
+    position: relative;
+    width: 100%;
+    height: clamp(70px, 10vh, 91px);
+    background: var(--color-white);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+    overflow: hidden;
+    border-top: var(--border-accent);
+    border-right: var(--border-accent);
+
+    /* Repeating navy geometric pattern */
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("../../assets/img/background.svg");
+        background-repeat: repeat;
+        background-size: 122px 140px;
+        opacity: 0.12;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    @media (max-width: $mobile) {
+        height: 50px;
+        padding: 0 var(--space-3);
+        gap: var(--space-2);
+        justify-content: space-between;
+        border-right: none;
+    }
+}
+
+.home-membership {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--space-5);
+
+    p {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: clamp(18px, 3vw, 50px);
+        color: var(--color-navy);
+        text-align: center;
+        white-space: nowrap;
+        margin: 0;
+    }
+
+    @media (max-width: $mobile) {
+        padding: 0;
+        flex: 1;
+        min-width: 0;
+        justify-content: flex-start;
+
+        p {
+            /* Scales down on the narrowest phones so the button keeps its room,
+               and ellipses rather than shoving the button off screen */
+            font-size: clamp(12px, 3.2vw, 18px);
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
+.home-cta {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    width: clamp(160px, 20vw, 260px);
+    height: clamp(36px, 6vh, 50px);
+    background: var(--color-red);
+    border: 2px solid var(--color-navy);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+        opacity: 0.85;
+    }
+
+    span {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: clamp(16px, 2.2vw, 30px);
+        color: var(--color-white);
+    }
+
+    @media (max-width: $mobile) {
+        width: clamp(100px, 24vw, 160px);
+        height: 34px;
+
+        span {
+            font-size: clamp(13px, 3.4vw, 16px);
+        }
     }
 }

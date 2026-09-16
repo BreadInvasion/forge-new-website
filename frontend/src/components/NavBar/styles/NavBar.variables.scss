@@ -10,6 +10,10 @@ $popup-highlight: var(--color-nav-highlight);
 /*width where nav bar collapes into hamburger menu if someone is an admin*/
 $mobile-breakpoint: 1050px;
 
+/*width below which the bar tightens its own spacing so the brand lockup and
+  the signed-in user menu can never collide (phones: 360px - 430px)*/
+$narrow-breakpoint: 480px;
+
 $layout-transition-speed: 0.5s;
 $hover-transition-speed: 0.15s;
 

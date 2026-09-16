@@ -8,21 +8,33 @@
   max-height: 72px;
   overflow: visible;
   border-bottom: 1px solid nav.$border-color;
-  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-nav);
   background-color: nav.$base-color;
+  /* The bar is a flex child of #root; never let the page squash it. */
+  flex-shrink: 0;
 }
 
+/* Radix wraps <NavMenu.List> in this div. It has to size to its own content
+   rather than grow to fill the row: when it grew, the right-hand items
+   overflowed their container and, because the list is justified to the end,
+   that overflow rendered *leftwards* on top of the brand lockup. */
 .nav-menu-root > div {
   overflow: visible;
-  flex: 1;
+  flex: 0 0 auto;
+  margin-left: auto;
   min-width: 0;
 }
 
 .nav-rpi-lockup {
-  height: 30px;
+  height: auto;
+  max-height: 30px;
   width: auto;
+  max-width: 100%;
   object-fit: contain;
-  flex-shrink: 0;
+  /* The lockup is the one piece allowed to scale down when a narrow phone
+     runs out of room, so the anvil and the menu always stay intact. */
+  flex: 0 1 auto;
+  min-width: 0;
   position: relative;
   top: 5px;
 }
@@ -54,12 +66,14 @@
   text-decoration: none;
   background-color: transparent;
   padding: 0.75rem 1rem;
-  flex-shrink: 0;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
   width: fit-content;
 }
 
 .logo-text {
-  font-family: "Funnel Display", "Montserrat", sans-serif;
+  font-family: var(--font-nav);
   font-weight: 700;
   font-size: 1.2rem;
   color: nav.$text-color;
@@ -71,13 +85,20 @@
 
 .nav-menu-list {
   display: flex;
+  flex-wrap: nowrap;
   justify-content: flex-end;
   align-items: center;
   width: 100%;
   height: 100%;
+  min-width: 0;
   gap: 1.75rem;
   list-style: none;
   padding: 0.75rem 1.75rem;
+}
+
+/* Menu items keep their size; only the user menu's label may be truncated. */
+.nav-menu-list > * {
+  flex-shrink: 0;
 }
 
 .list-item {
@@ -99,7 +120,7 @@
   display: flex;
   align-items: center;
   text-decoration: none;
-  font-family: "Noto Sans";
+  font-family: var(--font-nav);
   font-weight: 700;
   border-radius: 4px;
   font-size: 1.25rem;
@@ -117,7 +138,7 @@
 
 .link {
   text-decoration: none;
-  font-family: "Funnel Display", "Noto Sans", sans-serif;
+  font-family: var(--font-nav);
   font-weight: 700;
   border-radius: 4px;
   font-size: 1.15rem;
@@ -139,9 +160,7 @@
   border-radius: 4px;
   background-color: nav.$popup-color;
   color: nav.$popup-text;
-  box-shadow:
-    hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
-    hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  box-shadow: var(--shadow-popover);
   transition:
     width,
     height,
@@ -227,6 +246,28 @@
 .separator.horizontal {
   height: 100%;
   width: 2px;
+  flex-shrink: 0;
+}
+
+/* Signed-in user menu: the avatar and caret stay fixed, a long RCSID
+   ellipses instead of pushing the rest of the bar over the brand. */
+.nav-user-item {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.nav-user-item .user-trigger {
+  min-width: 0;
+}
+
+.user-rcsid {
+  min-width: 0;
+  /* Cap the label before it can squeeze the brand lockup: 10ch covers any
+     normal RCSID, and the vw term keeps it proportionate on small phones. */
+  max-width: min(10ch, 22vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .text {
@@ -322,7 +363,9 @@
     font-size: 0.8rem;
     letter-spacing: 0.01em;
   }
-  .nav-rpi-lockup,
+  .nav-rpi-lockup {
+    max-height: 22px;
+  }
   .nav-forge-sticker {
     height: 22px;
   }
@@ -348,7 +391,9 @@
     min-height: 56px;
     max-height: 56px;
   }
-  .nav-rpi-lockup,
+  .nav-rpi-lockup {
+    max-height: 20px;
+  }
   .nav-forge-sticker {
     height: 20px;
   }
@@ -365,8 +410,12 @@
     display: none;
   }
   .hamburger-icon {
+    /* Absolute on desktop so it can collapse out of the row without pushing
+       the layout. Once it is the visible menu button it has to take part in
+       layout again, otherwise its trigger measures 16px while the icon draws
+       24px and the overflow runs into the separator beside it. */
+    position: static;
     transform: translate(0);
-    margin-right: 0.2rem;
     opacity: 1;
     width: 18pt;
     height: 18pt;
@@ -389,5 +438,29 @@
   .sign-in-button .link {
     font-size: 1rem;
     padding: 0.25rem 0.4rem;
+  }
+}
+
+/* Phones. Desktop-sized padding and gaps used to leave the signed-in menu
+   (avatar + RCSID + caret) wider than the space left beside the brand, which
+   is what pushed the hamburger on top of the anvil on a 360px - 390px screen. */
+@media screen and (max-width: nav.$narrow-breakpoint) {
+  .nav-menu-list {
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+  .logo-link {
+    gap: 0.375rem;
+    padding: 0.75rem 0.5rem;
+  }
+  /* Match the sign-in link, which already drops to 1rem here. At 1.25rem the
+     signed-in menu was wider on a phone than it is on a desktop. */
+  .user-trigger {
+    font-size: 1rem;
+    padding: 0.25rem 0.375rem;
+  }
+  .nav-avatar-root {
+    height: 28px;
+    width: 28px;
   }
 }

@@ -1,15 +1,9 @@
-// =============================================================================
 // THE FORGE | THE MILL — Global Design Tokens
-// =============================================================================
-// Usage in styled-components:  color: var(--color-red);
-// Usage in SCSS:               color: var(--color-red);
-// =============================================================================
+// Usage (SCSS and styled-components):  color: var(--color-red);
 
 :root {
 
-  // ---------------------------------------------------------------------------
   // Colors
-  // ---------------------------------------------------------------------------
   --color-navy:         #111c36;
   --color-navy-mid:     #2d4a80;
   --color-navy-light:   #31519c;
@@ -27,29 +21,35 @@
   --color-white:        #ffffff;
   --color-black:        #000000;
 
-  // Dark-background (navy footer) text/border variants
+  --color-red-bright:   #d40000;
+  --color-red-deep:     #af0909;
+
+  --color-surface-form: #eeeeee;
+  --color-ink:          #333333;
+  --color-ink-strong:   #090909;
+  --color-input-border: #cccccc;
+  --color-placeholder:  rgba(0, 0, 0, 0.5);
+
+  // Navy footer text + borders
   --color-navy-border:  #1e2d4a;
   --color-ice:          #e8edf5;
   --color-steel-blue:   #7a90aa;
 
-  // NavBar hover/highlight variants
+  // NavBar hover states
   --color-nav-highlight: #f0f4fa;
   --color-nav-border:    #e0e0e0;
 
   // Data table body text
   --color-table-text:   #4a6080;
 
-  // ---------------------------------------------------------------------------
   // Typography — font families
-  // ---------------------------------------------------------------------------
   --font-display:  'Funnel Display', sans-serif;
   --font-heading:  'Familjen Grotesk', 'Helvetica Neue', Arial, sans-serif;
   --font-body:     'Funnel Display', 'Helvetica Neue', Arial, sans-serif;
+  --font-nav:      'Funnel Display', 'Noto Sans', sans-serif;
   --font-mono:     'Geist Mono', 'Fira Code', monospace;
 
-  // ---------------------------------------------------------------------------
   // Font sizes (fluid where appropriate)
-  // ---------------------------------------------------------------------------
   --text-xs:   11px;
   --text-sm:   12px;
   --text-base: 14px;
@@ -61,9 +61,7 @@
   --text-4xl:  clamp(32px, 4vw, 50px);
   --text-hero: clamp(60px, 7vw, 100px);
 
-  // ---------------------------------------------------------------------------
   // Spacing scale
-  // ---------------------------------------------------------------------------
   --space-1:   4px;
   --space-2:   8px;
   --space-3:   12px;
@@ -76,36 +74,43 @@
   --space-16:  64px;
   --space-20:  80px;
 
-  // ---------------------------------------------------------------------------
   // Border radius
-  // ---------------------------------------------------------------------------
   --radius-sm:  5px;
   --radius-md:  10px;
   --radius-lg:  14px;
 
-  // ---------------------------------------------------------------------------
   // Borders
-  // ---------------------------------------------------------------------------
   --border-accent:  4px solid var(--color-red);
   --border-card:    1.5px solid var(--color-border);
 
-  // ---------------------------------------------------------------------------
   // Shadows
-  // ---------------------------------------------------------------------------
-  --shadow-nav:  0px 1px 3px 0px rgba(0, 0, 0, 0.06);
+  --shadow-nav:      0px 1px 3px 0px rgba(0, 0, 0, 0.06);
+  --shadow-popover:  hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+                     hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  --shadow-form:     0px 0px 5px rgba(0, 0, 0, 0.5);
 
-  // ---------------------------------------------------------------------------
   // Layout
-  // ---------------------------------------------------------------------------
   --max-width:      1440px;
   --content-px:     174px;
   --content-px-r:   120px;
-  --navbar-height:  72px;
+  --navbar-height:  65px;
 }
 
-// ---------------------------------------------------------------------------
 // Responsive overrides
-// ---------------------------------------------------------------------------
+
+// NavBar height, matching the breakpoints in NavBar.scss
+@media (max-width: 1299px) {
+  :root {
+    --navbar-height: 63px;
+  }
+}
+
+@media (max-width: 1049px) {
+  :root {
+    --navbar-height: 56px;
+  }
+}
+
 @media (max-width: 1024px) {
   :root {
     --content-px:    80px;
@@ -120,13 +125,7 @@
   }
 }
 
-// =============================================================================
-// Shared data card + table
-// =============================================================================
-// Used by any page that displays a tabular data view (Admin tabs, etc.).
-// These classes live in globals.scss so every table across the site shares
-// the same visual design.
-// =============================================================================
+// Shared data card + table — used by any page with a tabular data view.
 
 .data-card {
     position: relative;
@@ -153,9 +152,8 @@
     }
 }
 
-// Header row that pairs the title with an inline action (e.g. the
-// "Advance Semester" button on the Semesters tab). The child title drops
-// its own horizontal padding so this wrapper controls the layout.
+// Title paired with an inline action; the child title drops its own
+// horizontal padding so this wrapper controls the layout.
 .data-card-header {
     display: flex;
     align-items: center;
@@ -213,7 +211,7 @@
     font-weight: 700;
     font-size: 16px;
     text-align: left;
-    color: var(--color-white); // All header labels are white
+    color: var(--color-white);
     padding: 16px 12px;
     vertical-align: middle;
     white-space: nowrap;
@@ -279,13 +277,8 @@
     color: var(--color-red);
 }
 
-// =============================================================================
-// Per-row edit / delete action buttons
-// =============================================================================
-// When the parent `<AdminTable>` is given `onEdit` / `onDelete` props it
-// renders a trailing column containing pencil and/or trash icon buttons.
-// These classes style that column and its buttons.
-// =============================================================================
+// Per-row edit / delete buttons — the trailing column <AdminTable> renders
+// when given onEdit / onDelete.
 
 .data-th-actions {
     width: 110px;
@@ -299,10 +292,8 @@
     white-space: nowrap;
     vertical-align: middle;
 
-    // Horizontal gap between the pencil and trash buttons. Siblings inside
-    // a <td> can't use flex reliably across browsers, so we use margin.
-    // Bumped up per design request so the edit / delete icons have more
-    // breathing room on each row.
+    // Flex is unreliable for siblings inside a <td>, so space the icons
+    // with margin instead.
     > * + * {
         margin-left: 20px;
     }
@@ -373,12 +364,8 @@
     }
 }
 
-// =============================================================================
-// Shared action buttons (blue = manager, red = eboard)
-// =============================================================================
-// The Admin page reuses these for tab-level actions (e.g. "Create Charge
-// Sheet", "Advance Semester").
-// =============================================================================
+// Shared action buttons (blue = manager, red = eboard), also used for
+// tab-level actions on the Admin page.
 
 .btn-action {
     all: unset;

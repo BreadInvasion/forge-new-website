@@ -52,7 +52,7 @@
 }
 
 .footer-col-label {
-  font-family: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-heading);
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 1.2px;
@@ -62,7 +62,7 @@
 }
 
 .footer-brand-title {
-  font-family: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-heading);
   font-weight: 700;
   font-size: 15px;
   color: var(--color-white);
@@ -70,7 +70,7 @@
 }
 
 .footer-brand-sub {
-  font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   font-weight: 400;
   font-size: 12px;
   color: var(--color-steel-blue);
@@ -79,7 +79,7 @@
 }
 
 .footer-contact-name {
-  font-family: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-heading);
   font-weight: 700;
   font-size: 13px;
   color: var(--color-ice);
@@ -87,7 +87,7 @@
 }
 
 .footer-contact-role {
-  font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   font-weight: 400;
   font-size: 11px;
   color: var(--color-steel-blue);
@@ -96,7 +96,7 @@
 }
 
 .footer-contact-line {
-  font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   font-weight: 400;
   font-size: 11px;
   color: var(--color-steel-blue);
@@ -105,7 +105,7 @@
 }
 
 .footer-link {
-  font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   font-weight: 400;
   font-size: 11px;
   color: var(--color-steel-blue);
@@ -125,7 +125,7 @@
 }
 
 .footer-nav-link {
-  font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   font-weight: 400;
   font-size: 12px;
   color: var(--color-steel-blue);
@@ -172,7 +172,7 @@
 }
 
 .footer-copyright {
-  font-family: "Funnel Display", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 11px;
   color: var(--color-steel-blue);
   margin: 0;

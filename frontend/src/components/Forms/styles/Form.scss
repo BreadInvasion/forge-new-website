@@ -28,40 +28,40 @@
     border-radius: 5px;
     padding: 1rem 2rem;
     gap: 1rem;
-    background-color: #eeeeee;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+    background-color: var(--color-surface-form);
+    box-shadow: var(--shadow-form);
 }
 
 .form-container > label {
     font-size: 4vh;
-    color: #333;
+    color: var(--color-ink);
     text-align: center;
 }
 
 .styled-input {
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-input-border);
     border-radius: 4px;
     font-size: 2vh;
     width: 100%;
-    border: 1px solid #333;
+    border: 1px solid var(--color-ink);
 }
 
 .styled-dropdown {
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-input-border);
     border-radius: 4px;
     font-size: 1.875vh;
     width: 100%;
-    border: 1px solid #333;
+    border: 1px solid var(--color-ink);
 }
 
 .styled-dropdown-option {
-    color: #090909;
+    color: var(--color-ink-strong);
 }
 
 .styled-dropdown-placeholder {
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--color-placeholder);
 }
 
 .styled-checkbox {

@@ -107,6 +107,7 @@ export default function App() {
                         </div>
                     } />
                 </Routes>
+                <Footer />
             </Suspense>
         </Router>
     );

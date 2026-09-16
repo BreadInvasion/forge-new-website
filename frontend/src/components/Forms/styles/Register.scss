@@ -6,7 +6,7 @@
     justify-content: right;
 
     padding: 10% 10% 10% 0;
-    background-color: #D40000;
+    background-color: var(--color-red-bright);
     background-image: url(anvil_with_benchys.png);
     background-size: cover;
     background-position: center;
@@ -22,25 +22,25 @@ form {
     border-radius: 5px;
     padding: 1rem 2rem;
     gap: 1rem;
-    background-color: #eeeeee;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+    background-color: var(--color-surface-form);
+    box-shadow: var(--shadow-form);
 }
 
 .submit-button {
 	padding: 5px 10px;
-	border: 1px solid #ccc;
+	border: 1px solid var(--color-input-border);
 	border-radius: 4px;
 	font-size: 1rem;
 	min-width: fit-content;
 	width: 50%;
-	background-color: #AF0909;
-	color: white;
+	background-color: var(--color-red-deep);
+	color: var(--color-white);
 	cursor: pointer;
 }
 
 .input-container label {
     font-size: 1rem;
     font-weight: 600;
-    color: #333;
+    color: var(--color-ink);
     text-align: right;
 }

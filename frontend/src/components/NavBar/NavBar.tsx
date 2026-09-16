@@ -30,10 +30,10 @@ const UserMenu: React.FC<NavBarProps> = ({ user, setAuth, isAuthed }) => {
   };
   if (isAuthed) {
     return (
-      <NavMenu.Item className="user-item">
+      <NavMenu.Item className="user-item nav-user-item">
         <NavMenu.Trigger className="user-trigger">
           <Avatar.default user={user} isNav={true} />
-          {user.RCSID}{" "}
+          <span className="user-rcsid">{user.RCSID}</span>
           <CaretDownIcon className="caret-down dropdown-spinner" aria-hidden />
         </NavMenu.Trigger>
         <NavMenu.Content className="user-content">
