@@ -32,7 +32,7 @@ async def send_failure_email(email, machine_name, percentage):
         "content": {
             "subject": "Your Machine Usage Failed",
             "plainText": (
-                f"Unfortunately, your machine usage on {machine_name} has failed at {percentage}%. You may want to stop by the Forge and try again (a reprint is free)."
+                f"Unfortunately, your machine usage on {machine_name} has failed at {percentage}%. You may want to stop by the Forge and try again (one reprint is free)."
             ),
         },
     }
