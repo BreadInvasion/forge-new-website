@@ -24,6 +24,7 @@ async def send_failure_email(email, machine_name, percentage):
         settings.AZURE_COMMUNICATION_CONNECTION_STRING
     )
 
+
     message = {
         "senderAddress": "DoNotReply@notifications.rpiforge.dev",
         "recipients": {
@@ -32,13 +33,14 @@ async def send_failure_email(email, machine_name, percentage):
         "content": {
             "subject": "Your Machine Usage Failed",
             "plainText": (
-                f"Unfortunately, your machine usage on {machine_name} has failed at {percentage}%. You may want to stop by the Forge and try again (a reprint is free)."
+                f"Unfortunately, your machine usage on {machine_name} has failed at {percentage}%. You may want to stop by the Forge and try again (one reprint is free)."
             ),
         },
     }
 
     poller = client.begin_send(message)
     result = poller.result()
+
     if result["status"] != "Succeeded" or result["error"] is not None:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
@@ -104,6 +106,7 @@ async def fail_machine(
             selectinload(Machine.active_usage).selectinload(MachineUsage.user)
         )
     )
+
     if not machine:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -115,7 +118,7 @@ async def fail_machine(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="This machine does not have an active usage",
         )
-    print("bo433o")
+
     audit_log = AuditLog(
         type=LogType.MACHINE_USAGE_FAILED,
         content={

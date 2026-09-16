@@ -66,6 +66,7 @@ export const FailAMachineForm: React.FC = () => {
                 console.log("Response:", response);
                 alert("An error occurred, please try again.");
             }
+            alert("Success, machine failure email sent");
         } catch (error) {
             console.error("Error:", error);
             alert("An error occurred, please try again.");
