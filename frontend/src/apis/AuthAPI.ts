@@ -40,14 +40,62 @@ export const AuthAPI = {
 
         return response.data;
     },
-    makeToken: async () => {
+    checkEmailToken: async (token: string) => {
         const response = await authApi.request({
-            url: "/verification",
-            method: "POST",
-            data: { tokenType: "email_verification" },
+            url: `/email-verification/${token}`,
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        });
+        if (response.status != 200) throw response.data;
+
+        return response.data;
+    },
+    makeVerifyToken: async (data: Record<string, any>) => {
+        const response = await authApi.request({
+            url: "/email-verification",
+            method: "POST",
+            data,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        });
+        if (response.status != 200) throw response.data;
+
+        return response.data;
+    },
+    makePasswordToken: async (data: Record<string, any>) => {
+        const response = await authApi.request({
+            url: "/password-verification",
+            method: "POST",
+            data,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        if (response.status != 200) throw response.data;
+
+        return response.data;
+    },
+    checkPasswordToken: async (token: string) => {
+        const response = await authApi.request({
+            url: `/password-verification/${token}`,
+            method: "GET",
+        });
+        if (response.status != 200) throw response.data;
+
+        return response.data;
+    },
+    resetPassword: async (token: string, data: Record<string, any>) => {
+        const response = await authApi.request({
+            url: `/password-verification/${token}`,
+            method: "POST",
+            data,
+            headers: {
+                "Content-Type": "application/json",
             },
         });
         if (response.status != 200) throw response.data;
