@@ -404,7 +404,7 @@ const ResourceUsageForm: React.FC<ResourceUsageFormProps> = ({ slots, initialVal
         setSlotValues(newSlotValues);
     }
 
-    const showBrand = slots.find((slot) => slot.valid_resources.find((resource) => resource.brand)) ? true : false;
+    const showBrand = false; //slots.find((slot) => slot.valid_resources.find((resource) => resource.brand)) ? true : false;
     const showColor = false; //slots.find((slot) => slot.valid_resources.find((resource) => resource.color) ? true : false);
 
     return (
