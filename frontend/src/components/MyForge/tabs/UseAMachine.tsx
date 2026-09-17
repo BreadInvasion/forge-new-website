@@ -239,7 +239,7 @@ export const DynamicMachineForm: React.FC = () => {
         }
 
         //Check if duration is valid
-        if (page == 4 && (formData.hours == 0 && formData.minutes == 0)) {
+        if (page == 4 && ((formData.hours == 0 && formData.minutes == 0) || formData.hours < 0 || formData.minutes < 0)) {
             updateStatus("Please enter a valid duration.", "error");
             return;
         }
