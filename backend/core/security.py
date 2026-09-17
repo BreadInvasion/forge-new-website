@@ -3,6 +3,13 @@
 import time
 
 import jwt
+import bcrypt
+# Workaround for passlib 1.7.4 compatibility with bcrypt >= 4.1.0
+if not hasattr(bcrypt, "__about__"):
+    class _BcryptAbout:
+        __version__ = getattr(bcrypt, "__version__", "4.0.1")
+    bcrypt.__about__ = _BcryptAbout()
+
 from passlib.context import CryptContext
 from pydantic import BaseModel, SecretStr
 
