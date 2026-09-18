@@ -198,6 +198,8 @@ class LogType(StrEnum):
     USER_EDITED = "user_edited"
     USER_DELETED = "user_deleted"
 
+    USER_LOGIN = "user_login"
+
     ORG_CREATED = "org_created"
     ORG_EDITED = "org_edited"
     ORG_DELETED = "org_deleted"
