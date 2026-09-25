@@ -1,21 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import "./Pagestyle.css";
 
 const AboutUs = () => {
-  const [scrollPosition, setScrollPosition] = useState(0);
-  
-  // Track scroll position
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollPosition(window.scrollY);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
   return (
     <div className="page-container">
 
