@@ -232,7 +232,7 @@ export const DynamicMachineForm: React.FC = () => {
             var invalidAmount = false;
 
             slotValues.forEach((slot) => {
-                if (slot.amount <= 0) {
+                if (slot.amount < 0) {
                     updateStatus("Please enter a valid amount of material", "error");
                     invalidAmount = true;
                 }
