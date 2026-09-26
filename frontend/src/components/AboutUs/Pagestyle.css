@@ -1,6 +1,11 @@
+@import "@radix-ui/colors/black-alpha.css";
+@import "@radix-ui/colors/mauve.css";
+@import "@radix-ui/colors/violet.css";
+
 .page-container {
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
-  min-height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -234,6 +239,23 @@ header {
 
 #social_links a:hover {
   color: rgba(255, 255, 255, .75);
+}
+
+div::-webkit-scrollbar {
+  width: 8px;
+}
+
+div::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+div::-webkit-scrollbar-thumb {
+  background: var(--mauve-8);
+  border-radius: 4px;
+}
+
+div::-webkit-scrollbar-thumb:hover {
+  background: var(--mauve-9);
 }
 
 /* Responsive adjustments */

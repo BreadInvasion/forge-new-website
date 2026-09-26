@@ -2,13 +2,14 @@
   "name": "forge_website",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
-    "@daypilot/daypilot-lite-react": "^3.19.0",
-    "@fortawesome/fontawesome-svg-core": "^6.4.2",
-    "@fortawesome/free-brands-svg-icons": "^6.4.2",
-    "@fortawesome/free-regular-svg-icons": "^6.4.2",
-    "@fortawesome/free-solid-svg-icons": "^6.4.2",
-    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@daypilot/daypilot-lite-react": "^5.10.0",
+    "@fortawesome/fontawesome-svg-core": "^7.3.1",
+    "@fortawesome/free-brands-svg-icons": "^7.3.1",
+    "@fortawesome/free-regular-svg-icons": "^7.3.1",
+    "@fortawesome/free-solid-svg-icons": "^7.3.1",
+    "@fortawesome/react-fontawesome": "^3.5.0",
     "@popperjs/core": "^2.11.8",
     "@radix-ui/colors": "^3.0.0",
     "@radix-ui/react-accordion": "^1.2.3",
@@ -24,41 +25,38 @@
     "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-toggle": "^1.1.2",
-    "@testing-library/dom": ">=7.21.4",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "@types/gapi": "^0.0.47",
-    "@types/jwt-decode": "^3.1.0",
-    "@vitejs/plugin-react": "^4.2.1",
+    "@types/react": "^19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.0",
-    "dotenv": "^16.4.7",
+    "dotenv": "^17.4.2",
     "gapi-script": "^1.2.0",
     "jwt-decode": "^4.0.0",
     "radix-ui": "^1.2.0",
-    "react": "^18.2.0",
+    "react": "^19.3.0",
     "react-bootstrap": "^2.8.0",
-    "react-dom": "^18.2.0",
+    "react-dom": "^19.3.0",
     "react-google-calendar-api": "^2.3.0",
-    "react-icons": "^4.10.1",
+    "react-icons": "^5.7.0",
+    "react-is": "^19.3.0",
     "react-minimal-pie-chart": "^9.1.0",
-    "react-router-dom": "^6.14.2",
-    "recharts": "^2.12.4",
+    "react-router-dom": "^7.18.3",
+    "recharts": "^3.10.1",
     "recoil": "^0.7.7",
     "sass": "^1.64.1",
     "styled-components": "^6.0.5",
-    "three": "^0.159.0",
-    "uuid": "^9.0.1",
-    "vite": "^5.0.12",
-    "vite-plugin-svgr": "^4.2.0",
-    "vite-tsconfig-paths": "^4.3.1",
-    "web-vitals": "^2.1.4"
+    "three": "^0.186.0",
+    "uuid": "^14.0.2",
+    "vite": "^8.3.0",
+    "vite-plugin-svgr": "^5.2.0",
+    "web-vitals": "^6.2.1"
   },
   "scripts": {
     "start": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "v": "type vite"
   },
   "browserslist": {
     "production": [
@@ -73,10 +71,14 @@
     ]
   },
   "devDependencies": {
-    "@types/three": "^0.159.0",
-    "@types/uuid": "^9.0.7"
+    "@testing-library/dom": ">=7.21.4",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@types/node": "^26.5.1",
+    "@types/three": "^0.186.0"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.9.5"
+    "@rollup/rollup-linux-x64-gnu": "4.63.3"
   }
 }

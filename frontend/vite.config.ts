@@ -1,19 +1,23 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import viteTsconfigPaths from 'vite-tsconfig-paths'
 import svgr from 'vite-plugin-svgr'
+import path from "path"
 
 export default defineConfig({
     assetsInclude: ["**/*.glb"],
     // depending on your application, base can also be "/"
     base: '',
+    resolve: {
+        alias: {
+            "src": path.resolve(import.meta.dirname, "src"),
+        }
+    },
     plugins: [
         svgr({
             svgrOptions: { exportType: 'named', ref: true, svgo: false, titleProp: true },
             include: '**/*.svg',
         }),
         react(), 
-        viteTsconfigPaths()
     ],
     server: {
         port: 3000,
@@ -35,7 +39,7 @@ export default defineConfig({
               },
         },
     },
-    esbuild: {
+    build: {
         target: 'esnext',
     }
 })
