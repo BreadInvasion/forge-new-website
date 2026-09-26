@@ -35,14 +35,21 @@ export const GridContainer = styled.div`
     -webkit-overflow-scrolling: touch;
     }
 `;
+const modeColors: Record<string, string> = {
+    available:   '#f5f5f5',  
+    maintenance: '#fff8e1',  
+    disabled:    '#eeeeee',  
+    failed:      '#ffebee', 
+};
 
 export const Card = styled.div<{ 
     $symbol?: string; 
     $minimized?: boolean; 
     $highlightFailed?: boolean; 
+    $mode?: string;
     progress: number;
 }>`
-    background-color: #f5f5f5;
+    background-color: ${({ $mode }) => modeColors[$mode ?? ''] ?? '#f5f5f5'};
     border-radius: 5px;
     padding:10px;
     display: flex;

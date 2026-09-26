@@ -123,6 +123,12 @@ async def use_a_machine(
             detail="Machine is in use",
         )
 
+    if machine.maintenance_mode or machine.disabled:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Machine is under maintenance or disabled",
+        )
+
     state = await session.scalar(
         select(State).options(selectinload(State.active_semester))
     )

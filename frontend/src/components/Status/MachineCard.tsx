@@ -57,6 +57,15 @@ const StyledButton = styled.button`
     }
 `;
 
+export type MachineMode = 'in_use' | 'failed' | 'maintenance' | 'disabled' | 'available';
+
+const getMode = (m: MachineProps): MachineMode => {
+    if (m.failed) return 'failed';
+    if (m.in_use) return 'in_use';
+    if (m.maintenance_mode) return 'maintenance';
+    if (m.disabled) return 'disabled';
+    return 'available';
+};
 
 const MachineCard: React.FC<MachineCardProps> = ({ machine: machineInput, $minimized, $highlightFailed}) => {
     const [machine, setMachine] = useState(machineInput);
@@ -121,20 +130,20 @@ function convHM(seconds: number): string {
     return `${hrs}h ${mins}m`;
 }
 
-const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: boolean, disabled?: boolean) => {
-    const statuses = [];
-    const progress = getProgress(usage_start, usage_duration); // Calculate progress once
+const getStatusText = () => {
+    const mode = getMode(machine);
+    const progress = getProgress(usage_start, usage_duration);
 
-    if (progress === 100) {statuses.push("Completed");
-    } else {
-        if (in_use) statuses.push("In Use");
-        if (failed) statuses.push("Failed");
-        if (maintenance_mode) statuses.push("Under Maintenance");
-        if (disabled) statuses.push("Disabled");
-        if (!in_use && !failed && !maintenance_mode && !disabled) statuses.push("Available");
+    // A print that finished normally shows "Completed", but a failed one never does
+    if (mode === 'in_use' && progress === 100) return 'Completed';
+
+    switch (mode) {
+        case 'failed':      return 'Failed';
+        case 'in_use':      return 'In Use';
+        case 'maintenance': return 'Under Maintenance';
+        case 'disabled':    return 'Disabled';
+        default:            return 'Available';
     }
-
-    return statuses.length > 0 ? statuses.join(", ") : "Operational";
 };
 
     return (
@@ -142,21 +151,22 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
             $symbol={name} 
             $minimized={$minimized} 
             $highlightFailed={$highlightFailed && failed}
-            progress={$minimized ? getProgress(usage_start, usage_duration) : 0}
+            $mode={getMode(machine)}
+            progress={$minimized && !failed ? getProgress(usage_start, usage_duration) : 0}
             onClick={handleClick}
         >
                 <MachineName $minimized={$minimized} $clearable={$highlightFailed && (failed || in_use)}>{name}</MachineName>
                 <BigCardText $minimized={$minimized} $clearable={$highlightFailed && (failed || in_use)}>USER </BigCardText><BigCardInfo $clearable={$highlightFailed && (failed || in_use)}>{user ? user : 'N/A'}</BigCardInfo> 
                 {!$minimized && (
                     <>
-                        {in_use && (
+                        {in_use && !failed && (
                             <>
                             <BigCardAttribute><BigCardText>START TIME</BigCardText><BigCardInfo>{usage_start?.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}</BigCardInfo></BigCardAttribute>
                             <BigCardAttribute><BigCardText>TOTAL TIME </BigCardText><BigCardInfo>{convHM(usage_duration ?? 0)}</BigCardInfo></BigCardAttribute>
                             <BigCardAttribute><BigCardText>PROGRESS </BigCardText><BigCardInfo>{getProgress(usage_start, usage_duration).toFixed(2)}%</BigCardInfo></BigCardAttribute>
                             </>
                         )}
-                        <BigCardAttribute><BigCardText>STATUS(ES)</BigCardText><BigCardInfo>{getStatusText(in_use, failed, maintenance_mode, disabled)}</BigCardInfo></BigCardAttribute>
+                        <BigCardAttribute><BigCardText>STATUS(ES)</BigCardText><BigCardInfo>{getStatusText()}</BigCardInfo></BigCardAttribute>
                        {failed &&(
                             <BigCardAttribute><BigCardText>FAILED AT </BigCardText><BigCardInfo>{failed_at?.toDateString()}</BigCardInfo></BigCardAttribute>
                         )}

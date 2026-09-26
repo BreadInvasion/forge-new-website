@@ -46,7 +46,7 @@ async def get_machines_status(
         machine_statuses = [
             MachineStatus.model_validate(
                 {
-                    "in_use": machine.active_usage is not None,
+                    "in_use": machine.active_usage is not None and not machine.active_usage.failed,
                     "group_id": machine.group_id,
                     "type_id": machine.type_id,
                     "failed": (

@@ -188,7 +188,10 @@ export const DynamicMachineForm: React.FC = () => {
             }
 
         } catch (error: any) {
-            if (error.status == 409) {
+            const detail: string = error?.response?.data?.detail ?? error?.detail ?? "";
+            if (error.status == 409 && /maintenance|disabled/i.test(detail)) {
+                updateStatus("This machine is under maintenance or disabled and can't be used right now.", "error");
+            } else if (error.status == 409) {
                 updateStatus("This machine is already in use. Please clear it before submitting a new usage.", "error");
             } else if (error.status == 404) {
                 updateStatus("The selected machine does not exist.", "error");
@@ -264,7 +267,15 @@ export const DynamicMachineForm: React.FC = () => {
                         >
                             <option className='styled-dropdown-placeholder' value="0" hidden>{"Please Select a Machine"}</option>
                             {machines.map((machine: Machine) => (
-                                <option className='styled-dropdown-option' key={machine.id} value={machine.id}>{machine.name}</option>
+                                <option
+                                    className='styled-dropdown-option'
+                                    key={machine.id}
+                                    value={machine.id}
+                                    disabled={machine.maintenance_mode || machine.disabled}
+                                >
+                                    {machine.name}
+                                    {machine.maintenance_mode ? ' (Under Maintenance)' : machine.disabled ? ' (Disabled)' : ''}
+                                </option>
                             ))}
                         </select>
                     </div>
