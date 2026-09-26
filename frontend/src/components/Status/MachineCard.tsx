@@ -56,6 +56,7 @@ const StyledButton = styled.button`
         background-color:rgb(186, 7, 7);
     }
 `;
+export const PROGRESS_TICK_MS = 5000;
 
 export type MachineMode = 'in_use' | 'failed' | 'maintenance' | 'disabled' | 'available';
 
@@ -74,6 +75,14 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine: machineInput, $minim
     const {id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material} = machine;
 
     const {setSelectedMachine } = useSelectedMachine();
+
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        if (!in_use || failed) return;
+        const timer = setInterval(() => setTick(t => t + 1), PROGRESS_TICK_MS);
+        return () => clearInterval(timer);
+    }, [in_use, failed]);
+    const liveProgress = $minimized && !failed ? getProgress(usage_start, usage_duration) : 0;
 
     const handleClick = () => {
         setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material});
@@ -152,7 +161,8 @@ const getStatusText = () => {
             $minimized={$minimized} 
             $highlightFailed={$highlightFailed && failed}
             $mode={getMode(machine)}
-            progress={$minimized && !failed ? getProgress(usage_start, usage_duration) : 0}
+            progress={liveProgress}
+            style={{ '--progress': liveProgress } as React.CSSProperties}
             onClick={handleClick}
         >
                 <MachineName $minimized={$minimized} $clearable={$highlightFailed && (failed || in_use)}>{name}</MachineName>
