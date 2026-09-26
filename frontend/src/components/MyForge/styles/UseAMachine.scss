@@ -25,6 +25,9 @@
 }
 
 .usage-form button {
+    align-items: center;
+    display: flex;
+    gap: 8px;
     padding: 10px 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -33,6 +36,26 @@
     background-color: #333;
     color: #eeeeee;
     cursor: pointer;
+}
+
+.usage-form button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.loading-spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #eeeeee;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: loading-spinner 0.7s linear infinite;
+}
+
+@keyframes loading-spinner {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .usage-form .divider {

@@ -1,15 +1,17 @@
 """ User authentication endpoints. """
 
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import and_, func, select
 
+from models.audit_log import AuditLog
 from models.machine_usage import MachineUsage
 from models.state import State
 from models.user import User
-from schemas.enums import Permissions
+from schemas.enums import LogType, Permissions
 from schemas.responses import AccessTokenResponse, UserNoHash
 
 from ..deps import DBSession, PermittedUserChecker
@@ -35,7 +37,8 @@ ACCOUNT_DISABLED_ERROR = HTTPException(
 
 @router.post("/login")
 async def login_user(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: DBSession
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], 
+    session: DBSession
 ) -> AccessTokenResponse:
     """Check if user credentials are valid. If they are, create and return an access token."""
 
@@ -50,6 +53,14 @@ async def login_user(
     ):
         # Provided user is locked out. Their credentials are right, but refuse login anyway.
         raise ACCOUNT_DISABLED_ERROR
+
+    session.add(
+        AuditLog(
+            type=LogType.USER_LOGIN,
+            content={"uer_rcsid": user.RCSID, "time": datetime.now(UTC).isoformat()},
+        )
+    )
+    await session.commit()
 
     return create_token_response(user.RCSID)
 
