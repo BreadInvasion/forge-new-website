@@ -284,6 +284,7 @@
     font-weight: 600;
     margin-bottom: 0.12rem;
     color: #222;
+    width: 100%;
 }
 
 .Input {
@@ -301,7 +302,30 @@
     gap: 0.4rem;
     padding: 0.12rem 0;
 }
+.checkbox-labels .Checkbox {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    cursor: pointer;
+}
 
+.checkbox-labels .Label {
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 2rem;          
+    flex-wrap: wrap;    
+}
+
+.checkbox-labels .Label {
+    margin-bottom: 0;
+    cursor: pointer;
+    white-space: nowrap; 
+}
 .Button.SaveBtn {
     padding: 0.4rem 0.75rem;
     border-radius: 0.5rem;
