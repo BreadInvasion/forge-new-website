@@ -5,10 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { userState } from 'src/GlobalAtoms';
 import { User } from 'src/interfaces';
-
-import './styles/Login.scss';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { AuthAPI } from 'src/apis/AuthAPI';
+import rulerMask from '../../assets/img/ruler-mask-tile.svg?url';
+import anvilImg from '../../assets/img/anvil_with_benchys.png';
+import PageRuler from '../shared/PageRuler';
+import './styles/Login.scss';
+
+const ANVIL_URL  = anvilImg;
+const RULER_URL  = rulerMask;
 
 interface CustomJwtPayload extends JwtPayload {
     expires_at?: number;
@@ -46,7 +51,7 @@ export default function Login() {
         try {
             const response = await AuthAPI.login(username, password);
             console.log('Login response:', response);
-            
+
             if (response.status === 200) {
                 const result = response.data;
                 const token = result.access_token;
@@ -80,29 +85,53 @@ export default function Login() {
     };
 
     return (
-        <div className='login-container'>
-            <form onSubmit={handleLogin}>
-                <div className='form-logo' />
-                <label>Sign In</label>
-                <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <div className='button-container'>
-                    <button type='submit'>Sign In</button>
-                    <a href="/reset-password">Forgot Password?</a>
+        <div className="login-page">
+            <img className="login-anvil" src={ANVIL_URL} alt="" />
+            <PageRuler src={RULER_URL} side="left" zIndex={1} />
+
+            <div className="login-card">
+                <div className="login-card__inner">
+                    <form className="login-form" onSubmit={handleLogin}>
+                        <h1 className="login-title">Sign In</h1>
+                        <div className="login-divider" />
+
+                        <div className="login-fields">
+                            <div className="login-field">
+                                <label className="login-field__label" htmlFor="rscid">RSC ID</label>
+                                <input
+                                    className="login-field__input"
+                                    id="rscid"
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="login-field">
+                                <label className="login-field__label" htmlFor="password">Password</label>
+                                <input
+                                    className="login-field__input"
+                                    id="password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="login-buttons">
+                            <button className="login-btn login-btn--submit" type="submit">Start Making!</button>
+                            <a className="login-btn" href="/reset-password">Forgot Password?</a>
+                        </div>
+
+                        <div className="login-divider" />
+
+                        <p className="login-register__label">Don't have an account?</p>
+                        <a className="login-register__btn" href="/register">Register Here!</a>
+                    </form>
                 </div>
-                <div className='seperator' />
-                <span className='register'>Don't have an account? <a href="/register">Register Here!</a></span>
-            </form>
+            </div>
         </div>
-    )
+    );
 }

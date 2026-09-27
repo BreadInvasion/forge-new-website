@@ -1,46 +1,235 @@
-.page-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: right;
+$navy: #111c36;
+$red: #a51c1c;
+$red-hover: #8a1515;
+$white: #ffffff;
+$font: var(--font-display, 'Funnel Display', sans-serif);
+$mobile: 700px;
 
-    padding: 10% 10% 10% 0;
-    background-color: var(--color-red-bright);
-    background-image: url(anvil_with_benchys.png);
-    background-size: cover;
-    background-position: center;
+@mixin field-control {
+    height: 30px;
+    width: clamp(130px, 20vw, 300px);
+    border: 2px solid #000;
+    border-radius: 5px;
+    background: $white;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-family: $font;
+    outline: none;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
-form {
+.register-page {
+    position: relative;
+    width: 100%;
+    min-height: calc(100vh - var(--navbar-height));
+    background: linear-gradient(to right, $red 0%, #2d4a80 100%);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    overflow: hidden;
+}
+
+.register-anvil {
+    position: absolute;
+    left: 4%;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 100%;
+    max-height: 816px;
+    width: auto;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+}
+
+.register-card {
+    position: relative;
+    z-index: 2;
+    background: $white;
+    border: 4px solid $navy;
+    border-radius: 10px;
+    width: clamp(320px, 38vw, 552px);
+    padding: 0 0 20px 0;
+    margin-right: clamp(24px, 6vw, 96px);
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: max-content !important;
-    height: auto;
-    
-    border-radius: 5px;
-    padding: 1rem 2rem;
-    gap: 1rem;
-    background-color: var(--color-surface-form);
-    box-shadow: var(--shadow-form);
+    box-shadow: 0 8px 32px rgba(17, 28, 54, 0.25);
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url('../../../assets/img/background.svg');
+        background-repeat: repeat;
+        background-size: 122px 140px;
+        opacity: 0.03;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    @media screen and (max-width: $mobile) {
+        width: calc(100% - 48px);
+        margin-right: 24px;
+        margin-left: 24px;
+    }
 }
 
-.submit-button {
-	padding: 5px 10px;
-	border: 1px solid var(--color-input-border);
-	border-radius: 4px;
-	font-size: 1rem;
-	min-width: fit-content;
-	width: 50%;
-	background-color: var(--color-red-deep);
-	color: var(--color-white);
-	cursor: pointer;
+.register-card__inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.input-container label {
-    font-size: 1rem;
+.register-form {
+    display: contents;
+}
+
+.register-title {
+    font-family: $font;
+    font-size: clamp(20px, 2.5vw, 30px);
+    font-weight: 700;
+    color: $navy;
+    text-align: center;
+    margin: 20px 0 14px 0;
+}
+
+.register-divider {
+    width: calc(100% - 40px);
+    height: 2px;
+    background: $navy;
+    flex-shrink: 0;
+}
+
+.register-fields {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    width: calc(100% - 40px);
+    padding: 12px 0 8px 0;
+}
+
+.register-field {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 5px 10px;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.register-field__label {
+    font-family: $font;
+    font-size: clamp(13px, 1.4vw, 20px);
+    font-weight: 700;
+    color: #000;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.register-field__input {
+    @include field-control;
+
+    &:focus {
+        border-color: $navy;
+        box-shadow: 0 0 0 2px rgba(17, 28, 54, 0.15);
+    }
+}
+
+.register-field__select {
+    @include field-control;
+    cursor: pointer;
+
+    &:focus {
+        border-color: $navy;
+    }
+}
+
+.register-checks {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    width: calc(100% - 40px);
+    padding: 8px 10px 4px 10px;
+}
+
+.register-check {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 7px 0;
+    width: 100%;
+}
+
+.register-check__box {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: $navy;
+    border: 2px solid #000;
+    border-radius: 4px;
+}
+
+.register-check__label {
+    font-family: $font;
+    font-size: clamp(11px, 1.1vw, 14px);
+    font-weight: 700;
+    color: #000;
+    cursor: pointer;
+    line-height: 1.3;
+}
+
+.register-status {
+    font-family: $font;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--color-ink);
-    text-align: right;
+    text-align: center;
+    padding: 4px 20px;
+    min-height: 18px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    color: transparent;
+
+    &--error {
+        color: $red;
+    }
+    &--success {
+        color: #1d7a48;
+    }
+}
+
+.register-submit {
+    height: clamp(54px, 6vw, 72px);
+    width: calc(100% - 40px);
+    background: $red;
+    border: 2px solid #000;
+    border-radius: 5px;
+    font-family: $font;
+    font-size: clamp(18px, 2.2vw, 30px);
+    font-weight: 700;
+    color: $white;
+    cursor: pointer;
+    margin-top: 4px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+
+    &:hover {
+        background: $red-hover;
+        transform: translateY(-1px);
+    }
+    &:active {
+        transform: translateY(0);
+    }
 }

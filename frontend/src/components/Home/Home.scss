@@ -35,16 +35,17 @@ $tablet: 1300px;
     flex-direction: column;
     width: 100%;
     flex: 1 1 auto;
-}
+    min-height: calc(100vh - var(--navbar-height));
 
-/* Hero — fills the whole screen below the navbar; the info bar and footer
-   follow underneath it */
+    @media (max-width: $mobile) {
+        min-height: auto;
+    }
+}
 
 .home-hero {
     position: relative;
     width: 100%;
     flex: 1 1 auto;
-    min-height: calc(100vh - var(--navbar-height));
     display: flex;
     align-items: stretch;
     background: linear-gradient(to right, var(--color-navy-mid) 10%, var(--color-red) 100%);
