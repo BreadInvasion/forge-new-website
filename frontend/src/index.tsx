@@ -1,6 +1,6 @@
 import './index.scss';
 import { RecoilRoot } from 'recoil';
-import React from "react";
+import React, { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { AuthProvider } from './components/Auth/AuthContext';
@@ -16,9 +16,11 @@ const initializeState = ({ set: set }: any) => {
 };
 
 root.render(
-    <RecoilRoot initializeState={initializeState}>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </RecoilRoot>
+    <StrictMode>
+        <RecoilRoot initializeState={initializeState}>
+        <AuthProvider>
+            <App />
+        </AuthProvider>
+        </RecoilRoot>
+    </StrictMode>
 );
