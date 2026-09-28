@@ -16,7 +16,7 @@ const Register = lazy(() => import('./components/Forms/Register'));
 const VerifyEmail = lazy(() => import('./components/Forms/VerifyEmail'));
 const ResetPassword = lazy(() => import('./components/Forms/ResetPassword'));
 const ComingSoon = lazy(() => import('./components/Home/ComingSoon'));
-const NewStatus = lazy(() => import('src/pages/Status/Status'));
+const NewStatus = lazy(() => import('./components/Status/Status'));
 const MyForge = lazy(() => import('./components/MyForge/MyForge'));
 const Hours = lazy(() => import('./components/Hours/Hours'));
 const Wiki = lazy(() => import('./components/Learn/Wiki'));
