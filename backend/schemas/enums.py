@@ -149,6 +149,9 @@ class Permissions(StrEnum):
     # Roles with this tag can only be assigned or edited by another superuser.
     IS_SUPERUSER = "isSuperuser"
 
+    # Allows the user to clean old user profiles
+    CAN_CLEAN_DATABASE = "canCleanDatabase"
+
 
 class LogType(StrEnum):
     MACHINE_USED = "machine_used"
