@@ -6,10 +6,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import and_, func, select
 
+from models.audit_log import AuditLog
 from models.machine_usage import MachineUsage
 from models.state import State
 from models.user import User
-from schemas.enums import Permissions
+from schemas.enums import LogType, Permissions
 from schemas.responses import AccessTokenResponse, UserNoHash
 
 from ..deps import DBSession, PermittedUserChecker
@@ -50,6 +51,15 @@ async def login_user(
     ):
         # Provided user is locked out. Their credentials are right, but refuse login anyway.
         raise ACCOUNT_DISABLED_ERROR
+
+    audit_log = AuditLog(
+        type=LogType.USER_LOGIN,
+        content={
+            "user_rcsid": user.RCSID,
+        },
+    )
+    session.add(audit_log)
+    await session.commit()
 
     return create_token_response(user.RCSID)
 
