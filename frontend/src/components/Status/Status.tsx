@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { OmniAPI } from "src/apis/OmniAPI";
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { GridContainer, StatusWrapper} from './StatusComponents';
 import { SelectedMachineProvider } from './SelectedMachineContext';
@@ -7,7 +6,8 @@ import UpNext from './components/UpNext';
 import Highlight from './components/Highlight';
 import Toolbar from './components/Toolbar';
 import MachineCard,{ getProgress } from './MachineCard';
-import { Machine, AllMachinesStatusResponse } from "src/interfaces";
+import { useMachines } from 'src/hooks/useMachines';
+import Info from 'src/components/Info';
 
 const Page = styled.div`
     width: 100%;
@@ -63,95 +63,51 @@ const Sidebar = styled.div`
 `;
 
 export const Status : React.FC = () => {
-    const [MachinesResponse, setAllMachinesResponse] = useState<AllMachinesStatusResponse | null>(null);
-    const [machines, setMachines] = useState<Machine[]>([]);
-    
     const [highlightFailed, setHighlightFailed] = useState(false);
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
-    
-    useEffect(() => {
-            const fetchMachines = async () => {
-                try {
-                    const response = await OmniAPI.getPublic("machinestatus");
-                    // console.log(response);
-    
-                    const data: AllMachinesStatusResponse = response;
-                    setAllMachinesResponse(data);
-
-                    const groups = [...data.groups.map(g => ({ id: g.machines[0].group_id, name: g.name }))];
-                    const types = [0]; // yeah this is fucked for now
-                    
-                    const flattenedMachines = [
-                        ...data.loners,
-                        ...data.groups.flatMap((group) => group.machines),
-                    ];
-
-                    // console.log("Flattened Machines:", flattenedMachines);
-    
-                    const transformedMachines = flattenedMachines.map((machine) => ({
-                        ...machine,
-                        group_id: machine.group_id,
-                        group: machine.group_id ? (groups.find(g => g.id === String(machine.group_id))?.name ?? 'Unknown Group') : 'No Group',
-                        type_id: machine.type_id,
-                        type: "Unknown Type",
-                        id: machine.id,
-                        name: machine.name,
-                        in_use: machine.in_use,
-                        usage_start: machine.usage_start ? new Date(machine.usage_start) : undefined, 
-                        usage_duration: machine.usage_duration,
-                        user: (machine as any).user_name ?? machine.user_id,
-                        maintenance_mode: machine.maintenance_mode,
-                        disabled: machine.disabled,
-                        failed: machine.failed,
-                        failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined,
-                    }));
-    
-                    // console.log("Machines:", transformedMachines);
-                    setMachines(transformedMachines);
-                } catch (error) {
-                    console.error("Error fetching machines:", error);
-                }
-            };
-    
-            fetchMachines();
-        }, []);
-
     const STATUS_FILTERS = ["In Progress", "Completed", "Available", "Failed", "Maintenance"];
+    
+    const {data: machines, error, isError, isLoading, refetch} = useMachines();
 
-    const filteredMachines = machines.filter((machine) => {
-        if (activeFilters.length === 0) return true;
+    const filteredMachines = useMemo(() => {
+        if (activeFilters.length === 0) return machines;
 
-        const statusFilters = activeFilters.filter((f) => STATUS_FILTERS.includes(f));
-        const otherFilters = activeFilters.filter((f) => !STATUS_FILTERS.includes(f));
+        return machines.filter((machine) => {    
+            const statusFilters = activeFilters.filter((f) => STATUS_FILTERS.includes(f));
+            const otherFilters = activeFilters.filter((f) => !STATUS_FILTERS.includes(f));
+    
+            let statusOk = true;
+            if (statusFilters.length > 0) {
+                const progress = getProgress(machine.usage_start, machine.usage_duration);
+                statusOk = statusFilters.some((filter) => {
+                    switch (filter) {
+                        case "In Progress":
+                            return progress < 100 && progress > 0;
+                        case "Completed":
+                            return progress === 100;
+                        case "Available":
+                            return !machine.in_use && !machine.failed && !machine.maintenance_mode;
+                        case "Failed":
+                            return machine.failed;
+                        case "Maintenance":
+                            return machine.maintenance_mode;
+                        default:
+                            return true;
+                    }
+                });
+            }
+    
+            let otherOk = true;
+            if (otherFilters.length > 0) {
+                otherOk = otherFilters.every((filter) => filter === machine.type || filter === machine.group);
+            }
+    
+            return statusOk && otherOk;
+        });
+    }, [machines, activeFilters]);
 
-        let statusOk = true;
-        if (statusFilters.length > 0) {
-            const progress = getProgress(machine.usage_start, machine.usage_duration);
-            statusOk = statusFilters.some((filter) => {
-                switch (filter) {
-                    case "In Progress":
-                        return progress < 100 && progress > 0;
-                    case "Completed":
-                        return progress === 100;
-                    case "Available":
-                        return !machine.in_use && !machine.failed && !machine.maintenance_mode;
-                    case "Failed":
-                        return machine.failed;
-                    case "Maintenance":
-                        return machine.maintenance_mode;
-                    default:
-                        return true;
-                }
-            });
-        }
-
-        let otherOk = true;
-        if (otherFilters.length > 0) {
-            otherOk = otherFilters.every((filter) => filter === machine.type || filter === machine.group);
-        }
-
-        return statusOk && otherOk;
-    });
+    if (isLoading) return (<Info>Loading...</Info>);
+    if (isError) return (<Info><p>Error: {error.message}</p><button onClick={() => refetch()}>Retry</button></Info>);
 
     return (
         <SelectedMachineProvider>
