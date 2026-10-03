@@ -123,10 +123,10 @@ async def use_a_machine(
             detail="Machine is in use",
         )
 
-    if machine.maintenance_mode or machine.disabled:
+    if machine.maintenance_mode:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Machine is under maintenance or disabled",
+            detail="Machine is under maintenance",
         )
 
     state = await session.scalar(
