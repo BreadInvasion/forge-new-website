@@ -15,6 +15,7 @@ export const ToolButton = styled.button`
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     border: 1px solid rgba(0, 0, 0, 0.4);
+    position: relative;
 
     &:hover, &:focus {
         background-color: rgba(0, 0, 0, 0.1);
@@ -25,7 +26,6 @@ export const ToolButton = styled.button`
         margin-left: 1px;
         margin-top: 1px;
     }
-        position: relative;
 
     /* Hover label, taken from the button's data-tooltip attribute */
     &[data-tooltip]:hover::after,

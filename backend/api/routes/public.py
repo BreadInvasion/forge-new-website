@@ -26,6 +26,7 @@ async def get_machines_status(
     machines = (
         await session.scalars(
             select(Machine)
+            .where(Machine.disabled.is_(False))
             .options(selectinload(Machine.active_usage).selectinload(MachineUsage.user))
             .options(selectinload(Machine.group))
             .options(selectinload(Machine.type))

@@ -309,22 +309,18 @@
     cursor: pointer;
 }
 
-.checkbox-labels .Label {
-    margin-bottom: 0;
-    cursor: pointer;
-}
-
 .checkbox-row {
     display: flex;
     align-items: center;
-    gap: 2rem;          
-    flex-wrap: wrap;    
+    gap: 2rem;
+    flex-wrap: wrap;
 }
 
 .checkbox-labels .Label {
+    width: auto;
     margin-bottom: 0;
     cursor: pointer;
-    white-space: nowrap; 
+    white-space: nowrap;
 }
 .Button.SaveBtn {
     padding: 0.4rem 0.75rem;

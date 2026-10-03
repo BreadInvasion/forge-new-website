@@ -58,13 +58,12 @@ const StyledButton = styled.button`
 `;
 export const PROGRESS_TICK_MS = 5000;
 
-export type MachineMode = 'in_use' | 'failed' | 'maintenance' | 'disabled' | 'available';
+export type MachineMode = 'in_use' | 'failed' | 'maintenance' | 'available';
 
 const getMode = (m: MachineProps): MachineMode => {
     if (m.failed) return 'failed';
     if (m.in_use) return 'in_use';
     if (m.maintenance_mode) return 'maintenance';
-    if (m.disabled) return 'disabled';
     return 'available';
 };
 
@@ -150,7 +149,6 @@ const getStatusText = () => {
         case 'failed':      return 'Failed';
         case 'in_use':      return 'In Use';
         case 'maintenance': return 'Under Maintenance';
-        case 'disabled':    return 'Disabled';
         default:            return 'Available';
     }
 };

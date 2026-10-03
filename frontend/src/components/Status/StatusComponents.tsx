@@ -39,7 +39,6 @@ export const GridContainer = styled.div`
 const modeColors: Record<string, string> = {
     available:   '#f5f5f5',  // default grey
     maintenance: '#b3d4fc',  // blue
-    disabled:    '#dddddd',  // darker grey
     failed:      '#f7b2b2',  // red
 };
 

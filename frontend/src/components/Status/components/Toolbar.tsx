@@ -154,7 +154,6 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
                 </Toggle>    
             </ToolButton>
             )}
-            <ToolButton aria-label="Filter machines" data-tooltip="Filter machines">
             <Filter 
                 filters={filters} 
                 activeFilters={activeFilters} 
@@ -174,7 +173,6 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
                     ))}
                 </ActiveFilters>
             }
-            </ToolButton>
         </ToolbarContainer>
     );
 }

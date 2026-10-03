@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom"
 import '../../Forms/styles/Form.scss';
 import '../styles/UseAMachine.scss';
 import { AxiosError } from "axios";
+import useAuth from "src/components/Auth/useAuth";
+import { UserPermission } from "src/enums";
 
 
 interface MachineSchemaResponse {
@@ -58,6 +60,8 @@ export const DynamicMachineForm: React.FC = () => {
     const [page, setPage] = useState<number>(1);
     const [status, setStatus] = useState<{ text: string; type: "error" | "success" | "warning" | "" }>({ text: "", type: "" });
     const navigate = useNavigate();
+    const { hasPermission } = useAuth();
+    const canSeeDisabled = hasPermission(UserPermission.CAN_EDIT_MACHINES);
 
     /**
      * Initial Step on Load
@@ -189,8 +193,8 @@ export const DynamicMachineForm: React.FC = () => {
 
         } catch (error: any) {
             const detail: string = error?.response?.data?.detail ?? error?.detail ?? "";
-            if (error.status == 409 && /maintenance|disabled/i.test(detail)) {
-                updateStatus("This machine is under maintenance or disabled and can't be used right now.", "error");
+            if (error.status == 409 && /maintenance/i.test(detail)) {
+                updateStatus("This machine is under maintenance and can't be used right now.", "error");
             } else if (error.status == 409) {
                 updateStatus("This machine is already in use. Please clear it before submitting a new usage.", "error");
             } else if (error.status == 404) {
@@ -266,12 +270,12 @@ export const DynamicMachineForm: React.FC = () => {
                             onChange={(e) => handleSelectMachine(e.target.value)}
                         >
                             <option className='styled-dropdown-placeholder' value="0" hidden>{"Please Select a Machine"}</option>
-                            {machines.map((machine: Machine) => (
+                            {machines.filter((machine: Machine) => canSeeDisabled || !machine.disabled).map((machine: Machine) => (
                                 <option
                                     className='styled-dropdown-option'
                                     key={machine.id}
                                     value={machine.id}
-                                    disabled={machine.maintenance_mode || machine.disabled}
+                                    disabled={machine.maintenance_mode}
                                 >
                                     {machine.name}
                                     {machine.maintenance_mode ? ' (Under Maintenance)' : machine.disabled ? ' (Disabled)' : ''}
