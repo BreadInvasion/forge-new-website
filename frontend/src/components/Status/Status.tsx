@@ -130,9 +130,9 @@ export const Status : React.FC = () => {
             statusOk = statusFilters.some((filter) => {
                 switch (filter) {
                     case "In Progress":
-                        return progress < 100 && progress > 0;
+                        return !machine.failed && progress < 100 && progress > 0;
                     case "Completed":
-                        return progress === 100;
+                        return !machine.failed && progress === 100;
                     case "Available":
                         return !machine.in_use && !machine.failed && !machine.maintenance_mode;
                     case "Failed":

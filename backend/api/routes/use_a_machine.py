@@ -47,14 +47,7 @@ async def get_usage_schema(
         .options(selectinload(Machine.active_usage))
     )
 
-    if not machine or (
-        machine.disabled
-        and not has_permissions_any(
-            session,
-            current_user.id,
-            {Permissions.CAN_EDIT_MACHINES, Permissions.IS_SUPERUSER},
-        )
-    ):
+    if not machine or machine.disabled:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine with provided ID not found",
@@ -102,16 +95,7 @@ async def use_a_machine(
         .options(selectinload(Machine.active_usage))
     )
 
-    can_edit_machines_permissions = await has_permissions_any(
-            session,
-            current_user.id,
-            {Permissions.CAN_EDIT_MACHINES, Permissions.IS_SUPERUSER},
-        )
-
-    if not machine or (
-        machine.disabled
-        and not can_edit_machines_permissions
-    ):
+    if not machine or machine.disabled:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Machine with provided ID not found",
@@ -121,6 +105,12 @@ async def use_a_machine(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Machine is in use",
+        )
+
+    if machine.maintenance_mode:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Machine is under maintenance",
         )
 
     state = await session.scalar(
