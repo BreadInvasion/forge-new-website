@@ -65,3 +65,53 @@ form {
     color: #333;
     text-align: right;
 }
+
+/* Register page positioning (scoped so About Us and MyForge forms are untouched) */
+.register-page {
+    /* Fill the space under the navbar and scroll inside it, instead of
+       letting a tall card overflow upward over the navbar */
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    overflow-y: auto;
+    align-items: flex-start;
+    padding: 2rem 10% 2rem 0;
+    box-sizing: border-box;
+}
+
+.register-page .form-container {
+    /* Auto margins center the card vertically when it fits, and pin it to the top when it doesn't */
+    margin-block: auto;
+    flex-shrink: 0;
+}
+
+/* Tablets and phones: center the card and keep it inside the screen */
+@media (max-width: 900px) {
+    .register-page {
+        justify-content: center;
+        padding: 1.5rem 1rem;
+    }
+
+    .register-page .form-container {
+        width: 100% !important;
+        max-width: 520px;
+        box-sizing: border-box;
+        padding: 1rem 1.25rem;
+    }
+
+    .register-page .styled-input,
+    .register-page .styled-dropdown {
+        box-sizing: border-box;
+        min-width: 0;
+        font-size: 16px; /* 16px+ stops iOS Safari from zooming in on focus */
+    }
+
+    /* Keep long checkbox labels from squishing the checkbox */
+    .register-page .styled-checkbox {
+        flex-shrink: 0;
+    }
+
+    .register-page .checkbox-label {
+        text-align: left;
+    }
+}

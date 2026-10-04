@@ -202,3 +202,68 @@
 .usage-duration input {
     text-align: right;
 }
+
+/* ---------- Phones: let the usage / failure forms fit the screen ---------- */
+@media (max-width: 900px) {
+    .use-a-machine {
+        height: auto;
+        min-height: 100%;
+        padding: 1rem 0.75rem;
+        box-sizing: border-box;
+    }
+
+    .usage-form {
+        width: 100% !important;
+        max-width: 520px;
+        box-sizing: border-box;
+        padding: 16px;
+    }
+
+    .usage-form label {
+        text-wrap: wrap;
+        white-space: normal;
+    }
+
+    /* Stack "1. Machine Selection" above its dropdown */
+    .machine-selection {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    /* Hours / minutes wrap instead of running off the side */
+    .usage-duration {
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .usage-duration > label:first-child {
+        flex-basis: 100%;
+    }
+
+    .usage-duration > input {
+        width: 5rem;
+        min-width: 0;
+    }
+
+    /* Wide resource table scrolls sideways inside the card instead of breaking the layout */
+    .resource-usage-form {
+        overflow-x: auto;
+    }
+
+    .usage-form select,
+    .usage-form input,
+    .resource-usage-form select,
+    .resource-usage-form input {
+        font-size: 16px; /* stops iOS Safari zooming in on focus */
+        box-sizing: border-box;
+        max-width: 100%;
+    }
+
+    .usage-form button,
+    .pagination-buttons button {
+        font-size: 1rem;
+    }
+}

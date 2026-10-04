@@ -20,8 +20,16 @@ const HighlightCard = styled.div`
         flex-shrink: 0;
     }
     @media screen and (max-width: 850px) {
-        max-height: 300px;
-        overflow-y: auto;
+        /* vh-based text gets cramped on phones; use fixed sizes and let the card grow */
+        font-size: 1rem;
+        margin-bottom: 0;
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+        > p {
+            color: white;
+        }
     }
 `;
 

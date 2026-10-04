@@ -14,6 +14,13 @@ const UpNextContainer = styled.div`
     overflow-y: auto;
     font-family: Montserrat;
     font-size: 2.0vh;
+    @media screen and (max-width: 850px) {
+        max-height: none;
+        font-size: 1rem;
+        h2 {
+            font-size: 1.25rem;
+        }
+    }
 `;
 
 const MachineItem = styled.div`
@@ -40,6 +47,9 @@ const MachineName = styled.h3`
     font-size: 2.5vh;
     font-weight: 600;
     text-transform: uppercase;
+    @media screen and (max-width: 850px) {
+        font-size: 1.1rem;
+    }
 `;
 
 const Countdown = styled.div`
@@ -55,18 +65,26 @@ const Countdown = styled.div`
     border-radius: 0.5rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     border-color: rgb(72, 72, 72);
-
+    @media screen and (max-width: 850px) {
+        font-size: 0.85rem;
+    }
 `;
 
 const UserName = styled.p`
     font-size: 2.0vh;
     font-weight: 400;
+    @media screen and (max-width: 850px) {
+        font-size: 0.95rem;
+    }
 `;
 
 const EstTime = styled(StatusText)`
     font-size: 2.0vh;
     font-weight: 500;
     text-align: left;
+    @media screen and (max-width: 850px) {
+        font-size: 0.95rem;
+    }
 `;
 
 const UpNext: React.FC = () => {

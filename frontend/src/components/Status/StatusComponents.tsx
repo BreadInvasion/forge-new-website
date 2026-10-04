@@ -107,6 +107,9 @@ export const BigCardText = styled.p<{ $minimized?: boolean, $clearable?: boolean
     font-weight: 600;
     text-align: center;
     width: auto;
+    @media screen and (max-width: 850px) {
+        ${({ $minimized }) => !$minimized && 'font-size: 0.85rem;'}
+    }
 `;
 export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
     font-weight: ${({ $minimized }) => ($minimized ? "600" : "400")};
@@ -114,7 +117,7 @@ export const BigCardInfo = styled.div<{ $area?: string, $minimized?: boolean, $c
     text-align: center;
     width: auto;
     @media screen and (max-width: 850px) {
-        font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "1.7vh")};
+        font-size: ${({ $minimized }) => ($minimized ? "1.5vh" : "0.95rem")};
     }
 `;
 
@@ -125,6 +128,9 @@ export const MachineName = styled.h3<{ $minimized?: boolean, $clearable?: boolea
     text-transform: uppercase;
     font-family: Montserrat;
     text-align: center;
+    @media screen and (max-width: 850px) {
+        ${({ $minimized }) => !$minimized && 'font-size: 1.4rem;'}
+    }
 `;
 
 export const StatusText = styled.p<{ $area?: string, $minimized?: boolean, $clearable?: boolean }>`
