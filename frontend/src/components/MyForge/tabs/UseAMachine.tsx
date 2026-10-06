@@ -3,15 +3,10 @@ import { OmniAPI } from "src/apis/OmniAPI";
 import { CheckboxInput, CustomForm, CustomFormField, DropdownInput, FormIcon, TextInput } from "src/components/Forms/Form";
 import { emptyMachine, Machine, Resource } from "src/interfaces";
 import { v4 as uuidv4 } from "uuid";
-import { useNavigate } from "react-router-dom"
 import '../../Forms/styles/Form.scss';
 import '../styles/UseAMachine.scss';
-import { AxiosError } from "axios";
-
-
-interface MachineSchemaResponse {
-    [key: string]: any;
-}
+import { useMachines, useMachineSchema, useMachineUse } from "src/hooks/useMachines";
+import Info from "src/components/Info";
 
 /** Database IDs specific to UsageForm Testing
  * Resource IDs:
@@ -41,9 +36,10 @@ interface MachineSchemaResponse {
 
 export const DynamicMachineForm: React.FC = () => {
 
-    const [machines, setMachines] = useState<Machine[]>([]);
-    const [selectedMachineId, setSelectedMachineId] = useState<string>("0");
-    const [schema, setSchema] = useState<MachineSchemaResponse>({});
+    const {data: machines, error: machinesError, refetch: refetchMachines} = useMachines();
+    const [selectedMachineId, setSelectedMachineId] = useState<string|undefined>(undefined);
+    const {data: schema, error: schemaError, refetch: refetchSchema} = useMachineSchema(selectedMachineId);
+    // const [schema, setSchema] = useState<MachineSchemaResponse>({});
     const [formData, setFormData] = useState<{ [key: string]: any }>({ hours: 0, minutes: 0, policy: false, org: false, reprint: false });
     const [slotValues, setSlotValues] = useState<ResourceSlotElement[]>([{
         slot_id: "_",
@@ -57,20 +53,7 @@ export const DynamicMachineForm: React.FC = () => {
     const [resourceUsageForm, setResourceUsageForm] = useState<ReactNode>(null);
     const [page, setPage] = useState<number>(1);
     const [status, setStatus] = useState<{ text: string; type: "error" | "success" | "warning" | "" }>({ text: "", type: "" });
-    const navigate = useNavigate();
-
-    /**
-     * Initial Step on Load
-     */
-    useEffect(() => {
-        const fetchMachines = async () => {
-            const allMachines: Machine[] = await OmniAPI.getAll("machines");
-            console.log("All machines:", allMachines);
-            setMachines(allMachines);
-        };
-
-        fetchMachines();
-    }, []);
+    const useMachineMutation = useMachineUse();
 
 
     /**
@@ -85,27 +68,10 @@ export const DynamicMachineForm: React.FC = () => {
 
 
     /**
-     * Fetch Machine Schema on Machine Selection
-     */
-    useEffect(() => {
-        if (selectedMachineId == "0") return;
-
-        const fetchSchema = async () => {
-            const schemaData: MachineSchemaResponse = await OmniAPI.get("use", `${selectedMachineId}/schema`);
-            console.log("Schema for machine:", schemaData);
-            setSchema(schemaData);
-        };
-
-        fetchSchema();
-
-    }, [selectedMachineId]);
-
-
-    /**
      * Generate Resource Usage Form on Schema Load
      */
     useEffect(() => {
-        if (!schema.resource_slots) return;
+        if (!schema?.resource_slots) return;
 
         const initialValues: ResourceSlotElement[] = schema.resource_slots.map((slot: ResourceSlotSchema) => ({
             slot_id: slot.resource_slot_id,
@@ -146,7 +112,7 @@ export const DynamicMachineForm: React.FC = () => {
     /**
      * Handle Form Submission
      */
-    const handleSubmit = async (event: FormEvent) => {
+    const handleSubmit = async (event: SubmitEvent) => {
         event.preventDefault();
 
         if (!formData.policy) {
@@ -177,30 +143,32 @@ export const DynamicMachineForm: React.FC = () => {
 
         console.log("Usage Data:", usageData);
 
-        try {
-            const response = await OmniAPI.use(selectedMachineId, usageData);
-            console.log("Usage Response:", response);
-            if (response == null) {
-                updateStatus("Usage submitted successfully.", "success");
-                window.setTimeout(() => navigate('../../status'), 1000);
-            } else {
-                throw new Error("An error occurred. Please try again.");
-            }
+        useMachineMutation.mutate({machineId: selectedMachineId ?? "", data: usageData});
+        // try {
+        //     const response = await OmniAPI.use(selectedMachineId, usageData);
+        //     console.log("Usage Response:", response);
+        //     if (response == null) {
+        //         updateStatus("Usage submitted successfully.", "success");
+        //         window.setTimeout(() => navigate('../../status'), 1000);
+        //     } else {
+        //         throw new Error("An error occurred. Please try again.");
+        //     }
 
-        } catch (error: any) {
-            if (error.status == 409) {
-                updateStatus("This machine is already in use. Please clear it before submitting a new usage.", "error");
-            } else if (error.status == 404) {
-                updateStatus("The selected machine does not exist.", "error");
-            } else if (error.status == 403) {
-                updateStatus("You are not permitted to use this machine.", "error");
-            } else {
-                updateStatus("An error occurred. Please try again.", "error");
-            }
-        }
+        // } catch (error: any) {
+        //     if (error.status == 409) {
+        //         updateStatus("This machine is already in use. Please clear it before submitting a new usage.", "error");
+        //     } else if (error.status == 404) {
+        //         updateStatus("The selected machine does not exist.", "error");
+        //     } else if (error.status == 403) {
+        //         updateStatus("You are not permitted to use this machine.", "error");
+        //     } else {
+        //         updateStatus("An error occurred. Please try again.", "error");
+        //     }
+        // }
     };
 
     const validateResourceUsage = (slotValue: ResourceSlotElement) => {
+        if (!schema) return "Loading...";
         if (!schema.resource_slots.find((slot: ResourceSlotSchema) => slot.resource_slot_id === slotValue.slot_id)?.allow_own_material && slotValue.own) {
             const displayName = schema.resource_slots.find((slot: ResourceSlotSchema) => slot.resource_slot_id === slotValue.slot_id)?.display_name;
             return `${displayName} does not allow personal material.`
@@ -247,6 +215,9 @@ export const DynamicMachineForm: React.FC = () => {
         clearStatus();
         setPage(page);
     };
+
+    if (machinesError !== null) return (<Info><p>Error: {machinesError.message}</p><button onClick={() => refetchMachines()}>Retry</button></Info>);
+    if (schemaError !== null) return (<Info><p>Error: {schemaError.message}</p><button onClick={() => refetchSchema()}>Retry</button></Info>);
 
 
     return (

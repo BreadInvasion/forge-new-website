@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Card, MachineName, BigCardAttribute, BigCardText, BigCardInfo, StatusText} from './StatusComponents';
-import { OmniAPI } from "src/apis/OmniAPI";
 import { useSelectedMachine } from './SelectedMachineContext';
+import { useMachineClear } from 'src/hooks/useMachines';
 
 export const getEndTime = (usage_start: Date, usage_duration: number) => {
     const start = usage_start; 
@@ -58,13 +58,15 @@ const StyledButton = styled.button`
 `;
 
 
-const MachineCard: React.FC<MachineCardProps> = ({ machine: machineInput, $minimized, $highlightFailed}) => {
-    const [machine, setMachine] = useState(machineInput);
+// export default function MachineCard({ machine: machineInput, $minimized, $highlightFailed }: MachineCardProps) {
+export default function MachineCard({ machine, $minimized, $highlightFailed }: MachineCardProps) {
+    const clearMachineMutation = useMachineClear();
+    // const [machine, setMachine] = useState(machineInput);
 
-    useEffect(() => {console.log(machineInput); setMachine(machineInput);}, [machineInput]);
+    // useEffect(() => {console.log(machineInput); setMachine(machineInput);}, [machineInput]);
     const {id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material} = machine;
 
-    const {setSelectedMachine } = useSelectedMachine();
+    const {setSelectedMachine} = useSelectedMachine();
 
     const handleClick = () => {
         setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material});
@@ -73,69 +75,36 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine: machineInput, $minim
     const handleClearClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
         if (failed || in_use) {
-            try {
-                const authToken = localStorage.getItem("authToken");
-                if (!authToken) {
-                    alert('Error, not authenticated. Must be logged in to clear machines.');
-                    return;
-                }
-
-                const response = await OmniAPI.clear(`${machine.id}`);
-                if (response != null) {
-                    if (response.status === 404) {
-                        alert('Machine not found. Please check the machine ID.');
-                    }
-                    if (response.status === 403) {
-                        alert('Error, not authenticated. Must be logged in to clear machines.');
-                        return;
-                    } 
-                    else {
-                        throw new Error(`Failed to clear machine: ${response.statusText}`);
-                    }
-                }
-                const updatedMachine = {
-                    ...machine,
-                    failed: false,
-                    in_use: false,
-                    maintenance_mode: false,
-                    disabled: false,
-                    failed_at: undefined,
-                    progress: 0
-                };
-    
-                setMachine(updatedMachine);
-                setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material });
-
-                window.location.reload();
-
-            } catch (error) {
-                console.error('Error clearing machine:', error);
-                alert('Failed to clear the machine. Please try again.');
+            const authToken = localStorage.getItem("authToken");
+            if (!authToken) {
+                alert('Error, not authenticated. Must be logged in to clear machines.');
+                return;
             }
+            clearMachineMutation.mutate(machine.id);
         }
-};
+    };
 
-function convHM(seconds: number): string {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    return `${hrs}h ${mins}m`;
-}
-
-const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: boolean, disabled?: boolean) => {
-    const statuses = [];
-    const progress = getProgress(usage_start, usage_duration); // Calculate progress once
-
-    if (progress === 100) {statuses.push("Completed");
-    } else {
-        if (in_use) statuses.push("In Use");
-        if (failed) statuses.push("Failed");
-        if (maintenance_mode) statuses.push("Under Maintenance");
-        if (disabled) statuses.push("Disabled");
-        if (!in_use && !failed && !maintenance_mode && !disabled) statuses.push("Available");
+    function convHM(seconds: number): string {
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        return `${hrs}h ${mins}m`;
     }
 
-    return statuses.length > 0 ? statuses.join(", ") : "Operational";
-};
+    const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: boolean, disabled?: boolean) => {
+        const statuses = [];
+        const progress = getProgress(usage_start, usage_duration); // Calculate progress once
+
+        if (progress === 100) {statuses.push("Completed");
+        } else {
+            if (in_use) statuses.push("In Use");
+            if (failed) statuses.push("Failed");
+            if (maintenance_mode) statuses.push("Under Maintenance");
+            if (disabled) statuses.push("Disabled");
+            if (!in_use && !failed && !maintenance_mode && !disabled) statuses.push("Available");
+        }
+
+        return statuses.length > 0 ? statuses.join(", ") : "Operational";
+    };
 
     return (
         <Card 
@@ -167,5 +136,3 @@ const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: bo
        </Card>
     );
 }
-
-export default MachineCard;
