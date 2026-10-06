@@ -11,3 +11,5 @@ export default function Info({children}: PropsWithChildren) {
         </div>
     );
 };
+
+export const Loading = <Info>Loading...</Info>;
