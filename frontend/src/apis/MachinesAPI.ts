@@ -1,10 +1,17 @@
 import { AllMachinesStatusResponse } from "src/interfaces";
-import { OmniAPI } from "./OmniAPI";
+import { get, getPublic, post } from "./OmniAPI";
+import { Machine, MachineSchemas } from "src/interfaces/machines";
 
 export async function fetchMachines() {
-    const response = await OmniAPI.getPublic("machinestatus");
-    // console.log(response);
+    return await get("/machines") as Machine[];
+}
 
+export async function fetchMachineSchema(machineId: string) {
+    return await get(`/use/${machineId}/schema`) as MachineSchemas;
+}
+
+export async function fetchMachineStatus() {
+    const response = await getPublic("/machinestatus");
     const data: AllMachinesStatusResponse = response;
 
     const groups = [...data.groups.map(g => ({ id: g.machines[0].group_id, name: g.name }))];
@@ -14,8 +21,6 @@ export async function fetchMachines() {
         ...data.loners,
         ...data.groups.flatMap((group) => group.machines),
     ];
-
-    // console.log("Flattened Machines:", flattenedMachines);
 
     const transformedMachines = flattenedMachines.map((machine) => ({
         ...machine,
@@ -35,6 +40,17 @@ export async function fetchMachines() {
         failed_at: machine.failed_at ? new Date(machine.failed_at) : undefined,
     }));
 
-    // console.log("Machines:", transformedMachines);
     return transformedMachines;
+}
+
+export async function clearMachine(machineId: string) {
+    return await post(`/clear/${machineId}`);
+}
+
+type UseMachineArgs = {
+    machineId: string,
+    data: Record<string, any>
+}
+export async function useMachine({machineId, data}: UseMachineArgs) {
+    return await post(`/use/${machineId}`, data)
 }
