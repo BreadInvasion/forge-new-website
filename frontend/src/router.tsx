@@ -7,6 +7,7 @@ import { ProtectedRoute } from './components/Auth/ProtectedRoute';
 import './App.scss';
 import useAuth from './components/Auth/useAuth';
 import { NavBar } from './components/NavBar/NavBar';
+import { Loading } from './components/Info';
 
 const Home = lazy(() => import('./components/Home/Home'));
 const Footer = lazy(() => import('./components/Footer/Footer'));
@@ -26,7 +27,7 @@ export default function AppRoutes() {
     const { isAuthenticated, user, setAuth } = useAuth();
     return (<Router>
         <NavBar user={user} setAuth={setAuth} isAuthed={isAuthenticated}/>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={Loading}>
             <Routes>
                 <Route path="/" Component={Home} />
                 <Route path="/status" Component={NewStatus} />
