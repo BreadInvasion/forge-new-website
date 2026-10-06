@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent, FormEvent, ReactNode, Suspense, useMemo, createContext, useContext } from "react";
+import React, { useEffect, useState, ChangeEvent, FormEvent, ReactNode, Suspense, useMemo, createContext, useContext, SyntheticEvent } from "react";
 import { OmniAPI } from "src/apis/OmniAPI";
 import { CheckboxInput, CustomForm, CustomFormField, DropdownInput, FormIcon, TextInput } from "src/components/Forms/Form";
 import { emptyMachine, Machine, Resource } from "src/interfaces";
@@ -19,7 +19,7 @@ import Info from "src/components/Info";
  *   "fec63512-f7d3-46c9-a89a-c0f4e0b5c8b7"
  *   "f0f83ef1-a4c5-4fc9-8ff8-821c7658f7ad"
  *
- * Reource Slot IDs:
+ * Resource Slot IDs:
  *   "6fad9ba9-2093-40cc-81d4-5443bc8d06f8"
  *   "af30b008-1f52-4e77-91ec-67dc8d61fa75"
  *   "73cd77a0-1a74-4047-9c2c-ce08d1062963"
@@ -112,7 +112,7 @@ export const DynamicMachineForm: React.FC = () => {
     /**
      * Handle Form Submission
      */
-    const handleSubmit = async (event: SubmitEvent) => {
+    const handleSubmit = async (event: SyntheticEvent) => {
         event.preventDefault();
 
         if (!formData.policy) {
