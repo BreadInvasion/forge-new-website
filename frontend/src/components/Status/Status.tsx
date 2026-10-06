@@ -6,7 +6,7 @@ import UpNext from './components/UpNext';
 import Highlight from './components/Highlight';
 import Toolbar from './components/Toolbar';
 import MachineCard,{ getProgress } from './MachineCard';
-import { useMachines } from 'src/hooks/useMachines';
+import { useMachineStatus } from 'src/hooks/useMachines';
 import Info from 'src/components/Info';
 
 const Page = styled.div`
@@ -67,7 +67,7 @@ export const Status : React.FC = () => {
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     const STATUS_FILTERS = ["In Progress", "Completed", "Available", "Failed", "Maintenance"];
     
-    const {data: machines, error, isError, isLoading, refetch} = useMachines();
+    const {data: machines, error, isError, isLoading, refetch} = useMachineStatus();
 
     const filteredMachines = useMemo(() => {
         if (activeFilters.length === 0) return machines;
