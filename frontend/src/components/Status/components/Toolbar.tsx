@@ -60,7 +60,7 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
 
     const handleEditClick = () => {
         // Navigate to the "Edit Machine" form
-        navigate("/myforge/usages");
+        navigate("/myforge/machines");
     };
 
     const handleFailClick = () => {
@@ -132,17 +132,17 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
     return (
         <ToolbarContainer>
             {hasPermission(UserPermission.CAN_EDIT_MACHINES) && (
-            <ToolButton aria-label="Edit" onClick={handleEditClick}>
+            <ToolButton aria-label="Edit" data-tooltip="Edit" onClick={handleEditClick}>
                 <Pencil1Icon />
             </ToolButton>
             )}
             {hasPermission(UserPermission.CAN_FAIL_MACHINES) && (
-            <ToolButton aria-label="Fail" onClick={handleFailClick}>
+            <ToolButton aria-label="Fail" data-tooltip="Failure Form" onClick={handleFailClick}>
                <ExclamationTriangleIcon />
             </ToolButton>
             )}
              {hasPermission(UserPermission.CAN_CLEAR_MACHINES) && (
-            <ToolButton aria-label="Clear"> 
+            <ToolButton aria-label="Clear" data-tooltip="Clear Machine"> 
                 <Toggle
                     pressed={highlightFailed}
                     onPressedChange={setHighlightFailed}
