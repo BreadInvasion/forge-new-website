@@ -121,7 +121,6 @@ async def use_a_machine(
             detail="Machine is in use",
         )
 
-    # disabled machines are hidden from users who don't have these permissions 
     if machine.maintenance_mode and not can_edit_machines_permissions:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
