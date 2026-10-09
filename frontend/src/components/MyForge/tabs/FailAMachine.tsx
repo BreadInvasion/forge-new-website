@@ -1,14 +1,15 @@
 import React, { useEffect, useState, FormEvent } from "react";
-import { OmniAPI } from "src/apis/OmniAPI";
 import { FormIcon } from "src/components/Forms/Form";
 import { Machine } from "src/interfaces";
 
 import '../../Forms/styles/Form.scss';
 import '../styles/UseAMachine.scss';
+import { useMachineFail, useMachines } from "src/hooks/useMachines";
+import Info from "src/components/Info";
 
 export const FailAMachineForm: React.FC = () => {
     
-    const [machines, setMachines] = useState<Machine[]>([]);
+    const {data: machines, error, refetch} = useMachines();
     const [selectedMachineId, setSelectedMachineId] = useState<string>("_");
     // I think this data is for the email the user gets sent? There isn't a way to pass it in the request TODO:
     const [estimatedPercentCompleted, setEstimatedPercentCompleted] = useState(0);
@@ -16,18 +17,7 @@ export const FailAMachineForm: React.FC = () => {
     const [noticeableFaults, setNoticeableFaults] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-
-    /**
-     * Load Machines
-     */
-    useEffect(() => {
-        const fetchMachines = async () => {
-            const allMachines: Machine[] = await OmniAPI.getAll("machines");
-            setMachines(allMachines);
-        };
-
-        fetchMachines();
-    }, []);
+    const failMachineMutation = useMachineFail();
 
     /**
      * Handle Machine Selection with placeholder protection
@@ -55,31 +45,13 @@ export const FailAMachineForm: React.FC = () => {
      */
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
-        setIsSubmitting(true);
-        const data: Record<string, any> = {
-            machine_id: selectedMachineId,
-            error_message: printerErrorMessage,
-            noticeable_fault: noticeableFaults.join(", "),
-            percentage: estimatedPercentCompleted,
-        };
-        try {
-            const response = await OmniAPI.fail(data);
-            if (response != null) {
-                console.log("Response:", response);
-                alert("An error occurred, please try again.");
-            }
-            alert("Success, machine failure email sent");
-        } catch (error) {
-            console.error("Error:", error);
-            alert("An error occurred, please try again.");
-        } finally {
-            setIsSubmitting(false);
-        }
-        
-        // Clear form
-        const form = document.querySelector(".usage-form") as HTMLFormElement;
-        form.reset();
-        resetFormFields();
+        const temp = selectedMachineId;
+        failMachineMutation.mutate(temp, {onSuccess: () => {
+            // Clear form
+            const form = document.querySelector(".usage-form") as HTMLFormElement;
+            form.reset();
+            resetFormFields();
+        }});
     };
 
     /**
@@ -90,6 +62,8 @@ export const FailAMachineForm: React.FC = () => {
         setPrinterErrorMessage("");
         setNoticeableFaults([]);
     };
+
+    if (error !== null) return (<Info><p>Error: {error.message}</p><button onClick={() => refetch()}>Retry</button></Info>);
     
     return (
         <div className="use-a-machine">

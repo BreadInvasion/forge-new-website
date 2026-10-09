@@ -47,6 +47,10 @@ export async function clearMachine(machineId: string) {
     return await post(`/clear/${machineId}`);
 }
 
+export async function failMachine(machineId: string) {
+    return await post(`/fail/${machineId}`);
+}
+
 type UseMachineArgs = {
     machineId: string,
     data: Record<string, any>

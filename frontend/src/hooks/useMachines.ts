@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
-import { clearMachine, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine } from "src/apis/MachinesAPI";
+import { clearMachine, failMachine, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine } from "src/apis/MachinesAPI";
 
 export function useMachines() {
     return useQuery({
@@ -50,10 +50,27 @@ export function useMachineClear() {
                         alert(`Failed to clear machine: ${error.response?.statusText}`);
                         break;
                 }
+            } else {
+                alert(`Failed to clear machine: ${error.message}`);
             }
-            alert(`Failed to clear machine: ${error.message}`);
         }
     });
+}
+
+export function useMachineFail() {
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    return useMutation({
+        mutationFn: failMachine,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["machine", "status"] });
+            navigate('/status');
+        },
+        onError: (error) => {
+            console.error(error);
+            alert("An error occurred, please try again.");
+        }
+    })
 }
 
 export function useMachineUse() {
@@ -67,7 +84,6 @@ export function useMachineUse() {
         },
         onError: (error) => {
             if (error instanceof AxiosError) {
-                alert(error.response?.status);
                 switch (error.response?.status) {
                     case 409:
                         alert('This machine is already in use. Please clear it before submitting a new usage.');
@@ -83,8 +99,9 @@ export function useMachineUse() {
                         alert(`An error occurred. Please try again.`);
                         break;
                 }
+            } else {
+                alert(`Failed to use machine: ${error.message}`);
             }
-            alert(`Failed to use machine: ${error.message}`);
         },
         
     });
