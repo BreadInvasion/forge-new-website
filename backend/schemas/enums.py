@@ -209,6 +209,8 @@ class LogType(StrEnum):
     ORG_EDITED = "org_edited"
     ORG_DELETED = "org_deleted"
 
+    DATABASE_CLEANED = "database_cleaned"
+
 
 # Used to indicate no particular permission is required to access
 # an endpoint. Lockout is still checked.
