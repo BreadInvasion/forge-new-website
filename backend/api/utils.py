@@ -5,12 +5,9 @@ from sqlalchemy import select, desc
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from datetime import datetime
 
-from models.role import Role
 from models.user import User
-from models.audit_log import AuditLog
-from schemas.enums import LogType, Permissions
+from schemas.enums import Permissions
 
 
 async def get_user_permissions(session: AsyncSession, user_id: UUID):
@@ -56,21 +53,3 @@ async def has_permissions_any(
 ) -> bool:
     user_permissions = await get_user_permissions(session, user_id)
     return any(permission in user_permissions for permission in permissions)
-
-async def is_obsolete_user(
-    session: AsyncSession, user_rcsid: str,
-):
-    most_recent = await session.scalar(
-        select(AuditLog)
-        .where(AuditLog.type == LogType.USER_LOGIN and AuditLog.content["user_rcsid"] == user_rcsid)
-        .order_by(desc(AuditLog.time_created))
-        .limit(1)
-    )
-
-    time_difference = datetime.now() - most_recent.time_created
-                            # number of microseconds in a Julian year
-    allowed_difference = 4 * 86400000000
-
-    return time_difference >= allowed_difference
-
-    
