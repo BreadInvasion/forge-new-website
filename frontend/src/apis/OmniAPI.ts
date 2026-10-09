@@ -109,33 +109,6 @@ export const OmniAPI = {
 
         return response.data;
     },
-    use: async (machine_id: string, data: Record<string, any>) => {
-        const response = await api.request({
-            url: `/use/${machine_id}`,
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-            data: data,
-        });
-        if (response.status != 200) throw response.data;
-
-        return response.data;
-    },
-    fail: async (machine_id: string) => {
-        const response = await api.request({
-            url: `/fail/${machine_id}`,
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        });
-        if (response.status != 200) throw response.data;
-
-        return response.data;
-    },
     getPublic: async (type: string, params?: Record<string, any>) => {
         const response = await publicApi.request({
             url: `/${type}`,

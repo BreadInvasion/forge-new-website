@@ -1,32 +1,22 @@
 import React, { useEffect, useState, FormEvent } from "react";
-import { OmniAPI } from "src/apis/OmniAPI";
 import { FormIcon } from "src/components/Forms/Form";
 import { Machine } from "src/interfaces";
 
 import '../../Forms/styles/Form.scss';
 import '../styles/UseAMachine.scss';
+import { useMachineFail, useMachines } from "src/hooks/useMachines";
+import Info from "src/components/Info";
 
 export const FailAMachineForm: React.FC = () => {
     
-    const [machines, setMachines] = useState<Machine[]>([]);
+    const {data: machines, error, refetch} = useMachines();
     const [selectedMachineId, setSelectedMachineId] = useState<string>("_");
     // I think this data is for the email the user gets sent? There isn't a way to pass it in the request TODO:
     const [estimatedPercentCompleted, setEstimatedPercentCompleted] = useState(0);
     const [printerErrorMessage, setPrinterErrorMessage] = useState<string>("");
     const [noticeableFaults, setNoticeableFaults] = useState<string[]>([]);
 
-
-    /**
-     * Load Machines
-     */
-    useEffect(() => {
-        const fetchMachines = async () => {
-            const allMachines: Machine[] = await OmniAPI.getAll("machines");
-            setMachines(allMachines);
-        };
-
-        fetchMachines();
-    }, []);
+    const failMachineMutation = useMachineFail();
 
     /**
      * Handle Machine Selection with placeholder protection
@@ -55,21 +45,12 @@ export const FailAMachineForm: React.FC = () => {
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
         const temp = selectedMachineId;
-        try {
-            const response = await OmniAPI.fail(temp);
-            if (response != null) {
-                console.log("Response:", response);
-                alert("An error occurred, please try again.");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("An error occurred, please try again.");
-        }
-        
-        // Clear form
-        const form = document.querySelector(".usage-form") as HTMLFormElement;
-        form.reset();
-        resetFormFields();
+        failMachineMutation.mutate(temp, {onSuccess: () => {
+            // Clear form
+            const form = document.querySelector(".usage-form") as HTMLFormElement;
+            form.reset();
+            resetFormFields();
+        }});
     };
 
     /**
@@ -80,6 +61,8 @@ export const FailAMachineForm: React.FC = () => {
         setPrinterErrorMessage("");
         setNoticeableFaults([]);
     };
+
+    if (error !== null) return (<Info><p>Error: {error.message}</p><button onClick={() => refetch()}>Retry</button></Info>);
     
     return (
         <div className="use-a-machine">

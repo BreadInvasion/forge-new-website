@@ -1,5 +1,4 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent, ReactNode, Suspense, useMemo, createContext, useContext, SyntheticEvent } from "react";
-import { OmniAPI } from "src/apis/OmniAPI";
 import { CheckboxInput, CustomForm, CustomFormField, DropdownInput, FormIcon, TextInput } from "src/components/Forms/Form";
 import { emptyMachine, Machine, Resource } from "src/interfaces";
 import { v4 as uuidv4 } from "uuid";
