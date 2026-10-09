@@ -1,6 +1,7 @@
 """ User authentication endpoints. """
 
 from decimal import Decimal
+from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -52,13 +53,8 @@ async def login_user(
         # Provided user is locked out. Their credentials are right, but refuse login anyway.
         raise ACCOUNT_DISABLED_ERROR
 
-    audit_log = AuditLog(
-        type=LogType.USER_LOGIN,
-        content={
-            "user_rcsid": user.RCSID,
-        },
-    )
-    session.add(audit_log)
+    user.last_login = datetime.now()
+    session.add(user)
     await session.commit()
 
     return create_token_response(user.RCSID)
