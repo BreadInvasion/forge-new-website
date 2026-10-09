@@ -489,7 +489,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
 
             // Find best resource with the selected options
             const resource = matchingResource(updatedDetails.name, updatedDetails.brand || "_", updatedDetails.color || "_");
-            const unitCost = parseFloat(resource?.cost ?? "0");
+            const unitCost = resource?.cost ?? 0;
             updatedDetails.cost = updatedDetails.own ? 0 : (updatedDetails.amount * unitCost);
 
             return updatedDetails;
