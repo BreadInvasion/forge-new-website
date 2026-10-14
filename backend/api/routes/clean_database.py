@@ -15,15 +15,6 @@ from .users import delete_user
 
 router = APIRouter()
 
-"""Plan: 
-        1) Use Alembic to allow USER_LOGIN as a valid LogType -- DONE!!!
-        2) Modify auth.py/login to log USER_LOGINS -- DONE!!
-        4) Implement delete user in users.py -- DONE!!
-        5) Make a security check (target not superuser & user valid target) -- DONE!!
-        7) Allow a way to enact the clean or make it an automatic call upon semester change
-        8) Clean up auth.py so logins don't cause huge amounts of bloat -> keep track of most recent only
-        """
-
 @router.post("/clean")
 async def clean_database(
     session: DBSession,

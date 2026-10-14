@@ -17,6 +17,7 @@ from .routes import (
     semesters,
     users,
     use_a_machine,
+    clean_database,
 )
 
 api_router = APIRouter()
@@ -35,3 +36,4 @@ api_router.include_router(semesters.router, tags=["semesters"])
 api_router.include_router(users.router, tags=["users"])
 api_router.include_router(use_a_machine.router, tags=["use_a_machine"])
 api_router.include_router(volunteer_actions.router, tags=["volunteer_actions"])
+api_router.include_router(clean_database.router, tags=["clean_database"])
