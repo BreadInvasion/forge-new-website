@@ -14,11 +14,11 @@ from models.user import User
 from schemas.enums import LogType, Permissions, SemesterType
 from schemas.requests import ActivateSemesterRequest, GetChargeSheetsRequest
 from schemas.responses import CreateResponse, UserChargeResponse
+from .clean_database import clean_database
 
 from ..deps import DBSession, PermittedUserChecker
 
 router = APIRouter()
-
 
 @router.post("/exec/next_semester")
 async def advance_semester(
@@ -62,6 +62,11 @@ async def advance_semester(
     state.active_semester = next_semester
     session.add(state)
     await session.commit()
+
+    try:
+        await clean_database(session=session, current_user=current_user)
+    except HTTPException:
+        pass
 
     audit_log = AuditLog(
         type=LogType.ACTIVE_SEMESTER_CHANGED,
