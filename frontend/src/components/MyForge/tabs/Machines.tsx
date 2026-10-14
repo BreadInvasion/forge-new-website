@@ -137,16 +137,11 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
                                 </select>
 
                                 {machine != null ? <>
-                                <div className="checkbox-row">
-                                    <div className="checkbox-labels">
-                                        <label className="Label" htmlFor="maintenance">Maintenance Mode</label>
-                                        <input className="Checkbox" type="checkbox" id="maintenance" checked={maintenanceMode} onChange={(e) => setMaintenanceMode(e.target.checked)} />
-                                    </div>
-                                    <div className="checkbox-labels">
-                                        <label className="Label" htmlFor="disabled">Disabled</label>
-                                        <input className="Checkbox" type="checkbox" id="disabled" checked={disabled} onChange={(e) => setDisabled(e.target.checked)} />
-                                    </div>
-                                </div>
+                                <input className="Input" type="checkbox" id="disabled" checked={disabled} onChange={(e) => setDisabled(e.target.checked)} />
+                                <label className="Label" htmlFor="machineType">Disabled</label>
+                                <br />
+                                <input className="Input" type="checkbox" id="maintenance" checked={maintenanceMode} onChange={(e) => setMaintenanceMode(e.target.checked)} />
+                                <label className="Label" htmlFor="machineType">Maintenance Mode</label>
                                 </> : null}
 
                             </fieldset>

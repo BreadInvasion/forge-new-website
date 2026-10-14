@@ -36,25 +36,13 @@ export const GridContainer = styled.div`
     }
 `;
 
-const modeColors: Record<string, string> = {
-    available:   '#f5f5f5',  // default grey
-    maintenance: '#b3d4fc',  // blue
-    disabled:    '#dddddd',  // darker grey
-    failed:      '#f7b2b2',  // red
-};
-
-// Progress fill colours
-const PROGRESS_IN_PROGRESS = 'rgba(255, 200, 0, 0.45)';  // yellow
-const PROGRESS_COMPLETED   = 'rgba(0, 200, 0, 0.35)';    // green
-
 export const Card = styled.div<{ 
     $symbol?: string; 
     $minimized?: boolean; 
     $highlightFailed?: boolean; 
-    $mode?: string;
     progress: number;
 }>`
-    background-color: ${({ $mode }) => modeColors[$mode ?? ''] ?? '#f5f5f5'};
+    background-color: #f5f5f5;
     border-radius: 5px;
     padding:10px;
     display: flex;
@@ -88,9 +76,8 @@ export const Card = styled.div<{
         bottom: 0;
         left: 0;
         width: 100%;
-        height: calc(var(--progress, 0) * 1%);
-        transition: height 5s linear, background-color 0.5s ease;
-        background-color: ${props => props.progress >= 100 ? PROGRESS_COMPLETED : PROGRESS_IN_PROGRESS};
+        height: ${props => props.progress}%;
+        background-color: rgba(0, 255, 0, 0.2);
         border-radius: 5px;
     }
     ${({ $minimized }) =>$minimized && `&:hover {    

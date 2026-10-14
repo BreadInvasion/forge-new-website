@@ -60,7 +60,7 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
 
     const handleEditClick = () => {
         // Navigate to the "Edit Machine" form
-        navigate("/myforge/machines");
+        navigate("/myforge/usages");
     };
 
     const handleFailClick = () => {
@@ -132,17 +132,17 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
     return (
         <ToolbarContainer>
             {hasPermission(UserPermission.CAN_EDIT_MACHINES) && (
-            <ToolButton aria-label="Edit" data-tooltip="Edit" onClick={handleEditClick}>
+            <ToolButton aria-label="Edit" onClick={handleEditClick}>
                 <Pencil1Icon />
             </ToolButton>
             )}
             {hasPermission(UserPermission.CAN_FAIL_MACHINES) && (
-            <ToolButton aria-label="Fail" data-tooltip="Failure Form" onClick={handleFailClick}>
+            <ToolButton aria-label="Fail" onClick={handleFailClick}>
                <ExclamationTriangleIcon />
             </ToolButton>
             )}
              {hasPermission(UserPermission.CAN_CLEAR_MACHINES) && (
-            <ToolButton aria-label="Clear" data-tooltip="Clear Machine"> 
+            <ToolButton aria-label="Clear"> 
                 <Toggle
                     pressed={highlightFailed}
                     onPressedChange={setHighlightFailed}
@@ -154,7 +154,6 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
                 </Toggle>    
             </ToolButton>
             )}
-            <ToolButton aria-label="Filter machines" data-tooltip="Filter machines">
             <Filter 
                 filters={filters} 
                 activeFilters={activeFilters} 
@@ -174,7 +173,6 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
                     ))}
                 </ActiveFilters>
             }
-            </ToolButton>
         </ToolbarContainer>
     );
 }
