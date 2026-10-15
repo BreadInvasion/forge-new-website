@@ -9,11 +9,54 @@ from models.audit_log import AuditLog
 
 from ..deps import DBSession, PermittedUserChecker
 from models.user import User
+from models.machine_usage import MachineUsage
+from models.auth_token import AuthToken
 from schemas.enums import LogType, Permissions
 from schemas.responses import AuditLogModel
-from .users import delete_user
 
 router = APIRouter()
+
+async def delete_user(
+    user_id: UUID,
+    session: DBSession,
+    current_user: Annotated[
+        User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_USERS}))
+    ],
+):  
+    target_user = await session.scalar(select(User).where(User.id == user_id))
+    if not target_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User with provided ID not found",
+        )
+    
+    usages = (
+        await session.scalars(
+            select(MachineUsage).where(MachineUsage.user_id == user_id)
+        )
+    ).all()
+    
+    for usage in usages:
+        await session.delete(usage)
+
+    authtokens = (
+        await session.scalars(
+            select(AuthToken).where(AuthToken.user_id == user_id)
+        )
+    ).all()
+
+    for authtoken in authtokens:
+        await session.delete(authtoken)
+
+    await session.delete(target_user)
+
+    audit_log = AuditLog(
+        type=LogType.USER_DELETED,
+        content={"target_user_rcsid": target_user.RCSID, "user_rcsid": current_user.RCSID}
+    )
+    session.add(audit_log)
+
+    await session.commit()
 
 @router.post("/clean")
 async def clean_database(
