@@ -15,6 +15,7 @@ export const ToolButton = styled.button`
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     border: 1px solid rgba(0, 0, 0, 0.4);
+    position: relative;
 
     &:hover, &:focus {
         background-color: rgba(0, 0, 0, 0.1);
@@ -24,6 +25,24 @@ export const ToolButton = styled.button`
     & > svg {
         margin-left: 1px;
         margin-top: 1px;
+    }
+
+    /* Hover label, taken from the button's data-tooltip attribute */
+    &[data-tooltip]:hover::after,
+    &[data-tooltip]:focus-visible::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: calc(100% + 8px);        /* show below the button */
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 4px 8px;
+        border-radius: 4px;
+        background: #222;
+        color: #fff;
+        font-size: 12px;
+        white-space: nowrap;
+        pointer-events: none;
+        z-index: 10;
     }
 `;
 

@@ -32,7 +32,7 @@ const Filter: React.FC<FilterProps> = ({
     return (
         <Popover.Root>
             <Popover.Trigger asChild>
-                <ToolButton aria-label="Customise options">
+                <ToolButton aria-label="Filter machines" data-tooltip="Filter machines">
                     <MixerHorizontalIcon />
                 </ToolButton>
             </Popover.Trigger>
