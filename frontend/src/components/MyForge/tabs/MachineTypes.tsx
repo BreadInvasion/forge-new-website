@@ -92,7 +92,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
         }
 
         aeMutation.mutate({
-            id: machineType.id,
+            id: machineType.i,
             name,
             slots: resourceSlots
                 .filter(r => resourceSlotIDS.includes(r.id))
