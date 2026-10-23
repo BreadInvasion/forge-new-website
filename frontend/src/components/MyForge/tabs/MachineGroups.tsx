@@ -1,21 +1,21 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import Table, { DeleteItem, TableHead, ITEMS_PER_PAGE } from '../components/Table';
-import { Machine, MachineGroup, MachineType } from 'src/interfaces';
+import { Machine, MachineGroup, MachineType } from 'src/interfaces/machines';
 
 import '../styles/TabStyles.scss';
 
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
-import { OmniAPI } from 'src/apis/OmniAPI';
 import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
+import { useMachineGroupDelete, useMachineGroupNewEdit, useMachineGroups, useMachines } from 'src/hooks/useMachines';
+import { OmniAPI } from 'src/apis/OmniAPI';
 
 interface aemenuprops {
     isDialogOpen: boolean;
     setIsDialogOpen: (open: boolean) => void;
     machineGroup: MachineGroup | null;
     setMachineGroup: (machine: MachineGroup | null) => void;
-    refresh: () => void;
 }
 
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineGroup | null) => void] => {
@@ -24,21 +24,16 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_GROUPS);
     const canSeeTables = hasPermission(UserPermission.CAN_SEE_TABLES);
 
-    let { isDialogOpen, setIsDialogOpen, machineGroup, setMachineGroup, refresh} = props;
+    let { isDialogOpen, setIsDialogOpen, machineGroup, setMachineGroup} = props;
 
     const [name, setName] = useState("");
-    const [machines, setMachines] = useState<Machine[]>([]);
-    const [machineIDS, setMachineIDS] = useState<string[]>([]);
-
-    useEffect(() => {
-        OmniAPI.getAll("machines")
-            .then((data: Machine[]) => setMachines(data))
-            .catch(err => console.error("Error fetching machines:", err));
-    }, []);
+    const {data: machines} = useMachines();
+    const [machineIds, setMachineIds] = useState<string[]>([]);
+    const aeMutation = useMachineGroupNewEdit();
     
     const handleCheckboxChange = (value: string) => {
         // handle potential null previous state by defaulting to an empty array
-        setMachineIDS(prev => {
+        setMachineIds(prev => {
             const p = prev ?? [];
             return p.includes(value)
                 ? p.filter(item => item !== value) // remove
@@ -50,16 +45,15 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
         setMachineGroup(mach);
         if (mach != null) {
             setName(mach.name);
-            OmniAPI.get("machinegroups", mach.id).then((m) => {
-                setMachineIDS(m.machine_ids);
-                setIsDialogOpen(state);
-            });
+            setMachineIds(mach.machines.map(m => m.id));
+            setIsDialogOpen(state);
         } else {
             setName("");
-            setMachineIDS([]);
+            setMachineIds([]);
             setIsDialogOpen(state);
         }
     }
+
 
     function create() {
         if (!canCreate) {
@@ -71,16 +65,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
             return;
         }
 
-        // Send API request
-        OmniAPI.create("machinegroups", {
-            name,
-            machine_ids: machines.filter(m => machineIDS.includes(m.id)).map(m => m.id)
-        }).then(() => {
-            refresh();
-            setOpenExtra(false, null);
-        }).catch(err => {
-            alert("Failed to create machine group: " + err.response?.data?.detail);
-        });
+        aeMutation.mutate({name, machineIds}, {onSuccess: () => setOpenExtra(false, null)});
     }
 
     function edit() {
@@ -94,15 +79,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
             return;
         }
 
-        OmniAPI.edit("machinegroups", machineGroup.id, {
-            name,
-            machine_ids: machineIDS
-        }).then(() => {
-            refresh();
-            setOpenExtra(false, null);
-        }).catch(err => {
-            alert("Failed to edit machine group: " + err.response?.data?.detail);
-        });
+        aeMutation.mutate({name, machineIds}, {onSuccess: () => setOpenExtra(false, null)});
     }
 
     if (!canSeeTables || (!canCreate && !canEdit)) return [null, setOpenExtra];
@@ -132,7 +109,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
                                         className='styled-checkbox'
                                         type="checkbox"
                                         id={machine.id}
-                                        checked={machineIDS == null ? false : machineIDS.includes(machine.id)}
+                                        checked={machineIds == null ? false : machineIds.includes(machine.id)}
                                         onChange={() => handleCheckboxChange(machine.id)}
                                     />
                                     <label htmlFor={machine.id} className='checkbox-label'>
@@ -156,47 +133,40 @@ const MachineGroups: React.FC = () => {
     const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINE_GROUPS);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_GROUPS);
 
-    const [data, setData] = React.useState<MachineGroup[]>([]);
-    const columns: (keyof MachineGroup)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineGroup)[]).filter((key) => key !== 'id') : [];
-    const [currentPage, setCurrentPage] = useState(1);
+    const {data: machines} = useMachines();
+    const mappings = useMemo(() => machines.reduce((pre, m) => ({
+        ...pre,
+        [m.id]: m.name
+    }), {} as Record<string, string>), [machines]);
 
-    const fetchPage = (page: number) => {
-        const offset = (page - 1) * ITEMS_PER_PAGE;
-        let mappings: Record<string, string> = {};
-        OmniAPI.getAll("machines")
-            .then((machines: Machine[]) => {
-                machines.forEach(m => mappings[m.id] = m.name);
-                return OmniAPI.getAll("machinegroups", { limit: ITEMS_PER_PAGE, offset });
-            })
-            .then(groups => {
-                const newData: MachineGroup[] = groups.map((g: any) => ({
-                    id: g.id,
-                    name: g.name,
-                    machines: g.machine_ids.map((id: string) => mappings[id])
-                }));
-                setData(newData);
-                setCurrentPage(page);
-            })
-            .catch(err => console.error("Error fetching machine groups:", err));
-    };
+    const [page, setPage] = useState(1);
+    const {data} = useMachineGroups(page, ITEMS_PER_PAGE);
+    const groups = useMemo(() => data.map(g => ({
+        id: g.id,
+        name: g.name,
+        machines: g.machine_ids.map(id => ({
+            id,
+            name: mappings[id]
+        }))
+    })), [data, mappings]);
+    const columns: (keyof MachineGroup)[] = useMemo(() => {
+        if (groups.length === 0) return [];
+        return (Object.keys(groups[0]) as (keyof MachineGroup)[])
+            .filter((key) => key !== 'id');
+    }, [groups]);
 
-    React.useEffect(() => {
-        fetchPage(1);
-    }, []);
-
-    const refreshPage = () => fetchPage(currentPage);
-
-    const onDelete = (index_local: number, index_real: number) => {
+    const deleteMutation = useMachineGroupDelete();
+    const onDelete = (index_local: number) => {
         if (!canDelete) {
             alert("You do not have the permissions to delete machine groups");
             return;
         }
-        DeleteItem("machinegroups", data[index_real],  refreshPage);
+        deleteMutation.mutate(groups[index_local]);
     };
 
-    let [machineGroup, setMachineGroup]:[MachineGroup | null, (machineGroup: any) => void] = useState(null);
+    let [machineGroup, setMachineGroup] = useState<MachineGroup | null>(null);
     let [isDialogOpen, setIsDialogOpen] = useState(false);
-    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, machineGroup, setMachineGroup, refresh: refreshPage});
+    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, machineGroup, setMachineGroup});
 
     return (
         <div className='tab-column-cover align-center'>
@@ -206,15 +176,15 @@ const MachineGroups: React.FC = () => {
                 aemenu={ae}
             />
             <Table<MachineGroup>
-                key={`mg-${currentPage}-${data.length}`}
+                key={`mg-${page}-${data.length}`}
                 columns={columns}
                 data={data}
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit={canEdit}
                 canDelete={canDelete}
-                currentPage={currentPage}
-                onPageChange={fetchPage}
+                currentPage={page}
+                onPageChange={setPage}
                 resourceType="machinegroups"
             />
         </div>

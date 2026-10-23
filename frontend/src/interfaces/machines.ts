@@ -47,7 +47,10 @@ export interface MachineType {
 export interface MachineGroup {
     id: string;
     name: string;
-    machines: string[];
+    machines: {
+        name: string,
+        id: string
+    }[];
 };
 
 export interface MachineUsage {

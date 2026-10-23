@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import Table, { DeleteItem, TableHead, ITEMS_PER_PAGE } from '../components/Table';
-import { Machine, MachineGroup, MachineType } from 'src/interfaces';
+import { Machine, MachineGroup, MachineType } from 'src/interfaces/machines';
 
 import '../styles/TabStyles.scss';
 import * as Dialog from '@radix-ui/react-dialog';

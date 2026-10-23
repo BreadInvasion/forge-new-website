@@ -1,8 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
-import { clearMachine, newEditMachineType, failMachine, fetchMachineGroups, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine, fetchMachineTypes, deleteMachineType } from "src/apis/MachinesAPI";
-import { MachineType } from "src/interfaces/machines";
+import { clearMachine, newEditMachineType, failMachine, fetchMachineGroupsPublic, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine, fetchMachineTypes, deleteMachineType, fetchMachineGroups, newEditMachineGroup, deleteMachineGroup} from "src/apis/MachinesAPI";
 
 export function useMachines() {
     return useQuery({
@@ -21,10 +20,10 @@ export function useMachineSchema(machineId?: string) {
     })
 }
 
-export function useMachineGroups() {
+export function useMachineGroupsPublic() {
     return useQuery({
-        queryKey: ["machine", "status", "groups"],
-        queryFn: fetchMachineGroups,
+        queryKey: ["machine", "status", "groups", "public"],
+        queryFn: fetchMachineGroupsPublic,
         initialData: []
     })
 }
@@ -117,7 +116,7 @@ export function useMachineUse() {
 
 export function useMachineTypes(page: number, limit: number) {
     return useQuery({
-        queryKey: ["machine", "types", ],
+        queryKey: ["machine", "type", limit, page],
         queryFn: async () => await fetchMachineTypes((page-1)*limit, limit),
         placeholderData: keepPreviousData,
         initialData: []
@@ -129,7 +128,7 @@ export function useMachineTypeNewEdit() {
     return useMutation({
         mutationFn: newEditMachineType,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["machine", "types"] });
+            queryClient.invalidateQueries({ queryKey: ["machine", "type"] });
         },
         onError: (error, {id}) => {
             if (error instanceof AxiosError) {
@@ -154,7 +153,7 @@ export function useMachineTypeDelete() {
     return useMutation({
         mutationFn: deleteMachineType,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["machine", "types"] });
+            queryClient.invalidateQueries({ queryKey: ["machine", "type"] });
         },
         onError: (error) => {
             if (error instanceof AxiosError) {
@@ -169,6 +168,65 @@ export function useMachineTypeDelete() {
                 }
             } else {
                 alert(`Failed to delete machine type: ${error.message}`);
+            }
+        }
+    });
+}
+
+export function useMachineGroups(page: number, limit: number) {
+    return useQuery({
+        queryKey: ['machine', 'group', limit, page],
+        queryFn: () => fetchMachineGroups((page-1)*limit, limit),
+        placeholderData: keepPreviousData,
+        initialData: []
+    });
+}
+
+export function useMachineGroupNewEdit() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: newEditMachineGroup,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["machine", "group"] });
+        },
+        onError: (error, {id}) => {
+            if (error instanceof AxiosError) {
+                switch (error.response?.status) {
+                    case 422:
+                        alert('Validation Failed.');
+                        break;
+                    default:
+                        console.error(error);
+                        alert(`An error occurred. Please try again.`);
+                        break;
+                }
+            } else {
+                alert(`Failed to ${id ? 'edit' : 'create'} machine group: ${error.message}`);
+            }
+        }
+    });
+}
+
+export function useMachineGroupDelete() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: deleteMachineGroup,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["machine", "group"] });
+        },
+        onError: (error) => {
+            if (error instanceof AxiosError) {
+                switch (error.response?.status) {
+                    case 422:
+                        alert('Validation Failed.');
+                        break;
+                    default:
+                        console.error(error);
+                        alert(`An error occurred. Please try again.`);
+                        break;
+                }
+            } else {
+                alert(`Failed to delete machine group: ${error.message}`);
             }
         }
     });

@@ -33,7 +33,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
     const [resourceSlotIDS, setResourceSlotIDS] = useState<string[]>([]);
     const [cost, setCost] = useState<number>(0.0);
 
-    const useMachineTypeNewEditMutation = useMachineTypeNewEdit();
+    const aeMutation = useMachineTypeNewEdit();
 
     const handleCheckboxChange = (value: string) => {
         setResourceSlotIDS(prev =>
@@ -71,7 +71,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
             return;
         }
 
-        useMachineTypeNewEditMutation.mutate({
+        aeMutation.mutate({
             name,
             slots: resourceSlots
                 .filter(r => resourceSlotIDS.includes(r.id))
@@ -91,7 +91,8 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
             return;
         }
 
-        useMachineTypeNewEditMutation.mutate({
+        aeMutation.mutate({
+            id: machineType.id,
             name,
             slots: resourceSlots
                 .filter(r => resourceSlotIDS.includes(r.id))
@@ -163,15 +164,14 @@ const MachineTypes: React.FC = () => {
             .filter((key) => !key.includes('_id') && key !== 'id' )
     }, [types]);
 
-    const useMachineTypeDeleteMutation = useMachineTypeDelete();
-
+    const deleteMutation = useMachineTypeDelete();
     const onDelete = (index_local: number) => {
         if (!canDelete) {
             alert("You do not have the permissions to delete machine types");
             return;
         }
 
-        useMachineTypeDeleteMutation.mutate(types[index_local]);
+        deleteMutation.mutate(types[index_local].id);
     };
 
     const [machineType, setMachineType] = useState<MachineType | null>(null);

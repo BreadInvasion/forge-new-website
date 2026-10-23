@@ -1,5 +1,5 @@
 import { API } from "./OmniAPI";
-import { AllMachinesStatusResponse, Machine, MachineSchemas, MachineType } from "src/interfaces/machines";
+import { AllMachinesStatusResponse, Machine, MachineGroup, MachineSchemas, MachineType } from "src/interfaces/machines";
 
 export async function fetchMachines() {
     return await API.get("/machines") as Machine[];
@@ -9,7 +9,7 @@ export async function fetchMachineSchema(machineId: string) {
     return await API.get(`/use/${machineId}/schema`) as MachineSchemas;
 }
 
-export async function fetchMachineGroups() {
+export async function fetchMachineGroupsPublic() {
     const response = await API.getPublic("/machinestatus");
     const data: AllMachinesStatusResponse = response;
     return [...data.groups.map(g => ({ id: g.machines[0].group_id, name: g.name }))];
@@ -69,13 +69,28 @@ export async function fetchMachineTypes(offset: number, limit: number) {
 }
 
 export async function newEditMachineType({id, name, slots, cost} : {id?: string, name: string, slots: string[], cost: number}) {
-    return await API.post('/machinetypes/new', {
+    return await API.post(`/machinetypes/${id ? id : 'new'}`, {
         name,
         resource_slot_ids: slots,
         cost_per_hour: cost.toString()
     });
 }
 
-export async function deleteMachineType(type: MachineType) {
-    return await API.delete(`/machinetypes/${type.id}`);
+export async function deleteMachineType(id: string) {
+    return await API.delete(`/machinetypes/${id}`);
+}
+
+export async function fetchMachineGroups(offset: number, limit: number) {
+    return await API.get(`/machinegroups`, {offset, limit});
+}
+
+export async function newEditMachineGroup({id, name, machineIds} : {id?: string, name: string, machineIds: string[]}) {
+    return await API.post(`/machinegroups/${id ? id : 'new'}`, {
+        name,
+        machine_ids: machineIds,
+    });
+}
+
+export async function deleteMachineGroup(id: string) {
+    return await API.delete(`/machinegroups/${id}`);
 }
