@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
-import { clearMachine, failMachine, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine } from "src/apis/MachinesAPI";
+import { clearMachine, failMachine, fetchMachineGroups, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine } from "src/apis/MachinesAPI";
 
 export function useMachines() {
     return useQuery({
@@ -17,6 +17,14 @@ export function useMachineSchema(machineId?: string) {
         queryFn: () => fetchMachineSchema(machineId!),
         initialData: undefined,
         enabled: machineId !== '0'
+    })
+}
+
+export function useMachineGroups() {
+    return useQuery({
+        queryKey: ["machine", "status", "groups"],
+        queryFn: fetchMachineGroups,
+        initialData: []
     })
 }
 

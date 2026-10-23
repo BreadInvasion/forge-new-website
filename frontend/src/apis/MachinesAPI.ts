@@ -10,6 +10,12 @@ export async function fetchMachineSchema(machineId: string) {
     return await get(`/use/${machineId}/schema`) as MachineSchemas;
 }
 
+export async function fetchMachineGroups() {
+    const response = await getPublic("/machinestatus");
+    const data: AllMachinesStatusResponse = response;
+    return [...data.groups.map(g => ({ id: g.machines[0].group_id, name: g.name }))];
+}
+
 export async function fetchMachineStatus() {
     const response = await getPublic("/machinestatus");
     const data: AllMachinesStatusResponse = response;

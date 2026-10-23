@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getEndTime} from '../MachineCard';
 import { OmniAPI } from 'src/apis/OmniAPI';
 import { MachineStatus } from 'src/interfaces';
 import { StatusText } from '../StatusComponents';
+import { formatTime, getTimeOffset } from 'src/utils/time';
 
 const UpNextContainer = styled.div`
     padding: 1rem;
@@ -147,7 +147,7 @@ const UpNext: React.FC = () => {
                         </Countdown>
                     </ItemHeader>
                     <UserName> Being used by: {machine.user ? machine.user : 'N/A'}</UserName>
-                    <EstTime $area="date">Est. Completion: {getEndTime(machine.usage_start!, machine.usage_duration!)}</EstTime>
+                    <EstTime $area="date">Est. Completion: {formatTime(getTimeOffset(machine.usage_start!, machine.usage_duration!))}</EstTime>
                 </MachineItem>
             ))}
         </UpNextContainer>

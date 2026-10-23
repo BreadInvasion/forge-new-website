@@ -1,5 +1,5 @@
 import { Pencil1Icon, ExclamationTriangleIcon, Cross2Icon, EraserIcon } from "@radix-ui/react-icons";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Filter from "./Filter";
@@ -8,6 +8,7 @@ import { Toggle } from "@radix-ui/react-toggle";
 import { UserPermission } from "../../../enums";
 import { OmniAPI } from "src/apis/OmniAPI";
 import useAuth from "../../Auth/useAuth";
+import { useMachineGroups } from "src/hooks/useMachines";
 
 const ToolbarContainer = styled.div`
     grid-area: tools;
@@ -68,7 +69,7 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
         navigate("/myforge/fail");
     };  
 
-    const [groups, setGroups] = React.useState<{ id: string; name: string }[]>([]);
+    const {data: groups} = useMachineGroups();
 
     useEffect(() => {
         const container = document.getElementById('active-filters') as HTMLElement; // .MAIN is a class since I think It could be more useful
@@ -88,26 +89,7 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
         }
     }, []);
 
-    useEffect(() => {
-        const fetchFilterData = async () => {
-            try {
-                const [machinestatus] = await Promise.all([
-                    OmniAPI.getPublic('machinestatus'),
-                ]);
-
-                if (machinestatus.groups) {
-                    const groupNames = machinestatus.groups.map((g: { machines: { group_id: any; }[]; name: any; }) => ({ id: g.machines[0].group_id, name: g.name }))
-                    setGroups(groupNames);
-                }
-            } catch (err) {console.error('Error fetching filter data:', err);}
-        };
-
-        fetchFilterData();
-
-        return () => {};
-    }, []);
-
-    const filters: { name: string; value: string[] }[] = [
+    const filters = useMemo(() => [
         {
             name: "Machine Group",
             value: groups.map(g => g.name) || []
@@ -116,7 +98,7 @@ const Toolbar: React.FC<ToolbarProps> = ({highlightFailed, setHighlightFailed, a
             name: "Status",
             value: ["In Progress", "Completed", "Available", "Failed", "Maintenance"]
         }
-    ];
+    ], [groups])
     
     const handleFilterClick = (value: string) => {
         if(!activeFilters.includes(value)) {
