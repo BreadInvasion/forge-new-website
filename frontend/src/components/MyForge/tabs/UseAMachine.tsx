@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom"
 import '../../Forms/styles/Form.scss';
 import '../styles/UseAMachine.scss';
+import * as Select from '@radix-ui/react-select';
+import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { AxiosError } from "axios";
 
 
@@ -257,16 +259,28 @@ export const DynamicMachineForm: React.FC = () => {
                 {page == 1 &&
                     <div className="machine-selection">
                         <label>1. Machine Selection</label>
-                        <select
-                            className='styled-dropdown'
-                            value={selectedMachineId}
-                            onChange={(e) => handleSelectMachine(e.target.value)}
+                        <Select.Root
+                            value={selectedMachineId === "0" ? "" : selectedMachineId}
+                            onValueChange={handleSelectMachine}
                         >
-                            <option className='styled-dropdown-placeholder' value="0" hidden>{"Please Select a Machine"}</option>
-                            {machines.map((machine: Machine) => (
-                                <option className='styled-dropdown-option' key={machine.id} value={machine.id}>{machine.name}</option>
-                            ))}
-                        </select>
+                            <Select.Trigger className="machine-select-trigger" aria-label="Select a machine">
+                                <Select.Value placeholder="Please Select a Machine" />
+                                <Select.Icon aria-hidden>
+                                    <ChevronDownIcon />
+                                </Select.Icon>
+                            </Select.Trigger>
+                            <Select.Portal>
+                                <Select.Content className="machine-select-content" position="popper" sideOffset={4}>
+                                    <Select.Viewport>
+                                        {machines.map((machine: Machine) => (
+                                            <Select.Item className="machine-select-item" key={machine.id} value={machine.id}>
+                                                <Select.ItemText>{machine.name}</Select.ItemText>
+                                            </Select.Item>
+                                        ))}
+                                    </Select.Viewport>
+                                </Select.Content>
+                            </Select.Portal>
+                        </Select.Root>
                     </div>
                 }
 
@@ -404,7 +418,7 @@ const ResourceUsageForm: React.FC<ResourceUsageFormProps> = ({ slots, initialVal
         setSlotValues(newSlotValues);
     }
 
-    const showBrand = slots.find((slot) => slot.valid_resources.find((resource) => resource.brand)) ? true : false;
+    const showBrand = false;
     const showColor = false; //slots.find((slot) => slot.valid_resources.find((resource) => resource.color) ? true : false);
 
     return (
@@ -551,9 +565,9 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
 
     return (
         <tr>
-            <td>{slot.display_name}</td>
+            <td data-label="Slot Name">{slot.display_name}</td>
             {/* Material Dropdown (Always available) */}
-            <td>
+            <td data-label="Material">
                 <select
                     name="name"
                     value={selectedDetails.name}
@@ -569,7 +583,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
 
             {/* Brand Dropdown (Only available if material is selected) */}
             {showBrand && (
-                <td>
+                <td data-label="Brand">
                     <select
                         name="brand"
                         value={selectedDetails.brand}
@@ -586,7 +600,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
 
             {/* Color Dropdown (Only available if brand is selected) */}
             {showColor && (
-                <td>
+                <td data-label="Color">
                     <select
                         name="color"
                         value={selectedDetails.color}
@@ -602,7 +616,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
             )}
 
             {/* Amount Input */}
-            <td>
+            <td data-label="Amount">
                 <input
                     type="number"
                     name="amount"
@@ -613,7 +627,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
             </td>
 
             {/* Own Checkbox */}
-            <td>
+            <td data-label="Personal Material">
                 <input
                     type="checkbox"
                     name="own"
@@ -623,10 +637,9 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
             </td>
 
             {/* Cost Display */}
-            <td>
+            <td data-label="Cost">
                 {"$" + cost.toFixed(2)}
             </td>
         </tr>
     );
 };
-
