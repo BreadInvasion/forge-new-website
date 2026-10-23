@@ -1,23 +1,22 @@
-import { AllMachinesStatusResponse } from "src/interfaces";
-import { get, getPublic, post } from "./OmniAPI";
-import { Machine, MachineSchemas } from "src/interfaces/machines";
+import { API } from "./OmniAPI";
+import { AllMachinesStatusResponse, Machine, MachineSchemas, MachineType } from "src/interfaces/machines";
 
 export async function fetchMachines() {
-    return await get("/machines") as Machine[];
+    return await API.get("/machines") as Machine[];
 }
 
 export async function fetchMachineSchema(machineId: string) {
-    return await get(`/use/${machineId}/schema`) as MachineSchemas;
+    return await API.get(`/use/${machineId}/schema`) as MachineSchemas;
 }
 
 export async function fetchMachineGroups() {
-    const response = await getPublic("/machinestatus");
+    const response = await API.getPublic("/machinestatus");
     const data: AllMachinesStatusResponse = response;
     return [...data.groups.map(g => ({ id: g.machines[0].group_id, name: g.name }))];
 }
 
 export async function fetchMachineStatus() {
-    const response = await getPublic("/machinestatus");
+    const response = await API.getPublic("/machinestatus");
     const data: AllMachinesStatusResponse = response;
 
     const groups = [...data.groups.map(g => ({ id: g.machines[0].group_id, name: g.name }))];
@@ -50,11 +49,11 @@ export async function fetchMachineStatus() {
 }
 
 export async function clearMachine(machineId: string) {
-    return await post(`/clear/${machineId}`);
+    return await API.post(`/clear/${machineId}`);
 }
 
 export async function failMachine(machineId: string) {
-    return await post(`/fail/${machineId}`);
+    return await API.post(`/fail/${machineId}`);
 }
 
 type UseMachineArgs = {
@@ -62,5 +61,21 @@ type UseMachineArgs = {
     data: Record<string, any>
 }
 export async function useMachine({machineId, data}: UseMachineArgs) {
-    return await post(`/use/${machineId}`, data)
+    return await API.post(`/use/${machineId}`, data);
+}
+
+export async function fetchMachineTypes(offset: number, limit: number) {
+    return await API.get('/machinetypes', {offset, limit}) as MachineType[];
+}
+
+export async function newEditMachineType({id, name, slots, cost} : {id?: string, name: string, slots: string[], cost: number}) {
+    return await API.post('/machinetypes/new', {
+        name,
+        resource_slot_ids: slots,
+        cost_per_hour: cost.toString()
+    });
+}
+
+export async function deleteMachineType(type: MachineType) {
+    return await API.delete(`/machinetypes/${type.id}`);
 }

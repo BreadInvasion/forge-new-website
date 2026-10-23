@@ -1,43 +1,57 @@
 import { api, publicApi } from "./configs/axiosConfigs";
 
-export async function get(url: string, params?: Record<string, any>) {
-    const response = await api.request({
-        url,
-        method: "GET",
-        params,
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-    });
-
-    return response.data
-}
-
-export async function getPublic(url: string, params?: Record<string, any>) {
-    const response = await publicApi.request({
-        url,
-        method: "GET",
-        params,
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
-
-    return response.data;
-}
-export async function post(url: string, data?: Record<string, any>) {
-    const response = await api.request({
-        url,
-        method: "POST",
-        data,
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-    });
-
-    return response.data;
+export const API = {
+    async get(url: string, params?: Record<string, any>) {
+        const response = await api.request({
+            url,
+            method: "GET",
+            params,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        });
+    
+        return response.data
+    },
+    async getPublic(url: string, params?: Record<string, any>) {
+        const response = await publicApi.request({
+            url,
+            method: "GET",
+            params,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+    
+        return response.data;
+    },
+    async post(url: string, data?: Record<string, any>) {
+        const response = await api.request({
+            url,
+            method: "POST",
+            data,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        });
+    
+        return response.data;
+    },
+    async delete(url: string, data?: Record<string, any>) {
+        const response = await api.request({
+            url,
+            method: "DELETE",
+            data,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        });
+    
+        return response.data;
+    }
 }
 
 export const OmniAPI = {
