@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom"
 import '../../Forms/styles/Form.scss';
 import '../styles/UseAMachine.scss';
+import * as Select from '@radix-ui/react-select';
+import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { AxiosError } from "axios";
 import useAuth from "src/components/Auth/useAuth";
 import { UserPermission } from "src/enums";
@@ -275,10 +277,9 @@ export const DynamicMachineForm: React.FC = () => {
                 {page == 1 &&
                     <div className="machine-selection">
                         <label>1. Machine Selection</label>
-                        <select
-                            className='styled-dropdown'
-                            value={selectedMachineId}
-                            onChange={(e) => handleSelectMachine(e.target.value)}
+                        <Select.Root
+                            value={selectedMachineId === "0" ? "" : selectedMachineId}
+                            onValueChange={handleSelectMachine}
                         >
                             <option className='styled-dropdown-placeholder' value="0" hidden>{"Please Select a Machine"}</option>
                             {machines.filter((machine: Machine) => canSeeDisabled || !machine.disabled).map((machine: Machine) => (
@@ -516,10 +517,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
         ) ?? null;
     };
 
-    const handleChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-        const { name, value, type } = event.target;
-        const newValue = type === "checkbox" ? (event.target as HTMLInputElement).checked : value;
-
+    const updateSelectedDetails = (name: string, newValue: string | boolean) => {
         setSelectedDetails(prev => {
             let updatedDetails = { ...prev, [name]: newValue };
 
@@ -552,6 +550,12 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
         });
     };
 
+    const handleChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+        const { name, value, type } = event.target;
+        const newValue = type === "checkbox" ? (event.target as HTMLInputElement).checked : value;
+        updateSelectedDetails(name, newValue);
+    };
+
     useEffect(() => {
         const matchedResource = validResources.find(resource =>
             resource.name === selectedDetails.name &&
@@ -577,25 +581,40 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
 
     return (
         <tr>
-            <td>{slot.display_name}</td>
+            <td data-label="Slot Name">{slot.display_name}</td>
             {/* Material Dropdown (Always available) */}
-            <td>
-                <select
-                    name="name"
+            <td data-label="Material">
+                <Select.Root
                     value={selectedDetails.name}
-                    onChange={handleChange}
+                    onValueChange={(value) => updateSelectedDetails("name", value)}
                     required={!slot.allow_empty}
                 >
-                    <option value="_">--Material--</option>
-                    {materialOptions.map(name => (
-                        <option key={name} value={name}>{name}</option>
-                    ))}
-                </select>
+                    <Select.Trigger className="resource-select-trigger" aria-label="Select material">
+                        <Select.Value />
+                        <Select.Icon aria-hidden>
+                            <ChevronDownIcon />
+                        </Select.Icon>
+                    </Select.Trigger>
+                    <Select.Portal>
+                        <Select.Content className="resource-select-content" position="popper" sideOffset={4}>
+                            <Select.Viewport>
+                                <Select.Item className="resource-select-item" value="_">
+                                    <Select.ItemText>--Material--</Select.ItemText>
+                                </Select.Item>
+                                {materialOptions.map(name => (
+                                    <Select.Item className="resource-select-item" key={name} value={name}>
+                                        <Select.ItemText>{name}</Select.ItemText>
+                                    </Select.Item>
+                                ))}
+                            </Select.Viewport>
+                        </Select.Content>
+                    </Select.Portal>
+                </Select.Root>
             </td>
 
             {/* Brand Dropdown (Only available if material is selected) */}
             {showBrand && (
-                <td>
+                <td data-label="Brand">
                     <select
                         name="brand"
                         value={selectedDetails.brand}
@@ -612,7 +631,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
 
             {/* Color Dropdown (Only available if brand is selected) */}
             {showColor && (
-                <td>
+                <td data-label="Color">
                     <select
                         name="color"
                         value={selectedDetails.color}
@@ -628,7 +647,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
             )}
 
             {/* Amount Input */}
-            <td>
+            <td data-label="Amount">
                 <input
                     type="number"
                     name="amount"
@@ -639,7 +658,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
             </td>
 
             {/* Own Checkbox */}
-            <td>
+            <td data-label="Personal Material">
                 <input
                     type="checkbox"
                     name="own"
@@ -649,10 +668,9 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
             </td>
 
             {/* Cost Display */}
-            <td>
+            <td data-label="Cost">
                 {"$" + cost.toFixed(2)}
             </td>
         </tr>
     );
 };
-

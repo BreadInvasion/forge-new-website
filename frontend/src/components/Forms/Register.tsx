@@ -150,13 +150,12 @@ export default function Register() {
     }
 
     return (
-        <div className='page-container'>
+        <div className='page-container register-page'>
             <Form
                 formFields={formFields}
                 handleSubmit={handleRegister} 
                 submitLabel="Register" 
                 title="Register"
-                showIcon={true} 
                 isSubmitting={isSubmitting}
             />
         </div>

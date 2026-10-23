@@ -90,6 +90,53 @@
     width: max-content;
 }
 
+.usage-form .machine-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #111;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.machine-select-content {
+    z-index: 1000;
+    width: var(--radix-select-trigger-width);
+    max-width: calc(100vw - 2rem);
+    max-height: var(--radix-select-content-available-height);
+    overflow-y: auto;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #111;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.machine-select-item {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.5rem;
+    cursor: pointer;
+    outline: none;
+}
+
+.machine-select-item[data-highlighted] {
+    background-color: #e5e5e5;
+}
+
+.usage-form .machine-select-trigger:focus-visible {
+    outline: 2px solid #ba0000;
+    outline-offset: 2px;
+}
+
 .usage-duration {
     display: flex;
     flex-direction: row;
@@ -168,6 +215,66 @@
     border: 1px solid #333;
 }
 
+.resource-usage-form .resource-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    min-width: 0;
+    padding: 5px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #111;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.resource-select-trigger > span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.resource-select-content {
+    z-index: 1000;
+    width: var(--radix-select-trigger-width);
+    min-width: 0;
+    max-width: calc(100vw - 2rem);
+    max-height: var(--radix-select-content-available-height);
+    overflow-y: auto;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #111;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.resource-select-item {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    min-height: 40px;
+    padding: 0.5rem;
+    overflow: hidden;
+    cursor: pointer;
+    font-size: 0.875rem;
+    outline: none;
+}
+
+.resource-select-item[data-highlighted] {
+    background-color: #e5e5e5;
+}
+
+.resource-select-item > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .usage-policies {
     display: grid;
     grid-template-columns: min-content 1fr;
@@ -224,4 +331,133 @@
 
 .usage-duration input {
     text-align: right;
+}
+
+/* ---------- Phones: let the usage / failure forms fit the screen ---------- */
+@media (max-width: 900px) {
+    .use-a-machine {
+        height: auto;
+        min-height: 100%;
+        padding: 1rem 0.75rem;
+        box-sizing: border-box;
+    }
+
+    .usage-form {
+        width: 100% !important;
+        max-width: 520px;
+        min-width: 0;
+        box-sizing: border-box;
+        padding: 16px;
+    }
+
+    .usage-form > .form-icon {
+        width: 100%;
+        height: 72px;
+        flex: 0 0 72px;
+        background-size: auto 90%;
+    }
+
+    .usage-form label {
+        text-wrap: wrap;
+        white-space: normal;
+    }
+
+    /* Stack "1. Machine Selection" above its dropdown */
+    .machine-selection {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .machine-selection .machine-select-trigger {
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+    }
+
+    /* Hours / minutes wrap instead of running off the side */
+    .usage-duration {
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .usage-duration > label:first-child {
+        flex-basis: 100%;
+    }
+
+    .usage-duration > input {
+        width: 5rem;
+        min-width: 0;
+    }
+
+    .resource-usage-form {
+        min-width: 0;
+    }
+
+    .resource-usage-form table,
+    .resource-usage-form tbody {
+        display: block;
+        width: 100%;
+    }
+
+    .resource-usage-form thead {
+        display: none;
+    }
+
+    .resource-usage-form tbody tr {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid #aaa;
+    }
+
+    .resource-usage-form td {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        min-width: 0;
+        padding: 0;
+        text-align: left;
+    }
+
+    .resource-usage-form td:first-child {
+        grid-column: 1 / -1;
+        font-weight: 600;
+    }
+
+    .resource-usage-form td::before {
+        content: attr(data-label);
+        margin-bottom: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #444;
+    }
+
+    .resource-usage-form td input[type="checkbox"] {
+        align-self: flex-start;
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    .usage-form select,
+    .usage-form input,
+    .resource-usage-form select,
+    .resource-usage-form input {
+        font-size: 16px; /* stops iOS Safari zooming in on focus */
+        box-sizing: border-box;
+        max-width: 100%;
+    }
+
+    .resource-usage-form .resource-select-trigger {
+        font-size: 16px;
+    }
+
+    .usage-form button,
+    .pagination-buttons button {
+        font-size: 1rem;
+    }
 }

@@ -3,15 +3,24 @@ import useAuth from '../../Auth/useAuth';
 import { Link } from 'react-router-dom';
 import * as Avatar from './Avatar';
 import { UserPermission } from "../../../enums";
+import { DoubleArrowLeftIcon } from '@radix-ui/react-icons';
 
 import '../styles/UserMenu.scss';
 
-const UserMenu: React.FC = () => {
+interface UserMenuProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+const UserMenu: React.FC<UserMenuProps> = ({ isOpen, onClose }) => {
 
     const { user, hasPermission } = useAuth();
 
     return (
-    <div className="sidebar">
+    <div className={`sidebar ${isOpen ? 'open' : 'collapsed'}`} aria-hidden={!isOpen}>
+            <button type='button' className='sidebar-close' onClick={onClose} aria-label='Collapse menu'>
+                <DoubleArrowLeftIcon />
+            </button>
             {/* Avatar should be able to be outlined based on user type 
                 - if user is a volunteer, avatar should have a green border
                 - is user is a room manager, avatar should have a gold border

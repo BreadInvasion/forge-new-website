@@ -1,6 +1,7 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import UserMenu from './components/UserMenu';
-import { Outlet, Route, Routes } from 'react-router-dom';
+import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
+import { HamburgerMenuIcon } from '@radix-ui/react-icons';
 
 import './styles/MyForge.scss';
 import './styles/TabStyles.scss';
@@ -26,15 +27,41 @@ interface MyForgeProps {
 
 }
 
+// Below this width the sidebar becomes a slide-out drawer (keep in sync with $mobile-breakpoint in MyForge.scss)
+const MOBILE_QUERY = '(max-width: 900px)';
+const isMobile = () => typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches;
+
 const MyForge: React.FC = () => {
     /** MyForge Component
      *  - Operates as a functional Router for the subpage types. Which are defined in the App.tsx file.
      *  - All children share the same prop API, defined above, which is passed through context.
     */
 
+    // Sidebar starts open on desktop and closed on phones
+    const [menuOpen, setMenuOpen] = useState<boolean>(() => !isMobile());
+    const location = useLocation();
+
+    // On phones, close the drawer after picking a page
+    useEffect(() => {
+        if (isMobile()) setMenuOpen(false);
+    }, [location.pathname]);
+
     return (
-        <div className='myforge'>
-            <UserMenu />
+        <div className={`myforge ${menuOpen ? 'menu-open' : 'menu-closed'}`}>
+            <UserMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+            {menuOpen && <div className='sidebar-backdrop' onClick={() => setMenuOpen(false)} aria-hidden='true' />}
+            {!menuOpen && (
+                <button
+                    type='button'
+                    className='sidebar-toggle'
+                    onClick={() => setMenuOpen(true)}
+                    aria-label='Open menu'
+                    aria-expanded={false}
+                >
+                    <HamburgerMenuIcon />
+                    <span>Menu</span>
+                </button>
+            )}
             <div className='tab-container'>
                 <Suspense fallback={<div></div>}>
                     <Routes>

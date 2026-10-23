@@ -87,3 +87,72 @@ a {
     height: 1px;
     background-color: #333;
 }
+
+/* Sign-in page links ("Forgot Password?" and "Register Here!") */
+.login-container a {
+    color: #AF0909;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 3px;
+    transition: color 0.15s ease;
+}
+
+.login-container a:hover {
+    color: #7a0606;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.login-container a:focus-visible {
+    outline: 2px solid #AF0909;
+    outline-offset: 2px;
+}
+
+.login-container .register {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.login-container .register a {
+    font-size: inherit;
+    white-space: nowrap;
+}
+
+/* Sign In button on top, "Forgot Password?" underneath, at every screen size */
+.login-container .button-container {
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.login-container .button-container button {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Tablets and phones: 25vw is far too narrow, so center the card and give it a real width */
+@media (max-width: 900px) {
+    .login-container {
+        justify-content: center;
+        padding: 1rem;
+        box-sizing: border-box;
+    }
+
+    .login-container form {
+        width: min(100%, 400px) !important;
+        box-sizing: border-box;
+        padding: 1.5rem;
+    }
+
+    .login-container .form-logo {
+        height: 80px;
+    }
+
+    .login-container input {
+        box-sizing: border-box;
+        padding: 10px;
+        font-size: 16px; /* 16px+ stops iOS Safari from zooming in when the field is focused */
+    }
+}

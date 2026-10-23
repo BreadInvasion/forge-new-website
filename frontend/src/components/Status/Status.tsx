@@ -47,18 +47,18 @@ const Sidebar = styled.div`
     min-width: 250px;
     overflow: visible;
     @media screen and (max-width: 850px) {
-        padding: 0.5rem;
-        padding-top: 1rem;
-        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        grid-template-rows: auto;
+        /* Phones: stack "Selected Machine" and "Up Next" full width under the grid
+           instead of squeezing them side by side into a fixed-height box */
+        display: flex;
+        flex-direction: column;
         gap: 1rem;
-        grid-template-areas:
-            "highlight up-next";
-        height: 40vh;
+        min-width: 0;
+        width: 100%;
+        height: auto;
+        padding: 1rem 0 1.5rem;
         box-sizing: border-box;
-        overflow-y: auto;
+        overflow: visible;
+        border-top: 1px solid rgba(0, 0, 0, 0.12);
     }
 `;
 

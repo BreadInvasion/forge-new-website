@@ -302,26 +302,70 @@
 }
 
 @media screen and (width < nav.$mobile-breakpoint) {
-    .logo-text, .list-item {
-        transform: translate(0, -200pt);
-        opacity: 0;
-        scale: 0%;
-    }
-    .hamburger-icon {
-        size: 100%;
-        transform: translate(0);
-        margin-right: .2rem;
-        opacity: 1;
-    }
-    .user-trigger:has(.hamburger-icon) {
-        transform: translate(0pt, 0pt);
+    .nav-menu-root {
         position: relative;
-        width: 15pt;
-        height: 20pt;
-        scale: 100%;
-        opacity: 1;
-        z-index: 999; // prevent going under logo icon
+        min-height: 64px;
+        height: auto;
     }
+
+    .nav-menu-list {
+        justify-content: flex-end;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .list-item,
+    .logo-text {
+        display: none;
+    }
+
+    .logo-link {
+        align-items: center;
+        justify-content: flex-start;
+        min-width: 0;
+        width: auto;
+        padding: 0.5rem 0.75rem;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+    }
+
+    .forge-logo {
+        display: block;
+        width: 48px;
+        height: auto;
+        flex: none;
+    }
+
+    .user-item:has(.hamburger-icon) {
+        margin-right: auto;
+    }
+
+    .user-trigger:has(.hamburger-icon) {
+        position: relative;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        transform: none;
+        scale: 1;
+        opacity: 1;
+        z-index: 1;
+    }
+
+    .hamburger-icon {
+        position: static;
+        width: 24px;
+        height: 24px;
+        margin: 0;
+        transform: none;
+    }
+
+    .user-content .link {
+        display: flex;
+        align-items: center;
+        min-height: 44px;
+    }
+
     .separator {
         margin-left: 0;
     }

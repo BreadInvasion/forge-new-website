@@ -1,7 +1,126 @@
 
 .myforge {
+    position: relative;
     display: flex;
     height: 100%;
     width: 100%;
     background-color: #f5f5f5;
+    overflow: hidden;
+}
+
+/* ---------- Collapsible sidebar ---------- */
+$mobile-breakpoint: 900px; // keep in sync with MOBILE_QUERY in MyForge.tsx
+
+.myforge .sidebar {
+    position: relative;
+    transition: margin-left 0.25s ease, transform 0.25s ease;
+}
+
+/* Desktop: collapsing slides the sidebar off to the left and the content takes the space */
+.myforge .sidebar.collapsed {
+    margin-left: -18vw;
+    visibility: hidden;
+}
+
+@media (max-width: 1222px) {
+    /* 18vw is under the 220px min-width here, so slide by the min-width instead */
+    .myforge .sidebar.collapsed {
+        margin-left: -220px;
+    }
+}
+
+.sidebar-close,
+.sidebar-toggle {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    color: #4d4f4e;
+    background-color: #f7f7f7;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+    transition: background-color 0.15s ease;
+}
+
+.sidebar-close:hover,
+.sidebar-toggle:hover {
+    background-color: #e6e6e6;
+}
+
+.sidebar-close:focus-visible,
+.sidebar-toggle:focus-visible {
+    outline: 2px solid #c74d37;
+    outline-offset: 2px;
+}
+
+.sidebar-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 2rem;
+    height: 2rem;
+    z-index: 2;
+}
+
+.sidebar-toggle {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 20;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-backdrop {
+    display: none;
+}
+
+/* Leave room under the floating Menu button so it never covers page content */
+.myforge.menu-closed .tab-container {
+    padding-top: 2.75rem;
+    box-sizing: border-box;
+}
+
+/* Phones and small tablets: the sidebar becomes a drawer that slides over the page */
+@media (max-width: $mobile-breakpoint) {
+    .myforge .sidebar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 30;
+        width: min(80vw, 300px);
+        flex: none;
+        min-width: 0;
+        margin-left: 0;
+        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .myforge .sidebar.collapsed {
+        margin-left: 0;
+        transform: translateX(-105%);
+    }
+
+    .sidebar-backdrop {
+        display: block;
+        position: absolute;
+        inset: 0;
+        z-index: 25;
+        background-color: rgba(0, 0, 0, 0.35);
+    }
+
+    /* Content gets the full width and can scroll */
+    .myforge .tab-container {
+        width: 100%;
+        overflow-y: auto;
+    }
+
+    /* The hover nudge pushes links off the edge of a narrow drawer */
+    .myforge .user-options li:hover * {
+        transform: none;
+    }
 }

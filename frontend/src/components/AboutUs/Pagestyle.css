@@ -260,6 +260,14 @@ div::-webkit-scrollbar-thumb:hover {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .top-section {
+    height: auto;
+    min-height: calc(100vh - 64px);
+    min-height: calc(100dvh - 64px);
+    padding: 1.5rem 0;
+    box-sizing: border-box;
+  }
+
   .title {
     font-size: 60px;
   }
