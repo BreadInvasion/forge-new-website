@@ -5,9 +5,10 @@ import { SelectedMachineProvider } from './SelectedMachineContext';
 import UpNext from './components/UpNext';
 import Highlight from './components/Highlight';
 import Toolbar from './components/Toolbar';
-import MachineCard,{ getProgress } from './MachineCard';
+import MachineCard from './MachineCard';
 import { useMachineStatus } from 'src/hooks/useMachines';
 import Info from 'src/components/Info';
+import { getProgress } from 'src/utils/time';
 
 const Page = styled.div`
     width: 100%;

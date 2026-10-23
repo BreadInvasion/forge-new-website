@@ -3,21 +3,7 @@ import styled from 'styled-components';
 import { Card, MachineName, BigCardAttribute, BigCardText, BigCardInfo, StatusText} from './StatusComponents';
 import { useSelectedMachine } from './SelectedMachineContext';
 import { useMachineClear } from 'src/hooks/useMachines';
-
-export const getEndTime = (usage_start: Date, usage_duration: number) => {
-    const start = usage_start; 
-    const end = new Date(start.getTime() + usage_duration * 1000);
-    return end.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
-}
-
-export const getProgress = (usage_start: Date | undefined, usage_duration: number | undefined) => {
-    if (!usage_start || !usage_duration) return 0;
-    const start = usage_start; 
-    const end = new Date(start.getTime() + usage_duration * 600);
-    const now = new Date();
-    const progress = (now.getTime() - start.getTime()) / (end.getTime() - start.getTime());
-    return Math.min(100, Math.max(0, progress * 100));
-}
+import { convHM, formatTime, getProgress, getTimeOffset } from 'src/utils/time';
 
 export interface MachineProps {
     id: string;    
@@ -60,6 +46,13 @@ export const PROGRESS_TICK_MS = 5000;
 
 export type MachineMode = 'in_use' | 'failed' | 'maintenance' | 'available';
 
+const getMode = (m: MachineProps): MachineMode => {
+    if (m.failed) return 'failed';
+    if (m.in_use) return 'in_use';
+    if (m.maintenance_mode) return 'maintenance';
+    return 'available';
+};
+
 // export default function MachineCard({ machine: machineInput, $minimized, $highlightFailed }: MachineCardProps) {
 export default function MachineCard({ machine, $minimized, $highlightFailed }: MachineCardProps) {
     const clearMachineMutation = useMachineClear();
@@ -87,12 +80,6 @@ export default function MachineCard({ machine, $minimized, $highlightFailed }: M
             clearMachineMutation.mutate(machine.id);
         }
     };
-
-    function convHM(seconds: number): string {
-        const hrs = Math.floor(seconds / 3600);
-        const mins = Math.floor((seconds % 3600) / 60);
-        return `${hrs}h ${mins}m`;
-    }
 
     const getStatusText = (in_use?: boolean, failed?: boolean, maintenance_mode?: boolean, disabled?: boolean) => {
         const statuses = [];
@@ -137,7 +124,7 @@ export default function MachineCard({ machine, $minimized, $highlightFailed }: M
                         )}
                     </>
                 )}
-                <StatusText $area="date" $minimized={$minimized} $clearable={$highlightFailed && (failed || in_use)}>EST. COMPLETION<br /> {usage_start && usage_duration ? getEndTime(usage_start, usage_duration) : 'N/A'}</StatusText>
+                <StatusText $area="date" $minimized={$minimized} $clearable={$highlightFailed && (failed || in_use)}>EST. COMPLETION<br /> {usage_start && usage_duration ? formatTime(getTimeOffset(usage_start, usage_duration)) : 'N/A'}</StatusText>
                 {$highlightFailed && (failed || in_use) && $minimized && <StyledButton onClick={handleClearClick}>Clear</StyledButton>}
        </Card>
     );
