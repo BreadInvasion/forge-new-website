@@ -60,6 +60,13 @@ export const PROGRESS_TICK_MS = 5000;
 
 export type MachineMode = 'in_use' | 'failed' | 'maintenance' | 'available';
 
+const getMode = (m: MachineProps): MachineMode => {
+    if (m.failed) return 'failed';
+    if (m.in_use) return 'in_use';
+    if (m.maintenance_mode) return 'maintenance';
+    return 'available';
+};
+
 // export default function MachineCard({ machine: machineInput, $minimized, $highlightFailed }: MachineCardProps) {
 export default function MachineCard({ machine, $minimized, $highlightFailed }: MachineCardProps) {
     const clearMachineMutation = useMachineClear();
@@ -69,6 +76,8 @@ export default function MachineCard({ machine, $minimized, $highlightFailed }: M
     const {id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material} = machine;
 
     const {setSelectedMachine} = useSelectedMachine();
+
+    const liveProgress = $minimized && !failed ? getProgress(usage_start, usage_duration) : 0;
 
     const handleClick = () => {
         setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material});
