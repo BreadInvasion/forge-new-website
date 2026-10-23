@@ -1,18 +1,51 @@
 from datetime import datetime
 from typing import Annotated
+from azure.communication.email import EmailClient
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import UUID4
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
+from core.config import settings
 from models.audit_log import AuditLog
 from models.machine import Machine
+from models.machine_usage import MachineUsage
 from models.user import User
 from schemas.enums import LogType, Permissions
+from schemas.requests import MachineFailRequest
 
 from ..deps import DBSession, PermittedUserChecker
 
 router = APIRouter()
+
+
+async def send_failure_email(email, machine_name, percentage):
+    client = EmailClient.from_connection_string(
+        settings.AZURE_COMMUNICATION_CONNECTION_STRING
+    )
+
+
+    message = {
+        "senderAddress": "DoNotReply@notifications.rpiforge.dev",
+        "recipients": {
+            "to": [{"address": email}]
+        },
+        "content": {
+            "subject": "Your Machine Usage Failed",
+            "plainText": (
+                f"Unfortunately, your machine usage on {machine_name} has failed at {percentage}%. You may want to stop by the Forge soon. If you used Forge filament, one reprint is free."
+            ),
+        },
+    }
+
+    poller = client.begin_send(message)
+    result = poller.result()
+
+    if result["status"] != "Succeeded" or result["error"] is not None:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Failed to send machine usage failure email.",
+        )
 
 
 @router.post("/clear/{machine_id}")
@@ -56,9 +89,9 @@ async def clear_machine(
     await session.commit()
 
 
-@router.post("/fail/{machine_id}")
+@router.post("/fail")
 async def fail_machine(
-    machine_id: UUID4,
+    request: MachineFailRequest,
     session: DBSession,
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_FAIL_MACHINES}))
@@ -68,9 +101,12 @@ async def fail_machine(
 
     machine = await session.scalar(
         select(Machine)
-        .where(Machine.id == machine_id)
-        .options(selectinload(Machine.active_usage))
+        .where(Machine.id == request.machine_id)
+        .options(
+            selectinload(Machine.active_usage).selectinload(MachineUsage.user)
+        )
     )
+
     if not machine:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -88,6 +124,9 @@ async def fail_machine(
         content={
             "machine_usage_id": str(machine.active_usage.id),
             "user_rcsid": current_user.RCSID,
+            "error_message": request.error_message,
+            "noticeable_fault": request.noticeable_fault,
+            "percentage": str(request.percentage),
         },
     )
     session.add(audit_log)
@@ -96,3 +135,10 @@ async def fail_machine(
     machine.active_usage.failed_at = datetime.now()
     session.add(machine)
     await session.commit()
+
+    await send_failure_email(
+        f"{machine.active_usage.user.RCSID}@rpi.edu",
+        machine.name,
+        str(request.percentage),
+    )
+

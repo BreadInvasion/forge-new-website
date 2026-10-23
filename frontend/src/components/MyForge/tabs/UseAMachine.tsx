@@ -9,6 +9,8 @@ import '../styles/UseAMachine.scss';
 import * as Select from '@radix-ui/react-select';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { AxiosError } from "axios";
+import useAuth from "src/components/Auth/useAuth";
+import { UserPermission } from "src/enums";
 
 
 interface MachineSchemaResponse {
@@ -60,6 +62,9 @@ export const DynamicMachineForm: React.FC = () => {
     const [page, setPage] = useState<number>(1);
     const [status, setStatus] = useState<{ text: string; type: "error" | "success" | "warning" | "" }>({ text: "", type: "" });
     const navigate = useNavigate();
+    const { hasPermission } = useAuth();
+    // Disabled machines are only listed for machine editors / superusers, and can't be selected by anyone
+    const canSeeDisabled = hasPermission(UserPermission.CAN_EDIT_MACHINES);
 
     /**
      * Initial Step on Load
@@ -190,7 +195,12 @@ export const DynamicMachineForm: React.FC = () => {
             }
 
         } catch (error: any) {
-            if (error.status == 409) {
+            const detail: string = error?.response?.data?.detail ?? error?.detail ?? "";
+            if (error.status == 409 && /maintenance/i.test(detail)) {
+                updateStatus("This machine is under maintenance and can't be used right now.", "error");
+            } else if (error.status == 409 && /disabled/i.test(detail)) {
+                updateStatus("This machine is disabled and can't be used.", "error");
+            } else if (error.status == 409) {
                 updateStatus("This machine is already in use. Please clear it before submitting a new usage.", "error");
             } else if (error.status == 404) {
                 updateStatus("The selected machine does not exist.", "error");
@@ -231,17 +241,25 @@ export const DynamicMachineForm: React.FC = () => {
                 return;
             }
 
+            var invalidAmount = false;
+
             slotValues.forEach((slot) => {
+                if (slot.amount < 0) {
+                    updateStatus("Please enter a valid amount of material", "error");
+                    invalidAmount = true;
+                }
                 if (slot.amount > 1000 && !slot.own) {
                     updateStatus(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please alert a volunteer or room manager after you start the print, so they are aware.`, "warning");
                 } else if (slot.amount > 1000 && slot.own) {
                     updateStatus(`WARNING: The amount of material you selected for ${slot.name} is greater than a single spool of filament. You will need to change the filament during the print. This is allowed, but please make sure you have enough material to complete the print - you will not able to use Forge resources to complete the print.`, "warning");
                 }
             });
+
+            if (invalidAmount) return;
         }
 
         //Check if duration is valid
-        if (page == 4 && (formData.hours == 0 && formData.minutes == 0)) {
+        if (page == 4 && ((formData.hours == 0 && formData.minutes == 0) || formData.hours < 0 || formData.minutes < 0)) {
             updateStatus("Please enter a valid duration.", "error");
             return;
         }
@@ -263,24 +281,19 @@ export const DynamicMachineForm: React.FC = () => {
                             value={selectedMachineId === "0" ? "" : selectedMachineId}
                             onValueChange={handleSelectMachine}
                         >
-                            <Select.Trigger className="machine-select-trigger" aria-label="Select a machine">
-                                <Select.Value placeholder="Please Select a Machine" />
-                                <Select.Icon aria-hidden>
-                                    <ChevronDownIcon />
-                                </Select.Icon>
-                            </Select.Trigger>
-                            <Select.Portal>
-                                <Select.Content className="machine-select-content" position="popper" sideOffset={4}>
-                                    <Select.Viewport>
-                                        {machines.map((machine: Machine) => (
-                                            <Select.Item className="machine-select-item" key={machine.id} value={machine.id}>
-                                                <Select.ItemText>{machine.name}</Select.ItemText>
-                                            </Select.Item>
-                                        ))}
-                                    </Select.Viewport>
-                                </Select.Content>
-                            </Select.Portal>
-                        </Select.Root>
+                            <option className='styled-dropdown-placeholder' value="0" hidden>{"Please Select a Machine"}</option>
+                            {machines.filter((machine: Machine) => canSeeDisabled || !machine.disabled).map((machine: Machine) => (
+                                <option
+                                    className='styled-dropdown-option'
+                                    key={machine.id}
+                                    value={machine.id}
+                                    disabled={machine.maintenance_mode || machine.disabled}
+                                >
+                                    {machine.name}
+                                    {machine.maintenance_mode ? ' (Under Maintenance)' : machine.disabled ? ' (Disabled)' : ''}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 }
 
@@ -418,7 +431,7 @@ const ResourceUsageForm: React.FC<ResourceUsageFormProps> = ({ slots, initialVal
         setSlotValues(newSlotValues);
     }
 
-    const showBrand = false;
+    const showBrand = false; //slots.find((slot) => slot.valid_resources.find((resource) => resource.brand)) ? true : false;
     const showColor = false; //slots.find((slot) => slot.valid_resources.find((resource) => resource.color) ? true : false);
 
     return (

@@ -201,6 +201,7 @@ class MachineUsageSchema(BaseResponse):
 
     maintenance_mode: bool
 
+
 class UsageResponse(BaseResponse):
     semester: str | None
     time_started: datetime
