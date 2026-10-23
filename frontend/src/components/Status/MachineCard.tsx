@@ -103,8 +103,7 @@ export default function MachineCard({ machine, $minimized, $highlightFailed }: M
             $minimized={$minimized} 
             $highlightFailed={$highlightFailed && failed}
             $mode={getMode(machine)}
-            progress={liveProgress}
-            style={{ '--progress': liveProgress } as React.CSSProperties}
+            $progress={liveProgress}
             onClick={handleClick}
         >
                 <MachineName $minimized={$minimized} $clearable={$highlightFailed && (failed || in_use)}>{name}</MachineName>

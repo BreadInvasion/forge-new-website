@@ -51,7 +51,7 @@ export const Card = styled.div<{
     $minimized?: boolean; 
     $highlightFailed?: boolean; 
     $mode?: string;
-    progress: number;
+    $progress: number;
 }>`
     background-color: ${({ $mode }) => modeColors[$mode ?? ''] ?? '#f5f5f5'};
     border-radius: 5px;
@@ -87,9 +87,9 @@ export const Card = styled.div<{
         bottom: 0;
         left: 0;
         width: 100%;
-        height: calc(var(--progress, 0) * 1%);
+        height: calc(${({$progress}) => $progress} * 1%);
         transition: height 5s linear, background-color 0.5s ease;
-        background-color: ${props => props.progress >= 100 ? PROGRESS_COMPLETED : PROGRESS_IN_PROGRESS};
+        background-color: ${({$progress}) => $progress >= 100 ? PROGRESS_COMPLETED : PROGRESS_IN_PROGRESS};
         border-radius: 5px;
     }
     ${({ $minimized }) =>$minimized && `&:hover {    
