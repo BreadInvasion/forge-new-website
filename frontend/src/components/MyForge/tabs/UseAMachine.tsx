@@ -6,6 +6,8 @@ import '../../Forms/styles/Form.scss';
 import '../styles/UseAMachine.scss';
 import { useMachines, useMachineSchema, useMachineUse } from "src/hooks/useMachines";
 import Info from "src/components/Info";
+import useAuth from "src/components/Auth/useAuth";
+import { UserPermission } from "src/enums";
 
 /** Database IDs specific to UsageForm Testing
  * Resource IDs:
@@ -53,6 +55,9 @@ export const DynamicMachineForm: React.FC = () => {
     const [page, setPage] = useState<number>(1);
     const [status, setStatus] = useState<{ text: string; type: "error" | "success" | "warning" | "" }>({ text: "", type: "" });
     const useMachineMutation = useMachineUse();
+    // Disabled machines are only listed for machine editors / superusers, and can't be selected by anyone
+    const { hasPermission } = useAuth();
+    const canSeeDisabled = hasPermission(UserPermission.CAN_EDIT_MACHINES);
 
 
     /**

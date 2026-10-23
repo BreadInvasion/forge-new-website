@@ -70,6 +70,8 @@ export default function MachineCard({ machine, $minimized, $highlightFailed }: M
 
     const {setSelectedMachine} = useSelectedMachine();
 
+    const liveProgress = $minimized && !failed ? getProgress(usage_start, usage_duration) : 0;
+
     const handleClick = () => {
         setSelectedMachine({ id, name, in_use, usage_start, usage_duration, user, maintenance_mode, disabled, failed, failed_at, weight, material});
     };
