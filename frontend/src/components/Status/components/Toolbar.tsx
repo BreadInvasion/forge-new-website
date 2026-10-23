@@ -6,7 +6,6 @@ import Filter from "./Filter";
 import { ToolButton, FilterItem, FilterX } from "./FilterComponents";
 import { Toggle } from "@radix-ui/react-toggle";
 import { UserPermission } from "../../../enums";
-import { OmniAPI } from "src/apis/OmniAPI";
 import useAuth from "../../Auth/useAuth";
 import { useMachineGroups } from "src/hooks/useMachines";
 
