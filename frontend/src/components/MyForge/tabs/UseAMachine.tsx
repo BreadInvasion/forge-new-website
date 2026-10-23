@@ -504,10 +504,7 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
         ) ?? null;
     };
 
-    const handleChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-        const { name, value, type } = event.target;
-        const newValue = type === "checkbox" ? (event.target as HTMLInputElement).checked : value;
-
+    const updateSelectedDetails = (name: string, newValue: string | boolean) => {
         setSelectedDetails(prev => {
             let updatedDetails = { ...prev, [name]: newValue };
 
@@ -540,6 +537,12 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
         });
     };
 
+    const handleChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+        const { name, value, type } = event.target;
+        const newValue = type === "checkbox" ? (event.target as HTMLInputElement).checked : value;
+        updateSelectedDetails(name, newValue);
+    };
+
     useEffect(() => {
         const matchedResource = validResources.find(resource =>
             resource.name === selectedDetails.name &&
@@ -568,17 +571,32 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
             <td data-label="Slot Name">{slot.display_name}</td>
             {/* Material Dropdown (Always available) */}
             <td data-label="Material">
-                <select
-                    name="name"
+                <Select.Root
                     value={selectedDetails.name}
-                    onChange={handleChange}
+                    onValueChange={(value) => updateSelectedDetails("name", value)}
                     required={!slot.allow_empty}
                 >
-                    <option value="_">--Material--</option>
-                    {materialOptions.map(name => (
-                        <option key={name} value={name}>{name}</option>
-                    ))}
-                </select>
+                    <Select.Trigger className="resource-select-trigger" aria-label="Select material">
+                        <Select.Value />
+                        <Select.Icon aria-hidden>
+                            <ChevronDownIcon />
+                        </Select.Icon>
+                    </Select.Trigger>
+                    <Select.Portal>
+                        <Select.Content className="resource-select-content" position="popper" sideOffset={4}>
+                            <Select.Viewport>
+                                <Select.Item className="resource-select-item" value="_">
+                                    <Select.ItemText>--Material--</Select.ItemText>
+                                </Select.Item>
+                                {materialOptions.map(name => (
+                                    <Select.Item className="resource-select-item" key={name} value={name}>
+                                        <Select.ItemText>{name}</Select.ItemText>
+                                    </Select.Item>
+                                ))}
+                            </Select.Viewport>
+                        </Select.Content>
+                    </Select.Portal>
+                </Select.Root>
             </td>
 
             {/* Brand Dropdown (Only available if material is selected) */}
