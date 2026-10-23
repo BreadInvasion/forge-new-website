@@ -57,3 +57,29 @@ export interface MachineUsage {
     machine_name: string
     cost: number
 };
+
+// MachineStatus block
+export interface MachineStatus{
+    id: string;
+    group_id: string;
+    type_id: string;
+    name: string;
+    in_use: boolean;
+    usage_start: Date;
+    usage_duration: number;
+    user_id: string;
+    maintenance_mode: boolean;
+    disabled: boolean;
+    failed: boolean;
+    failed_at: Date;
+}
+
+export interface MachineStatusGroup{
+    name: string;
+    machines: MachineStatus[];
+}
+
+export interface AllMachinesStatusResponse{
+    groups: MachineStatusGroup[];
+    loners: MachineStatus[];
+}
