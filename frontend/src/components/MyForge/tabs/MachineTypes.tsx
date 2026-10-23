@@ -1,27 +1,26 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import Table, { DeleteItem, ITEMS_PER_PAGE } from '../components/Table';
 import { TableHead } from '../components/Table';
 
 import '../styles/TabStyles.scss';
-import { emptyMachine, MachineType, ResourceSlot } from 'src/interfaces';
 
 import { Cross2Icon, PlusIcon } from "@radix-ui/react-icons";
 import * as Dialog from '@radix-ui/react-dialog';
-import ResourceSlots from './ResourceSlots';
-import { OmniAPI } from 'src/apis/OmniAPI';
 import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
+import { useResourceSlots } from 'src/hooks/useResources';
+import { useMachineTypeDelete, useMachineTypeNewEdit, useMachineTypes } from 'src/hooks/useMachines';
+import { MachineType } from 'src/interfaces/machines';
 
 interface aemenuprops {
     isDialogOpen: boolean;
     setIsDialogOpen: (open: boolean) => void;
     machineType: MachineType | null;
     setMachineType: (machine: MachineType | null) => void;
-    refresh: () => void;
 }
 
 const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineType | null) => void] => {
-    let { isDialogOpen, setIsDialogOpen, machineType, setMachineType, refresh} = props;
+    let { isDialogOpen, setIsDialogOpen, machineType, setMachineType} = props;
 
     const { hasPermission } = useAuth();
     const canCreate = hasPermission(UserPermission.CAN_CREATE_MACHINE_TYPES);
@@ -29,16 +28,13 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
     const canSeeTables = hasPermission(UserPermission.CAN_SEE_TABLES);
         
     const [name, setName] = useState("");
-    const [resourceSlots, setResourceSlots] = useState<ResourceSlot[]>([]);
-
-    React.useEffect(() => {
-        OmniAPI.getAll("resourceslots").then(rs =>{
-            setResourceSlots(rs);
-        });
-    }, []);
+    const {data: resourceSlots} = useResourceSlots();
 
     const [resourceSlotIDS, setResourceSlotIDS] = useState<string[]>([]);
     const [cost, setCost] = useState<number>(0.0);
+
+    const useMachineTypeNewEditMutation = useMachineTypeNewEdit();
+
     const handleCheckboxChange = (value: string) => {
         setResourceSlotIDS(prev =>
             prev.includes(value)
@@ -75,16 +71,13 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
             return;
         }
 
-        OmniAPI.create("machinetypes", {
+        useMachineTypeNewEditMutation.mutate({
             name,
-            resource_slot_ids: resourceSlots
+            slots: resourceSlots
                 .filter(r => resourceSlotIDS.includes(r.id))
                 .map(r => r.id),
-            cost_per_hour: cost.toString(),
-        }).then(() => {
-            refresh();
-            setOpenExtra(false, null);
-        });
+            cost
+        }, {onSuccess: () => setOpenExtra(false, null)});
     }
 
     function edit() {
@@ -98,16 +91,13 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
             return;
         }
 
-        OmniAPI.edit("machinetypes", machineType.id, {
+        useMachineTypeNewEditMutation.mutate({
             name,
-            resource_slot_ids: resourceSlots
+            slots: resourceSlots
                 .filter(r => resourceSlotIDS.includes(r.id))
                 .map(r => r.id),
-            cost_per_hour: cost.toString(),
-        }).then(() => {
-            refresh();
-            setOpenExtra(false, null);
-        });
+            cost
+        }, {onSuccess: () => setOpenExtra(false, null)});
     }
 
     if (!canSeeTables || (!canCreate && !canEdit)) return [<></>, () => {}]; 
@@ -165,35 +155,28 @@ const MachineTypes: React.FC = () => {
     const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINE_TYPES);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_TYPES);
 
-    const [data, setData] = React.useState<MachineType[]>([]);
-    const columns: (keyof MachineType)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof MachineType)[]).filter( (key) => !key.includes('_id') && key !== 'id' ) : [];
-    const [currentPage, setCurrentPage] = React.useState<number>(1);
-    
-    const fetchPage = (page: number) => {
-        const offset = (page - 1) * ITEMS_PER_PAGE;
-        OmniAPI.getAll("machinetypes", { limit: ITEMS_PER_PAGE, offset }).then( (mt) => {
-            setData(mt);
-            setCurrentPage(page);
-        });
-    };
+    const [page, setPage] = React.useState<number>(1);
+    const {data: types} = useMachineTypes(page, ITEMS_PER_PAGE);
+    const columns: (keyof MachineType)[] = useMemo(() => {
+        if (types.length === 0) return [];
+        return (Object.keys(types[0]) as (keyof MachineType)[])
+            .filter((key) => !key.includes('_id') && key !== 'id' )
+    }, [types]);
 
-    React.useEffect(() => {
-        fetchPage(1);
-    }, []);
-
-    const refreshPage = () => fetchPage(currentPage);
+    const useMachineTypeDeleteMutation = useMachineTypeDelete();
 
     const onDelete = (index_local: number) => {
         if (!canDelete) {
             alert("You do not have the permissions to delete machine types");
             return;
         }
-        DeleteItem("machinetypes", data[index_local], refreshPage);
+
+        useMachineTypeDeleteMutation.mutate(types[index_local]);
     };
 
     const [machineType, setMachineType] = useState<MachineType | null>(null);
     let [isDialogOpen, setIsDialogOpen] = useState(false);
-    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, machineType, setMachineType, refresh: refreshPage});
+    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, machineType, setMachineType});
 
     return (
         <div className='tab-column-cover align-center'>
@@ -204,13 +187,13 @@ const MachineTypes: React.FC = () => {
             />
             <Table<MachineType>
                 columns={columns}
-                data={data}
+                data={types}
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit={canEdit}
                 canDelete={canDelete}
-                currentPage={currentPage}
-                onPageChange={(p) => fetchPage(p)}
+                currentPage={page}
+                onPageChange={setPage}
                 resourceType={"machinetypes"}
             />
         </div>

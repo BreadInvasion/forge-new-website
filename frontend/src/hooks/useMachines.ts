@@ -1,7 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
-import { clearMachine, failMachine, fetchMachineGroups, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine } from "src/apis/MachinesAPI";
+import { clearMachine, newEditMachineType, failMachine, fetchMachineGroups, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine, fetchMachineTypes, deleteMachineType } from "src/apis/MachinesAPI";
+import { MachineType } from "src/interfaces/machines";
 
 export function useMachines() {
     return useQuery({
@@ -111,6 +112,64 @@ export function useMachineUse() {
                 alert(`Failed to use machine: ${error.message}`);
             }
         },
-        
+    });
+}
+
+export function useMachineTypes(page: number, limit: number) {
+    return useQuery({
+        queryKey: ["machine", "types", ],
+        queryFn: async () => await fetchMachineTypes((page-1)*limit, limit),
+        placeholderData: keepPreviousData,
+        initialData: []
+    })
+}
+
+export function useMachineTypeNewEdit() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: newEditMachineType,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["machine", "types"] });
+        },
+        onError: (error, {id}) => {
+            if (error instanceof AxiosError) {
+                switch (error.response?.status) {
+                    case 422:
+                        alert('Validation Failed.');
+                        break;
+                    default:
+                        console.error(error);
+                        alert(`An error occurred. Please try again.`);
+                        break;
+                }
+            } else {
+                alert(`Failed to ${id ? 'edit' : 'create'} machine type: ${error.message}`);
+            }
+        }
+    });
+}
+
+export function useMachineTypeDelete() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: deleteMachineType,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["machine", "types"] });
+        },
+        onError: (error) => {
+            if (error instanceof AxiosError) {
+                switch (error.response?.status) {
+                    case 422:
+                        alert('Validation Failed.');
+                        break;
+                    default:
+                        console.error(error);
+                        alert(`An error occurred. Please try again.`);
+                        break;
+                }
+            } else {
+                alert(`Failed to delete machine type: ${error.message}`);
+            }
+        }
     });
 }
