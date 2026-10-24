@@ -8,7 +8,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
-import { useMachineGroupDelete, useMachineGroupNewEdit, useMachineGroups, useMachines } from 'src/hooks/useMachines';
+import { useMachineGroupDelete, useMachineGroupNewEdit, useMachineGroups, useMachineGroupsLength, useMachines } from 'src/hooks/useMachines';
 import { OmniAPI } from 'src/apis/OmniAPI';
 import { createColumnHelper } from '@tanstack/react-table';
 
@@ -144,7 +144,7 @@ const MachineGroups: React.FC = () => {
     const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINE_GROUPS);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_GROUPS);
 
-    const {data: machines} = useMachines();
+    const {data: rowCount} = useMachineGroupsLength();
 
     const deleteMutation = useMachineGroupDelete();
     const onDelete = (id: string) => {
@@ -173,6 +173,7 @@ const MachineGroups: React.FC = () => {
                 onEdit={(e) => setOpen(true, e)}
                 canEdit={canEdit}
                 canDelete={canDelete}
+                rowCount={rowCount}
             />
         </div>
     );

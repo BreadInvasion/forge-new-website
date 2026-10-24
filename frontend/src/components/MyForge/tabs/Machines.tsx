@@ -9,7 +9,7 @@ import { OmniAPI } from 'src/apis/OmniAPI';
 import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useMachineDelete, useMachineGroups, useMachineNewEdit, useMachines, useMachineTypes } from 'src/hooks/useMachines';
+import { useMachineDelete, useMachineGroups, useMachineNewEdit, useMachines, useMachinesLength, useMachineTypes } from 'src/hooks/useMachines';
 
 interface aemenuprops {
     isDialogOpen: boolean;
@@ -18,14 +18,15 @@ interface aemenuprops {
     setMachine: (machine: Machine | null) => void;
 }
 
-const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine, setMachine}) => {
+const aemenu = (props: aemenuprops) : [ReactNode, (state: boolean, mach: Machine | null) => void] => {
     const { hasPermission } = useAuth();
     const canCreate = hasPermission(UserPermission.CAN_CREATE_MACHINES);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINES);
     const canSeeTables = hasPermission(UserPermission.CAN_SEE_TABLES);
     
-    const [name, setName] = useState("");
+    let { isDialogOpen, setIsDialogOpen, machine, setMachine } = props;
 
+    const [name, setName] = useState("");
     const [selectedMachineGroupId, setSelectedMachineGroupId] = useState<string>("_");
     const [selectedMachineTypeId, setSelectedMachineTypeId] = useState<string>("_");
     const {data: machineGroups} = useMachineGroups();
@@ -36,21 +37,24 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
 
     const aeMutation = useMachineNewEdit();
 
-    useEffect(() => {
-        if (machine) {
-            setName(machine.name);
-            setSelectedMachineGroupId(machine.group_id);
-            setSelectedMachineTypeId(machine.type_id);
-            setDisabled(machine.disabled);
-            setMaintenanceMode(machine.maintenance_mode);
+    function setOpenExtra (state: boolean, mach: Machine | null) {
+        setMachine(mach);
+        if (mach != null) {
+            setName(mach.name);
+            setSelectedMachineGroupId(mach.group_id);
+            setSelectedMachineTypeId(mach.type_id);
+            setDisabled(mach.disabled);
+            setMaintenanceMode(mach.maintenance_mode);
+            setIsDialogOpen(state);
         } else {
             setName("");
             setSelectedMachineGroupId("_");
             setSelectedMachineTypeId("_");
             setDisabled(false);
             setMaintenanceMode(false);
+            setIsDialogOpen(state);
         }
-    }, [machine]);
+    }
 
     function create() {
         if (name == "" || selectedMachineGroupId == "_" || selectedMachineTypeId == "_") {
@@ -62,7 +66,10 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
             name,
             groupId: selectedMachineGroupId,
             typeId: selectedMachineTypeId,
-        }, {onSuccess: () => setIsDialogOpen(false)});
+        }, {onSuccess: () => {
+            setIsDialogOpen(false);
+            setMachine(null);
+        }});
 
     };
 
@@ -78,7 +85,10 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
             typeId: selectedMachineTypeId,
             maintenance: maintenanceMode,
             disabled
-        }, {onSuccess: () => setIsDialogOpen(false)});
+        }, {onSuccess: () => {
+            setIsDialogOpen(false);
+            setMachine(null);
+        }});
     }
     
     const handleSelectMachineGroup = (id: string) => {
@@ -94,8 +104,8 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
         setSelectedMachineTypeId(id);
     };
 
-    if (!canSeeTables || (!canCreate && !canEdit)) return null;
-    return (
+    if (!canSeeTables || (!canCreate && !canEdit)) return [null, setOpenExtra];
+    return [(
         <Dialog.Root open={isDialogOpen} onOpenChange={(open) => { if (!open) setMachine(null); setIsDialogOpen(open); }}>
             {canCreate && (
                 <button className="addbtn" onClick={() => { setMachine(null); setIsDialogOpen(true); }}>
@@ -163,7 +173,7 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
                 </Dialog.Portal>
             ) : null}
         </Dialog.Root>
-    );
+    ), setOpenExtra];
 };
 
 const columnHelper = createColumnHelper<typeof features, Machine>();
@@ -190,6 +200,8 @@ const Machines: React.FC = () => {
     const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINES);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINES);
 
+    const {data: rowCount} = useMachinesLength();
+
     const deleteMutation = useMachineDelete();
     const onDelete = (id: string) => {
         if (!canDelete) {
@@ -201,29 +213,14 @@ const Machines: React.FC = () => {
 
     let [machine, setMachine]:[Machine | null, (machine: any) => void] = useState(null);
     let [isDialogOpen, setIsDialogOpen] = useState(false);
-
-    const onEdit = (mach: Machine) => {
-        if (!canEdit) {
-            alert("You do not have the permissions to edit machines");
-            return;
-        }
-        setMachine(mach);
-        setIsDialogOpen(true);
-    };
+    let [ae, setOpen] = aemenu({isDialogOpen, setIsDialogOpen, machine, setMachine});
 
     return (
         <div className='tab-column-cover align-center'>
             <TableHead
                 heading="Machines"
                 type="machines"
-                aemenu={
-                    <AEMenu
-                        isDialogOpen={isDialogOpen}
-                        setIsDialogOpen={setIsDialogOpen}
-                        machine={machine}
-                        setMachine={setMachine}
-                    />
-                }
+                aemenu={ae}
             />
             <Table<Machine>
                 columns={columns}
@@ -232,6 +229,7 @@ const Machines: React.FC = () => {
                 onEdit={onEdit}
                 canEdit={canEdit}
                 canDelete={canDelete}
+                rowCount={rowCount}
             />
         </div>
     );
