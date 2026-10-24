@@ -10,21 +10,6 @@ export interface Machine {
     disabled: boolean;
 };
 
-export const emptyMachine: Machine = {
-    id: '_',
-    name: '',
-    group_id: '',
-    type_id: '',
-    in_use: false,
-    usage_start: undefined,
-    usage_duration: undefined,
-    user: undefined,
-    failed: false,
-    failed_at: undefined,
-    maintenance_mode: false,
-    disabled: false,
-};
-
 export interface MachineSchemas {
     [key: string]: any;
 }

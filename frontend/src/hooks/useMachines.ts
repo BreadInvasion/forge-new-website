@@ -1,7 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PaginationState } from '@tanstack/react-table';
 import { AxiosError } from 'axios';
-import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clearMachine, newEditMachineType, failMachine, fetchMachineGroupsPublic, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine, fetchMachineTypes, deleteMachineType, fetchMachineGroups, newEditMachineGroup, deleteMachineGroup, deleteMachine, newEditMachine} from 'src/apis/MachinesAPI';
 
@@ -9,6 +8,7 @@ export function useMachines(pagination?: PaginationState) {
     return useQuery({
         queryKey: ['machine', pagination],
         queryFn: () => pagination ? fetchMachines(pagination.pageIndex*pagination.pageSize, pagination.pageSize) : fetchMachines(),
+        placeholderData: keepPreviousData,
         initialData: [],
     });
 }
