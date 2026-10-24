@@ -1,11 +1,10 @@
-import React, { ReactNode, useEffect, useState } from 'react';
-import Table, { TableHead, ITEMS_PER_PAGE, features } from '../components/Table';
+import React, { ReactNode, useState } from 'react';
+import Table, { TableHead, features } from '../components/Table';
 import { Machine, MachineGroup, MachineType } from 'src/interfaces/machines';
 
 import '../styles/TabStyles.scss';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
-import { OmniAPI } from 'src/apis/OmniAPI';
 import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
 import { createColumnHelper } from '@tanstack/react-table';

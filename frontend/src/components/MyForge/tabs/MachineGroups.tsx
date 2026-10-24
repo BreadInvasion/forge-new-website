@@ -9,7 +9,6 @@ import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
 import { useMachineGroupDelete, useMachineGroupNewEdit, useMachineGroups, useMachineGroupsLength, useMachines } from 'src/hooks/useMachines';
-import { OmniAPI } from 'src/apis/OmniAPI';
 import { createColumnHelper } from '@tanstack/react-table';
 
 interface aemenuprops {
