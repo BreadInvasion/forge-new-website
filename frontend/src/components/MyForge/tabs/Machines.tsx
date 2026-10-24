@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import Table, { DeleteItem, TableHead, ITEMS_PER_PAGE } from '../components/Table';
+import Table, { TableHead, ITEMS_PER_PAGE, features } from '../components/Table';
 import { Machine, MachineGroup, MachineType } from 'src/interfaces/machines';
 
 import '../styles/TabStyles.scss';
@@ -8,16 +8,17 @@ import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { OmniAPI } from 'src/apis/OmniAPI';
 import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
+import { createColumnHelper } from '@tanstack/react-table';
+import { useMachineDelete, useMachineGroups, useMachineNewEdit, useMachines, useMachineTypes } from 'src/hooks/useMachines';
 
 interface aemenuprops {
     isDialogOpen: boolean;
     setIsDialogOpen: (open: boolean) => void;
     machine: Machine | null;
     setMachine: (machine: Machine | null) => void;
-    refresh: () => void;
 }
 
-const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine, setMachine, refresh,}) => {
+const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine, setMachine}) => {
     const { hasPermission } = useAuth();
     const canCreate = hasPermission(UserPermission.CAN_CREATE_MACHINES);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINES);
@@ -26,15 +27,14 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
     const [name, setName] = useState("");
 
     const [selectedMachineGroupId, setSelectedMachineGroupId] = useState<string>("_");
-    const [machineGroups, setMachineGroups] = useState<MachineGroup[]>([]);
-    React.useEffect(() => { OmniAPI.getAll("machinegroups").then(res => {setMachineGroups(res);} ); }, []);
-
     const [selectedMachineTypeId, setSelectedMachineTypeId] = useState<string>("_");
-    const [machineTypes, setMachineTypes] = useState<MachineType[]>([]);
-    React.useEffect(() => { OmniAPI.getAll("machinetypes").then(res => {setMachineTypes(res);} ); }, []);
+    const {data: machineGroups} = useMachineGroups();
+    const {data: machineTypes} = useMachineTypes();
 
     const [disabled, setDisabled] = useState<boolean>(false);
     const [maintenanceMode, setMaintenanceMode] = useState<boolean>(false);
+
+    const aeMutation = useMachineNewEdit();
 
     useEffect(() => {
         if (machine) {
@@ -57,10 +57,13 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
             alert("All fields must be populated!");
             return;
         }
-        OmniAPI.create("machines", {name: name, group_id: selectedMachineGroupId, type_id: selectedMachineTypeId,}).then( () => {
-            refresh();
-            setIsDialogOpen(false);
-        });
+
+        aeMutation.mutate({
+            name,
+            groupId: selectedMachineGroupId,
+            typeId: selectedMachineTypeId,
+        }, {onSuccess: () => setIsDialogOpen(false)});
+
     };
 
     function edit() {
@@ -68,10 +71,14 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
             alert("Invalid machine state");
             return;
         }
-        OmniAPI.edit("machines", machine.id, {name: name, group_id: selectedMachineGroupId, type_id: selectedMachineTypeId, maintenance_mode: maintenanceMode, disabled: disabled,}).then( () => {
-            refresh();
-            setIsDialogOpen(false);
-        });
+        aeMutation.mutate({
+            id: machine.id,
+            name,
+            groupId: selectedMachineGroupId,
+            typeId: selectedMachineTypeId,
+            maintenance: maintenanceMode,
+            disabled
+        }, {onSuccess: () => setIsDialogOpen(false)});
     }
     
     const handleSelectMachineGroup = (id: string) => {
@@ -159,36 +166,37 @@ const AEMenu: React.FC<aemenuprops> = ({ isDialogOpen, setIsDialogOpen, machine,
     );
 };
 
+const columnHelper = createColumnHelper<typeof features, Machine>();
+const columns = columnHelper.columns([
+    columnHelper.accessor('name', {
+        header: 'Name'
+    }),
+    columnHelper.accessor('group_name', {
+        header: 'Group'
+    }),
+    columnHelper.accessor('type_name', {
+        header: 'Type'
+    }),
+    columnHelper.accessor('maintenance_mode', {
+        header: 'Maintenance'
+    }),
+    columnHelper.accessor('disabled', {
+        header: 'Disabled'
+    }),
+])
 
 const Machines: React.FC = () => {
     const { hasPermission } = useAuth();
     const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINES);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINES);
 
-    const [data, setData] = React.useState<Machine[]>([]);
-    const columns: (keyof Machine)[] = data.length > 0 ? (Object.keys(data[0]) as (keyof Machine)[]).filter((key) => !key.includes('_id') && key !== 'id') : [];
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const fetchPage = (page: number) => {
-        const offset = (page - 1) * ITEMS_PER_PAGE;
-        OmniAPI.getAll("machines", { limit: ITEMS_PER_PAGE, offset }).then( (data) => {
-            setData(data);
-            setCurrentPage(page);
-        });
-    };
-
-    React.useEffect(() => {
-        fetchPage(1);
-    }, []);
-
-    const refreshPage = () => fetchPage(currentPage);
-
-    const onDelete = (index_local: number, index_real: number) => {
+    const deleteMutation = useMachineDelete();
+    const onDelete = (id: string) => {
         if (!canDelete) {
             alert("You do not have the permissions to delete machines");
             return;
         }
-        DeleteItem("machines", data[index_real], refreshPage);
+        deleteMutation.mutate(id);
     };
 
     let [machine, setMachine]:[Machine | null, (machine: any) => void] = useState(null);
@@ -214,20 +222,16 @@ const Machines: React.FC = () => {
                         setIsDialogOpen={setIsDialogOpen}
                         machine={machine}
                         setMachine={setMachine}
-                        refresh={refreshPage}
                     />
                 }
             />
             <Table<Machine>
                 columns={columns}
-                data={data}
+                queryFn={useMachines}
                 onDelete={onDelete}
                 onEdit={onEdit}
                 canEdit={canEdit}
                 canDelete={canDelete}
-                currentPage={currentPage}
-                onPageChange={fetchPage}
-                resourceType="machines"
             />
         </div>
     );

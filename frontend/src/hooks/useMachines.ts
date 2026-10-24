@@ -1,21 +1,29 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PaginationState } from "@tanstack/react-table";
-import { AxiosError } from "axios";
-import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { clearMachine, newEditMachineType, failMachine, fetchMachineGroupsPublic, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine, fetchMachineTypes, deleteMachineType, fetchMachineGroups, newEditMachineGroup, deleteMachineGroup} from "src/apis/MachinesAPI";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { PaginationState } from '@tanstack/react-table';
+import { AxiosError } from 'axios';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { clearMachine, newEditMachineType, failMachine, fetchMachineGroupsPublic, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine, fetchMachineTypes, deleteMachineType, fetchMachineGroups, newEditMachineGroup, deleteMachineGroup, deleteMachine, newEditMachine} from 'src/apis/MachinesAPI';
 
-export function useMachines() {
+export function useMachines(pagination?: PaginationState) {
     return useQuery({
-        queryKey: ["machines"],
-        queryFn: fetchMachines,
+        queryKey: ['machine', pagination],
+        queryFn: () => pagination ? fetchMachines(pagination.pageIndex*pagination.pageSize, pagination.pageSize) : fetchMachines(),
         initialData: [],
     });
 }
 
+export function useMachinesLength() {
+    return useQuery({
+        queryKey: ['machine', 'length'],
+        queryFn: async () => (await fetchMachines()).length,
+    });
+}
+
+
 export function useMachineSchema(machineId?: string) {
     return useQuery({
-        queryKey: ["machine", "schema", machineId],
+        queryKey: ['machine', 'schema', machineId],
         queryFn: () => fetchMachineSchema(machineId!),
         initialData: undefined,
         enabled: machineId !== '0'
@@ -24,7 +32,7 @@ export function useMachineSchema(machineId?: string) {
 
 export function useMachineGroupsPublic() {
     return useQuery({
-        queryKey: ["machine", "status", "groups", "public"],
+        queryKey: ['machine', 'status', 'groups', 'public'],
         queryFn: fetchMachineGroupsPublic,
         initialData: []
     })
@@ -32,7 +40,7 @@ export function useMachineGroupsPublic() {
 
 export function useMachineStatus(refetchInterval?: number) {
     return useQuery({
-        queryKey: ["machine", "status"],
+        queryKey: ['machine', 'status'],
         queryFn: fetchMachineStatus,
         initialData: [],
         refetchInterval
@@ -44,7 +52,7 @@ export function useMachineClear() {
     return useMutation({
         mutationFn: clearMachine,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["machine", "status"] });
+            queryClient.invalidateQueries({ queryKey: ['machine', 'status'] });
         },
         onError: (error) => {
             if (error instanceof AxiosError) {
@@ -73,12 +81,12 @@ export function useMachineFail() {
     return useMutation({
         mutationFn: failMachine,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["machine", "status"] });
+            queryClient.invalidateQueries({ queryKey: ['machine', 'status'] });
             navigate('/status');
         },
         onError: (error) => {
             console.error(error);
-            alert("An error occurred, please try again.");
+            alert('An error occurred, please try again.');
         }
     })
 }
@@ -89,7 +97,7 @@ export function useMachineUse() {
     return useMutation({
         mutationFn: useMachine,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["machine", "status"] });
+            queryClient.invalidateQueries({ queryKey: ['machine', 'status'] });
             navigate('/status');
         },
         onError: (error) => {
@@ -116,10 +124,60 @@ export function useMachineUse() {
     });
 }
 
-export function useMachineTypes({pageIndex, pageSize}: PaginationState) {
+export function useMachineNewEdit() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: newEditMachine,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['machine'] });
+        },
+        onError: (error, {id}) => {
+            if (error instanceof AxiosError) {
+                switch (error.response?.status) {
+                    case 422:
+                        alert('Validation Failed.');
+                        break;
+                    default:
+                        console.error(error);
+                        alert(`An error occurred. Please try again.`);
+                        break;
+                }
+            } else {
+                alert(`Failed to ${id ? 'edit' : 'create'} machine type: ${error.message}`);
+            }
+        }
+    });
+}
+
+export function useMachineDelete() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: deleteMachine,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['machine'] });
+        },
+        onError: (error) => {
+            if (error instanceof AxiosError) {
+                switch (error.response?.status) {
+                    case 422:
+                        alert('Validation Failed.');
+                        break;
+                    default:
+                        console.error(error);
+                        alert(`An error occurred. Please try again.`);
+                        break;
+                }
+            } else {
+                alert(`Failed to delete machine type: ${error.message}`);
+            }
+        }
+    });
+}
+
+export function useMachineTypes(pagination?: PaginationState) {
     return useQuery({
-        queryKey: ["machine", "type", pageSize, pageIndex],
-        queryFn: async () => await fetchMachineTypes(pageIndex*pageSize, pageSize),
+        queryKey: ['machine', 'type', pagination],
+        queryFn: () => pagination ? fetchMachineTypes(pagination.pageIndex*pagination.pageSize, pagination.pageSize) : fetchMachineTypes(),
         placeholderData: keepPreviousData,
         initialData: []
     })
@@ -127,7 +185,7 @@ export function useMachineTypes({pageIndex, pageSize}: PaginationState) {
 
 export function useMachineTypesLength() {
     return useQuery({
-        queryKey: ["machine", "type"],
+        queryKey: ['machine', 'type', 'length'],
         queryFn: async () => (await fetchMachineTypes()).length,
     })
 }
@@ -137,7 +195,7 @@ export function useMachineTypeNewEdit() {
     return useMutation({
         mutationFn: newEditMachineType,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["machine", "type"] });
+            queryClient.invalidateQueries({ queryKey: ['machine', 'type'] });
         },
         onError: (error, {id}) => {
             if (error instanceof AxiosError) {
@@ -162,7 +220,7 @@ export function useMachineTypeDelete() {
     return useMutation({
         mutationFn: deleteMachineType,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["machine", "type"] });
+            queryClient.invalidateQueries({ queryKey: ['machine', 'type'] });
         },
         onError: (error) => {
             if (error instanceof AxiosError) {
@@ -182,12 +240,12 @@ export function useMachineTypeDelete() {
     });
 }
 
-export function useMachineGroups({pageIndex, pageSize}: PaginationState) {
+export function useMachineGroups(pagination?: PaginationState) {
     return useQuery({
-        queryKey: ['machine', 'group', pageSize, pageIndex],
+        queryKey: ['machine', 'group', pagination],
         queryFn: async () => {
             const [groups, machines] = await Promise.all([
-                await fetchMachineGroups(pageIndex*pageSize, pageSize),
+                await (pagination ? fetchMachineGroups(pagination.pageIndex*pagination.pageSize, pagination.pageSize) : fetchMachineGroups()),
                 await fetchMachines()
             ]);
             const mappings = machines.reduce((pre, m) => ({
@@ -210,7 +268,7 @@ export function useMachineGroups({pageIndex, pageSize}: PaginationState) {
 
 export function useMachineGroupsLength() {
     return useQuery({
-        queryKey: ["machine", "group"],
+        queryKey: ['machine', 'group', 'length'],
         queryFn: async () => (await fetchMachineGroups()).length,
     })
 }
@@ -220,7 +278,7 @@ export function useMachineGroupNewEdit() {
     return useMutation({
         mutationFn: newEditMachineGroup,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["machine", "group"] });
+            queryClient.invalidateQueries({ queryKey: ['machine', 'group'] });
         },
         onError: (error, {id}) => {
             if (error instanceof AxiosError) {
@@ -245,7 +303,7 @@ export function useMachineGroupDelete() {
     return useMutation({
         mutationFn: deleteMachineGroup,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["machine", "group"] });
+            queryClient.invalidateQueries({ queryKey: ['machine', 'group'] });
         },
         onError: (error) => {
             if (error instanceof AxiosError) {

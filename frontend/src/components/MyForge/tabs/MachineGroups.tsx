@@ -145,10 +145,6 @@ const MachineGroups: React.FC = () => {
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_GROUPS);
 
     const {data: machines} = useMachines();
-    const mappings = useMemo(() => machines.reduce((pre, m) => ({
-        ...pre,
-        [m.id]: m.name
-    }), {} as Record<string, string>), [machines]);
 
     const deleteMutation = useMachineGroupDelete();
     const onDelete = (id: string) => {

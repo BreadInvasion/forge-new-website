@@ -54,6 +54,7 @@ function Table<T extends TData>(props: TableProps<T>) {
     });
     const {data: raw} = queryFn(pagination);
     const data = raw ?? [];
+    console.debug(data);
 
     const hasDelete = !!(canDelete && onDelete);
     const hasEdit = !!(canEdit && onEdit);

@@ -1,16 +1,11 @@
 export interface Machine {
     id: string;
     name: string;
-    group: string;
+    group_name: string;
     group_id: string;
-    type: string;
+    type_name: string;
     type_id: string;
-    in_use: boolean;
-    usage_start?: Date;
-    usage_duration?: number;
-    user?: string;
-    failed?: boolean;
-    failed_at?: Date;
+    active_usage_id?: string;
     maintenance_mode: boolean;
     disabled: boolean;
 };
