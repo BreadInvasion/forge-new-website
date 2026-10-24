@@ -37,20 +37,18 @@ export interface MachineSchemas {
 export interface MachineType {
     id: string;
     name: string;
-    resource_slots: number;
-    count: number;
-    cost_per_hour: number;
+    num_machines: number;
+    resource_names: string[];
     resource_slot_ids: string[];
-    resource_types: string[];
+    resource_slot_names: string[];
+    cost_per_hour: number;
 };
 
 export interface MachineGroup {
     id: string;
     name: string;
-    machines: {
-        name: string,
-        id: string
-    }[];
+    machine_ids: string[];
+    machine_names: string[];
 };
 
 export interface MachineUsage {

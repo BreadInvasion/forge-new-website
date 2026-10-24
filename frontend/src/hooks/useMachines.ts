@@ -1,5 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { PaginationState } from "@tanstack/react-table";
 import { AxiosError } from "axios";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { clearMachine, newEditMachineType, failMachine, fetchMachineGroupsPublic, fetchMachines, fetchMachineSchema, fetchMachineStatus, useMachine, fetchMachineTypes, deleteMachineType, fetchMachineGroups, newEditMachineGroup, deleteMachineGroup} from "src/apis/MachinesAPI";
 
@@ -114,12 +116,19 @@ export function useMachineUse() {
     });
 }
 
-export function useMachineTypes(page: number, limit: number) {
+export function useMachineTypes({pageIndex, pageSize}: PaginationState) {
     return useQuery({
-        queryKey: ["machine", "type", limit, page],
-        queryFn: async () => await fetchMachineTypes((page-1)*limit, limit),
+        queryKey: ["machine", "type", pageSize, pageIndex],
+        queryFn: async () => await fetchMachineTypes(pageIndex*pageSize, pageSize),
         placeholderData: keepPreviousData,
         initialData: []
+    })
+}
+
+export function useMachineTypesLength() {
+    return useQuery({
+        queryKey: ["machine", "type"],
+        queryFn: async () => (await fetchMachineTypes()).length,
     })
 }
 
@@ -173,13 +182,37 @@ export function useMachineTypeDelete() {
     });
 }
 
-export function useMachineGroups(page: number, limit: number) {
+export function useMachineGroups({pageIndex, pageSize}: PaginationState) {
     return useQuery({
-        queryKey: ['machine', 'group', limit, page],
-        queryFn: () => fetchMachineGroups((page-1)*limit, limit),
+        queryKey: ['machine', 'group', pageSize, pageIndex],
+        queryFn: async () => {
+            const [groups, machines] = await Promise.all([
+                await fetchMachineGroups(pageIndex*pageSize, pageSize),
+                await fetchMachines()
+            ]);
+            const mappings = machines.reduce((pre, m) => ({
+                ...pre,
+                [m.id]: m.name
+            }), {} as Record<string, string>);
+            return groups.map(g => ({
+                ...g,
+                machines: g.machine_ids.map(id => ({
+                    id,
+                    name: mappings[id]
+                })),
+                machine_names: g.machine_ids.map(id => mappings[id])
+            }));
+        },
         placeholderData: keepPreviousData,
         initialData: []
     });
+}
+
+export function useMachineGroupsLength() {
+    return useQuery({
+        queryKey: ["machine", "group"],
+        queryFn: async () => (await fetchMachineGroups()).length,
+    })
 }
 
 export function useMachineGroupNewEdit() {

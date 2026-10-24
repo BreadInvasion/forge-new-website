@@ -1,6 +1,6 @@
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
-import Table, { DeleteItem, TableHead, ITEMS_PER_PAGE } from '../components/Table';
-import { Machine, MachineGroup, MachineType } from 'src/interfaces/machines';
+import React, { ReactNode, useMemo, useState } from 'react';
+import Table, { TableHead, features } from '../components/Table';
+import { Machine, MachineGroup } from 'src/interfaces/machines';
 
 import '../styles/TabStyles.scss';
 
@@ -10,6 +10,7 @@ import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
 import { useMachineGroupDelete, useMachineGroupNewEdit, useMachineGroups, useMachines } from 'src/hooks/useMachines';
 import { OmniAPI } from 'src/apis/OmniAPI';
+import { createColumnHelper } from '@tanstack/react-table';
 
 interface aemenuprops {
     isDialogOpen: boolean;
@@ -45,7 +46,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
         setMachineGroup(mach);
         if (mach != null) {
             setName(mach.name);
-            setMachineIds(mach.machines.map(m => m.id));
+            setMachineIds(mach.machine_ids);
             setIsDialogOpen(state);
         } else {
             setName("");
@@ -79,7 +80,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
             return;
         }
 
-        aeMutation.mutate({name, machineIds}, {onSuccess: () => setOpenExtra(false, null)});
+        aeMutation.mutate({id: machineGroup.id, name, machineIds}, {onSuccess: () => setOpenExtra(false, null)});
     }
 
     if (!canSeeTables || (!canCreate && !canEdit)) return [null, setOpenExtra];
@@ -128,6 +129,16 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineG
     ), setOpenExtra];
 };
 
+const columnHelper = createColumnHelper<typeof features, MachineGroup>();
+const columns = columnHelper.columns([
+    columnHelper.accessor('name', {
+        header: 'Name'
+    }),
+    columnHelper.accessor(row => row.machine_names.join(', '), {
+        header: 'Machines'
+    })
+])
+
 const MachineGroups: React.FC = () => {
     const { hasPermission } = useAuth();
     const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINE_GROUPS);
@@ -139,29 +150,13 @@ const MachineGroups: React.FC = () => {
         [m.id]: m.name
     }), {} as Record<string, string>), [machines]);
 
-    const [page, setPage] = useState(1);
-    const {data} = useMachineGroups(page, ITEMS_PER_PAGE);
-    const groups = useMemo(() => data.map(g => ({
-        id: g.id,
-        name: g.name,
-        machines: g.machine_ids.map(id => ({
-            id,
-            name: mappings[id]
-        }))
-    })), [data, mappings]);
-    const columns: (keyof MachineGroup)[] = useMemo(() => {
-        if (groups.length === 0) return [];
-        return (Object.keys(groups[0]) as (keyof MachineGroup)[])
-            .filter((key) => key !== 'id');
-    }, [groups]);
-
     const deleteMutation = useMachineGroupDelete();
-    const onDelete = (index_local: number) => {
+    const onDelete = (id: string) => {
         if (!canDelete) {
             alert("You do not have the permissions to delete machine groups");
             return;
         }
-        deleteMutation.mutate(groups[index_local]);
+        deleteMutation.mutate(id);
     };
 
     let [machineGroup, setMachineGroup] = useState<MachineGroup | null>(null);
@@ -176,16 +171,12 @@ const MachineGroups: React.FC = () => {
                 aemenu={ae}
             />
             <Table<MachineGroup>
-                key={`mg-${page}-${data.length}`}
                 columns={columns}
-                data={data}
+                queryFn={useMachineGroups}
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit={canEdit}
                 canDelete={canDelete}
-                currentPage={page}
-                onPageChange={setPage}
-                resourceType="machinegroups"
             />
         </div>
     );

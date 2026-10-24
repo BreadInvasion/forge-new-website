@@ -1,5 +1,5 @@
-import React, { ReactNode, useMemo, useState } from 'react';
-import Table, { DeleteItem, ITEMS_PER_PAGE } from '../components/Table';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import Table, { features, ITEMS_PER_PAGE } from '../components/Table';
 import { TableHead } from '../components/Table';
 
 import '../styles/TabStyles.scss';
@@ -9,8 +9,9 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
 import { useResourceSlots } from 'src/hooks/useResources';
-import { useMachineTypeDelete, useMachineTypeNewEdit, useMachineTypes } from 'src/hooks/useMachines';
+import { useMachineTypeDelete, useMachineTypeNewEdit, useMachineTypes, useMachineTypesLength } from 'src/hooks/useMachines';
 import { MachineType } from 'src/interfaces/machines';
+import { createColumnHelper, PaginationState } from '@tanstack/react-table';
 
 interface aemenuprops {
     isDialogOpen: boolean;
@@ -92,7 +93,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
         }
 
         aeMutation.mutate({
-            id: machineType.i,
+            id: machineType.id,
             name,
             slots: resourceSlots
                 .filter(r => resourceSlotIDS.includes(r.id))
@@ -151,27 +152,41 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
     ), setOpenExtra];
 };
 
+const columnHelper = createColumnHelper<typeof features, MachineType>();
+const columns = columnHelper.columns([
+    columnHelper.accessor('name', {
+        header: 'Name'
+    }),
+    columnHelper.accessor('num_machines', {
+        header: 'Num Machines'
+    }),
+    columnHelper.accessor((type) => type.resource_slot_names.join(', '), {
+        header: 'Resource Slot Names'
+    }),
+    columnHelper.accessor((type) => type.resource_names.join(', '), {
+        header: 'Resource Names'
+    }),
+    columnHelper.accessor('cost_per_hour', {
+        header: 'Cost per Hour'
+    }),
+
+]);
+
 const MachineTypes: React.FC = () => {
     const { hasPermission } = useAuth();
     const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINE_TYPES);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_TYPES);
 
-    const [page, setPage] = React.useState<number>(1);
-    const {data: types} = useMachineTypes(page, ITEMS_PER_PAGE);
-    const columns: (keyof MachineType)[] = useMemo(() => {
-        if (types.length === 0) return [];
-        return (Object.keys(types[0]) as (keyof MachineType)[])
-            .filter((key) => !key.includes('_id') && key !== 'id' )
-    }, [types]);
+    const {data: rowCount} = useMachineTypesLength();
 
     const deleteMutation = useMachineTypeDelete();
-    const onDelete = (index_local: number) => {
+    const onDelete = (id: string) => {
         if (!canDelete) {
             alert("You do not have the permissions to delete machine types");
             return;
         }
 
-        deleteMutation.mutate(types[index_local].id);
+        deleteMutation.mutate(id);
     };
 
     const [machineType, setMachineType] = useState<MachineType | null>(null);
@@ -187,14 +202,13 @@ const MachineTypes: React.FC = () => {
             />
             <Table<MachineType>
                 columns={columns}
-                data={types}
+                queryFn={useMachineTypes}
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit={canEdit}
                 canDelete={canDelete}
-                currentPage={page}
-                onPageChange={setPage}
-                resourceType={"machinetypes"}
+                // setPagination={setPagination}
+                rowCount={rowCount}
             />
         </div>
     );

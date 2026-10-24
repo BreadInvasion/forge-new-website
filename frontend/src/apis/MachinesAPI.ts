@@ -64,7 +64,7 @@ export async function useMachine({machineId, data}: UseMachineArgs) {
     return await API.post(`/use/${machineId}`, data);
 }
 
-export async function fetchMachineTypes(offset: number, limit: number) {
+export async function fetchMachineTypes(offset?: number, limit?: number) {
     return await API.get('/machinetypes', {offset, limit}) as MachineType[];
 }
 
@@ -80,8 +80,8 @@ export async function deleteMachineType(id: string) {
     return await API.delete(`/machinetypes/${id}`);
 }
 
-export async function fetchMachineGroups(offset: number, limit: number) {
-    return await API.get(`/machinegroups`, {offset, limit});
+export async function fetchMachineGroups(offset?: number, limit?: number) {
+    return await API.get(`/machinegroups`, {offset, limit}) as MachineGroup[];
 }
 
 export async function newEditMachineGroup({id, name, machineIds} : {id?: string, name: string, machineIds: string[]}) {
