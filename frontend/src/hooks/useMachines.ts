@@ -15,7 +15,7 @@ export function useMachines(pagination?: PaginationState) {
 
 export function useMachinesCount() {
     return useQuery({
-        queryKey: ['machine', 'length'],
+        queryKey: ['machine', 'count'],
         queryFn: async () => (await fetchMachines()).length,
     });
 }
@@ -185,7 +185,7 @@ export function useMachineTypes(pagination?: PaginationState) {
 
 export function useMachineTypesCount() {
     return useQuery({
-        queryKey: ['machine', 'type', 'length'],
+        queryKey: ['machine', 'type', 'count'],
         queryFn: async () => (await fetchMachineTypes()).length,
     })
 }
@@ -268,7 +268,7 @@ export function useMachineGroups(pagination?: PaginationState) {
 
 export function useMachineGroupsCount() {
     return useQuery({
-        queryKey: ['machine', 'group', 'length'],
+        queryKey: ['machine', 'group', 'count'],
         queryFn: async () => (await fetchMachineGroups()).length,
     })
 }
