@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
-import Table, { features, ITEMS_PER_PAGE } from '../components/Table';
+import Table, { DEFAULT_PAGINATION, features } from '../components/Table';
 import { TableHead } from '../components/Table';
 
 import '../styles/TabStyles.scss';
@@ -12,6 +12,7 @@ import { useResourceSlots } from 'src/hooks/useResources';
 import { useMachineTypeDelete, useMachineTypeNewEdit, useMachineTypes, useMachineTypesLength } from 'src/hooks/useMachines';
 import { MachineType } from 'src/interfaces/machines';
 import { createColumnHelper, PaginationState } from '@tanstack/react-table';
+import { formatCost } from 'src/utils/money';
 
 interface aemenuprops {
     isDialogOpen: boolean;
@@ -32,7 +33,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
     const {data: resourceSlots} = useResourceSlots();
 
     const [resourceSlotIDS, setResourceSlotIDS] = useState<string[]>([]);
-    const [cost, setCost] = useState<number>(0.0);
+    const [cost, setCost] = useState<string>('0.0');
 
     const aeMutation = useMachineTypeNewEdit();
 
@@ -57,7 +58,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
         } else {
             setName("");
             setResourceSlotIDS([]);
-            setCost(0);
+            setCost('0.0');
         }
         if (isDialogOpen != state) setIsDialogOpen(state);
     };
@@ -139,7 +140,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, mach: MachineT
                                 ))}
 
                                 <label className="Label" htmlFor="cost">Cost</label>
-                                <input className="Input" placeholder={cost + ""} id="cost" type="number" value={cost} min={0} pattern="[0-9]*" onChange={e => setCost(Math.max(0, e.target.valueAsNumber))} />
+                                <input className="Input" placeholder={cost + ""} id="cost" type="number" value={cost} min={0} pattern="[0-9]*" onChange={e => setCost(e.target.valueAsNumber < 0.0 ? '0.0' : e.target.value)} />
                             </fieldset>
                             <Dialog.Close asChild>
                                 <button className="Button SaveBtn" onClick={machineType == null ? create : edit}>Save</button>
@@ -160,14 +161,17 @@ const columns = columnHelper.columns([
     columnHelper.accessor('num_machines', {
         header: 'Num Machines'
     }),
-    columnHelper.accessor((type) => type.resource_slot_names.join(', '), {
-        header: 'Resource Slot Names'
+    columnHelper.accessor('resource_slot_names', {
+        header: 'Resource Slot Names',
+        cell: info => info.getValue().join(', ')
     }),
-    columnHelper.accessor((type) => type.resource_names.join(', '), {
-        header: 'Resource Names'
+    columnHelper.accessor('resource_names', {
+        header: 'Resource Names',
+        cell: info => info.getValue().join(', ')
     }),
     columnHelper.accessor('cost_per_hour', {
-        header: 'Cost per Hour'
+        header: 'Cost per Hour',
+        cell: info => formatCost(info.getValue())
     }),
 
 ]);
@@ -177,6 +181,8 @@ const MachineTypes: React.FC = () => {
     const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINE_TYPES);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_TYPES);
 
+    const [page, setPage] = useState<PaginationState>(DEFAULT_PAGINATION);
+    const {data} = useMachineTypes(page);
     const {data: rowCount} = useMachineTypesLength();
 
     const deleteMutation = useMachineTypeDelete();
@@ -202,13 +208,14 @@ const MachineTypes: React.FC = () => {
             />
             <Table<MachineType>
                 columns={columns}
-                queryFn={useMachineTypes}
+                data={data}
+                pagination={page}
+                onPaginationChange={setPage}
+                rowCount={rowCount}
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit={canEdit}
                 canDelete={canDelete}
-                // setPagination={setPagination}
-                rowCount={rowCount}
             />
         </div>
     );

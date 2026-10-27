@@ -21,7 +21,7 @@ export interface MachineType {
     resource_names: string[];
     resource_slot_ids: string[];
     resource_slot_names: string[];
-    cost_per_hour: number;
+    cost_per_hour: string;
 };
 
 export interface MachineGroup {

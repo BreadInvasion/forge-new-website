@@ -17,15 +17,21 @@ export const features = tableFeatures({
 
 interface TableProps<T extends TData> {
     columns: readonly ColumnDef<typeof features, T>[];
-    queryFn: (pagination: PaginationState) => UseQueryResult<T[], Error>;
+    data: T[];
+    pagination?: PaginationState;
     rowCount?: number;
     canEdit?: boolean;
     canDelete?: boolean;
     onEdit?: (activeItem: T) => void;
     onDelete?: (id: string) => void;
+    onPaginationChange?: OnChangeFn<PaginationState>;
 }
 
 export const ITEMS_PER_PAGE = 10;
+export const DEFAULT_PAGINATION: PaginationState = {
+    pageIndex: 0,
+    pageSize: ITEMS_PER_PAGE
+}
 
 interface TableHeadProps<T extends TData> {
     heading: string; 
@@ -46,26 +52,19 @@ export function TableHead<T extends TData>(props: TableHeadProps<T>) {
 }
 
 function Table<T extends TData>(props: TableProps<T>) {
-    const { columns, queryFn, rowCount, onDelete, onEdit, canEdit, canDelete } = props;
-
-    const [pagination, setPagination] = useState<PaginationState>({
-        pageIndex: 0, // initial page index
-        pageSize: ITEMS_PER_PAGE, // default page size
-    });
-    const {data: raw} = queryFn(pagination);
-    const data = raw ?? [];
-    console.debug(data);
+    const { columns, data, pagination, onPaginationChange, rowCount, onDelete, onEdit, canEdit, canDelete } = props;
 
     const hasDelete = !!(canDelete && onDelete);
     const hasEdit = !!(canEdit && onEdit);
     const hasEditOrDelete = hasEdit || hasDelete;
+    const hasPagination = !!(pagination && onPaginationChange && rowCount);
 
     const table = useTable({
         features,
         columns,
         data,
-        state: {pagination},
-        onPaginationChange: setPagination,
+        state: hasPagination ? {pagination} : undefined,
+        onPaginationChange,
         rowCount,
         autoResetAll: false
     });
@@ -128,7 +127,7 @@ function Table<T extends TData>(props: TableProps<T>) {
                     </button>
 
                     <button className="active" aria-current="page">
-                        {pagination.pageIndex+1}
+                        {hasPagination ? pagination.pageIndex+1 : 1}
                     </button>
 
                     <button onClick={table.nextPage} disabled={!table.getCanNextPage()} aria-label="Next page" >

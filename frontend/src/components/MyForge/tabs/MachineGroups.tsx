@@ -1,5 +1,5 @@
-import React, { ReactNode, useMemo, useState } from 'react';
-import Table, { TableHead, features } from '../components/Table';
+import React, { ReactNode, useState } from 'react';
+import Table, { DEFAULT_PAGINATION, TableHead, features } from '../components/Table';
 import { Machine, MachineGroup } from 'src/interfaces/machines';
 
 import '../styles/TabStyles.scss';
@@ -9,7 +9,7 @@ import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
 import { useMachineGroupDelete, useMachineGroupNewEdit, useMachineGroups, useMachineGroupsLength, useMachines } from 'src/hooks/useMachines';
-import { createColumnHelper } from '@tanstack/react-table';
+import { createColumnHelper, PaginationState } from '@tanstack/react-table';
 
 interface aemenuprops {
     isDialogOpen: boolean;
@@ -143,6 +143,8 @@ const MachineGroups: React.FC = () => {
     const canDelete = hasPermission(UserPermission.CAN_DELETE_MACHINE_GROUPS);
     const canEdit = hasPermission(UserPermission.CAN_EDIT_MACHINE_GROUPS);
 
+    const [page, setPage] = useState<PaginationState>(DEFAULT_PAGINATION);
+    const {data} = useMachineGroups(page);
     const {data: rowCount} = useMachineGroupsLength();
 
     const deleteMutation = useMachineGroupDelete();
@@ -167,12 +169,14 @@ const MachineGroups: React.FC = () => {
             />
             <Table<MachineGroup>
                 columns={columns}
-                queryFn={useMachineGroups}
+                data={data}
+                pagination={page}
+                onPaginationChange={setPage}
+                rowCount={rowCount}
                 onDelete={onDelete}
                 onEdit={(e) => setOpen(true, e)}
                 canEdit={canEdit}
                 canDelete={canDelete}
-                rowCount={rowCount}
             />
         </div>
     );

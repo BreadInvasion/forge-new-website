@@ -92,7 +92,7 @@ export async function newEditMachineType({id, name, slots, cost} : {
     id?: string,
     name: string,
     slots: string[],
-    cost: number
+    cost: string
 }) {
     return await API.post(`/machinetypes/${id ? id : 'new'}`, {
         name,
