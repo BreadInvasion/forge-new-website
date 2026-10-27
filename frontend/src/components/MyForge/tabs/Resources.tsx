@@ -29,8 +29,6 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource 
     const canSeeTables = hasPermission(UserPermission.CAN_SEE_TABLES);
 
     const [name, setName] = useState("");
-    const [brand, setBrand] = useState("");
-    const [color, setColor] = useState("");
     const [units, setUnits] = useState("");
     const [cost, setCost] = useState(0);
 
@@ -39,15 +37,11 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource 
             if (res != null) {
                 console.log("resource not null");
                 setName(res.name);
-                setBrand(res.brand?res.brand:"");
-                setColor(res.color?res.color:"");
                 setUnits(res.units?res.units:"");
                 setCost(res.cost?res.cost:0);
             } else {
                 console.log("resource is null");
                 setName("");
-                setBrand("");
-                setColor("");
                 setUnits("");
                 setCost(0);
             }
@@ -59,11 +53,11 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource 
             alert("You do not have the permissions to create resources");
             return;
         }
-        if (name == "" || brand == "" || color == "" || units == "") {
+        if (name == "" || units == "") {
             alert("All fields must be populated!");
             return;
         }
-        OmniAPI.create("resources", {name: name, brand: brand, color: color, units: units, cost: cost})
+        OmniAPI.create("resources", {name: name, units: units, cost: cost})
         .then( () => {
             refresh();
             setOpenExtra(false, null);
@@ -76,7 +70,7 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource 
             return;
         }
         if (resource == null) {return}
-        OmniAPI.edit("resources", resource.id, {name: name, brand: brand, color: color, units: units, cost: cost})
+        OmniAPI.edit("resources", resource.id, {name: name, units: units, cost: cost})
         .then( () => {
             refresh();
             setOpenExtra(false, null);
@@ -104,12 +98,6 @@ const aemenu = (props: aemenuprops): [ReactNode, (state: boolean, res: Resource 
                             <fieldset className="Fieldset">
                                 <label className="Label" htmlFor="name">Name</label>
                                 <input className="Input" id="name" value={name} onChange={e => setName(e.target.value)} maxLength={100}/>
-
-                                <label className="Label" htmlFor="brand">Brand</label>
-                                <input className="Input" id="brand" value={brand} onChange={e => setBrand(e.target.value)} maxLength={100}/>
-
-                                <label className="Label" htmlFor="color">Color</label>
-                                <input className="Input" id="color" value={color} onChange={e => setColor(e.target.value)} maxLength={100}/>
 
                                 <label className="Label" htmlFor="units">Units</label>
                                 <input className="Input" id="units" value={units} onChange={e => setUnits(e.target.value)} maxLength={16}/>

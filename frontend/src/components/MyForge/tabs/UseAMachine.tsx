@@ -50,8 +50,6 @@ export const DynamicMachineForm: React.FC = () => {
     const [slotValues, setSlotValues] = useState<ResourceSlotElement[]>([{
         slot_id: "_",
         name: "_",
-        brand: "_",
-        color: "_",
         amount: 0,
         own: false,
         cost: 0,
@@ -115,8 +113,6 @@ export const DynamicMachineForm: React.FC = () => {
         const initialValues: ResourceSlotElement[] = schema.resource_slots.map((slot: ResourceSlotSchema) => ({
             slot_id: slot.resource_slot_id,
             name: "_",
-            brand: "_",
-            color: "_",
             amount: 0,
             own: false,
             cost: 0,
@@ -404,8 +400,6 @@ interface ResourceSlotElement {
     slot_id: string;
     resource_id?: string;
     name: string;
-    brand?: string;
-    color?: string;
     amount: number;
     own?: boolean;
     cost: number;
@@ -430,9 +424,6 @@ const ResourceUsageForm: React.FC<ResourceUsageFormProps> = ({ slots, initialVal
         setSlotValues(newSlotValues);
     }
 
-    const showBrand = false; //slots.find((slot) => slot.valid_resources.find((resource) => resource.brand)) ? true : false;
-    const showColor = false; //slots.find((slot) => slot.valid_resources.find((resource) => resource.color) ? true : false);
-
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <div className="resource-usage-form">
@@ -442,8 +433,6 @@ const ResourceUsageForm: React.FC<ResourceUsageFormProps> = ({ slots, initialVal
                         <tr>
                             <th>Slot Name</th>
                             <th>Material</th>
-                            {showBrand && <th>Brand</th>}
-                            {showColor && <th>Color</th>}
                             <th className="amount">Amount</th>
                             <th className="own-material">Personal Material</th>
                             <th>Cost</th>
@@ -456,8 +445,6 @@ const ResourceUsageForm: React.FC<ResourceUsageFormProps> = ({ slots, initialVal
                                 slot={slot}
                                 slotValue={initialValues[index]}
                                 setSlotValue={setSlots}
-                                showBrand={showBrand}
-                                showColor={showColor}
                             />
                         ))}
                     </tbody>
@@ -472,17 +459,13 @@ interface ResourceSlotProps {
     slot: ResourceSlotSchema;
     slotValue: ResourceSlotElement;
     setSlotValue: (slotValue: ResourceSlotElement) => void;
-    showBrand?: boolean;
-    showColor?: boolean;
 }
 
 
-const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotValue, showBrand, showColor }) => {
+const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotValue}) => {
     const [selectedDetails, setSelectedDetails] = useState<ResourceSlotElement>({
         slot_id: slot.resource_slot_id,
         name: "_",
-        brand: "_",
-        color: "_",
         amount: 0,
         own: false,
         cost: 0,
@@ -495,24 +478,10 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
     // Get unique materials (always available)
     const materialOptions = useMemo(() => [...new Set(validResources.map(resource => resource.name))], [validResources]);
 
-    // Get brands based on selected material
-    const brandOptions = useMemo(() => [...new Set(validResources
-        .filter(resource => resource.name === selectedDetails.name || selectedDetails.name === "_")
-        .map(resource => resource.brand))],
-        [validResources, selectedDetails.name]);
-
-    // Get colors based on selected material and brand
-    const colorOptions = useMemo(() => [...new Set(validResources
-        .filter(resource => resource.name === selectedDetails.name && resource.brand === selectedDetails.brand || selectedDetails.name === "_")
-        .map(resource => resource.color))],
-        [validResources, selectedDetails.name, selectedDetails.brand]);
-
     // Find the best matching resource
-    const matchingResource = (name: string, brand: string, color: string) => {
+    const matchingResource = (name: string) => {
         return validResources.find(resource =>
-            resource.name === name &&
-            (brand === "_" || resource.brand === brand) &&
-            (color === "_" || resource.color === color)
+            resource.name === name
         ) ?? null;
     };
 
@@ -523,28 +492,8 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
         setSelectedDetails(prev => {
             let updatedDetails = { ...prev, [name]: newValue };
 
-            // Get valid brands for the selected material
-            const validBrands = validResources
-                .filter(resource => resource.name === updatedDetails.name)
-                .map(resource => resource.brand);
-
-            // Get valid colors for the selected material & brand
-            const validColors = validResources
-                .filter(resource => resource.name === updatedDetails.name && resource.brand === updatedDetails.brand)
-                .map(resource => resource.color);
-
-            // If material changes, check if brand is still valid
-            if (name === "name" && !validBrands.includes(updatedDetails.brand)) {
-                updatedDetails.brand = "_"; // Reset brand if it's not a valid option anymore
-            }
-
-            // If brand changes, check if color is still valid
-            if ((name === "name" || name === "brand") && !validColors.includes(updatedDetails.color)) {
-                updatedDetails.color = "_"; // Reset color if it's not a valid option anymore
-            }
-
             // Find best resource with the selected options
-            const resource = matchingResource(updatedDetails.name, updatedDetails.brand || "_", updatedDetails.color || "_");
+            const resource = matchingResource(updatedDetails.name);
             const unitCost = parseFloat(resource?.cost ?? "0");
             updatedDetails.cost = updatedDetails.own ? 0 : (updatedDetails.amount * unitCost);
 
@@ -554,17 +503,13 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
 
     useEffect(() => {
         const matchedResource = validResources.find(resource =>
-            resource.name === selectedDetails.name &&
-            (resource.brand === selectedDetails.brand || selectedDetails.brand === "_") &&
-            (resource.color === selectedDetails.color || selectedDetails.color === "_")
+            resource.name === selectedDetails.name
         );
 
         setSlotValue({
             slot_id: selectedDetails.slot_id,
             resource_id: matchedResource?.id,
             name: selectedDetails.name,
-            brand: selectedDetails.brand,
-            color: selectedDetails.color,
             amount: Number.isNaN(selectedDetails.amount) ? 0 : selectedDetails.amount,
             own: selectedDetails.own,
             cost: cost,
@@ -592,40 +537,6 @@ const ResourceSlot: React.FC<ResourceSlotProps> = ({ slot, slotValue, setSlotVal
                     ))}
                 </select>
             </td>
-
-            {/* Brand Dropdown (Only available if material is selected) */}
-            {showBrand && (
-                <td>
-                    <select
-                        name="brand"
-                        value={selectedDetails.brand}
-                        onChange={handleChange}
-                        disabled={selectedDetails.name === "_"}
-                    >
-                        <option value="_">--Brand--</option>
-                        {brandOptions.map(brand => (
-                            <option key={brand} value={brand}>{brand}</option>
-                        ))}
-                    </select>
-                </td>
-            )}
-
-            {/* Color Dropdown (Only available if brand is selected) */}
-            {showColor && (
-                <td>
-                    <select
-                        name="color"
-                        value={selectedDetails.color}
-                        onChange={handleChange}
-                        disabled={selectedDetails.name === "_" || selectedDetails.brand === "_"}
-                    >
-                        <option value="_">--Color--</option>
-                        {colorOptions.map(color => (
-                            <option key={color} value={color}>{color}</option>
-                        ))}
-                    </select>
-                </td>
-            )}
 
             {/* Amount Input */}
             <td>
