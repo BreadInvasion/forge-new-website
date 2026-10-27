@@ -8,7 +8,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
-import { useMachineGroupDelete, useMachineGroupNewEdit, useMachineGroups, useMachineGroupsLength, useMachines } from 'src/hooks/useMachines';
+import { useMachineGroupDelete, useMachineGroupNewEdit, useMachineGroups, useMachineGroupsCount, useMachines } from 'src/hooks/useMachines';
 import { createColumnHelper, PaginationState } from '@tanstack/react-table';
 
 interface aemenuprops {
@@ -145,7 +145,7 @@ const MachineGroups: React.FC = () => {
 
     const [page, setPage] = useState<PaginationState>(DEFAULT_PAGINATION);
     const {data} = useMachineGroups(page);
-    const {data: rowCount} = useMachineGroupsLength();
+    const {data: rowCount} = useMachineGroupsCount();
 
     const deleteMutation = useMachineGroupDelete();
     const onDelete = (id: string) => {

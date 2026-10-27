@@ -13,7 +13,7 @@ export function useMachines(pagination?: PaginationState) {
     });
 }
 
-export function useMachinesLength() {
+export function useMachinesCount() {
     return useQuery({
         queryKey: ['machine', 'length'],
         queryFn: async () => (await fetchMachines()).length,
@@ -183,7 +183,7 @@ export function useMachineTypes(pagination?: PaginationState) {
     })
 }
 
-export function useMachineTypesLength() {
+export function useMachineTypesCount() {
     return useQuery({
         queryKey: ['machine', 'type', 'length'],
         queryFn: async () => (await fetchMachineTypes()).length,
@@ -266,7 +266,7 @@ export function useMachineGroups(pagination?: PaginationState) {
     });
 }
 
-export function useMachineGroupsLength() {
+export function useMachineGroupsCount() {
     return useQuery({
         queryKey: ['machine', 'group', 'length'],
         queryFn: async () => (await fetchMachineGroups()).length,

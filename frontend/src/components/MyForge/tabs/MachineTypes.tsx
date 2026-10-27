@@ -9,7 +9,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { UserPermission } from 'src/enums';
 import useAuth from '../../Auth/useAuth';
 import { useResourceSlots } from 'src/hooks/useResources';
-import { useMachineTypeDelete, useMachineTypeNewEdit, useMachineTypes, useMachineTypesLength } from 'src/hooks/useMachines';
+import { useMachineTypeDelete, useMachineTypeNewEdit, useMachineTypes, useMachineTypesCount } from 'src/hooks/useMachines';
 import { MachineType } from 'src/interfaces/machines';
 import { createColumnHelper, PaginationState } from '@tanstack/react-table';
 import { formatCost } from 'src/utils/money';
@@ -183,7 +183,7 @@ const MachineTypes: React.FC = () => {
 
     const [page, setPage] = useState<PaginationState>(DEFAULT_PAGINATION);
     const {data} = useMachineTypes(page);
-    const {data: rowCount} = useMachineTypesLength();
+    const {data: rowCount} = useMachineTypesCount();
 
     const deleteMutation = useMachineTypeDelete();
     const onDelete = (id: string) => {
