@@ -37,8 +37,6 @@ async def create_resource(
     existing_resource = await session.scalar(
         select(Resource).where(
             and_(
-                Resource.brand == request.brand,
-                Resource.color == request.color,
                 Resource.name == request.name,
                 Resource.units == request.units,
             )
@@ -47,11 +45,11 @@ async def create_resource(
     if existing_resource:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="A resource with that brand, color, name, units combination already exists",
+            detail="A resource with that name, units combination already exists",
         )
 
     new_resource = Resource(
-        name=request.name, color=request.color, brand=request.brand, units=request.units, cost=request.cost
+        name=request.name, units=request.units, cost=request.cost
     )
     session.add(new_resource)
     await session.commit()
@@ -114,21 +112,19 @@ async def get_all_resources(
     ],
     limit: int = 20,
     offset: int = 0,
-    order_by: Literal["name", "brand", "color", "units", "cost"] = "brand",
+    order_by: Literal["name", "units", "cost"] = "name",
     descending: bool = False,
 ):
     "Fetch all resources."
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
         "name": Resource.name,
-        "brand": Resource.brand,
-        "color": Resource.color,
         "units": Resource.units,
         "cost": Resource.cost,
     }
     order_determinant = attr_key_map[order_by]
-    order_secondary = Resource.name if order_by != "name" else Resource.brand
-    order_tertiary = Resource.color if order_by != "color" else Resource.brand
+    order_secondary = Resource.cost if order_by != "cost" else Resource.name
+    order_tertiary = Resource.units if order_by != "units" else Resource.name
     if descending:
         order_determinant = order_determinant.desc()
         order_secondary = order_secondary.desc()
@@ -166,15 +162,11 @@ async def edit_resource(
 
     differences = {
         "name": request.name if resource.name != request.name else None,
-        "brand": request.brand if resource.brand != request.brand else None,
-        "color": request.color if resource.color != request.color else None,
         "units": request.units if resource.units != request.units else None,
         "cost": request.cost if resource.cost != request.cost else None,
     }
 
     resource.name = request.name
-    resource.brand = request.brand
-    resource.color = request.color
     resource.units = request.units
     resource.cost = request.cost
 

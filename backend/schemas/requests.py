@@ -132,8 +132,6 @@ class MachineFailRequest(BaseRequest):
 
 class ResourceCreateRequest(BaseRequest):
     name: str
-    brand: Optional[str]
-    color: Optional[str]
     units: str
     cost: Decimal = Field(max_digits=10, decimal_places=5)
 
@@ -144,8 +142,6 @@ class ResourceGetRequest(BaseRequest):
 
 class ResourceEditRequest(BaseRequest):
     name: str
-    brand: Optional[str]
-    color: Optional[str]
     units: str
     cost: Decimal = Field(max_digits=10, decimal_places=5)
 
