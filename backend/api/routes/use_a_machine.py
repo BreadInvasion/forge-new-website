@@ -32,7 +32,7 @@ async def get_usage_schema(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_USE_MACHINES}))
     ],
-):
+) -> MachineUsageSchema:
     """Retrieve the relevant information for using the machine with the provided ID."""
 
     machine = await session.scalar(
@@ -88,7 +88,7 @@ async def use_a_machine(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_USE_MACHINES}))
     ],
-):
+) -> None:
     """Log a machine usage for the provided machine ID."""
 
     machine = await session.scalar(

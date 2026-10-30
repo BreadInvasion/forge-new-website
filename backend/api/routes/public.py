@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from typing import List
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -20,7 +21,7 @@ router = APIRouter()
 @router.get("/machinestatus")
 async def get_machines_status(
     session: DBSession,
-):
+) -> AllMachinesStatusResponse:
     "Fetch all machines."
 
     machines = (

@@ -1,6 +1,6 @@
 """ Machine Usage endpoints. """
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, List
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.orm import InstrumentedAttribute, selectinload
@@ -28,7 +28,7 @@ async def get_my_usages(
         "name",
     ] = "time_started",
     descending: bool = False,
-):
+) -> List[UsageResponse]:
     """Fetch machine usage records for current user."""
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
@@ -72,7 +72,7 @@ async def get_my_usages(
     current_user: Annotated[
         User, Depends(PermittedUserChecker(set()))
     ],
-):
+) -> List[UsageResponse]:
     """Fetch current machine usages for current user."""
 
     machine_usages = (

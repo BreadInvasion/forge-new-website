@@ -1,6 +1,6 @@
 """ Resource Slot endpoints. """
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import and_, select
@@ -33,7 +33,7 @@ async def create_resource_slot(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_CREATE_RESOURCE_SLOTS}))
     ],
-):
+) -> CreateResponse:
     "Create a new resource slot with the provided configuration."
 
     existing_resource_slot = await session.scalar(
@@ -88,7 +88,7 @@ async def get_resource_slot(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_RESOURCE_SLOTS}))
     ],
-):
+) -> ResourceSlotDetails:
     "Fetch the resource slot with the provided ID."
 
     resource_slot = await session.scalar(
@@ -138,7 +138,7 @@ async def get_all_resource_slots(
         "allow_empty",
     ] = "db_name",
     descending: bool = False,
-):
+) -> List[ResourceSlotInfo]:
     "Fetch all resource slots."
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
@@ -183,7 +183,7 @@ async def edit_resource_slot(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_EDIT_RESOURCE_SLOTS}))
     ],
-):
+) -> None:
     """Update the resource slot with the provided ID."""
 
     resource_slot = await session.scalar(
@@ -255,7 +255,7 @@ async def delete_resource_slot(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_RESOURCE_SLOTS}))
     ],
-):
+) -> None:
     "Delete the resource slot with the provided ID."
 
     resource_slot = await session.scalar(

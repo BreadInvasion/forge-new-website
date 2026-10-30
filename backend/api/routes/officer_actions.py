@@ -1,6 +1,6 @@
 from decimal import Decimal
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import UUID4
 from sqlalchemy import and_, select, func
@@ -26,7 +26,7 @@ async def advance_semester(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_CHANGE_SEMESTER}))
     ],
-):
+) -> CreateResponse:
     """Move to the next semester chronologically, creating it if it doesn't already exist."""
 
     state = await session.scalar(
@@ -83,7 +83,7 @@ async def set_semester(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_CHANGE_SEMESTER}))
     ],
-):
+) -> None:
     """Make the semester with the provided semester_id the active semester."""
 
     state = await session.scalar(select(State))
@@ -121,7 +121,7 @@ async def get_charge_sheet(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_GET_CHARGES}))
     ],
-):
+) -> List[UserChargeResponse]:
     """Create and return the charge sheet for the provided semester."""
 
     semester = await session.scalar(

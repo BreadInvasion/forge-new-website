@@ -30,7 +30,7 @@ async def create_token(
     session: DBSession,
     tokenType: TokenType,
     current_user: User
-):
+) -> VerificationTokenResponse:
 
     token = secrets.token_urlsafe(32)
     token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
@@ -111,7 +111,7 @@ async def check_token(
     token: str, 
     current_user: User,
     return_token: bool = False
-):
+) -> VerificationTokenResponse:
     token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
 
     auth_token = await session.scalar(
@@ -145,7 +145,7 @@ async def verify_email_token(
     token: str, 
     session: DBSession,
     current_user: Annotated[User, Depends(PermittedUserChecker(set()))],
-):
+) -> VerificationTokenResponse:
     """Verify an account with an email verification token."""
 
     response, auth_token = await check_token(session, TokenType.EMAIL_VERIFICATION, token, current_user, True)
@@ -178,7 +178,7 @@ async def reset_password(
     token: str,
     session: DBSession,
     request: ResetPasswordRequest,
-):
+) -> VerificationTokenResponse:
     """Reset a user's password with a valid password reset token."""
 
     response, auth_token = await check_token(session, TokenType.PASSWORD_RESET, token, None, True)
@@ -201,7 +201,7 @@ async def get_email_verification(
     token: str,
     session: DBSession,
     current_user: Annotated[User, Depends(PermittedUserChecker(set()))],
-):
+) -> VerificationTokenResponse:
     """Check whether an email verification token is valid."""
 
     return await check_token(session, TokenType.EMAIL_VERIFICATION, token, current_user)
@@ -211,7 +211,7 @@ async def get_email_verification(
 async def get_password_verification(
     token: str,
     session: DBSession,
-):
+) -> VerificationTokenResponse:
     """Check whether a reset password token is valid."""
 
     return await check_token(session, TokenType.PASSWORD_RESET, token, None)
@@ -222,7 +222,7 @@ async def create_email_token(
     session: DBSession,
     request: VerificationTokenRequest,
     current_user: Annotated[User, Depends(PermittedUserChecker(set()))],
-):
+) -> VerificationTokenResponse:
     """Create and send an email verification token to the user's RPI email."""
 
     if (request.token_type != TokenType.EMAIL_VERIFICATION):
@@ -235,7 +235,7 @@ async def create_email_token(
 async def create_password_token(
     session: DBSession,
     request: ResetPasswordTokenRequest,
-):
+) -> VerificationTokenResponse:
     """Create and send a password reset token to the user's RPI email."""
 
     current_user = await session.scalar(

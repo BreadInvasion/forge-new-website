@@ -1,6 +1,6 @@
 """ Machine Type endpoints. """
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import and_, func, ScalarSelect, select
@@ -35,7 +35,7 @@ async def create_machine_type(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_CREATE_MACHINE_TYPES}))
     ],
-):
+) -> CreateResponse:
     """Create a new machine type with the provided name and resource slots."""
 
     existing_machine_type = await session.scalar(
@@ -88,7 +88,7 @@ async def get_machine_type(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_MACHINE_TYPES}))
     ],
-):
+) -> MachineTypeDetails:
     """Fetch the machine type with the provided ID."""
 
     machine_type = await session.scalar(
@@ -155,7 +155,7 @@ async def get_all_machine_types(
     offset: int = 0,
     order_by: Literal["name", "num_machines", "slots"] = "name",
     descending: bool = False,
-):
+) -> List[MachineTypeInfo]:
     """Fetch all machine types."""
 
     attr_key_map: dict[str, InstrumentedAttribute | ScalarSelect] = {
@@ -224,7 +224,7 @@ async def edit_machine_type(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_EDIT_MACHINE_TYPES}))
     ],
-):
+) -> None:
     """Update the machine type with the provided ID."""
 
     machine_type = await session.scalar(
@@ -291,7 +291,7 @@ async def delete_machine_type(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_MACHINE_TYPES}))
     ],
-):
+) -> None:
     """Delete the machine type with the provided ID."""
 
     machine_type = await session.scalar(

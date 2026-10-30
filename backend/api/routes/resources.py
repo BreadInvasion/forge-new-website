@@ -1,6 +1,6 @@
 """ Resource endpoints. """
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import and_, select
@@ -31,7 +31,7 @@ async def create_resource(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_CREATE_RESOURCES}))
     ],
-):
+) -> CreateResponse:
     "Create a new resource object with the provided information."
 
     existing_resource = await session.scalar(
@@ -77,7 +77,7 @@ async def get_resource(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_RESOURCES}))
     ],
-):
+) -> ResourceDetails:
     "Fetch the resource with the provided ID."
 
     resource = await session.scalar(select(Resource).where(Resource.id == resource_id))
@@ -116,7 +116,7 @@ async def get_all_resources(
     offset: int = 0,
     order_by: Literal["name", "brand", "color", "units", "cost"] = "brand",
     descending: bool = False,
-):
+) -> List[ResourceInfo]:
     "Fetch all resources."
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
@@ -154,7 +154,7 @@ async def edit_resource(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_EDIT_RESOURCES}))
     ],
-):
+) -> None:
     """Update the resource with the provided ID."""
 
     resource = await session.scalar(select(Resource).where(Resource.id == resource_id))
@@ -198,7 +198,7 @@ async def delete_resource(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_RESOURCES}))
     ],
-):
+) -> None:
     "Delete the resource with the provided ID."
 
     resource = await session.scalar(select(Resource).where(Resource.id == resource_id))
