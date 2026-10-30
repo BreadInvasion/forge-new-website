@@ -55,7 +55,7 @@ async def clear_machine(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_CLEAR_MACHINES}))
     ],
-):
+) -> None:
     """Clears the active usage of the machine with the provided ID."""
 
     machine = await session.scalar(
@@ -96,7 +96,7 @@ async def fail_machine(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_FAIL_MACHINES}))
     ],
-):
+) -> None:
     """Fails the active usage of the machine with the provided ID."""
 
     machine = await session.scalar(

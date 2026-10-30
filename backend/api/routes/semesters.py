@@ -1,6 +1,6 @@
 """ Semester endpoints. """
 
-from typing import Annotated, Literal, Mapping
+from typing import Annotated, Literal, Mapping, List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import Case, and_, case, func, select
@@ -32,7 +32,7 @@ async def create_semester(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_CREATE_SEMESTERS}))
     ],
-):
+) -> CreateResponse:
     """Create a new semester object with the provided information. This will NOT activate the new semester."""
 
     existing_semester = await session.scalar(
@@ -77,7 +77,7 @@ async def get_current_semester(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_SEMESTERS}))
     ],
-):
+) -> SemesterInfo:
     """Fetch current semester."""
 
     state = await session.scalar(select(State))
@@ -105,7 +105,7 @@ async def get_semester(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_SEMESTERS}))
     ],
-):
+) -> SemesterDetails:
     """Fetch the semester with the provided ID."""
 
     semester = await session.scalar(select(Semester).where(Semester.id == semester_id))
@@ -144,7 +144,7 @@ async def get_all_semesters(
     offset: int = 0,
     order_by: Literal["season", "year"] = "year",
     descending: bool = False,
-):
+) -> List[SemesterInfo]:
     """Fetch all semesters."""
 
     attr_key_map: dict[str, InstrumentedAttribute | Case] = {
@@ -183,7 +183,7 @@ async def edit_semester(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_EDIT_SEMESTERS}))
     ],
-):
+) -> None:
     """Update the semester with the provided ID."""
 
     semester = await session.scalar(select(Semester).where(Semester.id == semester_id))
@@ -243,7 +243,7 @@ async def delete_semester(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_SEMESTERS}))
     ],
-):
+) -> None:
     """Delete the semester with the provided ID."""
 
     semester = await session.scalar(select(Semester).where(Semester.id == semester_id))

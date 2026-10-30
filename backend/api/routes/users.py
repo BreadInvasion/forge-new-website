@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Annotated, Literal
+from typing import Annotated, Literal, List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -226,7 +226,7 @@ async def get_all_users(
         "major",
     ] = "RCSID",
     descending: bool = False,
-):
+) -> List[UserNoHash]:
     """Returns a list of all users. Provide query parameters to cap and re-order the output."""
 
     current_semester_id = await session.scalar(select(State.active_semester_id))
@@ -376,7 +376,7 @@ async def get_users_by_role(
     ],
     limit: int = 20,
     offset: int = 0,
-) -> list[UserNoHash]:
+) -> List[UserNoHash]:
     """Get all users that have a given role."""
 
     current_semester_id = await session.scalar(select(State.active_semester_id))
@@ -460,7 +460,7 @@ async def change_user_role(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_CHANGE_USER_ROLES}))
     ],
-):
+) -> None:
     """Assign or unassign a role for a user."""
 
     user = await session.scalar(

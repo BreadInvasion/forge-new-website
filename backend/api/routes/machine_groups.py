@@ -1,6 +1,6 @@
 """ Machine Type endpoints. """
 
-from typing import Annotated
+from typing import Annotated, List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import and_, select
@@ -32,7 +32,7 @@ async def create_machine_group(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_CREATE_MACHINE_GROUPS}))
     ],
-):
+) -> CreateResponse:
     """Create a new machine type with the provided name."""
 
     existing_machine_group = await session.scalar(
@@ -80,7 +80,7 @@ async def get_machine_group(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_MACHINE_GROUPS}))
     ],
-):
+) -> MachineInfoGroupDetails:
     """Fetch the machine group with the provided ID."""
 
     machine_group = await session.scalar(
@@ -122,7 +122,7 @@ async def get_all_machine_groups(
     ],
     limit: int = 20,
     offset: int = 0,
-):
+) -> List[MachineInfoGroup]:
     """Fetch all machine groups."""
 
     machine_groups = (
@@ -153,7 +153,7 @@ async def edit_machine_group(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_EDIT_MACHINE_GROUPS}))
     ],
-):
+) -> None:
     """Update the machine group with the provided ID."""
 
     machine_group = await session.scalar(
@@ -210,7 +210,7 @@ async def delete_machine_group(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_MACHINE_GROUPS}))
     ],
-):
+) -> None:
     """Delete the machine group with the provided ID."""
 
     machine_group = await session.scalar(

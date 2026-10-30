@@ -1,6 +1,6 @@
 """ Role endpoints. """
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, and_
@@ -24,7 +24,7 @@ async def create_role(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_CREATE_ROLES}))
     ],
-):
+) -> CreateResponse:
     """Create a new role with the provided properties."""
 
     existing_role = await session.scalar(
@@ -83,7 +83,7 @@ async def get_role(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_ROLES}))
     ],
-):
+) -> RoleDetails:
     """Fetch the role with the provided ID."""
     
     role = await session.scalar(select(Role).where(Role.id == role_id))
@@ -124,7 +124,7 @@ async def get_all_roles(
         "priority",
     ] = "name",
     descending: bool = False,
-):
+) -> List[RoleInfo]:
     """Fetch all roles."""
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
@@ -162,7 +162,7 @@ async def edit_role(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_EDIT_ROLES}))
     ],
-):
+) -> None:
     """Update the role with the provided ID."""
     
     role = await session.scalar(select(Role).where(Role.id == role_id))
@@ -222,7 +222,7 @@ async def delete_role(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_ROLES}))
     ],
-):
+) -> None:
     """Delete the role with the provided ID."""
 
     role = await session.scalar(

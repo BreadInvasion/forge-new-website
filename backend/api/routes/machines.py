@@ -1,6 +1,6 @@
 """ Machine endpoints. """
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import and_, select
@@ -28,7 +28,7 @@ async def create_machine(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_CREATE_MACHINES}))
     ],
-):
+) -> CreateResponse:
     """Create a new machine with the provided properties."""
 
     existing_machine = await session.scalar(
@@ -84,7 +84,7 @@ async def get_machine(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_SEE_MACHINES}))
     ],
-):
+) -> MachineDetails:
     """Fetch the machine with the provided ID."""
 
     machine = await session.scalar(
@@ -138,7 +138,7 @@ async def get_all_machines(
         "disabled",
     ] = "name",
     descending: bool = False,
-):
+) -> List[MachineInfo]:
     """Fetch all machines."""
 
     attr_key_map: dict[str, InstrumentedAttribute] = {
@@ -182,7 +182,7 @@ async def edit_machine(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_EDIT_MACHINES}))
     ],
-):
+) -> None:
     """Update the machine with the provided ID."""
 
     machine = await session.scalar(select(Machine).where(Machine.id == machine_id))
@@ -256,7 +256,7 @@ async def delete_machine(
     current_user: Annotated[
         User, Depends(PermittedUserChecker({Permissions.CAN_DELETE_MACHINES}))
     ],
-):
+) -> None:
     """Delete the machine with the provided ID."""
 
     machine = await session.scalar(select(Machine).where(Machine.id == machine_id))
